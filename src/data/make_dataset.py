@@ -47,7 +47,7 @@ def make(type_f, source_file, root, output_directory):
                 move = e["move"]
                 state = "%s" % e["model_state"].tostring()
                 state = state[2:-1]  # to remove b' and '
-                print(state, len(state), state[2])
+                #print(state, len(state), state[2])
                 if move == 0:
                     fo.write(" NN" + "\n")
                 if move == 1:
