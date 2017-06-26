@@ -171,7 +171,7 @@ if __name__ == '__main__':
 
     batch_size = 1
     n_batches = len(data_x) / batch_size
-    print len(data_x), batch_size, n_batches, datetime.datetime.now()
+    print(len(data_x), batch_size, n_batches, datetime.datetime.now())
 
     boring = False
 
