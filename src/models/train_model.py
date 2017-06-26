@@ -359,11 +359,12 @@ if __name__ == '__main__':
         #    ntwk.fit(X_new,[Y_new,Y2_new],nb_epoch=1, batch_size=10,validation_split=0.05)
     if epoch % 10 == 0:
         ntwk.save_weights(base_dir + '/my_model_weights-%i.h5' % epoch)
+    """
 
     print epoch, tc / n_batches, 1. * tc2 / n_batches / batch_size, 1. * tc3 / n_batches / batch_size, datetime.datetime.now()
     print_stats(o1mm)
     print_stats(o2mm)
     print confusion_matrix(y1mm, o1mm)
-    print confusion_matrix(y2mm, o2mm)
+    print confusion_matrix(y2mm, o2mm)"""
 
 #  print "out", np.min(out_gc), np.median(out_gc), np.max(out_gc), len(out_gc)

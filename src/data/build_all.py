@@ -22,7 +22,7 @@ else:
     do_script = os.popen
     do_folder = os.makedirs
 
-for type_read, file_name, folder in list_docs[:1]:
+for type_read, file_name, folder in list_docs:
 
     if not os.path.exists(ref):
         print(ref, "not found")
