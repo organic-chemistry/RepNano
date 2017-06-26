@@ -47,12 +47,10 @@ for type_read, file_name, folder in list_docs:
          root + "/" + folder, output_path + "_train")
     do_folder(output_path + "_test", exist_ok=True)
 
-    do_script("python src/data/make_dataset.py {type_read} {processed}/{file_name}.test {root}/{folder} {output_path}_test".format(root=root,
-                                                                                                                                   file_name=file_name,
-                                                                                                                                   ref=ref, folder=folder,
-                                                                                                                                   output_path=output_path,
-                                                                                                                                   type_read=type_read,
-                                                                                                                                   processed=processed))
+    make(type_read, processed + "/" + file_name + ".test",
+         root + "/" + folder, output_path + "_test")
+    do_folder(output_path + "_test", exist_ok=True)
+
   #  python split_training.py $root/$element $external/S288C_reference_sequence_R64-2-1_20150113.fa
     # python prepare_dataset.py temp $root/$element.train ../ForJM/control/
     # ../ForJM/control_template_train

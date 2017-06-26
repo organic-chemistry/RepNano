@@ -72,6 +72,8 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--Nbases', choices=["4", "5"], default='4')
+    parser.add_argument('--root', type=str, default="data/training/")
+
     parser.add_argument('directories', type=str, nargs='*')
     args = parser.parse_args()
 
@@ -99,8 +101,10 @@ if __name__ == '__main__':
     list_files = list_files
 
     list_files.sort()
-    load = True
-    if load is None:
+
+    os.makedirs(args.root, exist_ok=True)
+
+    if not os.path.exists(os.path.join(args.root, "Allignements-bis")):
         for fn in list_files:
             print(fn)
             f = open(fn)
@@ -139,10 +143,10 @@ if __name__ == '__main__':
             #print(len(seqs), len(ref))
             print len(alignments[0][0]), len(ref), len(seqs), alignments[0][2:]
 
-        with open("Allignements-bis", "wb") as f:
+        with open(os.path.join(args.root, "Allignements-bis"), "wb") as f:
             cPickle.dump([data_x, data_y, data_y2, data_index, data_alignment, refs, names], f)
     else:
-        with open("Allignements-bis", "rb") as f:
+        with open(os.path.join(args.root, "Allignements-bis"), "rb") as f:
             data_x, data_y, data_y2, data_index, data_alignment, refs, names = cPickle.load(f)
 
     print("done", sum(len(x) for x in refs))
@@ -160,12 +164,6 @@ if __name__ == '__main__':
     for i in range(len(p_arr)):
         p_arr[i] = 1. * p_arr[i] / sum_p
 
-    base_dir = str(datetime.datetime.now())
-    # base_dir = "compensate_bis"
-    base_dir = base_dir.replace(' ', '_')
-
-    os.mkdir(base_dir)
-    base_dir += "/"
     batch_size = 1
     n_batches = len(data_x) / batch_size
     print len(data_x), batch_size, n_batches, datetime.datetime.now()
@@ -181,7 +179,8 @@ if __name__ == '__main__':
 
         if epoch % 1000 == 0:
             if epoch != 0:
-                predictor.load_weights(base_dir + '/my_model_weights-%i.h5' % (epoch - 1))
+                predictor.load_weights(os.path.join(
+                    args.root, '/my_model_weights-%i.h5' % (epoch - 1)))
 
             print("Realign")
             New_seq = []
@@ -216,7 +215,8 @@ if __name__ == '__main__':
                     print()
             print("Change", change, len(data_x))
             import cPickle
-            with open(base_dir + "Allignements-bis-%i" % epoch, "wb") as f:
+            with open(os.path.join(
+                    args.root, "Allignements-bis-%i" % epoch), "wb") as f:
                 cPickle.dump([data_x, data_y, data_y2, data_index, data_alignment, refs, names], f)
 
                 # Keep new alignment
@@ -330,9 +330,12 @@ if __name__ == '__main__':
         maxin = 10 * (int(len(X_new) // 10) - 3)
         reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.2,
                                                       patience=5, min_lr=0.0001)
+        Log = keras.callbacks.CSVLogger(filename=os.path.join(
+            args.root, "training.log"))
+
         print(len(data_x), np.mean(Length), np.max(Length))
         ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size] * len(Length))[:maxin], Length[:maxin]],
-                 Label[:maxin], nb_epoch=1, batch_size=10, callbacks=[reduce_lr],
+                 Label[:maxin], nb_epoch=1, batch_size=10, callbacks=[reduce_lr, Log],
                  validation_data=([X_new[maxin:maxin + 30],
                                    Label[maxin:maxin + 30],
                                    np.array([subseq_size] *
@@ -358,7 +361,8 @@ if __name__ == '__main__':
         # if epoch == 0:
         #    ntwk.fit(X_new,[Y_new,Y2_new],nb_epoch=1, batch_size=10,validation_split=0.05)
     if epoch % 10 == 0:
-        ntwk.save_weights(base_dir + '/my_model_weights-%i.h5' % epoch)
+        ntwk.save_weights(os.path.join(
+            args.root, '/my_model_weights-%i.h5' % epoch))
     """
 
     print epoch, tc / n_batches, 1. * tc2 / n_batches / batch_size, 1. * tc3 / n_batches / batch_size, datetime.datetime.now()
