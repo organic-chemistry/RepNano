@@ -116,7 +116,7 @@ if __name__ == '__main__':
             ref = f.readline()
             ref = ref.replace("\n", "")
             if len(ref) > 30000:
-                print "out", len(ref)
+                print("out", len(ref))
                 continue
 
             X = []
@@ -131,7 +131,7 @@ if __name__ == '__main__':
                 seq.append(its[-1])
 
             if len(X) < subseq_size:
-                print "out (too small (to include must set a smaller subseq_size))", fn
+                print("out (too small (to include must set a smaller subseq_size))", fn)
                 continue
             refs.append(ref.strip())
             names.append(fn)
@@ -146,7 +146,7 @@ if __name__ == '__main__':
             alignments = pairwise2.align.globalxx(ref, seqs)
             data_alignment.append(alignments[0][:2])
             #print(len(seqs), len(ref))
-            print len(alignments[0][0]), len(ref), len(seqs), alignments[0][2:]
+            print(len(alignments[0][0]), len(ref), len(seqs), alignments[0][2:])
 
         with open(os.path.join(args.root, "Allignements-bis"), "wb") as f:
             cPickle.dump([data_x, data_y, data_y2, data_index, data_alignment, refs, names], f)
