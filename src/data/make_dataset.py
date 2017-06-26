@@ -20,7 +20,7 @@ def make(type_f, source_file, root, output_directory):
                 return model_state.replace("T", "B")
 
         fo = open(os.path.join(output_directory, "%s.txt" % i), "w")
-        fo.writelines(t_to_b(ref))
+        fo.writelines(t_to_b(ref) + "\n")
         base_loc = get_base_loc(h5)
 
         if type_f in ['temp', 'comp']:
