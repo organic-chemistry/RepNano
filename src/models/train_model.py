@@ -4,7 +4,7 @@ import numpy as np
 import datetime
 from collections import defaultdict
 import os
-from sklearn.metrics import confusion_matrix
+#from sklearn.metrics import confusion_matrix
 import glob
 import keras
 from Bio import pairwise2
