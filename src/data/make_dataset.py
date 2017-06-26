@@ -45,15 +45,15 @@ def make(type_f, source_file, root, output_directory):
                 move = e["move"]
                 state = str(e["model_state"])
                 if move == 0:
-                    fo.write("NN" + "\n")
+                    fo.write(" NN" + "\n")
                 if move == 1:
-                    fo.write("N%s" % t_to_b(state[2]) + "\n")
+                    fo.write(" N%s" % t_to_b(state[2]) + "\n")
                 if move == 2:
-                    fo.write("%s%s" % (t_to_b(state[1]),
-                                       t_to_b(state[2])) + "\n")
+                    fo.write(" %s%s" % (t_to_b(state[1]),
+                                        t_to_b(state[2])) + "\n")
                 if move in [3, 4, 5]:
-                    fo.write("%s%s" % (t_to_b(state[1]),
-                                       t_to_b(state[2])) + "\n")
+                    fo.write(" %s%s" % (t_to_b(state[1]),
+                                        t_to_b(state[2])) + "\n")
                 if move not in [0, 1, 2]:
                     print("Problem move value =", move, e["model_state"], g, i)
                     print(filename)
