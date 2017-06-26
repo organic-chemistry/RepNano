@@ -73,6 +73,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--Nbases', choices=["4", "5"], default='4')
     parser.add_argument('--root', type=str, default="data/training/")
+    parser.add_argument('--test', dest='test', action='store_true')
 
     parser.add_argument('directories', type=str, nargs='*')
     args = parser.parse_args()
@@ -105,7 +106,11 @@ if __name__ == '__main__':
     os.makedirs(args.root, exist_ok=True)
 
     if not os.path.exists(os.path.join(args.root, "Allignements-bis")):
-        for fn in list_files:
+        end = None
+        if args.test:
+            end = 10
+
+        for fn in list_files[:end]:
             print(fn)
             f = open(fn)
             ref = f.readline()

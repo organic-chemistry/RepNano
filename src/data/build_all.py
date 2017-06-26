@@ -6,7 +6,9 @@ from .make_dataset import make
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--bwa', dest='bwa', action='store_true')
+parser.add_argument('--split', dest='bwa', action='store_true')
+parser.add_argument('--Nomake', dest='Nomake', action='store_false')
+
 args = parser.parse_args()
 
 
@@ -18,6 +20,14 @@ list_docs = [["temp", "sub_template.InDeepNano", "substituted"],
 root = "data/raw/"
 ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
 processed = "data/processed/"
+
+
+list_docs = [["temp", "controlK47211_template.InDeepNano", "Control-K47211"],
+             ["comp", "controlK47211_complement.InDeepNano", "Control-K47211"]]
+root = "data/raw/"
+ref = "data/external/K47211/controlK47211.fa"
+processed = "data/processed/"
+
 
 simulate = False
 if simulate:
@@ -39,17 +49,18 @@ for type_read, file_name, folder in list_docs:
     if args.bwa:
         split(os.path.join(root, file_name), ref, output=os.path.join(processed, file_name))
 
-    output_path = "{processed}/{folder}_{type_read}".format(folder=folder,
-                                                            processed=processed, type_read=type_read)
-    do_folder(output_path + "_train", exist_ok=True)
+    if args.Nomake:
+        output_path = "{processed}/{folder}_{type_read}".format(folder=folder,
+                                                                processed=processed, type_read=type_read)
+        do_folder(output_path + "_train", exist_ok=True)
 
-    make(type_read, processed + "/" + file_name + ".train",
-         root + "/" + folder, output_path + "_train")
-    do_folder(output_path + "_test", exist_ok=True)
+        make(type_read, processed + "/" + file_name + ".train",
+             root + "/" + folder, output_path + "_train")
+        do_folder(output_path + "_test", exist_ok=True)
 
-    make(type_read, processed + "/" + file_name + ".test",
-         root + "/" + folder, output_path + "_test")
-    do_folder(output_path + "_test", exist_ok=True)
+        make(type_read, processed + "/" + file_name + ".test",
+             root + "/" + folder, output_path + "_test")
+        do_folder(output_path + "_test", exist_ok=True)
 
   #  python split_training.py $root/$element $external/S288C_reference_sequence_R64-2-1_20150113.fa
     # python prepare_dataset.py temp $root/$element.train ../ForJM/control/
