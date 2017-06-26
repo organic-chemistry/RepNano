@@ -124,7 +124,7 @@ if __name__ == '__main__':
             seq = []
             for l in f:
                 its = l.strip().split()
-                X.append(map(float, its[:-1]))
+                X.append(list(map(float, its[:-1])))
                 Y.append(mapping[its[-1][0]])
                 Y2.append(mapping[its[-1][1]])
                 seq.append(its[-1])
@@ -196,7 +196,7 @@ if __name__ == '__main__':
                     alph = "ACGTTN"   # use T to Align
                 if args.Nbases == "4":
                     alph = "ACGTN"
-                New_seq.append("".join(map(lambda x: alph[x], new_seq)))
+                New_seq.append("".join(list(map(lambda x: alph[x], new_seq))))
             # Here maybe realign with bwa
             # for s in range(len(data_x)):
                 old_align = data_alignment[s]
