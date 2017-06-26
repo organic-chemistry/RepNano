@@ -1,4 +1,3 @@
-import pickle
 import sys
 import numpy as np
 import datetime
@@ -8,7 +7,7 @@ import os
 import glob
 import keras
 from Bio import pairwise2
-import cPickle
+import _pickle as cPickle
 
 
 def print_stats(o):
