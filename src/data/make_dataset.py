@@ -17,7 +17,7 @@ def make(type_f, source_file, root, output_directory):
 
         if sub == "1":
             def t_to_b(model_state):
-                print(model_state, model_state.replace("T", "B"))
+                #print(model_state, model_state.replace("T", "B"))
                 return model_state.replace("T", "B")
 
         fo = open(os.path.join(output_directory, "%s.txt" % i), "w")
@@ -45,8 +45,8 @@ def make(type_f, source_file, root, output_directory):
                 g += 1
                 fo.write(" ".join(map(str, [mean, meansqr, std, length])))
                 move = e["move"]
-                state = e["model_state"].tostring()
-                #print(state, len(state))
+                state = "%s" % e["model_state"].tostring()
+                #print(dir(state), len(state), state[2])
                 if move == 0:
                     fo.write(" NN" + "\n")
                 if move == 1:
