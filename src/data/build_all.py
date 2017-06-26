@@ -3,6 +3,13 @@ from .split_training import split
 from .make_dataset import make
 
 
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--bwa', dest='bwa', action='store_true')
+args = parser.parse_args()
+
+
 list_docs = [["temp", "sub_template.InDeepNano", "substituted"],
              ["comp", "sub_complement.InDeepNano", "substituted"],
              ["temp", "control_template.InDeepNano", "control"],
@@ -29,7 +36,8 @@ for type_read, file_name, folder in list_docs:
     if not os.path.exists(os.path.join(root, file_name)):
         print(os.path.join(root, file_name), "not found")
 
-    split(os.path.join(root, file_name), ref, output=os.path.join(processed, file_name))
+    if args.bwa:
+        split(os.path.join(root, file_name), ref, output=os.path.join(processed, file_name))
 
     output_path = "{processed}/{folder}_{type_read}".format(folder=folder,
                                                             processed=processed, type_read=type_read)
