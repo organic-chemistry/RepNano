@@ -20,13 +20,14 @@ list_docs = [["temp", "sub_template.InDeepNano", "substituted"],
 root = "data/raw/"
 ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
 processed = "data/processed/"
-
+"""
 
 list_docs = [["temp", "controlK47211_template.InDeepNano", "Control-K47211"],
              ["comp", "controlK47211_complement.InDeepNano", "Control-K47211"]]
 root = "data/raw/"
 ref = "data/external/K47211/controlK47211.fa"
 processed = "data/processed/"
+"""
 
 
 simulate = False
