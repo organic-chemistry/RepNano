@@ -189,10 +189,10 @@ if __name__ == '__main__':
 # ntwk.load_weights("./my_model_weights.h5")
     for epoch in range(10000):
 
-        if epoch % 20 == 0 and epoch != 0:
-            if epoch != 0:
-                predictor.load_weights(os.path.join(
-                    args.root, 'my_model_weights-%i.h5' % (epoch - 10)))
+        if epoch % 200 == 0 and epoch != 0:
+
+            predictor.load_weights(os.path.join(
+                args.root, 'my_model_weights-%i.h5' % (epoch - 10)))
 
             print("Realign")
             New_seq = []
@@ -215,8 +215,9 @@ if __name__ == '__main__':
                 ref = "" + refs[s]
                 if b:
                     ref = ref.replace("B", "T")
+                print(New_seq[s])
                 new_align = pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))[0][:2]
-                print("Old", len(old_align[0]), "New", len(new_align[0]), b,)
+                print("Old", len(old_align[0]), "New", len(new_align[0]), b, len(ref))
 
                 old_length += len(old_align[0])
                 if len(new_align[0]) < len(old_align[0]):
@@ -232,13 +233,12 @@ if __name__ == '__main__':
                     new_length += len(old_align[0])
                     print()
             print("Change", change, len(data_x))
-            import cPickle
             with open(os.path.join(
                     args.root, "Allignements-bis-%i" % epoch), "wb") as f:
                 cPickle.dump([data_x, data_y, data_y2, data_index, data_alignment, refs, names], f)
-            with open(log_total_length, "wa"):
-                log_total_length.writelines("%i,%i,%i,%i\n" %
-                                            (epoch, old_length, new_length, change))
+            with open(log_total_length, "a") as f:
+                f.writelines("%i,%i,%i,%i\n" %
+                             (epoch, old_length, new_length, change))
 
             # Keep new alignment
 
