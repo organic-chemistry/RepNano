@@ -199,6 +199,7 @@ if __name__ == '__main__':
             change = 0
             old_length = 0
             new_length = 0
+            total_length = 0
             for s in range(len(data_x)):
                 new_seq = np.argmax(predictor.predict(np.array([data_x[s]]))[0], axis=-1)
                 # print(args.Nbases)
@@ -220,6 +221,7 @@ if __name__ == '__main__':
                 print("Old", len(old_align[0]), "New", len(new_align[0]), b, len(ref))
 
                 old_length += len(old_align[0])
+                total_length += len(ref)
                 if len(new_align[0]) < len(old_align[0]):
                     print("Keep!")
                     change += 1
@@ -237,8 +239,8 @@ if __name__ == '__main__':
                     args.root, "Allignements-bis-%i" % epoch), "wb") as f:
                 cPickle.dump([data_x, data_y, data_y2, data_index, data_alignment, refs, names], f)
             with open(log_total_length, "a") as f:
-                f.writelines("%i,%i,%i,%i\n" %
-                             (epoch, old_length, new_length, change))
+                f.writelines("%i,%i,%i,%i,%i\n" %
+                             (epoch, old_length, new_length, total_length, change))
 
             # Keep new alignment
 
