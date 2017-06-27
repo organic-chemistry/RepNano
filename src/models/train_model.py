@@ -85,6 +85,10 @@ if __name__ == '__main__':
     refs = []
     names = []
 
+    if keras.backend.backend() != 'tensorflow':
+        print("Must use tensorflow to train")
+        exit()
+
     if args.Nbases == "4":
         mapping = {"A": 0, "C": 1, "G": 2, "T": 3, "N": 4}  # Modif
     elif args.Nbases == "5":
@@ -107,7 +111,7 @@ if __name__ == '__main__':
     if not os.path.exists(os.path.join(args.root, "Allignements-bis")):
         end = None
         if args.test:
-            end = 10
+            end = 40
 
         for fn in list_files[:end]:
             print(fn)
@@ -138,8 +142,9 @@ if __name__ == '__main__':
             data_y.append(np.array(Y, dtype=np.int32))
             data_y2.append(np.array(Y2, dtype=np.int32))
             seq = "".join(seq)
+            # print(seq)
             seq = seq[1::2]
-
+            # print(seq)
             data_index.append(np.arange(len(seq))[np.array([s for s in seq]) != "N"])
             seqs = seq.replace("N", "")
             alignments = pairwise2.align.globalxx(ref, seqs)
@@ -181,7 +186,7 @@ if __name__ == '__main__':
 # ntwk.load_weights("./my_model_weights.h5")
     for epoch in range(10000):
 
-        if epoch % 1000 == 0:
+        if epoch % 1000 == 0 and epoch != 0:
             if epoch != 0:
                 predictor.load_weights(os.path.join(
                     args.root, '/my_model_weights-%i.h5' % (epoch - 1)))
@@ -297,33 +302,6 @@ if __name__ == '__main__':
         Label = np.array(Label)
         Length = np.array(Length)
         print(X_new.shape, Y_new.shape)
-        sum1 = 0
-        for k in stats.keys():
-            sum1 += stats[k]
-
-        if epoch == 0:
-            weight = [0 for k in stats.keys()]
-
-            for k in stats.keys():
-                weight[k] = stats[k] / 1.0 / sum1
-                weight[k] = 1 / weight[k]
-            weight = np.array(weight)
-            weight = weight * len(stats.keys()) / np.sum(weight)
-        # weight[4] *= 100
-
-        w2 = []
-
-        for y in Y2_new:
-            w2.append([])
-            for arr in y:
-                w2[-1].append(weight[np.argmax(arr)])
-
-        w2 = np.array(w2)
-        """
-        print(w2.shape)
-        print(weight)
-        print(Length)
-        """
 
         # To balance class weight
 
@@ -334,12 +312,12 @@ if __name__ == '__main__':
         maxin = 10 * (int(len(X_new) // 10) - 3)
         reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.2,
                                                       patience=5, min_lr=0.0001)
-        Log = keras.callbacks.CSVLogger(filename=os.path.join(
-            args.root, "training.log"))
+        # Log = keras.callbacks.CSVLogger(filename=os.path.join(
+        #      args.root, "training.log"))
 
         print(len(data_x), np.mean(Length), np.max(Length))
         ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size] * len(Length))[:maxin], Length[:maxin]],
-                 Label[:maxin], nb_epoch=1, batch_size=10, callbacks=[reduce_lr, Log],
+                 Label[:maxin], nb_epoch=1, batch_size=10, callbacks=[reduce_lr],
                  validation_data=([X_new[maxin:maxin + 30],
                                    Label[maxin:maxin + 30],
                                    np.array([subseq_size] *
