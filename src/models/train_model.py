@@ -192,7 +192,7 @@ if __name__ == '__main__':
         if epoch % 200 == 0 and epoch != 0:
             if epoch != 0:
                 predictor.load_weights(os.path.join(
-                    args.root, '/my_model_weights-%i.h5' % (epoch - 1)))
+                    args.root, 'my_model_weights-%i.h5' % (epoch - 1)))
 
             print("Realign")
             New_seq = []
