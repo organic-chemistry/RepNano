@@ -189,18 +189,16 @@ if __name__ == '__main__':
 # ntwk.load_weights("./my_model_weights.h5")
     for epoch in range(10000):
 
-        if epoch % 200 == 0 and epoch != 0:
+        # Test to see if realignment is interesting:
+        if epoch % 10 == 0 and epoch != 0:
 
-            predictor.load_weights(os.path.join(
-                args.root, 'my_model_weights-%i.h5' % (epoch - 10)))
-
-            print("Realign")
+            print("test for Realign")
             New_seq = []
             change = 0
             old_length = 0
             new_length = 0
             total_length = 0
-            for s in range(len(data_x)):
+            for s in np.random.randint(len(data_x), 20):
                 new_seq = np.argmax(predictor.predict(np.array([data_x[s]]))[0], axis=-1)
                 # print(args.Nbases)
                 if args.Nbases == "5":
@@ -216,7 +214,6 @@ if __name__ == '__main__':
                 ref = "" + refs[s]
                 if b:
                     ref = ref.replace("B", "T")
-                print(New_seq[s])
                 new_align = pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))[0][:2]
                 print("Old", len(old_align[0]), "New", len(new_align[0]), b, len(ref))
 
@@ -225,22 +222,56 @@ if __name__ == '__main__':
                 if len(new_align[0]) < len(old_align[0]):
                     print("Keep!")
                     change += 1
-                    data_alignment[s] = new_align
 
-                    data_index[s] = np.arange(len(New_seq[s]))[
-                        np.array([ss for ss in New_seq[s]]) != "N"]
-                    new_length += len(new_align[0])
+            if change > 5:
 
-                else:
-                    new_length += len(old_align[0])
-                    print()
-            print("Change", change, len(data_x))
-            with open(os.path.join(
-                    args.root, "Allignements-bis-%i" % epoch), "wb") as f:
-                cPickle.dump([data_x, data_y, data_y2, data_index, data_alignment, refs, names], f)
-            with open(log_total_length, "a") as f:
-                f.writelines("%i,%i,%i,%i,%i\n" %
-                             (epoch, old_length, new_length, total_length, change))
+                print("Realign (change = %i)" % change)
+                New_seq = []
+                change = 0
+                old_length = 0
+                new_length = 0
+                total_length = 0
+                for s in range(len(data_x)):
+                    new_seq = np.argmax(predictor.predict(np.array([data_x[s]]))[0], axis=-1)
+                    # print(args.Nbases)
+                    if args.Nbases == "5":
+                        alph = "ACGTTN"   # use T to Align
+                    if args.Nbases == "4":
+                        alph = "ACGTN"
+                    New_seq.append("".join(list(map(lambda x: alph[x], new_seq))))
+                # Here maybe realign with bwa
+                # for s in range(len(data_x)):
+                    old_align = data_alignment[s]
+
+                    b = "B" in refs[s]
+                    ref = "" + refs[s]
+                    if b:
+                        ref = ref.replace("B", "T")
+                    new_align = pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))[0][:2]
+                    print("Old", len(old_align[0]), "New", len(new_align[0]), b, len(ref))
+
+                    old_length += len(old_align[0])
+                    total_length += len(ref)
+                    if len(new_align[0]) < len(old_align[0]):
+                        print("Keep!")
+                        change += 1
+                        data_alignment[s] = new_align
+
+                        data_index[s] = np.arange(len(New_seq[s]))[
+                            np.array([ss for ss in New_seq[s]]) != "N"]
+                        new_length += len(new_align[0])
+
+                    else:
+                        new_length += len(old_align[0])
+                        print()
+                print("Change", change, len(data_x))
+                with open(os.path.join(
+                        args.root, "Allignements-bis-%i" % epoch), "wb") as f:
+                    cPickle.dump([data_x, data_y, data_y2, data_index,
+                                  data_alignment, refs, names], f)
+                with open(log_total_length, "a") as f:
+                    f.writelines("%i,%i,%i,%i,%i\n" %
+                                 (epoch, old_length, new_length, total_length, change))
 
             # Keep new alignment
 
