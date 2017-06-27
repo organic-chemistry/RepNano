@@ -111,7 +111,7 @@ if __name__ == '__main__':
     if not os.path.exists(os.path.join(args.root, "Allignements-bis")):
         end = None
         if args.test:
-            end = 40
+            end = 80
 
         for fn in list_files[:end]:
             print(fn)
