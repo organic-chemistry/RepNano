@@ -6,18 +6,22 @@ import numpy as np
 
 def make(type_f, source_file, root, output_directory):
     for i, l in enumerate(open(source_file)):
+        print(l)
         parts = l.strip().split()
         filename = ' '.join(parts[:-2])
         ref = parts[-2]
         sub = parts[-1]
-        h5 = h5py.File(root + "/" + filename, "r")
+        f_name = root + "/" + u"%s" % filename
+        # print(os.path.exists(f_name))
+        # print(f_name)
+        h5 = h5py.File(f_name, "r")
 
         def t_to_b(model_state):
             return model_state
 
         if sub == "1":
             def t_to_b(model_state):
-                #print(model_state, model_state.replace("T", "B"))
+                # print(model_state, model_state.replace("T", "B"))
                 return model_state.replace("T", "B")
 
         fo = open(os.path.join(output_directory, "%s.txt" % i), "w")
@@ -47,7 +51,7 @@ def make(type_f, source_file, root, output_directory):
                 move = e["move"]
                 state = "%s" % e["model_state"].tostring()
                 state = state[2:-1]  # to remove b' and '
-                #print(state, len(state), state[2])
+                # print(state, len(state), state[2])
                 if move == 0:
                     fo.write(" NN" + "\n")
                 if move == 1:

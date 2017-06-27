@@ -22,8 +22,8 @@ ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
 processed = "data/processed/"
 
 
-list_docs = [["temp", "controlK47211_template.InDeepNano", "control-K47211"],
-             ["comp", "controlK47211_complement.InDeepNano", "control-K47211"]]
+list_docs = [["temp", "controlK47211_template.InDeepNano", "control-k47211"],
+             ["comp", "controlK47211_complement.InDeepNano", "control-k47211"]]
 root = "data/raw/"
 #ref = "data/external/K47211/controlK47211.fa"
 processed = "data/processed/"
@@ -41,8 +41,9 @@ else:
 
 for type_read, file_name, folder in list_docs:
 
-    if not os.path.exists(ref):
+    if not os.path.exists(ref) and args.bwa:
         print(ref, "not found")
+        exit()
     if not os.path.exists(os.path.join(root, file_name)):
         print(os.path.join(root, file_name), "not found")
 
@@ -54,6 +55,7 @@ for type_read, file_name, folder in list_docs:
                                                                 processed=processed, type_read=type_read)
         do_folder(output_path + "_train", exist_ok=True)
 
+        print("Reading", processed + "/" + file_name + ".train")
         make(type_read, processed + "/" + file_name + ".train",
              root + "/" + folder, output_path + "_train")
         do_folder(output_path + "_test", exist_ok=True)
