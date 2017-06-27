@@ -346,7 +346,7 @@ if __name__ == '__main__':
         #    ntwk.fit(X_new,[Y_new,Y2_new],nb_epoch=1, batch_size=10,validation_split=0.05)
         if epoch % 10 == 0:
             ntwk.save_weights(os.path.join(
-                args.root, '/my_model_weights-%i.h5' % epoch))
+                args.root, 'my_model_weights-%i.h5' % epoch))
     """
 
     print epoch, tc / n_batches, 1. * tc2 / n_batches / batch_size, 1. * tc3 / n_batches / batch_size, datetime.datetime.now()
