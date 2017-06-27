@@ -198,7 +198,7 @@ if __name__ == '__main__':
             old_length = 0
             new_length = 0
             total_length = 0
-            for s in np.random.randint(len(data_x), 20):
+            for s in np.random.randint(0, len(data_x), 20):
                 new_seq = np.argmax(predictor.predict(np.array([data_x[s]]))[0], axis=-1)
                 # print(args.Nbases)
                 if args.Nbases == "5":
