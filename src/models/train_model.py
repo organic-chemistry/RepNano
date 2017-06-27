@@ -73,6 +73,7 @@ if __name__ == '__main__':
     parser.add_argument('--Nbases', choices=["4", "5"], default='4')
     parser.add_argument('--root', type=str, default="data/training/")
     parser.add_argument('--test', dest='test', action='store_true')
+    parser.add_argument('--size', type=int, default=20)
 
     parser.add_argument('directories', type=str, nargs='*')
     args = parser.parse_args()
@@ -179,8 +180,9 @@ if __name__ == '__main__':
 
     boring = False
 
-    from .model import model2 as ntwk
-    from .model import model as predictor
+    from .model import build_models
+
+    predictor, ntwk = build_models(args.size)
 
 
 # ntwk.load_weights("./my_model_weights.h5")
