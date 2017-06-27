@@ -313,7 +313,7 @@ if __name__ == '__main__':
         reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.2,
                                                       patience=5, min_lr=0.0001)
         Log = keras.callbacks.CSVLogger(filename=os.path.join(
-            args.root, "training.log"))
+            args.root, "training.log", append=True))
 
         print(len(data_x), np.mean(Length), np.max(Length))
         ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size] * len(Length))[:maxin], Length[:maxin]],
