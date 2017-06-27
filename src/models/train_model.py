@@ -3,7 +3,7 @@ import numpy as np
 import datetime
 from collections import defaultdict
 import os
-#from sklearn.metrics import confusion_matrix
+# from sklearn.metrics import confusion_matrix
 import glob
 import keras
 from Bio import pairwise2
@@ -151,7 +151,7 @@ if __name__ == '__main__':
             seqs = seq.replace("N", "")
             alignments = pairwise2.align.globalxx(ref, seqs)
             data_alignment.append(alignments[0][:2])
-            #print(len(seqs), len(ref))
+            # print(len(seqs), len(ref))
             print(len(alignments[0][0]), len(ref), len(seqs), alignments[0][2:])
 
         with open(os.path.join(args.root, "Allignements-bis"), "wb") as f:
@@ -196,6 +196,7 @@ if __name__ == '__main__':
 
             predictor.load_weights(os.path.join(
                 args.root, 'tmp.h5'))
+
             print("test for Realign")
             New_seq = []
             change = 0
@@ -209,7 +210,7 @@ if __name__ == '__main__':
                     alph = "ACGTTN"   # use T to Align
                 if args.Nbases == "4":
                     alph = "ACGTN"
-                New_seq.append("".join(list(map(lambda x: alph[x], new_seq))))
+                new_seq = "".join(list(map(lambda x: alph[x], new_seq)))
             # Here maybe realign with bwa
             # for s in range(len(data_x)):
                 old_align = data_alignment[s]
@@ -218,7 +219,7 @@ if __name__ == '__main__':
                 ref = "" + refs[s]
                 if b:
                     ref = ref.replace("B", "T")
-                new_align = pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))[0][:2]
+                new_align = pairwise2.align.globalxx(ref, new_seq.replace("N", ""))[0][:2]
                 print("Old", len(old_align[0]), "New", len(new_align[0]), b, len(ref))
 
                 old_length += len(old_align[0])
@@ -320,9 +321,9 @@ if __name__ == '__main__':
 
                 start_index_on_seqs = find_closest(start, Index)
                 end_index_on_seqs = find_closest(start + length, Index)
-                #from IPython import embed
+                # from IPython import embed
                 # embed()
-                #print(start, start_index_on_seqs, end_index_on_seqs, len(alignment))
+                # print(start, start_index_on_seqs, end_index_on_seqs, len(alignment))
                 seg, ss1, ss2 = get_segment(alignment, start_index_on_seqs, end_index_on_seqs)
 
                 maxi = 40
