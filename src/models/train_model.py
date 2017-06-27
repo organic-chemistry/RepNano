@@ -312,12 +312,12 @@ if __name__ == '__main__':
         maxin = 10 * (int(len(X_new) // 10) - 3)
         reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.2,
                                                       patience=5, min_lr=0.0001)
-        # Log = keras.callbacks.CSVLogger(filename=os.path.join(
-        #      args.root, "training.log"))
+        Log = keras.callbacks.CSVLogger(filename=os.path.join(
+            args.root, "training.log"))
 
         print(len(data_x), np.mean(Length), np.max(Length))
         ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size] * len(Length))[:maxin], Length[:maxin]],
-                 Label[:maxin], nb_epoch=1, batch_size=10, callbacks=[reduce_lr],
+                 Label[:maxin], nb_epoch=1, batch_size=10, callbacks=[reduce_lr, Log],
                  validation_data=([X_new[maxin:maxin + 30],
                                    Label[maxin:maxin + 30],
                                    np.array([subseq_size] *

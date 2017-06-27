@@ -6,7 +6,7 @@ import numpy as np
 
 def make(type_f, source_file, root, output_directory):
     for i, l in enumerate(open(source_file)):
-        print(l)
+        # print(l)
         parts = l.strip().split()
         filename = ' '.join(parts[:-2])
         ref = parts[-2]
