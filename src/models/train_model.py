@@ -191,7 +191,11 @@ if __name__ == '__main__':
 
         # Test to see if realignment is interesting:
         if epoch % 10 == 0 and epoch != 0:
+            ntwk.save_weights(os.path.join(
+                args.root, 'tmp.h5'))
 
+            predictor.load_weights(os.path.join(
+                args.root, 'tmp.h5'))
             print("test for Realign")
             New_seq = []
             change = 0
