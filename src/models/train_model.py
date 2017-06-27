@@ -189,10 +189,10 @@ if __name__ == '__main__':
 # ntwk.load_weights("./my_model_weights.h5")
     for epoch in range(10000):
 
-        if epoch % 200 == 0 and epoch != 0:
+        if epoch % 20 == 0 and epoch != 0:
             if epoch != 0:
                 predictor.load_weights(os.path.join(
-                    args.root, 'my_model_weights-%i.h5' % (epoch - 1)))
+                    args.root, 'my_model_weights-%i.h5' % (epoch - 10)))
 
             print("Realign")
             New_seq = []
