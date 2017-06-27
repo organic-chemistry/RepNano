@@ -86,6 +86,7 @@ if __name__ == '__main__':
     refs = []
     names = []
 
+    log_total_length = os.path.join(args.root, "total_length.log")
     if keras.backend.backend() != 'tensorflow':
         print("Must use tensorflow to train")
         exit()
@@ -196,6 +197,8 @@ if __name__ == '__main__':
             print("Realign")
             New_seq = []
             change = 0
+            old_length = 0
+            new_length = 0
             for s in range(len(data_x)):
                 new_seq = np.argmax(predictor.predict(np.array([data_x[s]]))[0], axis=-1)
                 # print(args.Nbases)
@@ -215,6 +218,7 @@ if __name__ == '__main__':
                 new_align = pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))[0][:2]
                 print("Old", len(old_align[0]), "New", len(new_align[0]), b,)
 
+                old_length += len(old_align[0])
                 if len(new_align[0]) < len(old_align[0]):
                     print("Keep!")
                     change += 1
@@ -222,15 +226,21 @@ if __name__ == '__main__':
 
                     data_index[s] = np.arange(len(New_seq[s]))[
                         np.array([ss for ss in New_seq[s]]) != "N"]
+                    new_length += len(new_align[0])
+
                 else:
+                    new_length += len(old_align[0])
                     print()
             print("Change", change, len(data_x))
             import cPickle
             with open(os.path.join(
                     args.root, "Allignements-bis-%i" % epoch), "wb") as f:
                 cPickle.dump([data_x, data_y, data_y2, data_index, data_alignment, refs, names], f)
+            with open(log_total_length, "wa"):
+                log_total_length.writelines("%i,%i,%i,%i\n" %
+                                            (epoch, old_length, new_length, change))
 
-                # Keep new alignment
+            # Keep new alignment
 
         taken_gc = []
         out_gc = []
