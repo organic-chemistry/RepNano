@@ -1,10 +1,8 @@
-from rnnf import Rnn
 import h5py
 import argparse
 import os
-import datetime
 import numpy as np
-from extract_events import extract_events
+from .model import build_models
 
 
 def scale(X):
@@ -28,32 +26,30 @@ def scale(X):
 
 
 def get_events(h5):
-    if not args.event_detect:
-        try:
-            e = h5["Analyses/Basecall_RNN_1D_000/BaseCalled_template/Events"]
-            return e
-        except:
-            pass
-        try:
-            e = h5["Analyses/Basecall_1D_000/BaseCalled_template/Events"]
-            return e
-        except:
-            pass
-
-    return extract_events(h5, args.chemistry)
+    try:
+        e = h5["Analyses/Basecall_RNN_1D_000/BaseCalled_template/Events"]
+        return e
+    except:
+        pass
+    try:
+        e = h5["Analyses/Basecall_1D_000/BaseCalled_template/Events"]
+        return e
+    except:
+        pass
 
 
-def basecall(filename, output_file):
+def basecall_one_file(filename, output_file, ntwk, alph):
     # try:
+    assert(os.path.exists(filename)), "File %s does no exists" % filename
     h5 = h5py.File(filename, "r")
     events = get_events(h5)
     if events is None:
-        print "No events in file %s" % filename
+        print("No events in file %s" % filename)
         h5.close()
         return 0
 
     if len(events) < 300:
-        print "Read %s too short, not basecalling" % filename
+        print("Read %s too short, not basecalling" % filename)
         h5.close()
         return 0
 
@@ -66,10 +62,7 @@ def basecall(filename, output_file):
     try:
         o1 = ntwk.predict(np.array(X)[np.newaxis, ::, ::])
         o1 = o1[0]
-        #o2 = o2[0]
-        # for i in o2[:20]:
-        #print(["%.2f"%ii for ii in i])
-        # print(o2)
+
     except:
         o1, o2 = ntwk.predict(X)
 
@@ -77,115 +70,80 @@ def basecall(filename, output_file):
     om = np.argmax(o1, axis=-1)
     # print(o2[:20])
     # exit()
-    """
 
-    o1m = (np.argmax(o1, 1))
-    o2m = (np.argmax(o2, 1))
-    om = np.vstack((o1m, o2m)).reshape((-1,), order='F')"""
-    # print(om)
     output = "".join(map(lambda x: alph[x], om)).replace("N", "")
     print(om.shape, len(output))
 
-    print >>output_file, ">%s_template_deepnano" % filename
-    print >>output_file, output
-    output_file.flush()
+    output_file.writelines(">%s_template_deepnano\n" % filename)
+    output_file.writelines(output + "\n")
 
     h5.close()
     return len(events)
     # except Exception as e:
-    print "Read %s failed with %s" % (filename, e)
+    print("Read %s failed with %s" % (filename, e))
     return 0
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--chemistry', choices=['r9', 'r9.4'], default='r9.4')
-parser.add_argument("--weights", default="None")
-parser.add_argument('--Nbases', choices=["4", "5"], default='4')
-parser.add_argument('--output', type=str, default="output.fasta")
-parser.add_argument('--directory', type=str, default='',
-                    help="Directory where read files are stored")
-parser.add_argument('--watch', type=str, default='', help='Watched directory')
-parser.add_argument('--debug', dest='debug', action='store_true')
-parser.add_argument('--no-debug', dest='debug', action='store_false')
-parser.add_argument('--event-detect', dest='event_detect', action='store_true')
-parser.add_argument('reads', type=str, nargs='*')
+def process(weights, Nbases, output, directory, reads=[], filter=""):
+    assert len(reads) != 0 or len(directory) != 0, "Nothing to basecall"
 
-parser.set_defaults(debug=False)
-parser.set_defaults(event_detect=False)
+    alph = "ACGTN"
+    if Nbases == 5:
+        alph = "ACGTBN"
 
-args = parser.parse_args()
-assert len(args.reads) != 0 or len(args.directory) != 0 or len(
-    args.watch) != 0, "Nothing to basecall"
-
-ntwks = {"r9": os.path.join("networks", "r9.pkl"), "r9.4": os.path.join("networks", "r94.pkl")}
-
-alph = "ACGTN"
-if args.Nbases == "5":
-    alph = "ACGTBN"
-classical = False
-if classical:
-    ntwk = Rnn()
-    if args.weights == "None":
-        ntwk.load(ntwks[args.chemistry])
-    else:
-        ntwk.load(args.weights)
-else:
     import sys
     sys.path.append("../training/")
 
-    from keras.models import load_model
-    from rnnbisbis import model as ntwk
-    ntwk.load_weights(args.weights)
+    ntwk, _ = build_models(20)
+    assert(os.path.exists(weights)), "Weights %s does not exist" % weights
+    ntwk.load_weights(weights)
     print("loaded")
 
+    Files = []
+    if filter != "":
+        assert(os.path.exists(filter)), "Filter %s does not exist" % filter
+        with open(filter, "r") as f:
+            for line in f.readlines():
+                Files.append(line.split()[0])
 
-if len(args.reads) or len(args.directory) != 0:
-    fo = open(args.output, "w")
+    if len(reads) or len(directory) != 0:
+        dire = os.path.split(output)[0]
+        os.makedirs(dire, exist_ok=True)
+        fo = open(output, "w")
 
-    files = args.reads
-    if len(args.directory):
-        files += [os.path.join(args.directory, x) for x in os.listdir(args.directory)]
+        files = reads
+        if reads == "":
+            files = []
+        if len(directory):
+            files += [os.path.join(directory, x) for x in os.listdir(directory)]
 
-    total_events = 0
-    start_time = datetime.datetime.now()
-    for i, read in enumerate(files):
-        current_events = basecall(read, fo)
-        if args.debug:
-            total_events += current_events
-            time_diff = (datetime.datetime.now() - start_time).seconds + 0.000001
-            print "Basecalled %d events in %f (%f ev/s)" % (total_events, time_diff, total_events / time_diff)
+        # print(Files)
+        # print(files)
+        # exit()
+        for i, read in enumerate(files):
 
-    fo.close()
+            if Files != []:
+                if os.path.split(read)[1] not in Files:
+                    continue
+            print("Processing read %s" % read)
+            basecall_one_file(read, fo, ntwk, alph)
 
-if len(args.watch) != 0:
-    try:
-        from watchdog.observers import Observer
-        from watchdog.events import PatternMatchingEventHandler
-    except:
-        print "Please install watchdog to watch directories"
-        sys.exit()
+        fo.close()
 
-    class Fast5Handler(PatternMatchingEventHandler):
-        """Class for handling creation fo fast5-files"""
-        patterns = ["*.fast5"]
 
-        def on_created(self, event):
-            print "Calling", event
-            file_name = str(os.path.basename(event.src_path))
-            fasta_file_name = os.path.splitext(event.src_path)[0] + '.fasta'
-            with open(fasta_file_name, "w") as fo:
-                basecall(event.src_path, fo)
-    print('Watch dir: ' + args.watch)
-    observer = Observer()
-    print('Starting Observerer')
-    # start watching directory for fast5-files
-    observer.start()
-    observer.schedule(Fast5Handler(), path=args.watch)
-    try:
-        while True:
-            time.sleep(1)
-    # quit script using ctrl+c
-    except KeyboardInterrupt:
-        observer.stop()
+if __name__ == "__main__":
 
-    observer.join()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--weights", default="None")
+    parser.add_argument('--Nbases', choices=["4", "5"], default='4')
+    parser.add_argument('--output', type=str, default="output.fasta")
+    parser.add_argument('--directory', type=str, default='',
+                        help="Directory where read files are stored")
+    parser.add_argument('reads', type=str, nargs='*')
+
+    parser.add_argument('--filter', type=str, default='')
+
+    args = parser.parse_args()
+
+    process(weights=args.weights, Nbases=args.Nbases, output=args.output,
+            directory=args.directory, reads=args.reads, filter=args.filter)
