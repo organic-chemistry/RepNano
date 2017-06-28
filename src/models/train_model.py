@@ -238,7 +238,8 @@ if __name__ == '__main__':
             old_length = 0
             new_length = 0
             total_length = 0
-
+            current_length = 0
+            switch = 0
             for s in range(len(data_x)):
                 new_seq = np.argmax(predictor.predict(np.array([data_x[s]]))[0], axis=-1)
                 # print(args.Nbases)
@@ -258,11 +259,14 @@ if __name__ == '__main__':
                 ref = "" + refs[s]
                 if b:
                     ref = ref.replace("B", "T")
+
                 new_align = pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))[0][:2]
-                print("Old", len(old_align[0]), "New", len(new_align[0]), b, len(ref))
+                print("Old", len(old_align[0]), "New", len(new_align[0]), b, len(
+                    ref), abs(len(ref) - len(New_seq[s].replace("N", ""))), nb / nt)
 
                 old_length += len(old_align[0])
                 total_length += len(ref)
+                current_length += len(New_seq[s].replace("N", ""))
                 if len(new_align[0]) < len(old_align[0]) and abs(len(ref) - len(New_seq[s].replace("N", ""))) / len(ref) > 0.95:
                     print("Keep!")
                     change += 1
@@ -274,6 +278,7 @@ if __name__ == '__main__':
 
                     if b and nb / nt < 0.3:
                         refs[s] = refs[s].replace("B", "T")
+                        switch += 1
 
                 else:
                     new_length += len(old_align[0])
@@ -284,8 +289,8 @@ if __name__ == '__main__':
                 cPickle.dump([data_x, data_y, data_y2, data_index,
                               data_alignment, refs, names], f)
             with open(log_total_length, "a") as f:
-                f.writelines("%i,%i,%i,%i,%i\n" %
-                             (epoch, old_length, new_length, total_length, change))
+                f.writelines("%i,%i,%i,%i,%i,%i,%i\n" %
+                             (epoch, old_length, new_length, total_length, current_length, change, switch))
 
             # Keep new alignment
 
