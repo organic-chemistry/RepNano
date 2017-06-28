@@ -231,6 +231,11 @@ if __name__ == '__main__':
             """
 
         if epoch % 200 == 0 and epoch != 0:
+            ntwk.save_weights(os.path.join(
+                args.root, 'tmp.h5'))
+
+            predictor.load_weights(os.path.join(
+                args.root, 'tmp.h5'))
 
             print("Realign")
             New_seq = []
