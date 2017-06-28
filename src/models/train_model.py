@@ -270,7 +270,7 @@ if __name__ == '__main__':
 
                 new_align = pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))[0][:2]
                 print("Old", len(old_align[0]), "New", len(new_align[0]), b, len(
-                    ref), (len(ref) - len(New_seq[s].replace("N", ""))) / len(ref), nb / nt)
+                    ref), (len(ref) - len(New_seq[s].replace("N", ""))) / len(ref), nb / (nt + 1))
 
                 old_length += len(old_align[0])
                 total_length += len(ref)
@@ -284,9 +284,10 @@ if __name__ == '__main__':
                         np.array([ss for ss in New_seq[s]]) != "N"]
                     new_length += len(new_align[0])
 
-                    if b and nb / nt < 0.3:
+                    if b and nb / (nt + 1) < 0.3:
                         refs[s] = refs[s].replace("B", "T")
                         switch += 1
+                        print("Swich")
 
                 else:
                     new_length += len(old_align[0])
