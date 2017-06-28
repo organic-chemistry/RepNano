@@ -237,6 +237,8 @@ if __name__ == '__main__':
             predictor.load_weights(os.path.join(
                 args.root, 'tmp.h5'))
 
+            # predictor.load_weights("data/training/my_model_weights-1990.h5")
+
             print("Realign")
             New_seq = []
             change = 0
@@ -246,6 +248,7 @@ if __name__ == '__main__':
             current_length = 0
             switch = 0
             for s in range(len(data_x)):
+
                 new_seq = np.argmax(predictor.predict(np.array([data_x[s]]))[0], axis=-1)
                 # print(args.Nbases)
                 if args.Nbases == "5":
@@ -267,12 +270,12 @@ if __name__ == '__main__':
 
                 new_align = pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))[0][:2]
                 print("Old", len(old_align[0]), "New", len(new_align[0]), b, len(
-                    ref), abs(len(ref) - len(New_seq[s].replace("N", ""))), nb / nt)
+                    ref), (len(ref) - len(New_seq[s].replace("N", ""))) / len(ref), nb / nt)
 
                 old_length += len(old_align[0])
                 total_length += len(ref)
                 current_length += len(New_seq[s].replace("N", ""))
-                if len(new_align[0]) < len(old_align[0]) and abs(len(ref) - len(New_seq[s].replace("N", ""))) / len(ref) > 0.95:
+                if len(new_align[0]) < len(old_align[0]) and (len(ref) - len(New_seq[s].replace("N", ""))) / len(ref) < 0.05:
                     print("Keep!")
                     change += 1
                     data_alignment[s] = new_align
