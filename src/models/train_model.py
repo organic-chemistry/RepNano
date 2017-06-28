@@ -284,14 +284,14 @@ if __name__ == '__main__':
                         np.array([ss for ss in New_seq[s]]) != "N"]
                     new_length += len(new_align[0])
 
-                    if b and nb / (nt + 1) < 0.3:
-                        refs[s] = refs[s].replace("B", "T")
-                        switch += 1
-                        print("Swich")
-
                 else:
                     new_length += len(old_align[0])
                     print()
+
+                if b and nb / (nt + 1) < 0.3:
+                    refs[s] = refs[s].replace("B", "T")
+                    switch += 1
+                    print("Swich")
             print("Change", change, len(data_x))
             with open(os.path.join(
                     args.root, "Allignements-bis-%i" % epoch), "wb") as f:
