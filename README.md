@@ -9,8 +9,12 @@ To evaluate the model :
 
 python -m src.models.predict_model --weights=data/training/my_model_weights-3390-removed-bad-B.h5 --directory=data/raw/control/ --Nbases=5 --output=data/processed/result.fasta
 
-The directory must contait fasta sequences
+The directory must contain fasta sequences
 
+to evaluate the model and get some info on T/B and alignement:
+But the code must be modified
+
+python -m src.test.evaluate
 ==============================
 
 Project Organization
@@ -45,15 +49,25 @@ Project Organization
     │   ├── __init__.py    <- Makes src a Python module
     │   │
     │   ├── data           <- Scripts to download or generate data
-    │   │   └── make_dataset.py
+    │   │   ├──build_all.py        <- Given InDeepNano files, fasta file corresponding to the indeepnano and ref of the genome
+    │   │   │                         generate automatically training and test set  
+    │   │   ├──split_training.py   <- Given InDeepNano files and ref of the genome generate a train and test InDeepNano file
+    │   │   │                         where test contain only the chromosome 11
+    │   │   └── make_dataset.py    <- Given one Basecall files and a fasta files generate the data to train the model
     │   │
     │   ├── features       <- Scripts to turn raw data into features for modeling
-    │   │   └── build_features.py
+    │   │   └── helpers.py         <- tools to normalize the signal
     │   │
     │   ├── models         <- Scripts to train models and then use trained models to make
     │   │   │                 predictions
+    │   │   ├── model.py           <- Generate keras model
     │   │   ├── predict_model.py
     │   │   └── train_model.py
+    │   │
+    │   ├── test           <- Scripts to evaluate the results on the test set
+    │   │   ├──evaluate.py                    <- Given InDeepNano files, fasta file corresponding to the indeepnano and ref of the genome
+    │   │   ├──ExportStatAlnFromSamYeast.py    <- script from magalie te get stat on alignements
+    │   │   └──get_fasta_from_train-test.py    <- script that get the results from the model and give stats on T and B and generate fasta without B
     │   │
     │   └── visualization  <- Scripts to create exploratory and results oriented visualizations
     │       └── visualize.py
