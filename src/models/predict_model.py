@@ -108,7 +108,10 @@ def process(weights, Nbases, output, directory, reads=[], filter=""):
 
     if len(reads) or len(directory) != 0:
         dire = os.path.split(output)[0]
-        os.makedirs(dire, exist_ok=True)
+        if dire != "":
+            os.makedirs(dire, exist_ok=True)
+        print("Writing on %s" % output)
+
         fo = open(output, "w")
 
         files = reads
@@ -135,7 +138,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--weights", default="None")
-    parser.add_argument('--Nbases', choices=["4", "5"], default='4')
+    parser.add_argument('--Nbases', type=int, choices=[4, 5], default=4)
     parser.add_argument('--output', type=str, default="output.fasta")
     parser.add_argument('--directory', type=str, default='',
                         help="Directory where read files are stored")
@@ -144,6 +147,6 @@ if __name__ == "__main__":
     parser.add_argument('--filter', type=str, default='')
 
     args = parser.parse_args()
-
+    # exit()
     process(weights=args.weights, Nbases=args.Nbases, output=args.output,
             directory=args.directory, reads=args.reads, filter=args.filter)
