@@ -3,6 +3,16 @@ DeepNano5Bases
 
 Extension of deepnano to work with 5 bases
 
+==============================
+
+To evaluate the model :
+
+python -m src.models.predict_model --weights=data/training/my_model_weights-3390-removed-bad-B.h5 --directory=data/raw/control/ --Nbases=5 --output=data/processed/result.fasta
+
+The directory must contait fasta sequences
+
+==============================
+
 Project Organization
 ------------
 
