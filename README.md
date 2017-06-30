@@ -3,6 +3,7 @@ DeepNano5Bases
 
 Extension of deepnano to work with 5 bases
 
+To Evaluate the performances
 ==============================
 
 To evaluate the model :
@@ -15,6 +16,8 @@ to evaluate the model and get some info on T/B and alignement:
 But the code must be modified
 
 python -m src.test.evaluate
+
+
 ==============================
 
 Project Organization
