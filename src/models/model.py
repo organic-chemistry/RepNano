@@ -55,6 +55,9 @@ def build_models(size=20):
     model.compile(optimizer='adadelta', loss='categorical_crossentropy',
                   sample_weight_mode='temporal')
 
+    if keras.backend.backend() != 'tensorflow':
+        return model, None
+
     if keras.backend.backend() == 'tensorflow':
 
         def ctc_lambda_func(args):
