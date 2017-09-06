@@ -3,6 +3,7 @@ import argparse
 import os
 import numpy as np
 from .model import build_models
+from ..features.extract_events import extract_events
 
 
 def scale(X):
@@ -25,24 +26,27 @@ def scale(X):
     return ret
 
 
-def get_events(h5):
-    try:
-        e = h5["Analyses/Basecall_RNN_1D_000/BaseCalled_template/Events"]
-        return e
-    except:
-        pass
-    try:
-        e = h5["Analyses/Basecall_1D_000/BaseCalled_template/Events"]
-        return e
-    except:
-        pass
+def get_events(h5, already_detected=True):
+    if already_detected:
+        try:
+            e = h5["Analyses/Basecall_RNN_1D_000/BaseCalled_template/Events"]
+            return e
+        except:
+            pass
+        try:
+            e = h5["Analyses/Basecall_1D_000/BaseCalled_template/Events"]
+            return e
+        except:
+            pass
+    else:
+        return extract_events(h5, "r9")
 
 
-def basecall_one_file(filename, output_file, ntwk, alph):
+def basecall_one_file(filename, output_file, ntwk, alph, already_detected):
     # try:
     assert(os.path.exists(filename)), "File %s does no exists" % filename
     h5 = h5py.File(filename, "r")
-    events = get_events(h5)
+    events = get_events(h5, already_detected)
     if events is None:
         print("No events in file %s" % filename)
         h5.close()
@@ -84,7 +88,7 @@ def basecall_one_file(filename, output_file, ntwk, alph):
     return 0
 
 
-def process(weights, Nbases, output, directory, reads=[], filter=""):
+def process(weights, Nbases, output, directory, reads=[], filter="", already_detected=True):
     assert len(reads) != 0 or len(directory) != 0, "Nothing to basecall"
 
     alph = "ACGTN"
@@ -129,7 +133,7 @@ def process(weights, Nbases, output, directory, reads=[], filter=""):
                 if os.path.split(read)[1] not in Files:
                     continue
             print("Processing read %s" % read)
-            basecall_one_file(read, fo, ntwk, alph)
+            basecall_one_file(read, fo, ntwk, alph, already_detected)
 
         fo.close()
 
@@ -143,10 +147,12 @@ if __name__ == "__main__":
     parser.add_argument('--directory', type=str, default='',
                         help="Directory where read files are stored")
     parser.add_argument('reads', type=str, nargs='*')
+    parser.add_argument('--detect', dest='already_detected', action='store_false')
 
     parser.add_argument('--filter', type=str, default='')
 
     args = parser.parse_args()
     # exit()
     process(weights=args.weights, Nbases=args.Nbases, output=args.output,
-            directory=args.directory, reads=args.reads, filter=args.filter)
+            directory=args.directory, reads=args.reads, filter=args.filter,
+            already_detected=args.already_detected)
