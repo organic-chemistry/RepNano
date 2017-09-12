@@ -238,7 +238,7 @@ if __name__ == '__main__':
                             data_alignment.append(alignments[0][:2])
                             if sub is not None:
                                 ref = ref.replace("T", sub)
-                            print(ref)
+                            # print(ref)
                             refs.append(ref)
                             # print(len(seqs), len(ref))
                             print(len(alignments[0][0]), len(ref), len(seqs), alignments[0][2:])
