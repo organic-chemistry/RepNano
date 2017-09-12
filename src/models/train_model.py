@@ -231,6 +231,9 @@ if __name__ == '__main__':
                                 continue
                             if len(data_x) > 10:
                                 break
+                        if len(ref) > 30000:
+                            print("out", len(ref))
+                            continue
                         if succes:
                             data_x.append(x)
                             alignments = pairwise2.align.globalxx(ref, seqs)
