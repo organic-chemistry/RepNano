@@ -15,179 +15,194 @@
 # error = /kingdoms/rce/workspace1/Nanopore/20161208-run4/Condor_output/K-47147-pass.StatAln.err
 # log = /kingdoms/rce/workspace1/Nanopore/20161208-run4/Condor_output/K-47147-pass.StatAln.log
 # queue
-
-
-import sys
 import re  # to use re.findall to parse the CIGAR string
 
-read_file = sys.argv[1]
-Chromlist = ['chr1', 'chr2', 'chr3', 'chr4', 'chr5', 'chr6', 'chr7', 'chr8', 'chr9',
-             'chr10', 'chr11', 'chr12', 'chr13', 'chr14', 'chr15', 'chr16', 'ref|NC_001224|']
 
-################"" read the sam file #############
-f = open(read_file, 'r')
+def get_stats(read_file, print_output=True):
+    Chromlist = ['chr1', 'chr2', 'chr3', 'chr4', 'chr5', 'chr6', 'chr7', 'chr8', 'chr9',
+                 'chr10', 'chr11', 'chr12', 'chr13', 'chr14', 'chr15', 'chr16', 'ref|NC_001224|']
 
-Table = {}
-read = 0
-alnTemp = 0
-unalign = 0
-R6000 = 0
-aln6000 = 0
-Ntemp = 0
-Ncomp = 0
-N2D = 0
-FTp = 0
-RTp = 0
-FCp = 0
-RCp = 0
-F2D = 0
-R2D = 0
-Reads = {}
-for chrom in Chromlist:
-    Reads[chrom] = 0
+    ################"" read the sam file #############
+    f = open(read_file, 'r')
 
-s = f.readline()  # read the 1st line
+    Table = {}
+    read = 0
+    alnTemp = 0
+    unalign = 0
+    R6000 = 0
+    aln6000 = 0
+    Ntemp = 0
+    Ncomp = 0
+    N2D = 0
+    FTp = 0
+    RTp = 0
+    FCp = 0
+    RCp = 0
+    F2D = 0
+    R2D = 0
+    Reads = {}
+    for chrom in Chromlist:
+        Reads[chrom] = 0
 
-# to file in Table : dictionary where each read number is associated with all features
+    # print(f.readlines())
+    s = f.readline()  # read the 1st line
 
-while s != '':
-    # print read
-    ss = s.split()
-    if ss[0] == '@SQ':
-        ref = ss[1]
-    elif ss[0] == '@PG':
-        ID = ss[1]
+    # to file in Table : dictionary where each read number is associated with all features
 
-    else:
+    while s != '':
+        # print read
+        ss = s.split()
         # print(ss)
-        Table[read] = {}
-        Table[read]['Name'] = ss[0].split('_')[0]
-        Table[read]['shortName'] = "Name"  # ss[0].split('_')[0].split('-')[4]
-        Table[read]['Type'] = "type"  # ss[0].split('_')[3]
-        Table[read]['Bit'] = ss[1]
-        Table[read]['chrom'] = ss[2]
-        Table[read]['pos'] = ss[3]
-        Table[read]['CIGAR'] = ss[5]
-        Table[read]['seq'] = ss[9]
-        Table[read]['ED'] = ss[11].split(':')[2]  # Edit distance
-        Table[read]['MD'] = ss[12].split(':')[2]  # mutations
+        if ss[0] == '@SQ':
+            ref = ss[1]
+        elif ss[0] == '@PG':
+            ID = ss[1]
 
-        # read the CIGAR to get the insertions, deletions and trimmed bases
-        # 25S3M1D9M1D22M1I5M1D3M2D8M4I19M1I3M1D3M1D7M2D6M2D4M1D1
-        cigar = re.findall('\d+|\D+', Table[read]['CIGAR'])
-        ins = 0
-        delet = 0
-        trim = 0
-        for i in range(len(cigar) - 1):
-            if cigar[i + 1] == 'S':
-                trim = trim + int(cigar[i])
-            if cigar[i + 1] == 'I':
-                ins = ins + int(cigar[i])
-            elif cigar[i + 1] == 'D':
-                delet = delet + int(cigar[i])
-            i += 2
+        else:
+            # print(ss)
+            if len(ss) <= 12:
+                print("Error with ", ss)
+                s = f.readline()
+                continue
 
-        Table[read]['ins'] = ins  # number of insertions in the read compared to the ref
-        Table[read]['delet'] = delet  # number of deletions in the read compared to the ref
-        # number of trimmed bases (beginning + end) in the read compared to the ref
-        Table[read]['trim'] = trim
+            Table[read] = {}
+            Table[read]['Name'] = ss[0].split('_')[0]
+            Table[read]['shortName'] = "Name"  # ss[0].split('_')[0].split('-')[4]
+            Table[read]['Type'] = "type"  # ss[0].split('_')[3]
+            Table[read]['Bit'] = ss[1]
+            Table[read]['chrom'] = ss[2]
+            Table[read]['pos'] = ss[3]
+            Table[read]['CIGAR'] = ss[5]
+            Table[read]['seq'] = ss[9]
+            Table[read]['ED'] = ss[11].split(':')[2]  # Edit distance
+            Table[read]['MD'] = ss[12].split(':')[2]  # mutations
 
-        # read MD
-        # 3^A2T6^A1G17G4G0G1^T0G2^AA3A0G7G0G1A0G1T0G1G0T2G4^T3^A...
-        MD = re.findall('\d+|\D+', Table[read]['MD'])
-        mut = 0
-        countTmut = 0
-        countAmut = 0
-        countCmut = 0
-        countGmut = 0
+            # read the CIGAR to get the insertions, deletions and trimmed bases
+            # 25S3M1D9M1D22M1I5M1D3M2D8M4I19M1I3M1D3M1D7M2D6M2D4M1D1
+            cigar = re.findall('\d+|\D+', Table[read]['CIGAR'])
+            ins = 0
+            delet = 0
+            trim = 0
+            for i in range(len(cigar) - 1):
+                if cigar[i + 1] == 'S':
+                    trim = trim + int(cigar[i])
+                if cigar[i + 1] == 'I':
+                    ins = ins + int(cigar[i])
+                elif cigar[i + 1] == 'D':
+                    delet = delet + int(cigar[i])
+                i += 2
 
-        for i in range(len(MD)):
-            if MD[i].isdigit() == True:
-                t = int(MD[i])
-            elif MD[i][0] == '^':
-                t = MD[i]
-            else:
-                mut += 1
-                if MD[i] == 'T':
-                    countTmut += 1
-                if MD[i] == 'A':
-                    countAmut += 1
-                if MD[i] == 'C':
-                    countCmut += 1
-                if MD[i] == 'G':
-                    countGmut += 1
+            Table[read]['ins'] = ins  # number of insertions in the read compared to the ref
+            Table[read]['delet'] = delet  # number of deletions in the read compared to the ref
+            # number of trimmed bases (beginning + end) in the read compared to the ref
+            Table[read]['trim'] = trim
 
-        Table[read]['mut'] = mut  # number of mismatches in the read compared to the ref
-        Table[read]['Amut'] = countAmut
-        Table[read]['Tmut'] = countTmut
-        Table[read]['Cmut'] = countCmut
-        Table[read]['Gmut'] = countGmut
+            # read MD
+            # 3^A2T6^A1G17G4G0G1^T0G2^AA3A0G7G0G1A0G1T0G1G0T2G4^T3^A...
+            MD = re.findall('\d+|\D+', Table[read]['MD'])
+            mut = 0
+            countTmut = 0
+            countAmut = 0
+            countCmut = 0
+            countGmut = 0
 
-        # "count aligned sequences############"
-        if Table[read]['Bit'] == '0' or Table[read]['Bit'] == '16' or Table[read]['Bit'] == '2064' or Table[read]['Bit'] == '2048':
-            alnTemp += 1
-            Reads[Table[read]['chrom']] += 1
-        elif Table[read]['Bit'] == '4':
-            unalign += 1
-        if len(Table[read]['seq']) > 6000:
-            R6000 += 1
+            for i in range(len(MD)):
+                if MD[i].isdigit() == True:
+                    t = int(MD[i])
+                elif MD[i][0] == '^':
+                    t = MD[i]
+                else:
+                    mut += 1
+                    if MD[i] == 'T':
+                        countTmut += 1
+                    if MD[i] == 'A':
+                        countAmut += 1
+                    if MD[i] == 'C':
+                        countCmut += 1
+                    if MD[i] == 'G':
+                        countGmut += 1
+
+            Table[read]['mut'] = mut  # number of mismatches in the read compared to the ref
+            Table[read]['Amut'] = countAmut
+            Table[read]['Tmut'] = countTmut
+            Table[read]['Cmut'] = countCmut
+            Table[read]['Gmut'] = countGmut
+
+            # "count aligned sequences############"
             if Table[read]['Bit'] == '0' or Table[read]['Bit'] == '16' or Table[read]['Bit'] == '2064' or Table[read]['Bit'] == '2048':
-                aln6000 += 1
-             ####################################################
+                alnTemp += 1
+                Reads[Table[read]['chrom']] += 1
+            elif Table[read]['Bit'] == '4':
+                unalign += 1
+            if len(Table[read]['seq']) > 6000:
+                R6000 += 1
+                if Table[read]['Bit'] == '0' or Table[read]['Bit'] == '16' or Table[read]['Bit'] == '2064' or Table[read]['Bit'] == '2048':
+                    aln6000 += 1
+                 ####################################################
 
-             # count 2D, template, complement, chrom	#########"
-        if Table[read]['Type'] == 'template':
-            Ntemp += 1
-            if (Table[read]['Bit'] == '0' or Table[read]['Bit'] == '2048'):
-                FTp += 1
-            if (Table[read]['Bit'] == '16' or Table[read]['Bit'] == '2064'):
-                RTp += 1
-        if Table[read]['Type'] == 'complement':
-            Ncomp += 1
-            if (Table[read]['Bit'] == '0' or Table[read]['Bit'] == '2048'):
-                FCp += 1
-            if (Table[read]['Bit'] == '16' or Table[read]['Bit'] == '2064'):
-                RCp += 1
-        if Table[read]['Type'] == '2d':
-            N2D += 1
-            if (Table[read]['Bit'] == '0' or Table[read]['Bit'] == '2048'):
-                F2D += 1
-            if (Table[read]['Bit'] == '16' or Table[read]['Bit'] == '2064'):
-                R2D += 1
-        read = read + 1
+                 # count 2D, template, complement, chrom	#########"
+            if Table[read]['Type'] == 'template':
+                Ntemp += 1
+                if (Table[read]['Bit'] == '0' or Table[read]['Bit'] == '2048'):
+                    FTp += 1
+                if (Table[read]['Bit'] == '16' or Table[read]['Bit'] == '2064'):
+                    RTp += 1
+            if Table[read]['Type'] == 'complement':
+                Ncomp += 1
+                if (Table[read]['Bit'] == '0' or Table[read]['Bit'] == '2048'):
+                    FCp += 1
+                if (Table[read]['Bit'] == '16' or Table[read]['Bit'] == '2064'):
+                    RCp += 1
+            if Table[read]['Type'] == '2d':
+                N2D += 1
+                if (Table[read]['Bit'] == '0' or Table[read]['Bit'] == '2048'):
+                    F2D += 1
+                if (Table[read]['Bit'] == '16' or Table[read]['Bit'] == '2064'):
+                    R2D += 1
+            read = read + 1
 
-    s = f.readline()
+        s = f.readline()
 
-f.close()
+    f.close()
 
-print('File = ' + read_file)
-print('Total = ' + str(read))
-print('Aligned = ' + str(alnTemp))
-print('Unaligned = ' + str(unalign))
-print('L>6000 = ' + str(R6000))
-print('Aligned  and L>6000 = ' + str(aln6000))
-print('Template = ' + str(Ntemp))
-print('Complement = ' + str(Ncomp))
-print('2D = ' + str(N2D))
-print('F Tp = ' + str(FTp))
-print('R Tp = ' + str(RTp))
-print('F Cp = ' + str(FCp))
-print('R Cp = ' + str(RCp))
-print('F 2D = ' + str(F2D))
-print('R 2D = ' + str(R2D))
-for chrom in Chromlist:
-    print(chrom, Reads[chrom])
+    if print_output:
+        print('File = ' + read_file)
+        print('Total = ' + str(read))
+        print('Aligned = ' + str(alnTemp))
+        print('Unaligned = ' + str(unalign))
+        print('L>6000 = ' + str(R6000))
+        print('Aligned  and L>6000 = ' + str(aln6000))
+        print('Template = ' + str(Ntemp))
+        print('Complement = ' + str(Ncomp))
+        print('2D = ' + str(N2D))
+        print('F Tp = ' + str(FTp))
+        print('R Tp = ' + str(RTp))
+        print('F Cp = ' + str(FCp))
+        print('R Cp = ' + str(RCp))
+        print('F 2D = ' + str(F2D))
+        print('R 2D = ' + str(R2D))
+        for chrom in Chromlist:
+            print(chrom, Reads[chrom])
 
-####################  print a smaller file usable for several samples ##################
+    ####################  print a smaller file usable for several samples ##################
 
-g = open(read_file.split('.')[0] + '.' + "StatAln", 'a')
-g.write('#')
-g.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" % ('ReadName', 'Type', 'Bit',
-                                                                    'Lenght', 'Pos', 'chrom', 'ED', 'Ins', 'Del', 'Trim', 'Amut', 'Tmut', 'Cmut', 'Gmut'))
-g.write("\n")
-
-for read in Table:
-    g.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" % (Table[read]['shortName'], Table[read]['Type'], Table[read]['Bit'], len(Table[read]['seq']), Table[read]['pos'], Table[
-            read]['chrom'], Table[read]['ED'], Table[read]['ins'], Table[read]['delet'], Table[read]['trim'], Table[read]['Amut'], Table[read]['Tmut'], Table[read]['Cmut'], Table[read]['Gmut']))
+    g = open(read_file.split('.')[0] + '.' + "StatAln", 'a')
+    g.write('#')
+    g.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" % ('ReadName', 'Type', 'Bit',
+                                                                        'Lenght', 'Pos', 'chrom', 'ED', 'Ins', 'Del', 'Trim', 'Amut', 'Tmut', 'Cmut', 'Gmut'))
     g.write("\n")
-g.close
+
+    for read in Table:
+        g.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" % (Table[read]['shortName'], Table[read]['Type'], Table[read]['Bit'], len(Table[read]['seq']), Table[read]['pos'], Table[
+                read]['chrom'], Table[read]['ED'], Table[read]['ins'], Table[read]['delet'], Table[read]['trim'], Table[read]['Amut'], Table[read]['Tmut'], Table[read]['Cmut'], Table[read]['Gmut']))
+        g.write("\n")
+    g.close
+
+    return alnTemp, unalign
+
+if __name__ == "__main__":
+
+    import sys
+
+    read_file = sys.argv[1]
+    get_stats(read_file)

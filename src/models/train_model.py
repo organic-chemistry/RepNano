@@ -48,11 +48,13 @@ def get_segment(alignment, start_index_on_seqs, end_index_on_seqs):
     # print(s1,s2)
     startf = False
     end = None
+    # found_end =
     for N, (c1, c2) in enumerate(zip(s1, s2)):
         # print(count)
         if count == start_index_on_seqs and not startf:
             start = 0 + N
             startf = True
+
         if count == end_index_on_seqs + 1:
             end = 0 + N
             break
@@ -61,8 +63,9 @@ def get_segment(alignment, start_index_on_seqs, end_index_on_seqs):
             count += 1
 
     # print(start,end)
-
-    return s1[start:end].replace("-", ""), s1[start:end], s2[start:end]
+    if not startf:
+        return "", "", "", 0
+    return s1[start:end].replace("-", ""), s1[start:end], s2[start:end], 1
 
 
 if __name__ == '__main__':
@@ -76,11 +79,15 @@ if __name__ == '__main__':
     parser.add_argument('--size', type=int, default=20)
 
     parser.add_argument('directories', type=str, nargs='*')
+
+    parser.add_argument('--from-pre-trained', dest='from_pre_trained', action='store_true')
+    parser.add_argument('--pre-trained-weight', dest='pre_trained_weight', type=str)
+    parser.add_argument('--pre-trained-dir-list', dest='pre_trained_dir_list', type=str)
+
     args = parser.parse_args()
 
     data_x = []
-    data_y = []
-    data_y2 = []
+
     data_index = []
     data_alignment = []
     refs = []
@@ -98,15 +105,11 @@ if __name__ == '__main__':
 
     n_classes = len(mapping.keys())
 
-    list_files = []
     subseq_size = 40
 
-    for folder in args.directories:
-        list_files += glob.glob(folder + "/*")
+    from .model import build_models
 
-    list_files = list_files
-
-    list_files.sort()
+    predictor, ntwk = build_models(args.size)
 
     os.makedirs(args.root, exist_ok=True)
 
@@ -115,50 +118,136 @@ if __name__ == '__main__':
         if args.test:
             end = 80
 
-        for fn in list_files[:end]:
-            print(fn)
-            f = open(fn)
-            ref = f.readline()
-            ref = ref.replace("\n", "")
-            if len(ref) > 30000:
-                print("out", len(ref))
-                continue
+        if not args.from_pre_trained:
 
-            X = []
-            Y = []
-            Y2 = []
-            seq = []
-            for l in f:
-                its = l.strip().split()
-                X.append(list(map(float, its[:-1])))
-                Y.append(mapping[its[-1][0]])
-                Y2.append(mapping[its[-1][1]])
-                seq.append(its[-1])
+            list_files = []
+            for folder in args.directories:
+                list_files += glob.glob(folder + "/*")
 
-            if len(X) < subseq_size:
-                print("out (too small (to include must set a smaller subseq_size))", fn)
-                continue
-            refs.append(ref.strip())
-            names.append(fn)
-            data_x.append(np.array(X, dtype=np.float32))
-            data_y.append(np.array(Y, dtype=np.int32))
-            data_y2.append(np.array(Y2, dtype=np.int32))
-            seq = "".join(seq)
-            # print(seq)
-            seq = seq[1::2]
-            # print(seq)
-            data_index.append(np.arange(len(seq))[np.array([s for s in seq]) != "N"])
-            seqs = seq.replace("N", "")
-            alignments = pairwise2.align.globalxx(ref, seqs)
-            data_alignment.append(alignments[0][:2])
-            # print(len(seqs), len(ref))
-            print(len(alignments[0][0]), len(ref), len(seqs), alignments[0][2:])
+            list_files.sort()
+
+            for fn in list_files[:end]:
+                print(fn)
+                f = open(fn)
+                ref = f.readline()
+                ref = ref.replace("\n", "")
+                if len(ref) > 30000:
+                    print("out", len(ref))
+                    continue
+
+                X = []
+
+                seq = []
+                for l in f:
+                    its = l.strip().split()
+                    X.append(list(map(float, its[:-1])))
+
+                    seq.append(its[-1])
+
+                if len(X) < subseq_size:
+                    print("out (too small (to include must set a smaller subseq_size))", fn)
+                    continue
+                refs.append(ref.strip())
+                names.append(fn)
+                data_x.append(np.array(X, dtype=np.float32))
+
+                seq = "".join(seq)
+                # print(seq)
+                seq = seq[1::2]
+                # print(seq)
+                data_index.append(np.arange(len(seq))[np.array([s for s in seq]) != "N"])
+                seqs = seq.replace("N", "")
+                alignments = pairwise2.align.globalxx(ref, seqs)
+                data_alignment.append(alignments[0][:2])
+                # print(len(seqs), len(ref))
+                print(len(alignments[0][0]), len(ref), len(seqs), alignments[0][2:])
+        else:
+            ntwk.load_weights(args.pre_trained_weight)
+            predictor.load_weights(args.pre_trained_weight)
+
+            from ..features.extract_events import extract_events, scale
+            import h5py
+            import subprocess
+            from ..features.bwa_tools import get_seq
+            end = None
+            if args.test:
+                end = 10
+
+            with open(args.pre_trained_dir_list, "r") as f:
+
+                for line in f.readlines():
+                    direct, type_sub = line.split()
+                    sub = None
+                    if "1" in type_sub:
+                        sub = "B"
+
+                    for filename in glob.glob(direct + "/*"):
+                        h5 = h5py.File(filename, "r")
+
+                        events = extract_events(h5, "r9.5")
+                        if events is None:
+                            print("No events in file %s" % filename)
+                            h5.close()
+                            continue
+
+                        if len(events) < 300:
+                            print("Read %s too short, not basecalling" % filename)
+                            h5.close()
+                            continue
+                        # print(len(events))
+                        events = events[1:-1]
+                        mean = events["mean"]
+                        std = events["stdv"]
+                        length = events["length"]
+                        x = scale(
+                            np.array(np.vstack([mean, mean * mean, std, length]).T, dtype=np.float32))
+
+                        o1 = predictor.predict(np.array(x)[np.newaxis, ::, ::])
+                        o1 = o1[0]
+                        om = np.argmax(o1, axis=-1)
+
+                        alph = "ACGTTN"
+                        seq = "".join(map(lambda x: alph[x], om))
+                        data_index.append(np.arange(len(seq))[np.array([s for s in seq]) != "N"])
+                        seqs = seq.replace("N", "")
+
+                        # write fasta
+                        with open("tmp.fasta", "w") as output_file:
+                            output_file.writelines(">%s_template_deepnano\n" % filename)
+                            output_file.writelines(seqs + "\n")
+
+                        # execute bwa
+                        ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
+                        exex = "bwa mem -x ont2d  %s  tmp.fasta > tmp.sam" % ref
+                        subprocess.call(exex, shell=True)
+
+                        # read from bwa
+                        ref, succes = get_seq(
+                            "tmp.sam", ref="data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa")
+
+                        if args.test:
+                            print(len(data_x), "LEN")
+                            if len(ref) > 2000:
+                                continue
+                            if len(data_x) > 10:
+                                break
+                        if succes:
+                            data_x.append(x)
+                            alignments = pairwise2.align.globalxx(ref, seqs)
+
+                            data_alignment.append(alignments[0][:2])
+                            if sub is not None:
+                                ref = ref.replace("T", sub)
+                            print(ref)
+                            refs.append(ref)
+                            # print(len(seqs), len(ref))
+                            print(len(alignments[0][0]), len(ref), len(seqs), alignments[0][2:])
 
         with open(os.path.join(args.root, "Allignements-bis"), "wb") as f:
-            cPickle.dump([data_x, data_y, data_y2, data_index, data_alignment, refs, names], f)
+            cPickle.dump([data_x, data_index, data_alignment, refs, names], f)
     else:
         with open(os.path.join(args.root, "Allignements-bis"), "rb") as f:
-            data_x, data_y, data_y2, data_index, data_alignment, refs, names = cPickle.load(f)
+            data_x, data_index, data_alignment, refs, names = cPickle.load(f)
 
     print("done", sum(len(x) for x in refs))
     sys.stdout.flush()
@@ -180,10 +269,6 @@ if __name__ == '__main__':
     print(len(data_x), batch_size, n_batches, datetime.datetime.now())
 
     boring = False
-
-    from .model import build_models
-
-    predictor, ntwk = build_models(args.size)
 
 
 # ntwk.load_weights("./my_model_weights.h5")
@@ -295,7 +380,7 @@ if __name__ == '__main__':
             print("Change", change, len(data_x))
             with open(os.path.join(
                     args.root, "Allignements-bis-%i" % epoch), "wb") as f:
-                cPickle.dump([data_x, data_y, data_y2, data_index,
+                cPickle.dump([data_x, data_index,
                               data_alignment, refs, names], f)
             with open(log_total_length, "a") as f:
                 f.writelines("%i,%i,%i,%i,%i,%i,%i\n" %
@@ -313,8 +398,6 @@ if __name__ == '__main__':
         o2mm = []
         y2mm = []
         X_new = []
-        Y_new = []
-        Y2_new = []
         Label = []
         Length = []
         stats = defaultdict(int)
@@ -330,12 +413,6 @@ if __name__ == '__main__':
                 ret[base] = 1
                 return ret
 
-            for xx in data_y2[s2][r:r + subseq_size]:
-                stats[xx] += 1
-
-            y = [domap(base) for base in data_y[s2][r:r + subseq_size]]
-            y2 = [domap(base) for base in data_y2[s2][r:r + subseq_size]]
-
             if not boring:
                 length = subseq_size
                 start = r
@@ -346,13 +423,17 @@ if __name__ == '__main__':
                 end_index_on_seqs = find_closest(start + length, Index)
                 # from IPython import embed
                 # embed()
-                # print(start, start_index_on_seqs, end_index_on_seqs, len(alignment))
-                seg, ss1, ss2 = get_segment(alignment, start_index_on_seqs, end_index_on_seqs)
-
+                print(start, start_index_on_seqs, end_index_on_seqs,
+                      len(alignment[0]), len(alignment[1]))
+                seg, ss1, ss2, success = get_segment(
+                    alignment, start_index_on_seqs, end_index_on_seqs)
+                if not success:
+                    continue
                 maxi = 40
                 l = min(max(len(seg), 1), maxi - 1)
-                if abs(len(ss2.replace("-", "")) - len(ss2)) + abs(len(ss1.replace("-", "")) - len(ss1)) > 10:
-                    continue
+                if not args.test:
+                    if abs(len(ss2.replace("-", "")) - len(ss2)) + abs(len(ss1.replace("-", "")) - len(ss1)) > 10:
+                        continue
                 Length.append(l)
 
                 # print(len(s))
@@ -366,15 +447,12 @@ if __name__ == '__main__':
                 # print([base for base in s])
                 Label.append([mapping[base] for base in seg])
             X_new.append(x)
-            Y_new.append(y)
-            Y2_new.append(y2)
 
         X_new = np.array(X_new)
-        Y_new = np.array(Y_new)
-        Y2_new = np.array(Y2_new)
+
         Label = np.array(Label)
         Length = np.array(Length)
-        print(X_new.shape, Y_new.shape)
+        print(X_new.shape)
 
         # To balance class weight
 
@@ -382,7 +460,14 @@ if __name__ == '__main__':
         print(X_new.shape, Label.shape, np.array(
             [length] * len(Length)).shape, Length.shape)
 
-        maxin = 10 * (int(len(X_new) // 10) - 3)
+        if args.test:
+            maxin = 8
+            val = 2
+            batch_size = 8
+        else:
+            maxin = 10 * (int(len(X_new) // 10) - 3)
+            val = 30
+            batch_size = 10
         reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.2,
                                                       patience=5, min_lr=0.0001)
         Log = keras.callbacks.CSVLogger(filename=os.path.join(
@@ -390,13 +475,13 @@ if __name__ == '__main__':
 
         print(len(data_x), np.mean(Length), np.max(Length))
         ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size] * len(Length))[:maxin], Length[:maxin]],
-                 Label[:maxin], nb_epoch=1, batch_size=10, callbacks=[reduce_lr, Log],
-                 validation_data=([X_new[maxin:maxin + 30],
-                                   Label[maxin:maxin + 30],
+                 Label[:maxin], nb_epoch=1, batch_size=batch_size, callbacks=[reduce_lr, Log],
+                 validation_data=([X_new[maxin:maxin + val],
+                                   Label[maxin:maxin + val],
                                    np.array([subseq_size] *
-                                            len(Length))[maxin:maxin + 30],
-                                   Length[maxin:maxin + 30]],
-                                  Label[maxin:maxin + 30]))
+                                            len(Length))[maxin:maxin + val],
+                                   Length[maxin:maxin + val]],
+                                  Label[maxin:maxin + val]))
 
         """
         import tensorflow as tf

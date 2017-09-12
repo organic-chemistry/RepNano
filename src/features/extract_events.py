@@ -12,8 +12,34 @@ defs = {
             'window_lengths': [5, 10], 'thresholds': [2.0, 1.1],
             'peak_height': 1.2
         }
+    },
+    'r9.5': {
+        'ed_params': {
+            'window_lengths': [10, 20], 'thresholds': [2.0, 1.1],
+            'peak_height': 1.4
+        }
     }
 }
+
+
+def scale(X):
+    m25 = np.percentile(X[:, 0], 25)
+    m75 = np.percentile(X[:, 0], 75)
+    s50 = np.median(X[:, 2])
+    me25 = 0.07499809
+    me75 = 0.26622871
+    se50 = 0.6103758
+    ret = np.array(X)
+    scale = (me75 - me25) / (m75 - m25)
+    m25 *= scale
+    shift = me25 - m25
+    ret[:, 0] = X[:, 0] * scale + shift
+    ret[:, 1] = ret[:, 0]**2
+
+    sscale = se50 / s50
+
+    ret[:, 2] = X[:, 2] * sscale
+    return ret
 
 
 def get_raw(h5):
@@ -21,11 +47,13 @@ def get_raw(h5):
     rk = list(h5["Raw/Reads"].keys())[0]
 
     raw = h5["Raw/Reads"][rk]["Signal"]
+    # print(list(h5["Raw/Reads"].keys()))
     meta = h5["UniqueGlobalKey/channel_id"].attrs
     offset = meta["offset"]
     raw_unit = meta['range'] / meta['digitisation']
     raw = (raw + offset) * raw_unit
     sl = meta["sampling_rate"]
+    # print(tracking
 
     return raw, sl
 
@@ -71,7 +99,7 @@ def get_tstat(s, s2, wl):
 
 
 def extract_events(h5, chem):
-    print("ed")
+    # print("ed")
     raw, sl = get_raw(h5)
 
     events = event_detect(raw, sl, **defs[chem]["ed_params"])

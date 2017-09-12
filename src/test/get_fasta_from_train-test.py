@@ -4,9 +4,11 @@ get_from = sys.argv[2]
 out_name = sys.argv[3]
 
 Files = []
-with open(get_from,"r") as f:
-    for line in f.readlines():
-        Files.append(line.split()[0])
+
+if get_from != "all":
+    with open(get_from, "r") as f:
+        for line in f.readlines():
+            Files.append(line.split()[0])
 
 cut = []
 cutT = []
@@ -14,26 +16,38 @@ B = 0
 T = 0
 found = []
 lost = []
-with open(out_network,"r") as f:
+with open(out_network, "r") as f:
     data = f.readlines()
-    for fi,seq in zip(data[::2],data[1:][::2]):
+    for fi, seq in zip(data[::2], data[1:][::2]):
+
+        doit = False
         for Fi in Files:
             if Fi in fi:
+                doit = True
                 found.append(Fi)
-                cut.append(fi+seq)
+                break
+        if get_from == "all":
+            doit = True
+        if doit:
 
-                B += seq.count("B")
-                T += seq.count("T")
-                seq = seq.replace("B","T")
-                cutT.append(fi+seq)
+            cut.append(fi + seq)
+
+            B += seq.count("B")
+            T += seq.count("T")
+            seq = seq.replace("B", "T")
+            cutT.append(fi + seq)
 
 
-with open(out_name + ".fasta" ,"w") as f:
+with open(out_name + ".fasta", "w") as f:
     f.writelines("".join(cut))
 
-with open(out_name +"_T" +".fasta","w") as f:
+with open(out_name + "_T" + ".fasta", "w") as f:
     f.writelines("".join(cutT))
 
-print(len(Files),len(cut),len(cutT))
+print(len(Files), len(cut), len(cutT))
 print(out_name)
-print("Number of T %i, number of B %i, ratio %f"%(T,B,B/1.0/T))
+r = 0
+if T != 0:
+    r = B / 1.0 / T
+
+print("Number of T %i, number of B %i, ratio %f" % (T, B, r))

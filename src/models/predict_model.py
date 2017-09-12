@@ -3,27 +3,7 @@ import argparse
 import os
 import numpy as np
 from .model import build_models
-from ..features.extract_events import extract_events
-
-
-def scale(X):
-    m25 = np.percentile(X[:, 0], 25)
-    m75 = np.percentile(X[:, 0], 75)
-    s50 = np.median(X[:, 2])
-    me25 = 0.07499809
-    me75 = 0.26622871
-    se50 = 0.6103758
-    ret = np.array(X)
-    scale = (me75 - me25) / (m75 - m25)
-    m25 *= scale
-    shift = me25 - m25
-    ret[:, 0] = X[:, 0] * scale + shift
-    ret[:, 1] = ret[:, 0]**2
-
-    sscale = se50 / s50
-
-    ret[:, 2] = X[:, 2] * sscale
-    return ret
+from ..features.extract_events import extract_events, scale
 
 
 def get_events(h5, already_detected=True):
@@ -39,7 +19,7 @@ def get_events(h5, already_detected=True):
         except:
             pass
     else:
-        return extract_events(h5, "r9")
+        return extract_events(h5, "r9.5")
 
 
 def basecall_one_file(filename, output_file, ntwk, alph, already_detected):
@@ -63,11 +43,14 @@ def basecall_one_file(filename, output_file, ntwk, alph, already_detected):
     std = events["stdv"]
     length = events["length"]
     X = scale(np.array(np.vstack([mean, mean * mean, std, length]).T, dtype=np.float32))
+    print(np.mean(X[:, 0]))
     try:
+        print("la")
         o1 = ntwk.predict(np.array(X)[np.newaxis, ::, ::])
         o1 = o1[0]
 
     except:
+        print("ici")
         o1, o2 = ntwk.predict(X)
 
     # print(o1[:20])
@@ -76,7 +59,7 @@ def basecall_one_file(filename, output_file, ntwk, alph, already_detected):
     # exit()
 
     output = "".join(map(lambda x: alph[x], om)).replace("N", "")
-    print(om.shape, len(output))
+    print(om.shape, len(output), len(output) / om.shape[0])
 
     output_file.writelines(">%s_template_deepnano\n" % filename)
     output_file.writelines(output + "\n")
@@ -88,7 +71,7 @@ def basecall_one_file(filename, output_file, ntwk, alph, already_detected):
     return 0
 
 
-def process(weights, Nbases, output, directory, reads=[], filter="", already_detected=True):
+def process(weights, Nbases, output, directory, reads=[], filter="", already_detected=True, Nmax=None):
     assert len(reads) != 0 or len(directory) != 0, "Nothing to basecall"
 
     alph = "ACGTN"
@@ -104,7 +87,7 @@ def process(weights, Nbases, output, directory, reads=[], filter="", already_det
     print("loaded")
 
     Files = []
-    if filter != "":
+    if filter != "" and filter is not None:
         assert(os.path.exists(filter)), "Filter %s does not exist" % filter
         with open(filter, "r") as f:
             for line in f.readlines():
@@ -134,6 +117,9 @@ def process(weights, Nbases, output, directory, reads=[], filter="", already_det
                     continue
             print("Processing read %s" % read)
             basecall_one_file(read, fo, ntwk, alph, already_detected)
+
+            if Nmax and i >= Nmax:
+                break
 
         fo.close()
 
