@@ -176,6 +176,9 @@ if __name__ == '__main__':
             with open(args.pre_trained_dir_list, "r") as f:
 
                 for line in f.readlines():
+                    if len(line.split()) != 2:
+                        print("Skipping ", line)
+                        continue
                     direct, type_sub = line.split()
                     sub = None
                     if "1" in type_sub:
