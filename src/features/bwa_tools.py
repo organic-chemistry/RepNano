@@ -70,6 +70,7 @@ def get_seq(sam, ref):
                     return "", 0
 
             s = f.readline()
+    return "", 0
 
 
 if __name__ == "__main__":
