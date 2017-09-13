@@ -256,6 +256,8 @@ if __name__ == '__main__':
                                 refs.append(ref)
                                 # print(len(seqs), len(ref))
                                 print(len(alignments[0][0]), len(ref), len(seqs), alignments[0][2:])
+                        else:
+                            print("Fail")
 
         with open(os.path.join(args.root, "Allignements-bis"), "wb") as f:
             cPickle.dump([data_x, data_index, data_alignment, refs, names], f)
