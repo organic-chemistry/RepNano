@@ -211,7 +211,6 @@ if __name__ == '__main__':
 
                         alph = "ACGTTN"
                         seq = "".join(map(lambda x: alph[x], om))
-                        data_index.append(np.arange(len(seq))[np.array([s for s in seq]) != "N"])
                         seqs = seq.replace("N", "")
 
                         # write fasta
@@ -243,7 +242,11 @@ if __name__ == '__main__':
 
                             if len(alignments) > 0 and len(alignments[0]) >= 2:
 
+                                names.append(filename)
+
                                 data_x.append(x)
+                                data_index.append(np.arange(len(seq))[
+                                                  np.array([s for s in seq]) != "N"])
 
                                 data_alignment.append(alignments[0][:2])
                                 if sub is not None:
