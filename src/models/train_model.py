@@ -239,7 +239,7 @@ if __name__ == '__main__':
                             continue
                         if succes:
                             alignments = pairwise2.align.globalxx(
-                                ref, seqs, one_alignement_only=True)
+                                ref, seqs, one_alignment_only=True)
 
                             if len(alignments) > 0 and len(alignments[0]) >= 2:
 
