@@ -238,7 +238,8 @@ if __name__ == '__main__':
                             print("out", len(ref))
                             continue
                         if succes:
-                            alignments = pairwise2.align.globalxx(ref, seqs)
+                            alignments = pairwise2.align.globalxx(
+                                ref, seqs, one_alignement_only=True)
 
                             if len(alignments) > 0 and len(alignments[0]) >= 2:
 
