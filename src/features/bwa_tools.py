@@ -36,10 +36,13 @@ def SeqInRef(Chrom, pos, bit, Lenght, ref):
             s = f.readline()
     if bit == '16' or bit == '2064':
         revcompl = lambda x: ''.join([{'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}[B] for B in x][::-1])
-        Ref = revcompl(Ref)
+        #Ref = revcompl(Ref)
     f.close()
     SeqInRef = ''.join(Ref[pos:pos + Lenght])
-    return SeqInRef
+    if bit == '16' or bit == '2064':
+        return revcompl(SeqInRef)
+    else:
+        return SeqInRef
 
 
 # read the sam file and write the input file for deepnano
@@ -49,7 +52,7 @@ def get_seq(sam, ref):
         s = f.readline()  # read the 1st line
         while s != '':
             ss = s.split()
-            # print ss
+            # print(ss)
             if ss[0] != '@SQ' and ss[0] != '@PG':
                 if ss[1] == '0' or ss[1] == '16':  # take only main alignment (not chimeric)
                     Bit = ss[1]

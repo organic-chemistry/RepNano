@@ -239,7 +239,7 @@ if __name__ == '__main__':
                         if succes:
                             alignments = pairwise2.align.globalxx(
                                 ref, seqs, one_alignment_only=True)
-
+                            print("la", len(alignments), len(alignments[0]))
                             if len(alignments) > 0 and len(alignments[0]) >= 2:
 
                                 names.append(filename)
