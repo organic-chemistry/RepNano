@@ -185,10 +185,10 @@ if __name__ == '__main__':
                     if "1" in type_sub:
                         sub = "B"
 
-                    for filename in enumerate(glob.glob(direct + "/*"):
-                        h5=h5py.File(filename, "r")
+                    for filename in glob.glob(direct + "/*"):
+                        h5 = h5py.File(filename, "r")
 
-                        events=extract_events(h5, "r9.5")
+                        events = extract_events(h5, "r9.5")
                         if events is None:
                             print("No events in file %s" % filename)
                             h5.close()
@@ -199,20 +199,20 @@ if __name__ == '__main__':
                             h5.close()
                             continue
                         # print(len(events))
-                        events=events[1:-1]
-                        mean=events["mean"]
-                        std=events["stdv"]
-                        length=events["length"]
-                        x=scale(
+                        events = events[1:-1]
+                        mean = events["mean"]
+                        std = events["stdv"]
+                        length = events["length"]
+                        x = scale(
                             np.array(np.vstack([mean, mean * mean, std, length]).T, dtype=np.float32))
 
-                        o1=predictor.predict(np.array(x)[np.newaxis, ::, ::])
-                        o1=o1[0]
-                        om=np.argmax(o1, axis=-1)
+                        o1 = predictor.predict(np.array(x)[np.newaxis, ::, ::])
+                        o1 = o1[0]
+                        om = np.argmax(o1, axis=-1)
 
-                        alph="ACGTTN"
-                        seq="".join(map(lambda x: alph[x], om))
-                        seqs=seq.replace("N", "")
+                        alph = "ACGTTN"
+                        seq = "".join(map(lambda x: alph[x], om))
+                        seqs = seq.replace("N", "")
 
                         # write fasta
                         with open("tmp.fasta", "w") as output_file:
@@ -220,12 +220,12 @@ if __name__ == '__main__':
                             output_file.writelines(seqs + "\n")
 
                         # execute bwa
-                        ref="data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
-                        exex="bwa mem -x ont2d  %s  tmp.fasta > tmp.sam" % ref
+                        ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
+                        exex = "bwa mem -x ont2d  %s  tmp.fasta > tmp.sam" % ref
                         subprocess.call(exex, shell=True)
 
                         # read from bwa
-                        ref, succes=get_seq(
+                        ref, succes = get_seq(
                             "tmp.sam", ref="data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa")
 
                         if args.test:
@@ -238,7 +238,7 @@ if __name__ == '__main__':
                             print("out", len(ref))
                             continue
                         if succes:
-                            alignments=pairwise2.align.globalxx(
+                            alignments = pairwise2.align.globalxx(
                                 ref, seqs, one_alignment_only=True)
                             print("la", len(alignments), len(alignments[0]))
                             if len(alignments) > 0 and len(alignments[0]) >= 2:
@@ -251,7 +251,7 @@ if __name__ == '__main__':
 
                                 data_alignment.append(alignments[0][:2])
                                 if sub is not None:
-                                    ref=ref.replace("T", sub)
+                                    ref = ref.replace("T", sub)
                                 # print(ref)
                                 refs.append(ref)
                                 # print(len(seqs), len(ref))
@@ -261,28 +261,28 @@ if __name__ == '__main__':
             cPickle.dump([data_x, data_index, data_alignment, refs, names], f)
     else:
         with open(os.path.join(args.root, "Allignements-bis"), "rb") as f:
-            data_x, data_index, data_alignment, refs, names=cPickle.load(f)
+            data_x, data_index, data_alignment, refs, names = cPickle.load(f)
 
     print("done", sum(len(x) for x in refs))
     sys.stdout.flush()
     # print(len(refs[0]),len(data_x[0]),len(data_y[0]))
     # exit()
 
-    s_arr=[]
-    p_arr=[]
+    s_arr = []
+    p_arr = []
     for s in range(len(data_x)):
         s_arr += [s]
         p_arr += [len(data_x[s]) - subseq_size]
 
-    sum_p=sum(p_arr)
+    sum_p = sum(p_arr)
     for i in range(len(p_arr)):
-        p_arr[i]=1. * p_arr[i] / sum_p
+        p_arr[i] = 1. * p_arr[i] / sum_p
 
-    batch_size=1
-    n_batches=len(data_x) / batch_size
+    batch_size = 1
+    n_batches = len(data_x) / batch_size
     print(len(data_x), batch_size, n_batches, datetime.datetime.now())
 
-    boring=False
+    boring = False
 
 
 # ntwk.load_weights("./my_model_weights.h5")
@@ -339,35 +339,35 @@ if __name__ == '__main__':
             # predictor.load_weights("data/training/my_model_weights-1990.h5")
 
             print("Realign")
-            New_seq=[]
-            change=0
-            old_length=0
-            new_length=0
-            total_length=0
-            current_length=0
-            switch=0
+            New_seq = []
+            change = 0
+            old_length = 0
+            new_length = 0
+            total_length = 0
+            current_length = 0
+            switch = 0
             for s in range(len(data_x)):
 
-                new_seq=np.argmax(predictor.predict(np.array([data_x[s]]))[0], axis=-1)
+                new_seq = np.argmax(predictor.predict(np.array([data_x[s]]))[0], axis=-1)
                 # print(args.Nbases)
                 if args.Nbases == "5":
-                    alph="ACGTBN"   # use T to Align
+                    alph = "ACGTBN"   # use T to Align
                 if args.Nbases == "4":
-                    alph="ACGTN"
+                    alph = "ACGTN"
                 New_seq.append("".join(list(map(lambda x: alph[x], new_seq))))
-                nb=New_seq[-1].count("B")
-                nt=New_seq[-1].count("T")
-                New_seq[-1]=New_seq[-1].replace("B", "T")
+                nb = New_seq[-1].count("B")
+                nt = New_seq[-1].count("T")
+                New_seq[-1] = New_seq[-1].replace("B", "T")
             # Here maybe realign with bwa
             # for s in range(len(data_x)):
-                old_align=data_alignment[s]
+                old_align = data_alignment[s]
 
-                b="B" in refs[s]
-                ref="" + refs[s]
+                b = "B" in refs[s]
+                ref = "" + refs[s]
                 if b:
-                    ref=ref.replace("B", "T")
+                    ref = ref.replace("B", "T")
 
-                new_align=pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))[0][:2]
+                new_align = pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))[0][:2]
                 print("Old", len(old_align[0]), "New", len(new_align[0]), b, len(
                     ref), (len(ref) - len(New_seq[s].replace("N", ""))) / len(ref), nb / (nt + 1))
 
@@ -377,9 +377,9 @@ if __name__ == '__main__':
                 if len(new_align[0]) < len(old_align[0]) and (len(ref) - len(New_seq[s].replace("N", ""))) / len(ref) < 0.05:
                     print("Keep!")
                     change += 1
-                    data_alignment[s]=new_align
+                    data_alignment[s] = new_align
 
-                    data_index[s]=np.arange(len(New_seq[s]))[
+                    data_index[s] = np.arange(len(New_seq[s]))[
                         np.array([ss for ss in New_seq[s]]) != "N"]
                     new_length += len(new_align[0])
 
@@ -388,7 +388,7 @@ if __name__ == '__main__':
                     print()
 
                 if b and nb / (nt + 1) < 0.3:
-                    refs[s]=refs[s].replace("B", "T")
+                    refs[s] = refs[s].replace("B", "T")
                     switch += 1
                     print("Swich")
             print("Change", change, len(data_x))
@@ -402,49 +402,49 @@ if __name__ == '__main__':
 
             # Keep new alignment
 
-        taken_gc=[]
-        out_gc=[]
-        tc=0
-        tc2=0
-        tc3=0
-        o1mm=[]
-        y1mm=[]
-        o2mm=[]
-        y2mm=[]
-        X_new=[]
-        Label=[]
-        Length=[]
-        stats=defaultdict(int)
+        taken_gc = []
+        out_gc = []
+        tc = 0
+        tc2 = 0
+        tc3 = 0
+        o1mm = []
+        y1mm = []
+        o2mm = []
+        y2mm = []
+        X_new = []
+        Label = []
+        Length = []
+        stats = defaultdict(int)
         for s in range(len(data_x)):
-            s2=np.random.choice(s_arr, p=p_arr)
-            r=np.random.randint(0, data_x[s2].shape[0] - subseq_size)
-            x=data_x[s2][r:r + subseq_size]
+            s2 = np.random.choice(s_arr, p=p_arr)
+            r = np.random.randint(0, data_x[s2].shape[0] - subseq_size)
+            x = data_x[s2][r:r + subseq_size]
             # x[:,0] += np.random.binomial(n=1, p=0.1, size=x.shape[0]) *
             # np.random.normal(scale=0.01, size=x.shape[0])
 
             def domap(base):
-                ret=[0 for b in range(n_classes)]
-                ret[base]=1
+                ret = [0 for b in range(n_classes)]
+                ret[base] = 1
                 return ret
 
             if not boring:
-                length=subseq_size
-                start=r
-                Index=data_index[s2]
-                alignment=data_alignment[s2]
+                length = subseq_size
+                start = r
+                Index = data_index[s2]
+                alignment = data_alignment[s2]
 
-                start_index_on_seqs=find_closest(start, Index)
-                end_index_on_seqs=find_closest(start + length, Index)
+                start_index_on_seqs = find_closest(start, Index)
+                end_index_on_seqs = find_closest(start + length, Index)
                 # from IPython import embed
                 # embed()
                 print(start, start_index_on_seqs, end_index_on_seqs,
                       len(alignment[0]), len(alignment[1]))
-                seg, ss1, ss2, success=get_segment(
+                seg, ss1, ss2, success = get_segment(
                     alignment, start_index_on_seqs, end_index_on_seqs)
                 if not success:
                     continue
-                maxi=40
-                l=min(max(len(seg), 1), maxi - 1)
+                maxi = 40
+                l = min(max(len(seg), 1), maxi - 1)
                 if not args.test:
                     if abs(len(ss2.replace("-", "")) - len(ss2)) + abs(len(ss1.replace("-", "")) - len(ss1)) > 10:
                         continue
@@ -452,20 +452,20 @@ if __name__ == '__main__':
 
                 # print(len(s))
                 if len(seg) > maxi - 1:
-                    seg=seg[:maxi - 1]
-                seg=seg + "A" * (maxi - len(seg))
+                    seg = seg[:maxi - 1]
+                seg = seg + "A" * (maxi - len(seg))
                 if "B" in refs[s2]:
-                    seg=seg.replace("T", "B")
+                    seg = seg.replace("T", "B")
                 # print(len(s))
                 # print(s)
                 # print([base for base in s])
                 Label.append([mapping[base] for base in seg])
             X_new.append(x)
 
-        X_new=np.array(X_new)
+        X_new = np.array(X_new)
 
-        Label=np.array(Label)
-        Length=np.array(Length)
+        Label = np.array(Label)
+        Length = np.array(Length)
         print(X_new.shape)
 
         # To balance class weight
@@ -475,16 +475,16 @@ if __name__ == '__main__':
             [length] * len(Length)).shape, Length.shape)
 
         if args.test:
-            maxin=8
-            val=2
-            batch_size=8
+            maxin = 8
+            val = 2
+            batch_size = 8
         else:
-            maxin=10 * (int(len(X_new) // 10) - 3)
-            val=30
-            batch_size=10
-        reduce_lr=keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.2,
+            maxin = 10 * (int(len(X_new) // 10) - 3)
+            val = 30
+            batch_size = 10
+        reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.2,
                                                       patience=5, min_lr=0.0001)
-        Log=keras.callbacks.CSVLogger(filename=os.path.join(
+        Log = keras.callbacks.CSVLogger(filename=os.path.join(
             args.root, "training.log"), append=True)
 
         print(len(data_x), np.mean(Length), np.max(Length))
