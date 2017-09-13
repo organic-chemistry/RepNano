@@ -238,16 +238,19 @@ if __name__ == '__main__':
                             print("out", len(ref))
                             continue
                         if succes:
-                            data_x.append(x)
                             alignments = pairwise2.align.globalxx(ref, seqs)
 
-                            data_alignment.append(alignments[0][:2])
-                            if sub is not None:
-                                ref = ref.replace("T", sub)
-                            # print(ref)
-                            refs.append(ref)
-                            # print(len(seqs), len(ref))
-                            print(len(alignments[0][0]), len(ref), len(seqs), alignments[0][2:])
+                            if len(alignments) > 0 and len(alignments[0]) >= 2:
+
+                                data_x.append(x)
+
+                                data_alignment.append(alignments[0][:2])
+                                if sub is not None:
+                                    ref = ref.replace("T", sub)
+                                # print(ref)
+                                refs.append(ref)
+                                # print(len(seqs), len(ref))
+                                print(len(alignments[0][0]), len(ref), len(seqs), alignments[0][2:])
 
         with open(os.path.join(args.root, "Allignements-bis"), "wb") as f:
             cPickle.dump([data_x, data_index, data_alignment, refs, names], f)
