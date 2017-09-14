@@ -454,7 +454,7 @@ if __name__ == '__main__':
                 maxi = 40
                 l = min(max(len(seg), 1), maxi - 1)
                 if not args.test:
-                    if abs(len(ss2.replace("-", "")) - len(ss2)) + abs(len(ss1.replace("-", "")) - len(ss1)) > args.deltaseq or len(ss2.replace("-", "")) < 0.75 * subseq_size:
+                    if abs(len(ss2.replace("-", "")) - len(ss2)) + abs(len(ss1.replace("-", "")) - len(ss1)) > args.deltaseq or len(ss2.replace("-", "")) < 0.25 * subseq_size:
                         continue
                 Length.append(l)
 
@@ -469,8 +469,6 @@ if __name__ == '__main__':
                     seq_tmp = "".join(map(lambda x: alph[x], om))
                     print(seq_tmp.replace("N", ""))
 
-                print(ss2, ss1)
-
                 # print(len(s))
                 if len(seg) > maxi - 1:
                     seg = seg[:maxi - 1]
@@ -481,6 +479,8 @@ if __name__ == '__main__':
                 # print(s)
                 # print([base for base in s])
                 Label.append([mapping[base] for base in seg])
+                print(ss2, ss1, seg)
+
                 X_new.append(x)
 
         X_new = np.array(X_new)
