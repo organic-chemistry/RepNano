@@ -2,7 +2,7 @@ from ..models.predict_model import process
 import os
 import subprocess
 weights = "data/training/my_model_weights-2290.h5"
-weights = "data/cluster/training/v9p5/my_model_weights-190.h5"
+weights = "data/cluster/training/v9p5delta10/my_model_weights-10.h5"
 
 basename = "results/v9p5_ctc_"
 

@@ -453,6 +453,8 @@ if __name__ == '__main__':
                         continue
                 Length.append(l)
 
+                print(ss2, ss1)
+
                 # print(len(s))
                 if len(seg) > maxi - 1:
                     seg = seg[:maxi - 1]
