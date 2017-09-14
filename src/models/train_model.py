@@ -266,6 +266,11 @@ if __name__ == '__main__':
         with open(os.path.join(args.root, "Allignements-bis"), "rb") as f:
             data_x, data_index, data_alignment, refs, names = cPickle.load(f)
 
+    if args.from_pre_trained:
+
+        ntwk.load_weights(args.pre_trained_weight)
+        predictor.load_weights(args.pre_trained_weight)
+
     print("done", sum(len(x) for x in refs))
     sys.stdout.flush()
     # print(len(refs[0]),len(data_x[0]),len(data_y[0]))
@@ -452,6 +457,17 @@ if __name__ == '__main__':
                     if abs(len(ss2.replace("-", "")) - len(ss2)) + abs(len(ss1.replace("-", "")) - len(ss1)) > args.deltaseq or len(ss2.replace("-", "")) < 0.75 * subseq_size:
                         continue
                 Length.append(l)
+
+                test = False
+                if test:
+                    # print(len(data_x[s2]))
+                    o1 = predictor.predict(np.array(x)[np.newaxis, ::, ::])
+                    o1 = o1[0]
+                    om = np.argmax(o1, axis=-1)
+
+                    alph = "ACGTTN"
+                    seq_tmp = "".join(map(lambda x: alph[x], om))
+                    print(seq_tmp.replace("N", ""))
 
                 print(ss2, ss1)
 
