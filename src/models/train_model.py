@@ -418,7 +418,7 @@ if __name__ == '__main__':
         Label = []
         Length = []
         stats = defaultdict(int)
-        while len(data_x) < 200:
+        while len(X_new) < 200:
             for s in range(len(data_x)):
                 s2 = np.random.choice(s_arr, p=p_arr)
                 r = np.random.randint(0, data_x[s2].shape[0] - subseq_size)
