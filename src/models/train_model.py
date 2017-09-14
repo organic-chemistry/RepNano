@@ -83,6 +83,7 @@ if __name__ == '__main__':
     parser.add_argument('--from-pre-trained', dest='from_pre_trained', action='store_true')
     parser.add_argument('--pre-trained-weight', dest='pre_trained_weight', type=str)
     parser.add_argument('--pre-trained-dir-list', dest='pre_trained_dir_list', type=str)
+    parser.add_argument('--deltaseq', dest='deltaseq', type=int, default=10)
 
     args = parser.parse_args()
 
@@ -429,39 +430,38 @@ if __name__ == '__main__':
                 ret[base] = 1
                 return ret
 
-            if not boring:
-                length = subseq_size
-                start = r
-                Index = data_index[s2]
-                alignment = data_alignment[s2]
+            length = subseq_size
+            start = r
+            Index = data_index[s2]
+            alignment = data_alignment[s2]
 
-                start_index_on_seqs = find_closest(start, Index)
-                end_index_on_seqs = find_closest(start + length, Index)
-                # from IPython import embed
-                # embed()
-                print(start, start_index_on_seqs, end_index_on_seqs,
-                      len(alignment[0]), len(alignment[1]))
-                seg, ss1, ss2, success = get_segment(
-                    alignment, start_index_on_seqs, end_index_on_seqs)
-                if not success:
+            start_index_on_seqs = find_closest(start, Index)
+            end_index_on_seqs = find_closest(start + length, Index)
+            # from IPython import embed
+            # embed()
+            print(start, start_index_on_seqs, end_index_on_seqs,
+                  len(alignment[0]), len(alignment[1]))
+            seg, ss1, ss2, success = get_segment(
+                alignment, start_index_on_seqs, end_index_on_seqs)
+            if not success:
+                continue
+            maxi = 40
+            l = min(max(len(seg), 1), maxi - 1)
+            if not args.test:
+                if abs(len(ss2.replace("-", "")) - len(ss2)) + abs(len(ss1.replace("-", "")) - len(ss1)) > args.deltaseq:
                     continue
-                maxi = 40
-                l = min(max(len(seg), 1), maxi - 1)
-                if not args.test:
-                    if abs(len(ss2.replace("-", "")) - len(ss2)) + abs(len(ss1.replace("-", "")) - len(ss1)) > 10:
-                        continue
-                Length.append(l)
+            Length.append(l)
 
-                # print(len(s))
-                if len(seg) > maxi - 1:
-                    seg = seg[:maxi - 1]
-                seg = seg + "A" * (maxi - len(seg))
-                if "B" in refs[s2]:
-                    seg = seg.replace("T", "B")
-                # print(len(s))
-                # print(s)
-                # print([base for base in s])
-                Label.append([mapping[base] for base in seg])
+            # print(len(s))
+            if len(seg) > maxi - 1:
+                seg = seg[:maxi - 1]
+            seg = seg + "A" * (maxi - len(seg))
+            if "B" in refs[s2]:
+                seg = seg.replace("T", "B")
+            # print(len(s))
+            # print(s)
+            # print([base for base in s])
+            Label.append([mapping[base] for base in seg])
             X_new.append(x)
 
         X_new = np.array(X_new)
@@ -472,7 +472,7 @@ if __name__ == '__main__':
 
         # To balance class weight
 
-        print(Label)
+        # print(Label)
         print(X_new.shape, Label.shape, np.array(
             [length] * len(Length)).shape, Length.shape)
 
