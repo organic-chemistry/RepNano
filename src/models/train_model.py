@@ -418,51 +418,52 @@ if __name__ == '__main__':
         Label = []
         Length = []
         stats = defaultdict(int)
-        for s in range(len(data_x)):
-            s2 = np.random.choice(s_arr, p=p_arr)
-            r = np.random.randint(0, data_x[s2].shape[0] - subseq_size)
-            x = data_x[s2][r:r + subseq_size]
-            # x[:,0] += np.random.binomial(n=1, p=0.1, size=x.shape[0]) *
-            # np.random.normal(scale=0.01, size=x.shape[0])
+        while len(data_x) < 200:
+            for s in range(len(data_x)):
+                s2 = np.random.choice(s_arr, p=p_arr)
+                r = np.random.randint(0, data_x[s2].shape[0] - subseq_size)
+                x = data_x[s2][r:r + subseq_size]
+                # x[:,0] += np.random.binomial(n=1, p=0.1, size=x.shape[0]) *
+                # np.random.normal(scale=0.01, size=x.shape[0])
 
-            def domap(base):
-                ret = [0 for b in range(n_classes)]
-                ret[base] = 1
-                return ret
+                def domap(base):
+                    ret = [0 for b in range(n_classes)]
+                    ret[base] = 1
+                    return ret
 
-            length = subseq_size
-            start = r
-            Index = data_index[s2]
-            alignment = data_alignment[s2]
+                length = subseq_size
+                start = r
+                Index = data_index[s2]
+                alignment = data_alignment[s2]
 
-            start_index_on_seqs = find_closest(start, Index)
-            end_index_on_seqs = find_closest(start + length, Index)
-            # from IPython import embed
-            # embed()
-            print(start, start_index_on_seqs, end_index_on_seqs,
-                  len(alignment[0]), len(alignment[1]))
-            seg, ss1, ss2, success = get_segment(
-                alignment, start_index_on_seqs, end_index_on_seqs)
-            if not success:
-                continue
-            maxi = 40
-            l = min(max(len(seg), 1), maxi - 1)
-            if not args.test:
-                if abs(len(ss2.replace("-", "")) - len(ss2)) + abs(len(ss1.replace("-", "")) - len(ss1)) > args.deltaseq:
+                start_index_on_seqs = find_closest(start, Index)
+                end_index_on_seqs = find_closest(start + length, Index)
+                # from IPython import embed
+                # embed()
+                # print(start, start_index_on_seqs, end_index_on_seqs,
+                #      len(alignment[0]), len(alignment[1]))
+                seg, ss1, ss2, success = get_segment(
+                    alignment, start_index_on_seqs, end_index_on_seqs)
+                if not success:
                     continue
-            Length.append(l)
+                maxi = 40
+                l = min(max(len(seg), 1), maxi - 1)
+                if not args.test:
+                    if abs(len(ss2.replace("-", "")) - len(ss2)) + abs(len(ss1.replace("-", "")) - len(ss1)) > args.deltaseq:
+                        continue
+                Length.append(l)
 
-            # print(len(s))
-            if len(seg) > maxi - 1:
-                seg = seg[:maxi - 1]
-            seg = seg + "A" * (maxi - len(seg))
-            if "B" in refs[s2]:
-                seg = seg.replace("T", "B")
-            # print(len(s))
-            # print(s)
-            # print([base for base in s])
-            Label.append([mapping[base] for base in seg])
-            X_new.append(x)
+                # print(len(s))
+                if len(seg) > maxi - 1:
+                    seg = seg[:maxi - 1]
+                seg = seg + "A" * (maxi - len(seg))
+                if "B" in refs[s2]:
+                    seg = seg.replace("T", "B")
+                # print(len(s))
+                # print(s)
+                # print([base for base in s])
+                Label.append([mapping[base] for base in seg])
+                X_new.append(x)
 
         X_new = np.array(X_new)
 
