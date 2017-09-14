@@ -449,7 +449,7 @@ if __name__ == '__main__':
                 maxi = 40
                 l = min(max(len(seg), 1), maxi - 1)
                 if not args.test:
-                    if abs(len(ss2.replace("-", "")) - len(ss2)) + abs(len(ss1.replace("-", "")) - len(ss1)) > args.deltaseq and len(ss2.replace("-", "")) > 0.75 * subseq_size:
+                    if abs(len(ss2.replace("-", "")) - len(ss2)) + abs(len(ss1.replace("-", "")) - len(ss1)) > args.deltaseq or len(ss2.replace("-", "")) < 0.75 * subseq_size:
                         continue
                 Length.append(l)
 
