@@ -85,6 +85,7 @@ if __name__ == '__main__':
     parser.add_argument('--pre-trained-dir-list', dest='pre_trained_dir_list', type=str)
     parser.add_argument('--deltaseq', dest='deltaseq', type=int, default=10)
     parser.add_argument('--forcelength', dest='forcelength', type=float, default=0.5)
+    parser.add_argument('--oversampleb', dest='oversampleb', type=int, default=3)
 
     args = parser.parse_args()
 
@@ -438,6 +439,10 @@ if __name__ == '__main__':
                 x = data_x[s2][r:r + subseq_size]
                 # x[:,0] += np.random.binomial(n=1, p=0.1, size=x.shape[0]) *
                 # np.random.normal(scale=0.01, size=x.shape[0])
+
+                # oversampleb
+                if "B" not in refs[s2] and np.random.randint(args.oversampleb) != 0:
+                    continue
 
                 def domap(base):
                     ret = [0 for b in range(n_classes)]
