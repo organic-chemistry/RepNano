@@ -480,10 +480,12 @@ if __name__ == '__main__':
                 # print(len(s))
                 if len(seg) > maxi - 1:
                     seg = seg[:maxi - 1]
+
+                megas += seg
+
                 seg = seg + "A" * (maxi - len(seg))
                 if "B" in refs[s2]:
                     seg = seg.replace("T", "B")
-                megas += seg
                 # print(len(s))
                 # print(s)
                 # print([base for base in s])
