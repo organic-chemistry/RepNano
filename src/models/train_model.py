@@ -84,6 +84,7 @@ if __name__ == '__main__':
     parser.add_argument('--pre-trained-weight', dest='pre_trained_weight', type=str)
     parser.add_argument('--pre-trained-dir-list', dest='pre_trained_dir_list', type=str)
     parser.add_argument('--deltaseq', dest='deltaseq', type=int, default=10)
+    parser.add_argument('--forcelength', dest='forcelength', type=float, default=0.5)
 
     args = parser.parse_args()
 
@@ -460,7 +461,7 @@ if __name__ == '__main__':
                 maxi = 40
                 l = min(max(len(seg), 1), maxi - 1)
                 if not args.test:
-                    if abs(len(ss2.replace("-", "")) - len(ss2)) + abs(len(ss1.replace("-", "")) - len(ss1)) > args.deltaseq or len(ss2.replace("-", "")) < 0.25 * subseq_size:
+                    if abs(len(ss2.replace("-", "")) - len(ss2)) + abs(len(ss1.replace("-", "")) - len(ss1)) > args.deltaseq or len(ss2.replace("-", "")) < args.forcelength * subseq_size:
                         continue
                 Length.append(l)
 
