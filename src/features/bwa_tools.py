@@ -57,7 +57,11 @@ def get_seq(sam, ref):
                 if ss[1] == '0' or ss[1] == '16':  # take only main alignment (not chimeric)
                     Bit = ss[1]
                     Chrom = ss[2]
-                    pos = int(ss[3])
+                    if ss[1] == '0':
+                        pos = max(int(ss[3]) - 1, 0)
+                    else:
+                        pos = max(int(ss[3]), 0)
+
                     CIGAR = ss[5]
                     # SamSeq = ss[9]
                     # print ss[0]

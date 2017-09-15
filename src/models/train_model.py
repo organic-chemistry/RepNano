@@ -375,7 +375,13 @@ if __name__ == '__main__':
                 if b:
                     ref = ref.replace("B", "T")
 
-                new_align = pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))[0][:2]
+                #new_align = pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))[0][:2]
+                new_align = pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))
+                if len(new_align) == 0 or len(new_align[0]) < 2:
+                    new_length += len(old_align[0])
+                    print()
+                    continue
+                new_align = new_align[0][:2]
                 print("Old", len(old_align[0]), "New", len(new_align[0]), b, len(
                     ref), (len(ref) - len(New_seq[s].replace("N", ""))) / len(ref), nb / (nt + 1))
 
