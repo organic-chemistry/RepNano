@@ -430,6 +430,7 @@ if __name__ == '__main__':
         Label = []
         Length = []
         stats = defaultdict(int)
+        megas = ""
         while len(X_new) < 200:
             for s in range(len(data_x)):
                 s2 = np.random.choice(s_arr, p=p_arr)
@@ -482,15 +483,18 @@ if __name__ == '__main__':
                 seg = seg + "A" * (maxi - len(seg))
                 if "B" in refs[s2]:
                     seg = seg.replace("T", "B")
+                megas += seg
                 # print(len(s))
                 # print(s)
                 # print([base for base in s])
                 Label.append([mapping[base] for base in seg])
-                print(ss2, ss1, seg)
+                #print(ss2, ss1, seg)
 
                 X_new.append(x)
 
         X_new = np.array(X_new)
+
+        print(megas.count("B") / len(megas), megas.count("T") / len(megas))
 
         Label = np.array(Label)
         Length = np.array(Length)
@@ -499,8 +503,8 @@ if __name__ == '__main__':
         # To balance class weight
 
         # print(Label)
-        print(X_new.shape, Label.shape, np.array(
-            [length] * len(Length)).shape, Length.shape)
+        # print(X_new.shape, Label.shape, np.array(
+        #    [length] * len(Length)).shape, Length.shape)
 
         if args.test:
             maxin = 8
@@ -515,7 +519,7 @@ if __name__ == '__main__':
         Log = keras.callbacks.CSVLogger(filename=os.path.join(
             args.root, "training.log"), append=True)
 
-        print(len(data_x), np.mean(Length), np.max(Length))
+        #print(len(data_x), np.mean(Length), np.max(Length))
         ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size] * len(Length))[:maxin], Length[:maxin]],
                  Label[:maxin], nb_epoch=1, batch_size=batch_size, callbacks=[reduce_lr, Log],
                  validation_data=([X_new[maxin:maxin + val],
