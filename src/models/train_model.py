@@ -255,8 +255,8 @@ if __name__ == '__main__':
                                         chp = kp.split("_")[0][3:]
                                         readp = kp.split("_")[1][4:]
 
-                                        if read == readp:
-                                            #print(k, kp)
+                                        if read == readp and ch == chp:
+                                            print(k, kp)
                                             ref = sp[9]
                                             Ref.append("" + ref)
                                             succes = True
