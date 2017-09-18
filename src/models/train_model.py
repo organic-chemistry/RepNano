@@ -244,6 +244,7 @@ if __name__ == '__main__':
                             k = filename.split("/")[-1]
                             read, ch = k.split("_")[9], k.split("_")[11]
                             succes = False
+                            Ref = []
                             with open(ref_file, "r") as f:
                                 for line in f.readlines():
                                     sp = line.split()
@@ -255,13 +256,22 @@ if __name__ == '__main__':
                                         readp = kp.split("_")[1][4:]
 
                                         if read == readp:
+                                            #print(k, kp)
                                             ref = sp[9]
+                                            Ref.append("" + ref)
                                             succes = True
-                                            break
+                                            # break
+                            if succes:
+                                ref = list(sorted(Ref, key=lambda x: len(x)))[-1]
+                                print(list(map(len, Ref)))
 
+                                print(len(ref), len(seqs))
+
+                            if abs(len(ref) - len(seqs)) > 1000:
+                                succes = False
                         if args.test:
                             print(len(data_x), "LEN")
-                            if len(ref) > 2000:
+                            if len(ref) > 2000 or len(seqs) > 2000:
                                 continue
                             if len(data_x) > 20 * idirect:
                                 break
