@@ -86,7 +86,7 @@ if __name__ == '__main__':
     parser.add_argument('--deltaseq', dest='deltaseq', type=int, default=10)
     parser.add_argument('--forcelength', dest='forcelength', type=float, default=0.5)
     parser.add_argument('--oversampleb', dest='oversampleb', type=int, default=3)
-
+    parser.add_argument('--ref-from-file', dest="ref_from_file", type=bool, default=False)
     args = parser.parse_args()
 
     data_x = []
@@ -179,10 +179,18 @@ if __name__ == '__main__':
             with open(args.pre_trained_dir_list, "r") as f:
                 idirect = 0
                 for line in f.readlines():
-                    if len(line.split()) != 2:
-                        print("Skipping ", line)
-                        continue
-                    direct, type_sub = line.split()
+                    if not args.ref_from_file:
+                        if len(line.split()) != 2:
+                            print("Skipping ", line)
+                            continue
+
+                        direct, type_sub = line.split()
+                    else:
+                        if len(line.split()) != 3:
+                            print("Skipping ", line)
+                            continue
+
+                        direct, type_sub, ref_file = line.split()
                     idirect += 1
                     sub = None
                     if "1" in type_sub:
@@ -223,13 +231,33 @@ if __name__ == '__main__':
                             output_file.writelines(seqs + "\n")
 
                         # execute bwa
-                        ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
-                        exex = "bwa mem -x ont2d  %s  tmp.fasta > tmp.sam" % ref
-                        subprocess.call(exex, shell=True)
 
-                        # read from bwa
-                        ref, succes = get_seq(
-                            "tmp.sam", ref="data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa")
+                        if not args.ref_from_file:
+                            ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
+                            exex = "bwa mem -x ont2d  %s  tmp.fasta > tmp.sam" % ref
+                            subprocess.call(exex, shell=True)
+
+                            # read from bwa
+                            ref, succes = get_seq(
+                                "tmp.sam", ref="data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa")
+                        else:
+                            k = filename.split("/")[-1]
+                            read, ch = k.split("_")[9], k.split("_")[11]
+                            succes = False
+                            with open(ref_file, "r") as f:
+                                for line in f.readlines():
+                                    sp = line.split()
+
+                                    if len(sp) > 1 and sp[0].startswith("@ch"):
+                                        kp = sp[0].split("/")[-1]
+
+                                        chp = kp.split("_")[0][3:]
+                                        readp = kp.split("_")[1][4:]
+
+                                        if read == readp:
+                                            ref = sp[9]
+                                            succes = True
+                                            break
 
                         if args.test:
                             print(len(data_x), "LEN")
