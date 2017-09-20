@@ -32,7 +32,7 @@ def basecall_one_file(filename, output_file, ntwk, alph, already_detected):
         h5.close()
         return 0
 
-    if len(events) < 300:
+    if len(events) < 30:
         print("Read %s too short, not basecalling" % filename)
         h5.close()
         return 0
@@ -45,12 +45,10 @@ def basecall_one_file(filename, output_file, ntwk, alph, already_detected):
     X = scale(np.array(np.vstack([mean, mean * mean, std, length]).T, dtype=np.float32))
     print(np.mean(X[:, 0]))
     try:
-        print("la")
         o1 = ntwk.predict(np.array(X)[np.newaxis, ::, ::])
         o1 = o1[0]
 
     except:
-        print("ici")
         o1, o2 = ntwk.predict(X)
 
     # print(o1[:20])

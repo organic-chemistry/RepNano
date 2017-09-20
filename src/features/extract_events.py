@@ -13,10 +13,16 @@ defs = {
             'peak_height': 1.2
         }
     },
+    'r9.5b': {
+        'ed_params': {
+            'window_lengths': [4, 5], 'thresholds': [1.4, 1.0],
+            'peak_height': 1
+        }
+    },
     'r9.5': {
         'ed_params': {
-            'window_lengths': [10, 20], 'thresholds': [2.0, 1.1],
-            'peak_height': 1.4
+            'window_lengths': [4, 6], 'thresholds': [1.4, 1.0],
+            'peak_height': 0.65
         }
     }
 }
@@ -58,7 +64,7 @@ def get_raw(h5):
     return raw, sl
 
 
-def find_stall(events, threshold):
+def find_stall_old(events, threshold):
     count_above = 0
     start_ev_ind = 0
     for ev_ind, event in enumerate(events[:100]):
@@ -85,6 +91,44 @@ def find_stall(events, threshold):
 
     return new_start
 
+import pandas as pd
+
+
+def find_stall(events, start_threshold, end_threshold, raw, sampling_rate, max_under_threshold=10):
+
+    std = pd.Series(raw).rolling(window=20, center=False).std(
+    ).rolling(window=100, center=False).mean()
+    mean = pd.Series(raw).rolling(window=20, center=False).mean()
+    dtav = std  # / mean
+
+    istart = None
+    iend = None
+    cumul = 0
+    for iel, el in enumerate(dtav):
+        if not np.isnan(el) and el > start_threshold and istart is None:
+
+            istart = iel / sampling_rate
+
+        if istart is not None:
+            if el < end_threshold:
+                cumul += 1
+                if cumul == 1:
+                    iend = iel / sampling_rate
+            else:
+                cumul = 0
+            if cumul == max_under_threshold:
+                break
+
+    real_start = 0
+    real_end = None
+    for ievent, start in enumerate(events["start"]):
+        if istart is not None and start > istart and real_start is 0:
+            real_start = 0 + ievent
+        if iend is not None and start > iend and real_end is None:
+            real_end = 0 + ievent
+            break
+    return real_start, real_end
+
 
 def get_tstat(s, s2, wl):
     eta = 1e-100
@@ -106,9 +150,14 @@ def extract_events(h5, chem):
     med, mad = med_mad(events['mean'][-100:])
     max_thresh = med + 1.48 * 2 + mad
 
-    first_event = find_stall(events, max_thresh)
+    #first_event = find_stall(events, max_thresh)
+    # first_event, last_event = find_stall(
+    #    events, threshold=0.05, raw=raw, sampling_rate=sl, max_under_threshold=100)
 
-    return events[first_event:]
+    first_event, last_event = find_stall(
+        events, start_threshold=8.5, end_threshold=4, raw=raw, sampling_rate=sl, max_under_threshold=750)
+
+    return events[first_event:last_event]
 
 
 def med_mad(data):
