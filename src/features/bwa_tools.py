@@ -47,7 +47,8 @@ def SeqInRef(Chrom, pos, bit, Lenght, ref):
 
 # read the sam file and write the input file for deepnano
 
-def get_seq(sam, ref):
+def get_seq(sam, ref, pos=False):
+    ret = ["", 0, None, None]
     with open(sam, 'r') as f:
         s = f.readline()  # read the 1st line
         while s != '':
@@ -69,12 +70,17 @@ def get_seq(sam, ref):
                     #print(Chrom, pos, Bit, LenghtOnRef(CIGAR), ref)
                     Seq = SeqInRef(Chrom, pos, Bit, LenghtOnRef(CIGAR), ref)
                     #print("Inside", Seq)
-                    return Seq, 1
+                    ret = [Seq, 1, int(ss[2]), pos]
+
                 else:
-                    return "", 0
+
+                    break
 
             s = f.readline()
-    return "", 0
+    if pos:
+        return ret
+    else:
+        return ret[:2]
 
 
 if __name__ == "__main__":

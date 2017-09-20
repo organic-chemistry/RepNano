@@ -87,6 +87,9 @@ if __name__ == '__main__':
     parser.add_argument('--forcelength', dest='forcelength', type=float, default=0.5)
     parser.add_argument('--oversampleb', dest='oversampleb', type=int, default=3)
     parser.add_argument('--ref-from-file', dest="ref_from_file", type=bool, default=False)
+    parser.add_argument('--select-agree', dest="select_agree", type=bool, default=False)
+    parser.add_argument('--max-file', dest="max_file", type=int, default=0)
+
     args = parser.parse_args()
 
     data_x = []
@@ -196,7 +199,9 @@ if __name__ == '__main__':
                     if "1" in type_sub:
                         sub = "B"
 
-                    for filename in glob.glob(direct + "/*"):
+                    for ifilename, filename in (glob.glob(direct + "/*")):
+                        if args.max_file != 0 and ifilename > args.max_file:
+                            continue
                         h5 = h5py.File(filename, "r")
 
                         events = extract_events(h5, "r9.5")
@@ -232,14 +237,17 @@ if __name__ == '__main__':
 
                         # execute bwa
 
-                        if not args.ref_from_file:
+                        if not args.ref_from_file or args.select_agree:
                             ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
                             exex = "bwa mem -x ont2d  %s  tmp.fasta > tmp.sam" % ref
                             subprocess.call(exex, shell=True)
 
                             # read from bwa
-                            ref, succes = get_seq(
-                                "tmp.sam", ref="data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa")
+                            ref, succes, X1, P1 = get_seq(
+                                "tmp.sam", ref="data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa", pos=True)
+
+                            if not succes:
+                                continue
                         else:
                             k = filename.split("/")[-1]
                             read, ch = k.split("_")[9], k.split("_")[11]
@@ -255,6 +263,9 @@ if __name__ == '__main__':
                                         chp = kp.split("_")[0][3:]
                                         readp = kp.split("_")[1][4:]
 
+                                        X2 = int(sp[2])
+                                        P2 = int(sp[3])
+
                                         if read == readp and ch == chp:
                                             print(k, kp)
                                             ref = sp[9]
@@ -262,13 +273,23 @@ if __name__ == '__main__':
                                             succes = True
                                             # break
                             if succes:
-                                ref = list(sorted(Ref, key=lambda x: len(x)))[-1]
-                                print(list(map(len, Ref)))
+                                if not args.select_agree:
+                                    ref = list(sorted(Ref, key=lambda x: len(x)))[-1]
+                                    print(list(map(len, Ref)))
 
-                                print(len(ref), len(seqs))
+                                    print(len(ref), len(seqs))
+                                else:
+                                    ref1 = list(sorted(Ref, key=lambda x: len(x)))[-1]
 
                             if abs(len(ref) - len(seqs)) > 1000:
                                 succes = False
+
+                            if not succes:
+                                continue
+
+                            if args.select_agree:
+                                if not(X1 == X2 and abs(P1 - P2) < 5000):
+                                    continue
                         if args.test:
                             print(len(data_x), "LEN")
                             if len(ref) > 2000 or len(seqs) > 2000:
@@ -281,7 +302,7 @@ if __name__ == '__main__':
                         if succes:
                             alignments = pairwise2.align.globalxx(
                                 ref, seqs, one_alignment_only=True)
-                            #print("la", len(alignments), len(alignments[0]))
+                            # print("la", len(alignments), len(alignments[0]))
                             if len(alignments) > 0 and len(alignments[0]) >= 2:
 
                                 names.append(filename)
@@ -377,7 +398,7 @@ if __name__ == '__main__':
                     change += 1
             """
 
-        if epoch % 200 == 0 and epoch != 0:
+        if epoch % 300 == 0 and epoch != 0:
             ntwk.save_weights(os.path.join(
                 args.root, 'tmp.h5'))
 
@@ -415,7 +436,7 @@ if __name__ == '__main__':
                 if b:
                     ref = ref.replace("B", "T")
 
-                #new_align = pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))[0][:2]
+                # new_align = pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))[0][:2]
                 new_align = pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))
                 if len(new_align) == 0 or len(new_align[0]) < 2:
                     new_length += len(old_align[0])
@@ -536,7 +557,7 @@ if __name__ == '__main__':
                 # print(s)
                 # print([base for base in s])
                 Label.append([mapping[base] for base in seg])
-                #print(ss2, ss1, seg)
+                # print(ss2, ss1, seg)
 
                 X_new.append(x)
 
@@ -567,7 +588,7 @@ if __name__ == '__main__':
         Log = keras.callbacks.CSVLogger(filename=os.path.join(
             args.root, "training.log"), append=True)
 
-        #print(len(data_x), np.mean(Length), np.max(Length))
+        # print(len(data_x), np.mean(Length), np.max(Length))
         ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size] * len(Length))[:maxin], Length[:maxin]],
                  Label[:maxin], nb_epoch=1, batch_size=batch_size, callbacks=[reduce_lr, Log],
                  validation_data=([X_new[maxin:maxin + val],

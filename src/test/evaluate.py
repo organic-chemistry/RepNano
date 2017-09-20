@@ -21,9 +21,9 @@ list_dir = [["substituted", "sub_template"], ["control", "control_template"],
 list_dir = [["20170908-R9.5/AG-Thy/0", "20170908-R9.5/BTF_AG_ONT_1_FAH14273_A-select_pass"],
             ["20170908-R9.5/AH-BrdU/0", "20170908-R9.5/BTF_AH_ONT_1_FAH14319_A-select_pass"],
             ["20170908-R9.5/AI-CldU/0/", "20170908-R9.5/BTF_AI_ONT_1_FAH14242_A-select_pass"],
-            ["20170908-R9.5/AK-EdU/0/", "20170908-R9.5/BTF_AI_ONT_1_FAH14242_A-select_pass"],
-            ["20170908-R9.5/AL-IdU/0/", "20170908-R9.5/BTF_AL_ONT_1_FAH14242_A-select_pass"]]
-for dire, out in list_dir[0:2]:  # + list_dir[4:]:
+            ["20170908-R9.5/AK-EdU/0/", "20170908-R9.5/BTF_AK_ONT_1_FAH14211_A-select_pass"],
+            ["20170908-R9.5/AL-IdU/0/", "20170908-R9.5/BTF_AL_ONT_1_FAH14352_A-select_pass"]]
+for dire, out in list_dir[2:]:  # + list_dir[4:]:
     if redo:
         process(weights, directory="data/raw/%s/" % dire,
                 output="data/processed/{0}{1}.fasta".format(basename, out), Nbases=5, reads="",
