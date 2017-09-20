@@ -262,26 +262,32 @@ if __name__ == '__main__':
 
                                         chp = kp.split("_")[0][3:]
                                         readp = kp.split("_")[1][4:]
-                                        """
-                                        if sp[2] == '*':
-
-                                        X2 = int(sp[2][3:])
-                                        P2 = int(sp[3])"""
 
                                         if read == readp and ch == chp:
                                             print(k, kp)
+
+                                            if sp[2] == '*':
+                                                continue
+
+                                            X2 = int(sp[2][3:])
+                                            P2 = int(sp[3])
                                             ref = sp[9]
-                                            Ref.append("" + ref)
+                                            Ref.append(["" + ref, X2, P2])
                                             succes = True
                                             # break
                             if succes:
                                 if not args.select_agree:
-                                    ref = list(sorted(Ref, key=lambda x: len(x)))[-1]
+                                    ref = list(sorted(Ref, key=lambda x: len(x)))[-1][0]
                                     print(list(map(len, Ref)))
 
                                     print(len(ref), len(seqs))
                                 else:
-                                    ref1 = list(sorted(Ref, key=lambda x: len(x)))[-1]
+                                    found = False
+                                    for seq2, X2, P2 in Ref:
+                                        if X1 == X2 and abs(P1 - P2) < 5000:
+                                            found = True
+                                    if not found:
+                                        continue
 
                             if abs(len(ref) - len(seqs)) > 1000:
                                 succes = False
@@ -289,9 +295,6 @@ if __name__ == '__main__':
                             if not succes:
                                 continue
 
-                            if args.select_agree:
-                                if not(X1 == X2 and abs(P1 - P2) < 5000):
-                                    continue
                         if args.test:
                             print(len(data_x), "LEN")
                             if len(ref) > 2000 or len(seqs) > 2000:
