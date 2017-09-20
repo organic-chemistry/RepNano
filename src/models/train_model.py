@@ -263,7 +263,7 @@ if __name__ == '__main__':
                                         chp = kp.split("_")[0][3:]
                                         readp = kp.split("_")[1][4:]
 
-                                        X2 = int(sp[2])
+                                        X2 = int(sp[2][3:])
                                         P2 = int(sp[3])
 
                                         if read == readp and ch == chp:

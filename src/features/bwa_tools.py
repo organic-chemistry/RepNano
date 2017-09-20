@@ -70,7 +70,7 @@ def get_seq(sam, ref, pos=False):
                     #print(Chrom, pos, Bit, LenghtOnRef(CIGAR), ref)
                     Seq = SeqInRef(Chrom, pos, Bit, LenghtOnRef(CIGAR), ref)
                     #print("Inside", Seq)
-                    ret = [Seq, 1, int(ss[2]), pos]
+                    ret = [Seq, 1, int(ss[2][3:]), pos]
 
                 else:
 
