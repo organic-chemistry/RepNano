@@ -199,7 +199,7 @@ if __name__ == '__main__':
                     if "1" in type_sub:
                         sub = "B"
 
-                    for ifilename, filename in (glob.glob(direct + "/*")):
+                    for ifilename, filename in enumerate(glob.glob(direct + "/*")):
                         if args.max_file != 0 and ifilename > args.max_file:
                             continue
                         h5 = h5py.File(filename, "r")
