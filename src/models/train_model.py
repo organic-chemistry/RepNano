@@ -286,7 +286,7 @@ if __name__ == '__main__':
                                         if read == readp and ch == chp:
                                             print(k, kp)
 
-                                            if sp[2] == '*':
+                                            if sp[2] == '*' or "chr" not in sp[2]:
                                                 continue
 
                                             X2 = int(sp[2][3:])
