@@ -109,7 +109,7 @@ if __name__ == '__main__':
     elif args.Nbases == 5:
         mapping = {"A": 0, "C": 1, "G": 2, "T": 3, "B": 4, "N": 5}  # Modif
     elif args.Nbases == 8:
-        mapping = {"A": 0, "C": 1, "G": 2, "T": 3, "B": 4, "I": 5, "K": 6, "L": 7, "N": 8}  # Modif
+        mapping = {"A": 0, "C": 1, "G": 2, "T": 3, "B": 4, "L": 5, "E": 6, "I": 7, "N": 8}  # Modif
 
     n_classes = len(mapping.keys())
 
@@ -445,7 +445,7 @@ if __name__ == '__main__':
                 new_seq = np.argmax(predictor.predict(np.array([data_x[s]]))[0], axis=-1)
                 # print(args.Nbases)
                 if args.Nbases == 8:
-                    alph = "ACGTBIKLN"   # use T to Align
+                    alph = "ACGTBLEIN"   # use T to Align
                 if args.Nbases == 5:
                     alph = "ACGTBN"   # use T to Align
                 if args.Nbases == 4:
@@ -454,10 +454,10 @@ if __name__ == '__main__':
 
                 nc = {}
 
-                for l in ["B", "I", "K", "L", "T"]:
+                for l in ["B", "L", "E", "I", "T"]:
                     nc[l] = New_seq[-1].count(l)
 
-                for l in ["B", "I", "K", "L"]:
+                for l in ["B", "L", "E", "I"]:
                     New_seq[-1] = New_seq[-1].replace(l, "T")
 
             # Here maybe realign with bwa
@@ -466,7 +466,7 @@ if __name__ == '__main__':
 
                 type_sub = "T"
                 subts = False
-                for l in ["B", "I", "K", "L"]:
+                for l in ["B", "L", "E", "I"]:
                     if l in ref[s]:
                         subst = l
                         break
@@ -589,7 +589,7 @@ if __name__ == '__main__':
                     megas += seg
 
                 seg = seg + "A" * (maxi - len(seg))
-                for l in ["B", "I", "K", "L"]:
+                for l in ["B", "L", "E", "I"]:
                     if l in refs[s2]:
 
                         seg = seg.replace("T", l)
