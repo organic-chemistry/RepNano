@@ -8,13 +8,13 @@ weights = "data/cluster/training/v9p5delta10-bis/my_model_weights-940.h5"
 #weights = "data/cluster/training//v9p5-delta10-ref-from-file/my_model_weights-50.h5"
 
 #weights = "data/cluster/training/v9p5-delta10-oversamplingB/my_model_weights-20.h5"
-weights = "data/cluster/training/v9p5-delta10-ref-from-file-bis-max-files/my_model_weights-290.h5"
+weights = "data/cluster/training/v9p5-delta10-ref-from-file-bis-max-files/my_model_weights-9300.h5"
 
 
 basename = "results/v9p5-best-B-20170908-R9.5-newchem/"
 
 ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
-redo = 0
+redo = 1
 # Evaluate all the sample
 list_dir = [["substituted", "sub_template"], ["control", "control_template"],
             ["control-k47211", "control-k47211_template"]]

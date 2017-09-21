@@ -297,8 +297,8 @@ if __name__ == '__main__':
                                             # break
                             if succes:
                                 if not args.select_agree:
-                                    ref = list(sorted(Ref, key=lambda x: len(x)))[-1][0]
-                                    print(list(map(len, Ref)))
+                                    ref = list(sorted(Ref, key=lambda x: len(x[0])))[-1][0]
+                                    print([len(iRef[0]) for iRef in Ref])
 
                                     print(len(ref), len(seqs))
                                 else:
