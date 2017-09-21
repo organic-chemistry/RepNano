@@ -354,7 +354,7 @@ if __name__ == '__main__':
         with open(os.path.join(args.root, "Allignements-bis"), "rb") as f:
             data_x, data_index, data_alignment, refs, names = cPickle.load(f)
 
-    if args.from_pre_trained:
+    if args.from_pre_trained and args.Nbases != 8:
 
         ntwk.load_weights(args.pre_trained_weight)
         predictor.load_weights(args.pre_trained_weight)
