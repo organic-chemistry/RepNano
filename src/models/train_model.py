@@ -308,6 +308,8 @@ if __name__ == '__main__':
                                             found = True
                                     if not found:
                                         continue
+                            else:
+                                continue
 
                             if abs(len(ref) - len(seqs)) > 1000:
                                 succes = False
