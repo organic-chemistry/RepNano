@@ -8,7 +8,7 @@ from keras.optimizers import SGD
 import keras
 
 
-def build_models(size=20):
+def build_models(size=20, nbase=1):
     if keras.backend.backend() == 'tensorflow':
         import tensorflow as tf
 
@@ -40,7 +40,7 @@ def build_models(size=20):
                                                  ctc_merge_repeated=ctc_merge_repeated), 1)
 
     inputs = Input(shape=(None, 4))
-    Nbases = 5 + 1
+    Nbases = 5 + nbase
 
     l1 = Bidirectional(LSTM(size, return_sequences=True), merge_mode='concat')(inputs)
     l2 = Bidirectional(LSTM(size, return_sequences=True), merge_mode='concat')(l1)

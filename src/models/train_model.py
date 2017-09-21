@@ -73,7 +73,7 @@ if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--Nbases', choices=["4", "5"], default='4')
+    parser.add_argument('--Nbases', type=int, choices=[4, 5, 8], default=4)
     parser.add_argument('--root', type=str, default="data/training/")
     parser.add_argument('--test', dest='test', action='store_true')
     parser.add_argument('--size', type=int, default=20)
@@ -104,10 +104,12 @@ if __name__ == '__main__':
         print("Must use tensorflow to train")
         exit()
 
-    if args.Nbases == "4":
+    if args.Nbases == 4:
         mapping = {"A": 0, "C": 1, "G": 2, "T": 3, "N": 4}  # Modif
-    elif args.Nbases == "5":
+    elif args.Nbases == 5:
         mapping = {"A": 0, "C": 1, "G": 2, "T": 3, "B": 4, "N": 5}  # Modif
+    elif args.Nbases == 8:
+        mapping = {"A": 0, "C": 1, "G": 2, "T": 3, "B": 4, "I": 5, "K": 6, "L": 7, "N": 8}  # Modif
 
     n_classes = len(mapping.keys())
 
@@ -115,7 +117,10 @@ if __name__ == '__main__':
 
     from .model import build_models
 
-    predictor, ntwk = build_models(args.size)
+    predictor, ntwk = build_models(args.size, nbase=args.Nbases - 4)
+
+    if args.Nbases == 8:
+        old_predictor, old_ntwk = build_models(args.size, nbase=1)
 
     os.makedirs(args.root, exist_ok=True)
 
@@ -168,8 +173,12 @@ if __name__ == '__main__':
                 # print(len(seqs), len(ref))
                 print(len(alignments[0][0]), len(ref), len(seqs), alignments[0][2:])
         else:
-            ntwk.load_weights(args.pre_trained_weight)
-            predictor.load_weights(args.pre_trained_weight)
+
+            if args.Nbases == 5:
+                ntwk.load_weights(args.pre_trained_weight)
+                predictor.load_weights(args.pre_trained_weight)
+            else:
+                old_predictor.load_weights(args.pre_trained_weight)
 
             from ..features.extract_events import extract_events, scale
             import h5py
@@ -196,8 +205,11 @@ if __name__ == '__main__':
                         direct, type_sub, ref_file = line.split()
                     idirect += 1
                     sub = None
-                    if "1" in type_sub:
-                        sub = "B"
+                    type_sub = type_sub.strip()
+                    if type_sub != "T":
+                        sub = type_sub
+                        if sub not in mapping:
+                            raise "Invalid substitution"
 
                     for ifilename, filename in enumerate(glob.glob(direct + "/*")):
                         if args.max_file != 0 and ifilename > args.max_file:
@@ -222,11 +234,19 @@ if __name__ == '__main__':
                         x = scale(
                             np.array(np.vstack([mean, mean * mean, std, length]).T, dtype=np.float32))
 
-                        o1 = predictor.predict(np.array(x)[np.newaxis, ::, ::])
+                        if args.Nbases == 5:
+                            o1 = predictor.predict(np.array(x)[np.newaxis, ::, ::])
+                        elif args.Nbases == 8:
+                            o1 = old_predictor.predict(np.array(x)[np.newaxis, ::, ::])
                         o1 = o1[0]
                         om = np.argmax(o1, axis=-1)
 
-                        alph = "ACGTTN"
+                        alph = "ACGTN"
+                        if args.Nbases == 5:
+                            alph = "ACGTTN"
+                        if args.Nbases == 8:
+                            alph = "ACGTTTTTN"
+
                         seq = "".join(map(lambda x: alph[x], om))
                         seqs = seq.replace("N", "")
 
@@ -424,22 +444,35 @@ if __name__ == '__main__':
 
                 new_seq = np.argmax(predictor.predict(np.array([data_x[s]]))[0], axis=-1)
                 # print(args.Nbases)
-                if args.Nbases == "5":
+                if args.Nbases == 8:
+                    alph = "ACGTBIKLN"   # use T to Align
+                if args.Nbases == 5:
                     alph = "ACGTBN"   # use T to Align
-                if args.Nbases == "4":
+                if args.Nbases == 4:
                     alph = "ACGTN"
                 New_seq.append("".join(list(map(lambda x: alph[x], new_seq))))
-                nb = New_seq[-1].count("B")
-                nt = New_seq[-1].count("T")
-                New_seq[-1] = New_seq[-1].replace("B", "T")
+
+                nc = {}
+
+                for l in ["B", "I", "K", "L", "T"]:
+                    nc[l] = New_seq[-1].count(l)
+
+                for l in ["B", "I", "K", "L"]:
+                    New_seq[-1] = New_seq[-1].replace(l, "T")
+
             # Here maybe realign with bwa
             # for s in range(len(data_x)):
                 old_align = data_alignment[s]
 
-                b = "B" in refs[s]
+                type_sub = "T"
+                subts = False
+                for l in ["B", "I", "K", "L"]:
+                    if l in ref[s]:
+                        subst = l
+                        break
                 ref = "" + refs[s]
-                if b:
-                    ref = ref.replace("B", "T")
+                if subts:
+                    ref = ref.replace(subts, "T")
 
                 # new_align = pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))[0][:2]
                 new_align = pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))
@@ -448,8 +481,8 @@ if __name__ == '__main__':
                     print()
                     continue
                 new_align = new_align[0][:2]
-                print("Old", len(old_align[0]), "New", len(new_align[0]), b, len(
-                    ref), (len(ref) - len(New_seq[s].replace("N", ""))) / len(ref), nb / (nt + 1))
+                print("Old", len(old_align[0]), "New", len(new_align[0]), subts, len(
+                    ref), (len(ref) - len(New_seq[s].replace("N", ""))) / len(ref), nc[subts] / (nc["T"] + 1))
 
                 old_length += len(old_align[0])
                 total_length += len(ref)
@@ -467,8 +500,8 @@ if __name__ == '__main__':
                     new_length += len(old_align[0])
                     print()
 
-                if b and nb / (nt + 1) < 0.3:
-                    refs[s] = refs[s].replace("B", "T")
+                if subts and nc[subts] / (nc["T"] + 1) < 0.3:
+                    refs[s] = refs[s].replace(subts, "T")
                     switch += 1
                     print("Swich")
             print("Change", change, len(data_x))
@@ -505,8 +538,8 @@ if __name__ == '__main__':
                 # np.random.normal(scale=0.01, size=x.shape[0])
 
                 # oversampleb
-                if "B" not in refs[s2] and np.random.randint(args.oversampleb) != 0:
-                    continue
+                # if "B" not in refs[s2] and np.random.randint(args.oversampleb) != 0:
+            #        continue
 
                 def domap(base):
                     ret = [0 for b in range(n_classes)]
@@ -556,8 +589,11 @@ if __name__ == '__main__':
                     megas += seg
 
                 seg = seg + "A" * (maxi - len(seg))
-                if "B" in refs[s2]:
-                    seg = seg.replace("T", "B")
+                for l in ["B", "I", "K", "L"]:
+                    if l in refs[s2]:
+
+                        seg = seg.replace("T", l)
+                        break
                 # print(len(s))
                 # print(s)
                 # print([base for base in s])
