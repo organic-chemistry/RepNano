@@ -192,11 +192,13 @@ if __name__ == '__main__':
                 idirect = 0
                 for line in f.readlines():
                     if not args.ref_from_file:
-                        if len(line.split()) != 2:
+                        if len(line.split()) not in [2, 3]:
                             print("Skipping ", line)
                             continue
-
-                        direct, type_sub = line.split()
+                        if len(line.split()) == 2:
+                            direct, type_sub = line.split()
+                        else:
+                            direct, type_sub, ref_file = line.split()
                     else:
                         if len(line.split()) != 3:
                             print("Skipping ", line)
