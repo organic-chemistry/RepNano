@@ -10,6 +10,9 @@ To evaluate the model :
 
 python -m src.models.predict_model --weights=data/training/my_model_weights-3390-removed-bad-B.h5 --directory=data/raw/control/ --Nbases=5 --output=data/processed/result.fasta
 
+New model with extract_event:
+python -m src.models.predict_model --weights=data/training/my_model_weights-9300.h5 --directory=data/raw/control/ --Nbases=5 --output=data/processed/result.fasta --detect
+
 The directory must contain fasta sequences
 
 to evaluate the model and get some info on T/B and alignement:
@@ -17,6 +20,7 @@ But the code must be modified
 
 python -m src.test.evaluate
 
+python -m src.models.train_model --Nbases 8 --pre-trained-weight=data/training/v9p5-delta10-ref-from-file-bis-max-files//my_model_weights-9300.h5 --from-pre-trained --pre-trained-dir-list=test-ref-all.txt --root data/training/v9p5-delta10-ref-from-net-bis-max-files-8b-max200 --deltaseq=50 --forcelength=0.1  --max-file=200
 
 ==============================
 
