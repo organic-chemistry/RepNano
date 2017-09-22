@@ -427,7 +427,7 @@ if __name__ == '__main__':
                     change += 1
             """
 
-        if epoch % 300 == 0 and epoch != 0:
+        if epoch % 2000 == 0 and epoch != 0:
             ntwk.save_weights(os.path.join(
                 args.root, 'tmp.h5'))
 
@@ -564,7 +564,7 @@ if __name__ == '__main__':
                 seg, ss1, ss2, success = get_segment(
                     alignment, start_index_on_seqs, end_index_on_seqs)
 
-                print(ss2, ss1, seg, [l in refs[s2] for l in ["B", "L", "E", "I"]])
+                #print(ss2, ss1, seg, [l in refs[s2] for l in ["B", "L", "E", "I"]])
 
                 if not success:
                     continue
