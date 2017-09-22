@@ -14,7 +14,7 @@ weights = "data/cluster/training/v9p5-delta10-ref-from-file-bis-max-files/my_mod
 basename = "results/v9p5-best-B-20170908-R9.5-newchem/"
 
 ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
-redo = 1
+redo = 0
 # Evaluate all the sample
 list_dir = [["substituted", "sub_template"], ["control", "control_template"],
             ["control-k47211", "control-k47211_template"]]

@@ -563,6 +563,9 @@ if __name__ == '__main__':
                 #      len(alignment[0]), len(alignment[1]))
                 seg, ss1, ss2, success = get_segment(
                     alignment, start_index_on_seqs, end_index_on_seqs)
+
+                print(ss2, ss1, seg, [l in refs[s2] for l in ["B", "L", "E", "I"]])
+
                 if not success:
                     continue
                 maxi = 40
@@ -598,11 +601,11 @@ if __name__ == '__main__':
 
                         seg = seg.replace("T", l)
                         break
+
                 # print(len(s))
                 # print(s)
                 # print([base for base in s])
                 Label.append([mapping[base] for base in seg])
-                # print(ss2, ss1, seg)
 
                 X_new.append(x)
 
