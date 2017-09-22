@@ -70,7 +70,11 @@ def get_seq(sam, ref, pos=False):
                     #print(Chrom, pos, Bit, LenghtOnRef(CIGAR), ref)
                     Seq = SeqInRef(Chrom, pos, Bit, LenghtOnRef(CIGAR), ref)
                     #print("Inside", Seq)
-                    ret = [Seq, 1, int(ss[2][3:]), pos]
+                    if ss[2] == '*' or "chr" not in ss[2]:
+                        Chrom = None
+                    else:
+                        Chrom = int(ss[2][3:])
+                    ret = [Seq, 1, Chrom, pos]
 
                 else:
 
