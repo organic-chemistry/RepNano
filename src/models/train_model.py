@@ -186,7 +186,9 @@ if __name__ == '__main__':
                 if n_output == 2 and args.convert_to_t:
                     p = np.sum(data_y[-1] == 5) / len(Y)
                     if p > args.convert_to_t:
+                        print(np.sum(data_y[-1] == mapping["B"]))
                         data_y[-1][data_y[-1] == mapping["B"]] = mapping["T"]
+                        print(np.sum(data_y[-1] == mapping["B"]))
                         print("Converted")
 
                 print(fn, np.sum(data_y[-1] == 5) / len(Y))
@@ -593,9 +595,12 @@ if __name__ == '__main__':
                     start = r
                     Index = data_index[s2]
                     alignment = data_alignment[s2]
+                    f = 1
+                    if n_input == 1 and n_output == 2:
+                        f = 2
 
-                    start_index_on_seqs = find_closest(start, Index)
-                    end_index_on_seqs = find_closest(start + length, Index)
+                    start_index_on_seqs = find_closest(start * f, Index)
+                    end_index_on_seqs = find_closest(start * f + length * f, Index)
                     # from IPython import embed
                     # embed()
                     # print(start, start_index_on_seqs, end_index_on_seqs,
