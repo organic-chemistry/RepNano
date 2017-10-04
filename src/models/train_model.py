@@ -90,6 +90,7 @@ if __name__ == '__main__':
     parser.add_argument('--select-agree', dest="select_agree", type=bool, default=False)
     parser.add_argument('--max-file', dest="max_file", type=int, default=None)
     parser.add_argument('--ctc', dest='ctc', action="store_true")
+    parser.add_argument('--convert-to-t', dest='convert_to_t', type=float, default=None)
 
     args = parser.parse_args()
 
@@ -181,6 +182,11 @@ if __name__ == '__main__':
                 names.append(fn)
                 data_x.append(np.array(X, dtype=np.float32))
                 data_y.append(np.array(Y, dtype=np.int32))
+
+                if n_output == 2 and args.convert_to_t:
+                    p = np.sum(data_y[-1] == 5) / len(Y)
+                    if p > args.convert_to_t:
+                        data_y[-1][data_y[-1] == mapping["B"]] = mapping["T"]
 
                 print(fn, np.sum(data_y[-1] == 5) / len(Y))
 
