@@ -19,9 +19,11 @@ weights = "data/cluster/training/v9p5delta10-bis/my_model_weights-940.h5"
 weights = "data/cluster/training/v9p5-delta10-ref-from-file-bis-max-files/my_model_weights-9300.h5"
 weights = "data/training/al-8-bases/my_model_weights-90.h5"
 weights = "data/training/test-single-base/my_model_weights-180.h5"
+weights = "data/cluster/training/test-single-base-filter/my_model_weights-60.h5"
+weights = "data/training/test-single-base-bis/my_model_weights-0.h5"
 
 
-basename = "results/v9p5-best-B-20170908-R9.5-newchem-test/"
+basename = "results/v9p5-best-B-20170908-R9.5-newchem-test-clean-retest/"
 
 ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
 redo = 1
@@ -40,7 +42,7 @@ for dire, out in list_dir[:2]:  # + list_dir[4:]:
     if redo:
         process(weights, directory="data/raw/%s/" % dire,
                 output="data/processed/{0}{1}.fasta".format(basename, out), Nbases=5, reads="",
-                filter=None, already_detected=True, Nmax=50, size=20, n_output_network=1, n_input=2)
+                filter=None, already_detected=True, Nmax=50, size=20, n_output_network=2, n_input=1)
         # filter="data/processed/%s.InDeepNano.test" % outz , already_detected=False)
 
     exex = "python src/test/get_fasta_from_train-test.py data/processed/{0}{1}.fasta all data/processed/{0}{1}_test".format(

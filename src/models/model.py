@@ -1,10 +1,11 @@
 from keras.layers import Input, Dense
 from keras.layers.merge import Concatenate
+
 from keras.models import Model
 from keras.layers.recurrent import LSTM
 from keras.layers.wrappers import Bidirectional, TimeDistributed
 from keras import backend as K
-from keras.layers.core import Lambda
+from keras.layers.core import Lambda, Reshape
 from keras.optimizers import SGD, Adadelta
 import keras
 
@@ -43,6 +44,7 @@ def build_models(size=20, nbase=1, trainable=False, ctc_length=40, ctc=True,
                                                  ctc_merge_repeated=ctc_merge_repeated), 1)
 
     input_length = input_length
+    out_layer2 = None
     inputs = Input(shape=(input_length, 4))
     Nbases = 4 + nbase + 1
 
@@ -91,14 +93,9 @@ def build_models(size=20, nbase=1, trainable=False, ctc_length=40, ctc=True,
             out_layer1 = TD(l3d)
             out_layer2 = TD(l3u)
 
-            try:
-                model = Model(input=inputs, output=[out_layer1, out_layer2])
-            except:
-                model = Model(inputs=inputs, outputs=[out_layer1, out_layer2])
-
-    try:
-        model = Model(input=inputs, output=out_layer1)
-    except:
+    if out_layer2 is not None:
+        model = Model(inputs=inputs, outputs=[out_layer1, out_layer2])
+    else:
         model = Model(inputs=inputs, outputs=out_layer1)
 
     ada = Adadelta(lr=.2, rho=0.95, epsilon=1e-08, decay=0.0)

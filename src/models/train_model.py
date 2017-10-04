@@ -91,6 +91,9 @@ if __name__ == '__main__':
     parser.add_argument('--max-file', dest="max_file", type=int, default=None)
     parser.add_argument('--ctc', dest='ctc', action="store_true")
     parser.add_argument('--convert-to-t', dest='convert_to_t', type=float, default=None)
+    parser.add_argument('--n-input', dest="n_input", type=int, default=1)
+    parser.add_argument('--n-output', dest="n_output", type=int, default=2)
+    parser.add_argument('--n-output-network', dest="n_output_network", type=int, default=2)
 
     args = parser.parse_args()
 
@@ -117,16 +120,20 @@ if __name__ == '__main__':
 
     n_classes = len(mapping.keys())
 
-    n_output_network = 1
-    n_output = 2
-    n_input = 2
+    n_output_network = args.n_output_network
+    n_output = args.n_output
+    n_input = args.n_input
 
-    subseq_size = 100 * n_output
+    subseq_size = 100
 
     from .model import build_models
+    ctc_length = subseq_size
+    if n_output_network == 2:
+        input_length = subseq_size
+        ctc_length = 2 * subseq_size
 
     predictor, ntwk = build_models(args.size, nbase=args.Nbases - 4,
-                                   ctc_length=subseq_size, input_length=None, n_output=n_output_network)
+                                   ctc_length=ctc_length, input_length=input_length, n_output=n_output_network)
 
     if args.Nbases == 8:
         old_predictor, old_ntwk = build_models(args.size, nbase=1)
@@ -612,7 +619,7 @@ if __name__ == '__main__':
 
                     if not success:
                         continue
-                    maxi = subseq_size
+                    maxi = f * subseq_size
                     l = min(max(len(seg), 1), maxi - 1)
                     if not args.test:
                         if abs(len(ss2.replace("-", "")) - len(ss2)) + abs(len(ss1.replace("-", "")) - len(ss1)) > args.deltaseq or len(ss2.replace("-", "")) < args.forcelength * subseq_size:
