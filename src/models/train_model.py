@@ -117,9 +117,9 @@ if __name__ == '__main__':
 
     n_classes = len(mapping.keys())
 
-    n_output_network = 2
+    n_output_network = 1
     n_output = 2
-    n_input = 1
+    n_input = 2
 
     subseq_size = 100 * n_output
 
