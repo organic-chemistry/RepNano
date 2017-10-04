@@ -187,6 +187,7 @@ if __name__ == '__main__':
                     p = np.sum(data_y[-1] == 5) / len(Y)
                     if p > args.convert_to_t:
                         data_y[-1][data_y[-1] == mapping["B"]] = mapping["T"]
+                        print("Converted")
 
                 print(fn, np.sum(data_y[-1] == 5) / len(Y))
 
