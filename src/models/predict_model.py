@@ -22,7 +22,7 @@ def get_events(h5, already_detected=True):
         return extract_events(h5, "r9.5")
 
 
-def basecall_one_file(filename, output_file, ntwk, alph, already_detected):
+def basecall_one_file(filename, output_file, ntwk, alph, already_detected, n_input=1, filter_size=None):
     # try:
     assert(os.path.exists(filename)), "File %s does no exists" % filename
     h5 = h5py.File(filename, "r")
@@ -43,22 +43,39 @@ def basecall_one_file(filename, output_file, ntwk, alph, already_detected):
     std = events["stdv"]
     length = events["length"]
     X = scale(np.array(np.vstack([mean, mean * mean, std, length]).T, dtype=np.float32))
-    print(np.mean(X[:, 0]))
-    try:
-        o1 = ntwk.predict(np.array(X)[np.newaxis, ::, ::])
-        o1 = o1[0]
+    if n_input == 2:
+        X = []
+        for m, s, l in zip(mean, std, length):
+            X.append([m, m * m, s, l])
+            X.append([m, m * m, s, l])
+        X = scale(np.array(X))
 
-    except:
-        o1, o2 = ntwk.predict(X)
+    #print(np.mean(X[:, 0]))
+
+    p = ntwk.predict(X[np.newaxis, ::, ::])
+    #print(p[0, 50:60])
+    # print(X[50:60])
+    #print(np.max(p[0, ::, :5]))
+    if len(p) == 2:
+        o1, o2 = p
+        o1m = (np.argmax(o1[0], -1))
+        o2m = (np.argmax(o2[0], -1))
+        om = np.vstack((o1m, o2m)).reshape((-1,), order='F')
+        print("len", len(om))
+    else:
+        o1 = p[0]
+        om = np.argmax(o1, axis=-1)
 
     # print(o1[:20])
-    om = np.argmax(o1, axis=-1)
     # print(o2[:20])
     # exit()
 
     output = "".join(map(lambda x: alph[x], om)).replace("N", "")
     print(om.shape, len(output), len(output) / om.shape[0])
 
+    if filter_size is not None and len(output) < filter_size:
+        print("Out too small")
+        return 0
     output_file.writelines(">%s_template_deepnano\n" % filename)
     output_file.writelines(output + "\n")
 
@@ -69,17 +86,20 @@ def basecall_one_file(filename, output_file, ntwk, alph, already_detected):
     return 0
 
 
-def process(weights, Nbases, output, directory, reads=[], filter="", already_detected=True, Nmax=None):
+def process(weights, Nbases, output, directory, reads=[], filter="",
+            already_detected=True, Nmax=None, size=20, n_output_network=1, n_input=1, filter_size=None):
     assert len(reads) != 0 or len(directory) != 0, "Nothing to basecall"
 
     alph = "ACGTN"
     if Nbases == 5:
         alph = "ACGTBN"
+    if Nbases == 8:
+        alph = "ACGTBLEIN"
 
     import sys
     sys.path.append("../training/")
 
-    ntwk, _ = build_models(20)
+    ntwk, _ = build_models(size, Nbases - 4, n_output=n_output_network)
     assert(os.path.exists(weights)), "Weights %s does not exist" % weights
     ntwk.load_weights(weights)
     print("loaded")
@@ -104,6 +124,13 @@ def process(weights, Nbases, output, directory, reads=[], filter="", already_det
             files = []
         if len(directory):
             files += [os.path.join(directory, x) for x in os.listdir(directory)]
+            nfiles = []
+            for f in files:
+                if os.path.isdir(f):
+                    nfiles += [os.path.join(f, x) for x in os.listdir(f)]
+                else:
+                    nfiles.append(f)
+            files = nfiles
 
         # print(Files)
         # print(files)
@@ -114,7 +141,8 @@ def process(weights, Nbases, output, directory, reads=[], filter="", already_det
                 if os.path.split(read)[1] not in Files:
                     continue
             print("Processing read %s" % read)
-            basecall_one_file(read, fo, ntwk, alph, already_detected)
+            basecall_one_file(read, fo, ntwk, alph, already_detected,
+                              n_input=n_input, filter_size=filter_size)
 
             if Nmax and i >= Nmax:
                 break
@@ -126,7 +154,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--weights", default="None")
-    parser.add_argument('--Nbases', type=int, choices=[4, 5], default=4)
+    parser.add_argument('--Nbases', type=int, choices=[4, 5, 8], default=4)
     parser.add_argument('--output', type=str, default="output.fasta")
     parser.add_argument('--directory', type=str, default='',
                         help="Directory where read files are stored")
@@ -134,9 +162,10 @@ if __name__ == "__main__":
     parser.add_argument('--detect', dest='already_detected', action='store_false')
 
     parser.add_argument('--filter', type=str, default='')
+    parser.add_argument('--filter-size', dest="filter_size", type=int, default=None)
 
     args = parser.parse_args()
     # exit()
     process(weights=args.weights, Nbases=args.Nbases, output=args.output,
             directory=args.directory, reads=args.reads, filter=args.filter,
-            already_detected=args.already_detected)
+            already_detected=args.already_detected, filter_size=args.filter_size)

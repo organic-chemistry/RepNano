@@ -31,6 +31,8 @@ def get_stats(read_file, print_output=True):
     unalign = 0
     R6000 = 0
     aln6000 = 0
+    R200 = 0
+    aln200 = 0
     Ntemp = 0
     Ncomp = 0
     N2D = 0
@@ -134,6 +136,10 @@ def get_stats(read_file, print_output=True):
                 Reads[Table[read]['chrom']] += 1
             elif Table[read]['Bit'] == '4':
                 unalign += 1
+            if len(Table[read]['seq']) < 200:
+                R200 += 1
+                if Table[read]['Bit'] == '0' or Table[read]['Bit'] == '16' or Table[read]['Bit'] == '2064' or Table[read]['Bit'] == '2048':
+                    aln200 += 1
             if len(Table[read]['seq']) > 6000:
                 R6000 += 1
                 if Table[read]['Bit'] == '0' or Table[read]['Bit'] == '16' or Table[read]['Bit'] == '2064' or Table[read]['Bit'] == '2048':
@@ -172,6 +178,7 @@ def get_stats(read_file, print_output=True):
         print('Unaligned = ' + str(unalign))
         print('L>6000 = ' + str(R6000))
         print('Aligned  and L>6000 = ' + str(aln6000))
+        print('Aligned  and L<200 = ' + str(aln200))
         print('Template = ' + str(Ntemp))
         print('Complement = ' + str(Ncomp))
         print('2D = ' + str(N2D))

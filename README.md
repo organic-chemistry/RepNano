@@ -22,6 +22,28 @@ python -m src.test.evaluate
 
 python -m src.models.train_model --Nbases 8 --pre-trained-weight=data/training/v9p5-delta10-ref-from-file-bis-max-files//my_model_weights-9300.h5 --from-pre-trained --pre-trained-dir-list=test-ref-all.txt --root data/training/v9p5-delta10-ref-from-net-bis-max-files-8b-max200 --deltaseq=50 --forcelength=0.1  --max-file=200
 
+
+To train the model
+==============================
+ -  first generate the files needed by the network with the script src.data.build_all:
+ python -m src.data.build_all --split --root data/raw/ --processed data/processed --file sub_template.InDeepNano  --from-folder substituted --type-read temp
+
+if split is specified it will create two folders in data/processed:
+  substituted_temp_train and substituted_temp_test
+  if comp is specified:
+  substituted_comp_train and substituted_comp_test
+
+  where the read about the chromosome 11 are stored in test
+
+the file sub_template.InDeepNano must be in the root directory data/raw
+and the folder data/raw/substituted must contain the read to wich sub_template.InDeepNano
+refers to.
+
+The script will generate one file per read that will be used as input by the network
+
+
+
+
 ==============================
 
 Project Organization

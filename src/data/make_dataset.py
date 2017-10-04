@@ -67,39 +67,6 @@ def make(type_f, source_file, root, output_directory):
                     print(filename)
                     # exit()
 
-        if type_f == '2d':
-            tscale, tscale_sd, tshift, tdrift = extract_scaling(h5, "template", base_loc)
-            cscale, cscale_sd, cshift, cdrift = extract_scaling(h5, "complement", base_loc)
-            al = h5["Analyses/Basecall_2D_000/BaseCalled_2D/Alignment"]
-            temp_events = h5[base_loc + "/BaseCalled_template/Events"]
-            comp_events = h5[base_loc + "/BaseCalled_complement/Events"]
-            prev = None
-            for a in al:
-                ev = []
-                if a[0] == -1:
-                    ev += [0, 0, 0, 0, 0]
-                else:
-                    e = temp_events[a[0]]
-                    mean = (e["mean"] - tshift) / cscale
-                    stdv = e["stdv"] / tscale_sd
-                    length = e["length"]
-                    ev += [1] + preproc_event(mean, stdv, length)
-                if a[1] == -1:
-                    ev += [0, 0, 0, 0, 0]
-                else:
-                    e = comp_events[a[1]]
-                    mean = (e["mean"] - cshift) / cscale
-                    stdv = e["stdv"] / cscale_sd
-                    length = e["length"]
-                    ev += [1] + preproc_event(mean, stdv, length)
-                print >>fo, " ".join(map(str, ev)),
-                if prev == a[2]:
-                    print >>fo, "NN"
-                elif not prev or a[2][:-1] == prev[1:]:
-                    print >>fo, "N%c" % a[2][2]
-                else:
-                    print >>fo, "%c%c" % (a[2][1], a[2][2])
-
         fo.close()
         h5.close()
 if __name__ == "__main__":

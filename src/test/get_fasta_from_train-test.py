@@ -13,6 +13,9 @@ if get_from != "all":
 cut = []
 cutT = []
 B = 0
+L = 0
+E = 0
+I = 0
 T = 0
 found = []
 lost = []
@@ -33,8 +36,16 @@ with open(out_network, "r") as f:
             cut.append(fi + seq)
 
             B += seq.count("B")
+            L += seq.count("L")
+            E += seq.count("E")
+            I += seq.count("I")
+
             T += seq.count("T")
             seq = seq.replace("B", "T")
+            seq = seq.replace("L", "T")
+            seq = seq.replace("E", "T")
+            seq = seq.replace("I", "T")
+
             cutT.append(fi + seq)
 
 
@@ -51,3 +62,18 @@ if T != 0:
     r = B / 1.0 / T
 
 print("Number of T %i, number of B %i, ratio %f" % (T, B, r))
+r = 0
+if T != 0:
+    r = L / 1.0 / T
+
+print("Number of T %i, number of L %i, ratio %f" % (T, L, r))
+r = 0
+if T != 0:
+    r = E / 1.0 / T
+
+print("Number of T %i, number of E %i, ratio %f" % (T, E, r))
+r = 0
+if T != 0:
+    r = I / 1.0 / T
+
+print("Number of T %i, number of I %i, ratio %f" % (T, I, r))

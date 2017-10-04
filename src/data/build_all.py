@@ -8,25 +8,25 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--split', dest='bwa', action='store_true')
 parser.add_argument('--Nomake', dest='Nomake', action='store_false')
+parser.add_argument('--root', dest='root', type=str)
+parser.add_argument('--processed', dest='processed', type=str)
+parser.add_argument('--file', dest='file', type=str)
+parser.add_argument('--from-folder', dest='from_folder', type=str)
+parser.add_argument('--type-read', dest="type_read", type=str,
+                    default="temp", choices=["temp", "comp"])
+parser.add_argument('--ref', dest='ref', type=str,
+                    default="data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa")
+
 
 args = parser.parse_args()
 
 
-list_docs = [["temp", "sub_template.InDeepNano", "substituted"],
-             ["comp", "sub_complement.InDeepNano", "substituted"],
-             ["temp", "control_template.InDeepNano", "control"],
-             ["comp", "control_complement.InDeepNano", "control"],
-             ]
-root = "data/raw/"
-ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
-processed = "data/processed/"
-
-
-list_docs = [["temp", "controlK47211_template.InDeepNano", "control-k47211"],
-             ["comp", "controlK47211_complement.InDeepNano", "control-k47211"]]
-root = "data/raw/"
-#ref = "data/external/K47211/controlK47211.fa"
-processed = "data/processed/"
+root = args.root
+processed = args.processed
+file_name = args.file
+type_read = args.type_read
+folder = args.from_folder
+ref = args.ref
 
 
 simulate = False
@@ -39,30 +39,29 @@ else:
     do_script = os.popen
     do_folder = os.makedirs
 
-for type_read, file_name, folder in list_docs:
 
-    if not os.path.exists(ref) and args.bwa:
-        print(ref, "not found")
-        exit()
-    if not os.path.exists(os.path.join(root, file_name)):
-        print(os.path.join(root, file_name), "not found")
+if not os.path.exists(ref) and args.bwa:
+    print(ref, "not found")
+    exit()
+if not os.path.exists(os.path.join(root, file_name)):
+    print(os.path.join(root, file_name), "not found")
+
+if args.bwa:
+    split(os.path.join(root, file_name), ref, output=os.path.join(processed, file_name))
+
+if args.Nomake:
+    output_path = "{processed}/{folder}_{type_read}".format(folder=folder,
+                                                            processed=processed, type_read=type_read)
+
+    do_folder(output_path + "_train", exist_ok=True)
+    print("Reading", root + "/" + file_name + ".train")
+    make(type_read, processed + "/" + file_name + ".train",
+         root + "/" + folder, output_path + "_train")
 
     if args.bwa:
-        split(os.path.join(root, file_name), ref, output=os.path.join(processed, file_name))
-
-    if args.Nomake:
-        output_path = "{processed}/{folder}_{type_read}".format(folder=folder,
-                                                                processed=processed, type_read=type_read)
-        do_folder(output_path + "_train", exist_ok=True)
-
-        print("Reading", processed + "/" + file_name + ".train")
-        make(type_read, processed + "/" + file_name + ".train",
-             root + "/" + folder, output_path + "_train")
         do_folder(output_path + "_test", exist_ok=True)
-
         make(type_read, processed + "/" + file_name + ".test",
              root + "/" + folder, output_path + "_test")
-        do_folder(output_path + "_test", exist_ok=True)
 
   #  python split_training.py $root/$element $external/S288C_reference_sequence_R64-2-1_20150113.fa
     # python prepare_dataset.py temp $root/$element.train ../ForJM/control/

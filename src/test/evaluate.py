@@ -1,6 +1,14 @@
 from ..models.predict_model import process
 import os
 import subprocess
+
+
+import tensorflow as tf
+import keras.backend.tensorflow_backend as KTF
+
+S = tf.Session(config=tf.ConfigProto(intra_op_parallelism_threads=1))
+KTF.set_session(S)
+
 weights = "data/cluster/training/v9p5delta10-bis/my_model_weights-940.h5"
 # weights = "data/cluster/training/v9p5delta10-new-weight-longer/my_model_weights-60.h5"  # a lot of B
 #weights = "data/cluster/training//v9p5-delta10-oversamplingL/my_model_weights-190.h5"
@@ -9,26 +17,30 @@ weights = "data/cluster/training/v9p5delta10-bis/my_model_weights-940.h5"
 
 #weights = "data/cluster/training/v9p5-delta10-oversamplingB/my_model_weights-20.h5"
 weights = "data/cluster/training/v9p5-delta10-ref-from-file-bis-max-files/my_model_weights-9300.h5"
+weights = "data/training/al-8-bases/my_model_weights-90.h5"
+weights = "data/training/test-single-base/my_model_weights-180.h5"
 
 
-basename = "results/v9p5-best-B-20170908-R9.5-newchem/"
+basename = "results/v9p5-best-B-20170908-R9.5-newchem-test/"
 
 ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
-redo = 0
+redo = 1
 # Evaluate all the sample
 list_dir = [["substituted", "sub_template"], ["control", "control_template"],
             ["control-k47211", "control-k47211_template"]]
 
-list_dir = [["20170908-R9.5/AG-Thy/0", "20170908-R9.5/BTF_AG_ONT_1_FAH14273_A-select_pass"],
-            ["20170908-R9.5/AH-BrdU/0", "20170908-R9.5/BTF_AH_ONT_1_FAH14319_A-select_pass"],
+list_dir = [["20170908-R9.5/AG-basecalled", "20170908-R9.5/BTF_AG_ONT_1_FAH14273_A-select_pass"],
+            ["20170908-R9.5/AH-basecalled", "20170908-R9.5/BTF_AH_ONT_1_FAH14319_A-select_pass"],
+            ["20170908-R9.5/AG-Thy/", "20170908-R9.5/BTF_AG_ONT_1_FAH14273_A-select_pass"],
+            ["20170908-R9.5/AH-BrdU/", "20170908-R9.5/BTF_AH_ONT_1_FAH14319_A-select_pass"],
             ["20170908-R9.5/AI-CldU/0/", "20170908-R9.5/BTF_AI_ONT_1_FAH14242_A-select_pass"],
             ["20170908-R9.5/AK-EdU/0/", "20170908-R9.5/BTF_AK_ONT_1_FAH14211_A-select_pass"],
             ["20170908-R9.5/AL-IdU/0/", "20170908-R9.5/BTF_AL_ONT_1_FAH14352_A-select_pass"]]
-for dire, out in list_dir:  # + list_dir[4:]:
+for dire, out in list_dir[:2]:  # + list_dir[4:]:
     if redo:
         process(weights, directory="data/raw/%s/" % dire,
                 output="data/processed/{0}{1}.fasta".format(basename, out), Nbases=5, reads="",
-                filter=None, already_detected=False, Nmax=None)
+                filter=None, already_detected=True, Nmax=50, size=20, n_output_network=1, n_input=2)
         # filter="data/processed/%s.InDeepNano.test" % outz , already_detected=False)
 
     exex = "python src/test/get_fasta_from_train-test.py data/processed/{0}{1}.fasta all data/processed/{0}{1}_test".format(

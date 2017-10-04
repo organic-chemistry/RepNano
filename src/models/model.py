@@ -1,18 +1,21 @@
 from keras.layers import Input, Dense
+from keras.layers.merge import Concatenate
 from keras.models import Model
 from keras.layers.recurrent import LSTM
 from keras.layers.wrappers import Bidirectional, TimeDistributed
 from keras import backend as K
 from keras.layers.core import Lambda
-from keras.optimizers import SGD
+from keras.optimizers import SGD, Adadelta
 import keras
 
 
-def build_models(size=20, nbase=1):
+def build_models(size=20, nbase=1, trainable=False, ctc_length=40, ctc=True,
+                 uniform=True, input_length=None, n_output=1):
     if keras.backend.backend() == 'tensorflow':
         import tensorflow as tf
 
-        def ctc_batch_cost(y_true, y_pred, input_length, label_length, ctc_merge_repeated=False):
+        def ctc_batch_cost(y_true, y_pred, input_length, label_length,
+                           ctc_merge_repeated=False):
             '''Runs CTC loss algorithm on each batch element.
 
             # Arguments
@@ -39,42 +42,94 @@ def build_models(size=20, nbase=1):
                                                  sequence_length=input_length,
                                                  ctc_merge_repeated=ctc_merge_repeated), 1)
 
-    inputs = Input(shape=(None, 4))
-    Nbases = 5 + nbase
+    input_length = input_length
+    inputs = Input(shape=(input_length, 4))
+    Nbases = 4 + nbase + 1
 
-    l1 = Bidirectional(LSTM(size, return_sequences=True), merge_mode='concat')(inputs)
-    l2 = Bidirectional(LSTM(size, return_sequences=True), merge_mode='concat')(l1)
-    l3 = Bidirectional(LSTM(size, return_sequences=True), merge_mode='concat')(l2)
-    out_layer1 = TimeDistributed(Dense(Nbases, activation="softmax"), name="out_layer1")(l3)
+    l1 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable),
+                       merge_mode='concat')(inputs)
+    l2 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable),
+                       merge_mode='concat')(l1)
+
+    if n_output == 1:
+        l3 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable),
+                           merge_mode='concat')(l2)
+
+        out_layer1 = TimeDistributed(Dense(Nbases, activation="softmax"), name="out_layer1")(l3)
+
+    else:
+        l3 = Bidirectional(LSTM(2 * size, return_sequences=True, trainable=trainable),
+                           merge_mode='concat')(l2)
+
+        if input_length != None:
+            TD = TimeDistributed(Dense(Nbases, activation="softmax"), name="out_layer1")
+            r = Reshape((input_length * 2, 2 * size))(l3)
+            out_layer1 = TD(r)
+        else:
+            print("Latttt")
+
+            def slice_last_d(x):
+
+                return x[::, ::, :2 * size]
+
+            def slice_last_u(x):
+
+                return x[::, ::, 2 * size:]
+
+            def slice_shape(input_shape):
+                shape = list(input_shape)
+
+                shape[-1] = 2 * size
+                return tuple(shape)
+
+            TD = TimeDistributed(Dense(Nbases, activation="softmax"),
+                                 name="out_layer1")
+
+            l3d = Lambda(slice_last_d, slice_shape)(l3)
+            l3u = Lambda(slice_last_u, slice_shape)(l3)
+
+            out_layer1 = TD(l3d)
+            out_layer2 = TD(l3u)
+
+            try:
+                model = Model(input=inputs, output=[out_layer1, out_layer2])
+            except:
+                model = Model(inputs=inputs, outputs=[out_layer1, out_layer2])
 
     try:
         model = Model(input=inputs, output=out_layer1)
     except:
         model = Model(inputs=inputs, outputs=out_layer1)
 
-    model.compile(optimizer='adadelta', loss='categorical_crossentropy',
-                  sample_weight_mode='temporal')
+    ada = Adadelta(lr=.2, rho=0.95, epsilon=1e-08, decay=0.0)
+    if not uniform:
+        model.compile(optimizer='adadelta', loss='categorical_crossentropy',
+                      sample_weight_mode='temporal')
+    else:
+        model.compile(optimizer='adadelta', loss='categorical_crossentropy')
 
     if keras.backend.backend() != 'tensorflow':
         return model, None
 
     if keras.backend.backend() == 'tensorflow':
 
-        def ctc_lambda_func(args):
-            y_pred, labels, input_length, label_length = args
-            y_pred = y_pred[:, :, :]
-            return ctc_batch_cost(labels, y_pred, input_length, label_length, ctc_merge_repeated=False)
+        if ctc:
+            def ctc_lambda_func(args):
+                y_pred, labels, input_length, label_length = args
+                y_pred = y_pred[:, :, :]
+                return ctc_batch_cost(labels, y_pred, input_length, label_length, ctc_merge_repeated=False)
 
-        labels = Input(name='the_labels', shape=[40], dtype='float32')
-        input_length = Input(name='input_length', shape=[1], dtype='int64')
-        label_length = Input(name='label_length', shape=[1], dtype='int64')
+            labels = Input(name='the_labels', shape=[ctc_length], dtype='float32')
+            input_length = Input(name='input_length', shape=[1], dtype='int64')
+            label_length = Input(name='label_length', shape=[1], dtype='int64')
 
-        loss_out = Lambda(ctc_lambda_func, output_shape=(1,), name='ctc')(
-            [out_layer1, labels, input_length, label_length])
+            loss_out = Lambda(ctc_lambda_func, output_shape=(1,), name='ctc')(
+                [out_layer1, labels, input_length, label_length])
 
-        model2 = Model(inputs=[inputs, labels, input_length, label_length], outputs=loss_out)
+            model2 = Model(inputs=[inputs, labels, input_length, label_length], outputs=loss_out)
 
-        sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True, clipnorm=5)
-        #rms = RMSprop(lr=0.0005, rho=0.9, epsilon=1e-08, decay=0.0, clipvalue=0.05)
-        model2.compile(loss={'ctc': lambda y_true, y_pred: y_pred}, optimizer=sgd)
+            sgd = SGD(lr=0.001, decay=1e-6, momentum=0.9, nesterov=True, clipnorm=5)
+            # rms = RMSprop(lr=0.0005, rho=0.9, epsilon=1e-08, decay=0.0, clipvalue=0.05)
+            model2.compile(loss={'ctc': lambda y_true, y_pred: y_pred}, optimizer=sgd)
+
     return model, model2

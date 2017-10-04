@@ -1,4 +1,5 @@
 import numpy as np
+from .helpers import scale
 
 defs = {
     'r9.4': {
@@ -26,26 +27,6 @@ defs = {
         }
     }
 }
-
-
-def scale(X):
-    m25 = np.percentile(X[:, 0], 25)
-    m75 = np.percentile(X[:, 0], 75)
-    s50 = np.median(X[:, 2])
-    me25 = 0.07499809
-    me75 = 0.26622871
-    se50 = 0.6103758
-    ret = np.array(X)
-    scale = (me75 - me25) / (m75 - m25)
-    m25 *= scale
-    shift = me25 - m25
-    ret[:, 0] = X[:, 0] * scale + shift
-    ret[:, 1] = ret[:, 0]**2
-
-    sscale = se50 / s50
-
-    ret[:, 2] = X[:, 2] * sscale
-    return ret
 
 
 def get_raw(h5):
