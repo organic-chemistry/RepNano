@@ -92,8 +92,8 @@ if __name__ == '__main__':
     parser.add_argument('--ctc', dest='ctc', action="store_true")
     parser.add_argument('--convert-to-t', dest='convert_to_t', type=float, default=None)
     parser.add_argument('--n-input', dest="n_input", type=int, default=1)
-    parser.add_argument('--n-output', dest="n_output", type=int, default=2)
-    parser.add_argument('--n-output-network', dest="n_output_network", type=int, default=2)
+    parser.add_argument('--n-output', dest="n_output", type=int, default=1)
+    parser.add_argument('--n-output-network', dest="n_output_network", type=int, default=1)
     parser.add_argument('--f-size', nargs='+', dest="f_size", type=int, default=None)
 
     args = parser.parse_args()
@@ -129,6 +129,7 @@ if __name__ == '__main__':
 
     from .model import build_models
     ctc_length = subseq_size
+    input_length = None
     if n_output_network == 2:
         input_length = subseq_size
         ctc_length = 2 * subseq_size
@@ -278,7 +279,7 @@ if __name__ == '__main__':
                             raise "Invalid substitution"
 
                     for ifilename, filename in enumerate(glob.glob(direct + "/*")):
-                        if args.max_file != 0 and ifilename > args.max_file:
+                        if args.max_file is not None and ifilename > args.max_file:
                             continue
                         h5 = h5py.File(filename, "r")
 
@@ -286,6 +287,7 @@ if __name__ == '__main__':
                             events = extract_events(h5, "rf", window_size=args.f_size[iline])
                         else:
                             events = extract_events(h5, "r9.5")
+
                         if events is None:
                             print("No events in file %s" % filename)
                             h5.close()
