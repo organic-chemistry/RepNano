@@ -94,6 +94,7 @@ if __name__ == '__main__':
     parser.add_argument('--n-input', dest="n_input", type=int, default=1)
     parser.add_argument('--n-output', dest="n_output", type=int, default=2)
     parser.add_argument('--n-output-network', dest="n_output_network", type=int, default=2)
+    parser.add_argument('--f-size', nargs='+', dest="f_size", type=int, default=None)
 
     args = parser.parse_args()
 
@@ -253,7 +254,7 @@ if __name__ == '__main__':
 
             with open(args.pre_trained_dir_list, "r") as f:
                 idirect = 0
-                for line in f.readlines():
+                for iline, line in enumerate(f.readlines()):
                     if not args.ref_from_file:
                         if len(line.split()) not in [2, 3]:
                             print("Skipping ", line)
@@ -281,7 +282,10 @@ if __name__ == '__main__':
                             continue
                         h5 = h5py.File(filename, "r")
 
-                        events = extract_events(h5, "r9.5")
+                        if args.f_size is not None:
+                            events = extract_events(h5, "rf", window_size=args.f_size[iline])
+                        else:
+                            events = extract_events(h5, "r9.5")
                         if events is None:
                             print("No events in file %s" % filename)
                             h5.close()

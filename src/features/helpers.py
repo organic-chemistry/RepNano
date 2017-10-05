@@ -27,6 +27,7 @@ def scale(X):
     sscale = se50 / s50
 
     ret[:, 2] = X[:, 2] * sscale
+    print("Mean window length", np.mean(ret[:3]), np.std(ret[:3]))
     return ret
 
 

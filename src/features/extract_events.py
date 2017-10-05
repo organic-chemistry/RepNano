@@ -10,7 +10,7 @@ defs = {
     },
     'r9': {
         'ed_params': {
-            'window_lengths': [5, 10], 'thresholds': [2.0, 1.1],
+            'window_lengths': [6, 12], 'thresholds': [2.0, 1.1],
             'peak_height': 1.2
         }
     },
@@ -25,7 +25,14 @@ defs = {
             'window_lengths': [4, 6], 'thresholds': [1.4, 1.0],
             'peak_height': 0.65
         }
+    },
+    'rf': {
+        'ed_params': {
+            'window_lengths': [4, 6], 'thresholds': [1.4, 1.1],
+            'peak_height': 1.2
+        }
     }
+
 }
 
 
@@ -123,11 +130,15 @@ def get_tstat(s, s2, wl):
     return np.concatenate([np.zeros(wl), np.abs(delta / np.sqrt(deltav)), np.zeros(wl - 1)])
 
 
-def extract_events(h5, chem):
+def extract_events(h5, chem, window_size=None):
     # print("ed")
     raw, sl = get_raw(h5)
 
-    events = event_detect(raw, sl, **defs[chem]["ed_params"])
+    param = defs[chem]["ed_params"]
+    if window_size is not None:
+        param['window_lengths'] = [window_size - 1, window_size + 1]
+        print("Modif length", window_size)
+    events = event_detect(raw, sl, **param)
     med, mad = med_mad(events['mean'][-100:])
     max_thresh = med + 1.48 * 2 + mad
 
@@ -138,7 +149,7 @@ def extract_events(h5, chem):
     first_event, last_event = find_stall(
         events, start_threshold=8.5, end_threshold=4, raw=raw, sampling_rate=sl, max_under_threshold=750)
 
-    return events[first_event:last_event]
+    return events[first_event:]
 
 
 def med_mad(data):

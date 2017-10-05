@@ -28,7 +28,7 @@ def get_stats(read_file, print_output=True):
     Table = {}
     read = 0
     alnTemp = 0
-    unalign = 0
+    unalign = []
     R6000 = 0
     aln6000 = 0
     R200 = 0
@@ -135,7 +135,7 @@ def get_stats(read_file, print_output=True):
                 alnTemp += 1
                 Reads[Table[read]['chrom']] += 1
             elif Table[read]['Bit'] == '4':
-                unalign += 1
+                unalign.append(len(Table[read]['seq']))
             if len(Table[read]['seq']) < 200:
                 R200 += 1
                 if Table[read]['Bit'] == '0' or Table[read]['Bit'] == '16' or Table[read]['Bit'] == '2064' or Table[read]['Bit'] == '2048':
@@ -175,7 +175,7 @@ def get_stats(read_file, print_output=True):
         print('File = ' + read_file)
         print('Total = ' + str(read))
         print('Aligned = ' + str(alnTemp))
-        print('Unaligned = ' + str(unalign))
+        print('Unaligned = ' + str(len(unalign)))
         print('L>6000 = ' + str(R6000))
         print('Aligned  and L>6000 = ' + str(aln6000))
         print('Aligned  and L<200 = ' + str(aln200))
@@ -190,6 +190,7 @@ def get_stats(read_file, print_output=True):
         print('R 2D = ' + str(R2D))
         for chrom in Chromlist:
             print(chrom, Reads[chrom])
+        print("Size unaligned", unalign)
 
     ####################  print a smaller file usable for several samples ##################
 
@@ -205,7 +206,7 @@ def get_stats(read_file, print_output=True):
         g.write("\n")
     g.close
 
-    return alnTemp, unalign
+    return alnTemp, len(unalign)
 
 if __name__ == "__main__":
 

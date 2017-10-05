@@ -6,7 +6,7 @@ from .model import build_models
 from ..features.extract_events import extract_events, scale
 
 
-def get_events(h5, already_detected=True):
+def get_events(h5, already_detected=True, chemistry="r9.5", window_size=None):
     if already_detected:
         try:
             e = h5["Analyses/Basecall_RNN_1D_000/BaseCalled_template/Events"]
@@ -19,14 +19,15 @@ def get_events(h5, already_detected=True):
         except:
             pass
     else:
-        return extract_events(h5, "r9.5")
+        return extract_events(h5, chemistry, window_size)
 
 
-def basecall_one_file(filename, output_file, ntwk, alph, already_detected, n_input=1, filter_size=None):
+def basecall_one_file(filename, output_file, ntwk, alph, already_detected,
+                      n_input=1, filter_size=None, chemistry="r9.5", window_size=None):
     # try:
     assert(os.path.exists(filename)), "File %s does no exists" % filename
     h5 = h5py.File(filename, "r")
-    events = get_events(h5, already_detected)
+    events = get_events(h5, already_detected, chemistry, window_size)
     if events is None:
         print("No events in file %s" % filename)
         h5.close()
@@ -74,7 +75,7 @@ def basecall_one_file(filename, output_file, ntwk, alph, already_detected, n_inp
     print(om.shape, len(output), len(output) / om.shape[0])
 
     if filter_size is not None and len(output) < filter_size:
-        print("Out too small")
+        print("Out too small", filter_size)
         return 0
     output_file.writelines(">%s_template_deepnano\n" % filename)
     output_file.writelines(output + "\n")
@@ -87,7 +88,8 @@ def basecall_one_file(filename, output_file, ntwk, alph, already_detected, n_inp
 
 
 def process(weights, Nbases, output, directory, reads=[], filter="",
-            already_detected=True, Nmax=None, size=20, n_output_network=1, n_input=1, filter_size=None):
+            already_detected=True, Nmax=None, size=20, n_output_network=1, n_input=1, filter_size=None,
+            chemistry="r9.5", window_size=None):
     assert len(reads) != 0 or len(directory) != 0, "Nothing to basecall"
 
     alph = "ACGTN"
@@ -142,7 +144,7 @@ def process(weights, Nbases, output, directory, reads=[], filter="",
                     continue
             print("Processing read %s" % read)
             basecall_one_file(read, fo, ntwk, alph, already_detected,
-                              n_input=n_input, filter_size=filter_size)
+                              n_input=n_input, filter_size=filter_size, chemistry=chemistry, window_size=window_size)
 
             if Nmax and i >= Nmax:
                 break
@@ -163,9 +165,12 @@ if __name__ == "__main__":
 
     parser.add_argument('--filter', type=str, default='')
     parser.add_argument('--filter-size', dest="filter_size", type=int, default=None)
+    parser.add_argument('--chemistry', type=str, default='r9.5')
+    parser.add_argument('--window-size', type=int, default=6, dest="window_size")
 
     args = parser.parse_args()
     # exit()
     process(weights=args.weights, Nbases=args.Nbases, output=args.output,
             directory=args.directory, reads=args.reads, filter=args.filter,
-            already_detected=args.already_detected, filter_size=args.filter_size)
+            already_detected=args.already_detected, filter_size=args.filter_size,
+            chemistry=args.chemistry, window_size=args.window_size)
