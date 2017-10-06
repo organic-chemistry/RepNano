@@ -638,35 +638,35 @@ if __name__ == '__main__':
                         if abs(len(ss2.replace("-", "")) - len(ss2)) + abs(len(ss1.replace("-", "")) - len(ss1)) > args.deltaseq or len(ss2.replace("-", "")) < args.forcelength * subseq_size:
                             # print(ss2, ss1, abs(len(ss2.replace("-", "")) - len(ss2)) +
                             # abs(len(ss1.replace("-", "")) -
-                                                                                            len(ss1)), len(ss2.replace("-", "")))
+                            # len(ss1)), len(ss2.replace("-", "")))
                             continue
                     Length.append(l)
 
-                    test=False
+                    test = False
                     if test:
                         # print(len(data_x[s2]))
-                        o1=predictor.predict(np.array(x)[np.newaxis, ::, ::])
-                        o1=o1[0]
-                        om=np.argmax(o1, axis=-1)
+                        o1 = predictor.predict(np.array(x)[np.newaxis, ::, ::])
+                        o1 = o1[0]
+                        om = np.argmax(o1, axis=-1)
 
-                        alph="ACGTTN"
-                        seq_tmp="".join(map(lambda x: alph[x], om))
+                        alph = "ACGTTN"
+                        seq_tmp = "".join(map(lambda x: alph[x], om))
                         print(seq_tmp.replace("N", ""))
 
                     # print(len(s))
                     if len(seg) > maxi - 1:
-                        seg=seg[:maxi - 1]
+                        seg = seg[:maxi - 1]
 
                     if "B" in refs[s2]:
                         megas += seg.replace("T", "B")
                     else:
                         megas += seg
 
-                    seg=seg + "A" * (maxi - len(seg))
+                    seg = seg + "A" * (maxi - len(seg))
                     for l in ["B", "L", "E", "I"]:
                         if l in refs[s2]:
 
-                            seg=seg.replace("T", l)
+                            seg = seg.replace("T", l)
                             break
 
                     # print(ss1, ss2, seg)
@@ -678,35 +678,35 @@ if __name__ == '__main__':
 
                     X_new.append(x)
 
-        X_new=np.array(X_new)
-        Y_new=np.array(Y_new)
+        X_new = np.array(X_new)
+        Y_new = np.array(Y_new)
 
         if not args.ctc:
-            sum1=0
+            sum1 = 0
             for k in stats.keys():
                 sum1 += stats[k]
 
             if epoch == 0:
-                weight=[0 for k in stats.keys()]
+                weight = [0 for k in stats.keys()]
 
                 for k in stats.keys():
-                    weight[k]=stats[k] / 1.0 / sum1
-                    weight[k]=1 / weight[k]
-                weight=np.array(weight)
-                weight=weight * len(stats.keys()) / np.sum(weight)
+                    weight[k] = stats[k] / 1.0 / sum1
+                    weight[k] = 1 / weight[k]
+                weight = np.array(weight)
+                weight = weight * len(stats.keys()) / np.sum(weight)
             # weight[4] *= 100
 
-            w2=[]
+            w2 = []
 
             for y in Y2_new:
                 w2.append([])
                 for arr in y:
                     w2[-1].append(weight[np.argmax(arr)])
 
-            w2=np.array(w2)
+            w2 = np.array(w2)
 
         if not args.ctc:
-            predictor.fit(X_new, Y_new, nb_epoch= 1, batch_size = 10, validation_split = 0.05)
+            predictor.fit(X_new, Y_new, nb_epoch=1, batch_size=10, validation_split=0.05)
             # ntwk.fit(X_new, Y_new, nb_epoch=1, batch_size=10, validation_split=0.05,
             #          sample_weight={"out_layer2": w2}, )
             if epoch % 10 == 0:
@@ -716,8 +716,8 @@ if __name__ == '__main__':
         if args.ctc:
             print(megas.count("B") / len(megas), megas.count("T") / len(megas))
 
-            Label=np.array(Label)
-            Length=np.array(Length)
+            Label = np.array(Label)
+            Length = np.array(Length)
             print(X_new.shape)
 
             # To balance class weight
@@ -727,16 +727,16 @@ if __name__ == '__main__':
             #    [length] * len(Length)).shape, Length.shape)
 
             if args.test:
-                maxin=8
-                val=2
-                batch_size=8
+                maxin = 8
+                val = 2
+                batch_size = 8
             else:
-                maxin=10 * (int(len(X_new) // 10) - 3)
-                val=30
-                batch_size=10
-            reduce_lr=keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.2,
+                maxin = 10 * (int(len(X_new) // 10) - 3)
+                val = 30
+                batch_size = 10
+            reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.2,
                                                           patience=5, min_lr=0.0001)
-            Log=keras.callbacks.CSVLogger(filename=os.path.join(
+            Log = keras.callbacks.CSVLogger(filename=os.path.join(
                 args.root, "training.log"), append=True)
 
             # print(len(data_x), np.mean(Length), np.max(Length))
