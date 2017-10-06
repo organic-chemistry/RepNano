@@ -432,10 +432,13 @@ if __name__ == '__main__':
     if args.pre_trained_weight is not None:
 
         try:
-            ntwk.load_weights(args.pre_trained_weight)
+            try:
+                ntwk.load_weights(args.pre_trained_weight)
+            except:
+                print("Only predictor loaded (normal if no ctc)")
+            predictor.load_weights(args.pre_trained_weight)
         except:
-            print("Only predictor loaded (normal if no ctc)")
-        predictor.load_weights(args.pre_trained_weight)
+            print("Learning from scratch")
 
     print("done", sum(len(x) for x in refs))
     sys.stdout.flush()
