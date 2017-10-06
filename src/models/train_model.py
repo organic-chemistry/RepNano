@@ -635,7 +635,8 @@ if __name__ == '__main__':
                     maxi = f * subseq_size
                     l = min(max(len(seg), 1), maxi - 1)
                     if not args.test:
-                        if abs(len(ss2.replace("-", "")) - len(ss2)) + abs(len(ss1.replace("-", "")) - len(ss1)) > args.deltaseq or len(ss2.replace("-", "")) < args.forcelength * subseq_size:
+                        if abs(len(ss2.replace("-", "")) - len(ss2)) + abs(len(ss1.replace("-", "")) - len(ss1)) > args.deltaseq or \
+                                len(ss2.replace("-", "")) < args.forcelength * subseq_size or or len(ss1.replace("-", "")) < args.forcelength * subseq_size:
                             # print(ss2, ss1, abs(len(ss2.replace("-", "")) - len(ss2)) +
                             # abs(len(ss1.replace("-", "")) -
                             # len(ss1)), len(ss2.replace("-", "")))
