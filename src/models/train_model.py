@@ -607,10 +607,13 @@ if __name__ == '__main__':
                         ret = [0 for b in range(n_classes)]
                         ret[base] = 1
                         return ret
+                    skip = False
                     if args.skip_new:
                         for l in ["L", "E", "I"]:
                             if l in refs[s2]:
-                                continue
+                                skip = True
+                    if skip:
+                        continue
                     length = subseq_size
                     start = r
                     Index = data_index[s2]
