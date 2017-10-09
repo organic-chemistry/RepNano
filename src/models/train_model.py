@@ -339,8 +339,9 @@ if __name__ == '__main__':
                             subprocess.call(exex, shell=True)
 
                             # read from bwa
+
                             ref, succes, X1, P1 = get_seq(
-                                "tmp.sam", ref="data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa", pos=True)
+                                "tmp.sam", ref="data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa", ret_pos=True)
 
                             if not succes:
                                 continue
