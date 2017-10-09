@@ -126,7 +126,7 @@ if __name__ == '__main__':
     n_output = args.n_output
     n_input = args.n_input
 
-    subseq_size = 100
+    subseq_size = 50
 
     from .model import build_models
     ctc_length = subseq_size
@@ -299,6 +299,10 @@ if __name__ == '__main__':
                             h5.close()
                             continue
                         # print(len(events))
+                        if args.test and len(events) > 2500:
+                            continue
+                        if args.test and len(data_x) > (iline + 1) * 10:
+                            break
                         events = events[1:-1]
                         mean = events["mean"]
                         std = events["stdv"]
@@ -340,7 +344,8 @@ if __name__ == '__main__':
 
                             if not succes:
                                 continue
-                        else:
+
+                        if args.ref_from_file or args.select_agree:
                             k = filename.split("/")[-1]
                             read, ch = k.split("_")[9], k.split("_")[11]
                             succes = False
@@ -378,6 +383,7 @@ if __name__ == '__main__':
                                     for seq2, X2, P2 in Ref:
                                         if X1 == X2 and abs(P1 - P2) < 5000:
                                             found = True
+                                            print("Agreee")
                                     if not found:
                                         continue
                             else:
@@ -637,13 +643,15 @@ if __name__ == '__main__':
                         continue
                     maxi = f * subseq_size
                     l = min(max(len(seg), 1), maxi - 1)
-                    if not args.test:
-                        if abs(len(ss2.replace("-", "")) - len(ss2)) + abs(len(ss1.replace("-", "")) - len(ss1)) > args.deltaseq or \
-                                len(ss2.replace("-", "")) < args.forcelength * subseq_size or len(ss1.replace("-", "")) < args.forcelength * subseq_size:
-                            # print(ss2, ss1, abs(len(ss2.replace("-", "")) - len(ss2)) +
-                            # abs(len(ss1.replace("-", "")) -
-                            # len(ss1)), len(ss2.replace("-", "")))
-                            continue
+                    delta = abs(len(ss2.replace("-", "")) - len(ss2)) + \
+                        abs(len(ss1.replace("-", "")) - len(ss1))
+
+                    if delta > args.deltaseq or \
+                            len(ss2.replace("-", "")) < args.forcelength * subseq_size or len(ss1.replace("-", "")) < args.forcelength * subseq_size:
+                        #print(ss2, ss1, delta, len(ss2.replace("-", "")))
+                        # print("Skip")
+                        continue
+                    #print("Keep", delta, ss2, ss1)
                     Length.append(l)
 
                     test = False

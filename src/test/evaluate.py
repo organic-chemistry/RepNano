@@ -21,10 +21,13 @@ weights = "data/training/al-8-bases/my_model_weights-90.h5"
 weights = "data/training/test-single-base/my_model_weights-180.h5"
 weights = "data/cluster/training/test-single-base-filter/my_model_weights-60.h5"
 weights = "data/training/my_model_weights-3390-removed-bad-B.h5"
+weights = "data/cluster/training/skip-new/my_model_weights-7590.h5"
+#weights = "data/cluster/training/test-single-various-w-size-8bases/my_model_weights-30.h5"
 #weights = "data/training/test-single-base-bis/my_model_weights-0.h5"
 
 
 basename = "results/v9p5-best-B-20170908-R9.5-newchem-test-clean-window_size/"
+basename = "results/v9p5-best-B-20170908-R9.5-froms/"
 
 ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
 redo = 1
@@ -40,12 +43,12 @@ list_dir = [["20170908-R9.5/AD-basecalled", "20170908-R9.5/prout"],
             ["20170908-R9.5/AI-CldU/0/", "20170908-R9.5/BTF_AI_ONT_1_FAH14242_A-select_pass"],
             ["20170908-R9.5/AK-EdU/0/", "20170908-R9.5/BTF_AK_ONT_1_FAH14211_A-select_pass"],
             ["20170908-R9.5/AL-IdU/0/", "20170908-R9.5/BTF_AL_ONT_1_FAH14352_A-select_pass"]]
-for dire, out in list_dir[5:]:  # + list_dir[4:]:
+for dire, out in list_dir[1:2]:  # + list_dir[4:]:
     if redo:
         process(weights, directory="data/raw/%s/" % dire,
                 output="data/processed/{0}{1}.fasta".format(basename, out), Nbases=5, reads="",
                 filter=None, already_detected=False, Nmax=10, size=20,
-                n_output_network=1, n_input=1, chemistry="rf", window_size=5)
+                n_output_network=1, n_input=1, chemistry="rf", window_size=8)
         # filter="data/processed/%s.InDeepNano.test" % outz , already_detected=False)
 
     exex = "python src/test/get_fasta_from_train-test.py data/processed/{0}{1}.fasta all data/processed/{0}{1}_test".format(
