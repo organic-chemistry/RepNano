@@ -8,6 +8,7 @@ import glob
 import keras
 from Bio import pairwise2
 import _pickle as cPickle
+import copy
 
 
 def print_stats(o):
@@ -68,6 +69,128 @@ def get_segment(alignment, start_index_on_seqs, end_index_on_seqs):
     return s1[start:end].replace("-", ""), s1[start:end], s2[start:end], 1
 
 
+import pysam
+
+
+def rebuild_alignemnt_from_bam(ref, filename="./tmp.sam", debug=False):
+
+    samf = pysam.AlignmentFile(filename)
+
+    read = None
+    for read in samf:
+        break
+
+    if read is None or read.flag == 4:
+        return "", "", False, None, None, None
+
+    # print(read.flag)
+    s = read.get_reference_sequence()
+    to_match = ref
+
+    # return s,to_match
+
+    if read.is_reverse:
+        revcompl = lambda x: ''.join(
+            [{'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}[B.upper()] for B in x][::-1])
+        to_match = revcompl(ref)
+        # print("reverse")
+
+    # print(s[:100])
+    # print(to_match[:100])
+
+    to_build = []
+    seq_tobuild = []
+    index = 0
+    for p in read.get_aligned_pairs(with_seq=False, matches_only=False):
+        x0, y0 = p
+
+        if x0 is not None:
+            x0 = read.seq[x0]
+        else:
+            x0 = "-"
+        if y0 is not None:
+            y01 = s[y0 - read.reference_start]
+            if index >= len(to_match):
+                print("Break")
+                break
+            if y01.islower() or y01.upper() == to_match[index]:
+                #same or mismatch
+                to_build.append(y01.upper())
+                index += 1
+
+            else:
+                to_build.append("-")
+        else:
+            to_build.append("-")
+
+        y02 = to_build[-1]
+        if debug:
+            if y0 is None:
+                print(x0, y0)
+            else:
+                print(x0, y02, y01)
+        seq_tobuild.append(x0)
+
+    if read.is_reverse:
+        seq_tobuild = seq_tobuild[::-1]
+        to_build = to_build[::-1]
+
+    start = 0
+    for iss, s in enumerate(to_build):
+        if s != "-":
+            start = iss
+            break
+    end = None
+    for iss, s in enumerate(to_build[::-1]):
+        if s != "-":
+            end = -iss
+            break
+    if end == 0:
+        end = None
+    if read.is_reverse:
+        compl = lambda x: ''.join(
+            [{'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A', "-": "-"}[B.upper()] for B in x])
+        return "".join(compl(seq_tobuild)), "".join(compl(to_build)), True, start, end, True
+    return "".join(seq_tobuild), "".join(to_build), True, start, end, False
+
+
+def get_al(se0, ref, tmpfile="./tmp.sam", check=False):
+    seq, match, success, start, end, reverse = rebuild_alignemnt_from_bam(ref, tmpfile, debug=False)
+
+    iend = copy.deepcopy(end)
+    istart = copy.deepcopy(start)
+    endp = 0
+    if not reverse:
+        if len(se0) != len(seq.replace("-", "")):
+            endp = - (len(se0) - len(seq.replace("-", "")))
+
+        if end is None:
+            end = 0
+        end = end + endp
+        if end == 0:
+            end = None
+    if reverse:
+        if len(se0) != len(seq.replace("-", "")):
+            endp = (len(se0) - len(seq.replace("-", "")))
+        start += endp
+
+    if check:
+        print("Checking ref,build_ref")
+
+        for i in range(len(ref) // 100):
+            print(ref[i * 100:(i + 1) * 100])
+            print(match.replace("-", "")[i * 100:(i + 1) * 100])
+
+        print("Checking seq,build_seq")
+        for i in range(len(ref) // 100 + 1):
+            print(se0[i * 100:(i + 1) * 100])
+            print(seq.replace("-", "")[i * 100:(i + 1) * 100])
+
+    # return where to truncate se0 and the allignement over this portion:
+    # seq correspond to se0
+    # and match to the ref
+    return start, end, seq[istart:iend], match[istart:iend], success
+
 if __name__ == '__main__':
 
     import argparse
@@ -87,7 +210,7 @@ if __name__ == '__main__':
     parser.add_argument('--forcelength', dest='forcelength', type=float, default=0.5)
     parser.add_argument('--oversampleb', dest='oversampleb', type=int, default=3)
     parser.add_argument('--ref-from-file', dest="ref_from_file", type=bool, default=False)
-    parser.add_argument('--select-agree', dest="select_agree", type=bool, default=False)
+    parser.add_argument('--select-agree', dest="select_agree", action="store_true")
     parser.add_argument('--max-file', dest="max_file", type=int, default=None)
     parser.add_argument('--ctc', dest='ctc', action="store_true")
     parser.add_argument('--convert-to-t', dest='convert_to_t', type=float, default=None)
@@ -405,7 +528,8 @@ if __name__ == '__main__':
                         if len(ref) > 30000:
                             print("out", len(ref))
                             continue
-                        if succes:
+                        bio = False
+                        if succes and bio:
                             alignments = pairwise2.align.globalxx(
                                 ref, seqs, one_alignment_only=True)
                             # print("la", len(alignments), len(alignments[0]))
@@ -425,7 +549,34 @@ if __name__ == '__main__':
                                 # print(len(seqs), len(ref))
                                 print(len(alignments[0][0]), len(ref), len(seqs), alignments[0][2:])
                         else:
-                            print("Fail")
+                            start, end, seq_all, ref_all, success = get_al(seq, ref)
+                            if not success:
+                                continue
+
+                            nb = 0
+                            for istart, iseq in enumerate(seq):
+                                if iseq != "N":
+                                    nb += 1
+
+                                if nb == start:
+                                    break
+                            if end is None:
+                                end = 0
+                            end = -end
+                            for iend, iseq in enumerate(seq[::-1]):
+                                if iseq != "N":
+                                    nb += 1
+
+                                if nb == end:
+                                    break
+                            data_x.append(x[istart:iend])
+                            data_index.append(np.arange(len(seq[istart:iend]))[
+                                np.array([s for s in seq[istart:iend]]) != "N"])
+                            data_alignment.append([ref_all, seq_all])
+                            if sub is not None:
+                                ref_all = ref_all.replace("T", sub)
+                            # print(ref)
+                            refs.append(ref_all)
 
             with open(os.path.join(args.root, "Allignements-bis"), "wb") as f:
                 cPickle.dump([data_x, data_index, data_alignment, refs, names], f)

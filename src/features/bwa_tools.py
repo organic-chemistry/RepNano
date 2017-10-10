@@ -61,7 +61,7 @@ def get_seq(sam, ref, ret_pos=False):
                     if ss[1] == '0':
                         pos = max(int(ss[3]) - 1, 0)
                     else:
-                        pos = max(int(ss[3]), 0)
+                        pos = max(int(ss[3]) - 1, 0)
 
                     CIGAR = ss[5]
                     # SamSeq = ss[9]
