@@ -72,7 +72,8 @@ def basecall_one_file(filename, output_file, ntwk, alph, already_detected,
     # exit()
 
     output = "".join(map(lambda x: alph[x], om)).replace("N", "")
-    print(om.shape, len(output), len(output) / om.shape[0])
+    print(om.shape, len(output), len(output) /
+          om.shape[0], output.count("B") / (1 + output.count("T")))
 
     if filter_size is not None and len(output) < filter_size:
         print("Out too small", filter_size)

@@ -671,7 +671,7 @@ if __name__ == '__main__':
                 ref = "" + refs[s]
 
                 for l in ["B", "L", "E", "I"]:
-                    if l in ref[s]:
+                    if l in refs[s]:
                         type_sub = l
                         break
                 if subts:
@@ -707,7 +707,7 @@ if __name__ == '__main__':
                         new_length += len(old_align[0])
                         print()
 
-                if subts and nc[type_sub] / (nc["T"] + 1) < 0.3:
+                if subts and nc[type_sub] / (nc["T"] + 1) < 3:
                     refs[s] = refs[s].replace(type_sub, "T")
                     switch += 1
                     print("Swich")
