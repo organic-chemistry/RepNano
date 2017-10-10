@@ -219,6 +219,7 @@ if __name__ == '__main__':
     parser.add_argument('--n-output-network', dest="n_output_network", type=int, default=1)
     parser.add_argument('--f-size', nargs='+', dest="f_size", type=int, default=None)
     parser.add_argument('--skip-new', dest="skip_new", action="store_true")
+    parser.add_argument('--force-clean', dest="force_clean", action="store_true")
 
     args = parser.parse_args()
 
@@ -626,7 +627,7 @@ if __name__ == '__main__':
 
         # Test to see if realignment is interesting:
 
-        if args.ctc and epoch % 2000 == 0 and epoch != 0 and False:
+        if args.ctc and epoch % 2000 == 0 and (epoch != 0 or args.force_clean):
             ntwk.save_weights(os.path.join(
                 args.root, 'tmp.h5'))
 
@@ -665,8 +666,6 @@ if __name__ == '__main__':
 
             # Here maybe realign with bwa
             # for s in range(len(data_x)):
-                old_align = data_alignment[s]
-
                 type_sub = "T"
                 subts = False
                 for l in ["B", "L", "E", "I"]:
@@ -677,31 +676,35 @@ if __name__ == '__main__':
                 if subts:
                     ref = ref.replace(subts, "T")
 
-                # new_align = pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))[0][:2]
-                new_align = pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))
-                if len(new_align) == 0 or len(new_align[0]) < 2:
-                    new_length += len(old_align[0])
-                    print()
-                    continue
-                new_align = new_align[0][:2]
-                print("Old", len(old_align[0]), "New", len(new_align[0]), subts, len(
-                    ref), (len(ref) - len(New_seq[s].replace("N", ""))) / len(ref), nc[subts] / (nc["T"] + 1))
+                re_align = True
 
-                old_length += len(old_align[0])
-                total_length += len(ref)
-                current_length += len(New_seq[s].replace("N", ""))
-                if len(new_align[0]) < len(old_align[0]) and (len(ref) - len(New_seq[s].replace("N", ""))) / len(ref) < 0.05:
-                    print("Keep!")
-                    change += 1
-                    data_alignment[s] = new_align
+                if re_align:
+                    old_align = data_alignment[s]
+                    # new_align = pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))[0][:2]
+                    new_align = pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))
+                    if len(new_align) == 0 or len(new_align[0]) < 2:
+                        new_length += len(old_align[0])
+                        print()
+                        continue
+                    new_align = new_align[0][:2]
+                    print("Old", len(old_align[0]), "New", len(new_align[0]), subts, len(
+                        ref), (len(ref) - len(New_seq[s].replace("N", ""))) / len(ref), nc[subts] / (nc["T"] + 1))
 
-                    data_index[s] = np.arange(len(New_seq[s]))[
-                        np.array([ss for ss in New_seq[s]]) != "N"]
-                    new_length += len(new_align[0])
+                    old_length += len(old_align[0])
+                    total_length += len(ref)
+                    current_length += len(New_seq[s].replace("N", ""))
+                    if len(new_align[0]) < len(old_align[0]) and (len(ref) - len(New_seq[s].replace("N", ""))) / len(ref) < 0.05:
+                        print("Keep!")
+                        change += 1
+                        data_alignment[s] = new_align
 
-                else:
-                    new_length += len(old_align[0])
-                    print()
+                        data_index[s] = np.arange(len(New_seq[s]))[
+                            np.array([ss for ss in New_seq[s]]) != "N"]
+                        new_length += len(new_align[0])
+
+                    else:
+                        new_length += len(old_align[0])
+                        print()
 
                 if subts and nc[subts] / (nc["T"] + 1) < 0.3:
                     refs[s] = refs[s].replace(subts, "T")
