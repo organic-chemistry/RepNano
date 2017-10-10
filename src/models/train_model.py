@@ -668,11 +668,12 @@ if __name__ == '__main__':
             # for s in range(len(data_x)):
                 type_sub = "T"
                 subts = False
+                ref = "" + refs[s]
+
                 for l in ["B", "L", "E", "I"]:
                     if l in ref[s]:
                         subst = l
                         break
-                ref = "" + refs[s]
                 if subts:
                     ref = ref.replace(subts, "T")
 
