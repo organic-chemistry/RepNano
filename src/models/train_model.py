@@ -672,12 +672,12 @@ if __name__ == '__main__':
 
                 for l in ["B", "L", "E", "I"]:
                     if l in ref[s]:
-                        subst = l
+                        type_sub = l
                         break
                 if subts:
-                    ref = ref.replace(subts, "T")
+                    ref = ref.replace(type_sub, "T")
 
-                re_align = True
+                re_align = False
 
                 if re_align:
                     old_align = data_alignment[s]
@@ -689,7 +689,7 @@ if __name__ == '__main__':
                         continue
                     new_align = new_align[0][:2]
                     print("Old", len(old_align[0]), "New", len(new_align[0]), subts, len(
-                        ref), (len(ref) - len(New_seq[s].replace("N", ""))) / len(ref), nc[subts] / (nc["T"] + 1))
+                        ref), (len(ref) - len(New_seq[s].replace("N", ""))) / len(ref), nc[type_sub] / (nc["T"] + 1))
 
                     old_length += len(old_align[0])
                     total_length += len(ref)
@@ -707,8 +707,8 @@ if __name__ == '__main__':
                         new_length += len(old_align[0])
                         print()
 
-                if subts and nc[subts] / (nc["T"] + 1) < 0.3:
-                    refs[s] = refs[s].replace(subts, "T")
+                if subts and nc[type_sub] / (nc["T"] + 1) < 0.3:
+                    refs[s] = refs[s].replace(type_sub, "T")
                     switch += 1
                     print("Swich")
             print("Change", change, len(data_x))
