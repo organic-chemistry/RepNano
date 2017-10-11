@@ -673,6 +673,7 @@ if __name__ == '__main__':
                 for l in ["B", "L", "E", "I"]:
                     if l in refs[s]:
                         type_sub = l
+                        subts = True
                         break
                 if subts:
                     ref = ref.replace(type_sub, "T")
