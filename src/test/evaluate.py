@@ -23,12 +23,13 @@ weights = "data/cluster/training/test-single-base-filter/my_model_weights-60.h5"
 weights = "data/training/my_model_weights-3390-removed-bad-B.h5"
 weights = "data/cluster/training/skip-new/my_model_weights-7590.h5"
 weights = "data/cluster/training/allign-agree-five/my_model_weights-2560.h5"
+weights = "data/cluster/training/allign-agree-five-clean-B/my_model_weights-1990.h5"
 #weights = "data/cluster/training/test-single-various-w-size-8bases/my_model_weights-30.h5"
 #weights = "data/training/test-single-base-bis/my_model_weights-0.h5"
 
 
 basename = "results/v9p5-best-B-20170908-R9.5-newchem-test-clean-window_size/"
-basename = "results/v9p5-best-B-20170908-R9.5-froms/"
+basename = "results/v9p5-best-B-20170908-R9.5-froms-two/"
 
 ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
 redo = 1

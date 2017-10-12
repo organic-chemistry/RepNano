@@ -708,7 +708,7 @@ if __name__ == '__main__':
                         new_length += len(old_align[0])
                         print()
 
-                if subts and nc[type_sub] / (nc["T"] + 1) < 3:
+                if subts and nc[type_sub] / (nc["T"] + 1) < 0.2:
                     refs[s] = refs[s].replace(type_sub, "T")
                     switch += 1
                     print("Swich")
