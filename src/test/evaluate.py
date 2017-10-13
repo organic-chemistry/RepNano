@@ -21,25 +21,25 @@ weights = "data/training/al-8-bases/my_model_weights-90.h5"
 weights = "data/training/test-single-base/my_model_weights-180.h5"
 weights = "data/cluster/training/test-single-base-filter/my_model_weights-60.h5"
 weights = "data/training/my_model_weights-3390-removed-bad-B.h5"
-weights = "data/cluster/training/skip-new/my_model_weights-7590.h5"
-weights = "data/cluster/training/allign-agree-five/my_model_weights-2560.h5"
-weights = "data/cluster/training/allign-agree-five-clean-B/my_model_weights-1990.h5"
+#weights = "data/cluster/training/skip-new/my_model_weights-7590.h5"
+#weights = "data/cluster/training/allign-agree-five/my_model_weights-2560.h5"
+weights = "data/cluster/training/allign-agree-five-clean-B/my_model_weights-3990.h5"
 #weights = "data/cluster/training/test-single-various-w-size-8bases/my_model_weights-30.h5"
 #weights = "data/training/test-single-base-bis/my_model_weights-0.h5"
 
 
 basename = "results/v9p5-best-B-20170908-R9.5-newchem-test-clean-window_size/"
-basename = "results/v9p5-best-B-20170908-R9.5-froms-two/"
+basename = "results/v9p5-best-B-20170908-R9.5-froms-two-200-seg-last-small/"
 
 ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
 redo = 1
 # Evaluate all the sample
-list_dir = [["substituted", "sub_template"], ["control", "control_template"],
-            ["control-k47211", "control-k47211_template"]]
+list_dir = [["substituted", "sub_template", 5], ["control", "control_template", 5],
+            ["control-k47211", "control-k47211_template", 5]]
 
-list_dir = [["20170908-R9.5/AD-basecalled", "20170908-R9.5/prout", 5],
-            ["20170908-R9.5/AG-basecalled", "20170908-R9.5/BTF_AG_ONT_1_FAH14273_A-select_pass", 8],
-            ["20170908-R9.5/AH-basecalled", "20170908-R9.5/BTF_AH_ONT_1_FAH14319_A-select_pass", 5],
+list_dir = [["20170908-R9.5/AD-basecalled", "20170908-R9.5/prout", 4],
+            ["20170908-R9.5/AG-basecalled", "20170908-R9.5/BTF_AG_ONT_1_FAH14273_A-select_pass", 6],
+            ["20170908-R9.5/AH-basecalled", "20170908-R9.5/BTF_AH_ONT_1_FAH14319_A-select_pass", 4],
             ["20170908-R9.5/AG-Thy/", "20170908-R9.5/BTF_AG_ONT_1_FAH14273_A-select_pass", 5],
             ["20170908-R9.5/AH-BrdU/", "20170908-R9.5/BTF_AH_ONT_1_FAH14319_A-select_pass", 5],
             ["20170908-R9.5/AI-CldU/0/", "20170908-R9.5/BTF_AI_ONT_1_FAH14242_A-select_pass", 5],
@@ -49,7 +49,7 @@ for dire, out, w in list_dir[:3]:  # + list_dir[4:]:
     if redo:
         process(weights, directory="data/raw/%s/" % dire,
                 output="data/processed/{0}{1}.fasta".format(basename, out), Nbases=5, reads="",
-                filter=None, already_detected=False, Nmax=50, size=20,
+                filter=None, already_detected=False, Nmax=200, size=20,
                 n_output_network=1, n_input=1, chemistry="rf", window_size=w)
         # filter="data/processed/%s.InDeepNano.test" % outz , already_detected=False)
 

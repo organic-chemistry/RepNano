@@ -51,12 +51,12 @@ def basecall_one_file(filename, output_file, ntwk, alph, already_detected,
             X.append([m, m * m, s, l])
         X = scale(np.array(X))
 
-    #print(np.mean(X[:, 0]))
+    # print(np.mean(X[:, 0]))
 
     p = ntwk.predict(X[np.newaxis, ::, ::])
-    #print(p[0, 50:60])
+    # print(p[0, 50:60])
     # print(X[50:60])
-    #print(np.max(p[0, ::, :5]))
+    # print(np.max(p[0, ::, :5]))
     if len(p) == 2:
         o1, o2 = p
         o1m = (np.argmax(o1[0], -1))
@@ -67,11 +67,16 @@ def basecall_one_file(filename, output_file, ntwk, alph, already_detected,
         o1 = p[0]
         om = np.argmax(o1, axis=-1)
 
+        #rBT = o1[::, 4] / o1[::, 3]
+        #r = (0.5 < rBT) & (rBT < 2) & ((om == 3) | (om == 4))
+
+        #om[r] = 6
     # print(o1[:20])
     # print(o2[:20])
     # exit()
 
-    output = "".join(map(lambda x: alph[x], om)).replace("N", "")
+    output = "".join(map(lambda x: str(alph + "U")[x], om)).replace("N", "")
+
     print(om.shape, len(output), len(output) /
           om.shape[0], output.count("B") / (1 + output.count("T")))
 
