@@ -3,4 +3,3 @@ data/raw/20170908-R9.5/AH-BrdU/0/ B data/raw/20170908-R9.5/BTF_AH_ONT_1_FAH14319
 data/raw/20170908-R9.5/AI-CldU/0/ L data/raw/20170908-R9.5/BTF_AH_ONT_1_FAH14242_A-select.sam
 data/raw/20170908-R9.5/AK-EdU/0/ E data/raw/20170908-R9.5/BTF_AH_ONT_1_FAH14211_A-select.sam
 data/raw/20170908-R9.5/AL-IdU/0/ I data/raw/20170908-R9.5/BTF_AH_ONT_1_FAH14352_A-select.sam
-   
