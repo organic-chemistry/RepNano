@@ -529,7 +529,7 @@ if __name__ == '__main__':
                         if len(ref) > 30000:
                             print("out", len(ref))
                             continue
-                        bio = False
+                        bio = True
                         if succes and bio:
                             alignments = pairwise2.align.globalxx(
                                 ref, seqs, one_alignment_only=True)
