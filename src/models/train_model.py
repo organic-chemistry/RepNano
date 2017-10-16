@@ -317,7 +317,7 @@ if __name__ == '__main__':
                 data_x.append(np.array(X, dtype=np.float32))
                 data_y.append(np.array(Y, dtype=np.int32))
 
-                if n_output == 2 and args.convert_to_t:
+                if args.convert_to_t:
                     p = np.sum(data_y[-1] == 5) / len(Y)
                     if p > args.convert_to_t:
                         print(np.sum(data_y[-1] == mapping["B"]))
