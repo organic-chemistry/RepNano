@@ -29,7 +29,7 @@ weights = "data/cluster/training/allign-agree-five-clean-B/my_model_weights-3990
 
 
 basename = "results/v9p5-best-B-20170908-R9.5-newchem-test-clean-window_size/"
-basename = "results/v9p5-best-B-20170908-R9.5-froms-two-200-seg-last-small/"
+basename = "results/v9p5-best-B-20170908-R9.5-froms-two-200-seg-last-smaller/"
 
 ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
 redo = 1
@@ -37,15 +37,15 @@ redo = 1
 list_dir = [["substituted", "sub_template", 5], ["control", "control_template", 5],
             ["control-k47211", "control-k47211_template", 5]]
 
-list_dir = [["20170908-R9.5/AD-basecalled", "20170908-R9.5/prout", 4],
+list_dir = [["20170908-R9.5/AD-basecalled", "20170908-R9.5/prout", 3],
             ["20170908-R9.5/AG-basecalled", "20170908-R9.5/BTF_AG_ONT_1_FAH14273_A-select_pass", 6],
-            ["20170908-R9.5/AH-basecalled", "20170908-R9.5/BTF_AH_ONT_1_FAH14319_A-select_pass", 4],
+            ["20170908-R9.5/AH-basecalled", "20170908-R9.5/BTF_AH_ONT_1_FAH14319_A-select_pass", 3],
             ["20170908-R9.5/AG-Thy/", "20170908-R9.5/BTF_AG_ONT_1_FAH14273_A-select_pass", 5],
             ["20170908-R9.5/AH-BrdU/", "20170908-R9.5/BTF_AH_ONT_1_FAH14319_A-select_pass", 5],
             ["20170908-R9.5/AI-CldU/0/", "20170908-R9.5/BTF_AI_ONT_1_FAH14242_A-select_pass", 4],
             ["20170908-R9.5/AK-EdU/0/", "20170908-R9.5/BTF_AK_ONT_1_FAH14211_A-select_pass", 4],
             ["20170908-R9.5/AL-IdU/0/", "20170908-R9.5/BTF_AL_ONT_1_FAH14352_A-select_pass", 4]]
-for dire, out, w in list_dir[5:]:  # + list_dir[4:]:
+for dire, out, w in list_dir[:3]:  # + list_dir[4:]:
     if redo:
         process(weights, directory="data/raw/%s/" % dire,
                 output="data/processed/{0}{1}.fasta".format(basename, out), Nbases=5, reads="",

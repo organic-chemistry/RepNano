@@ -451,7 +451,7 @@ if __name__ == '__main__':
                         seqs = seq.replace("N", "")
 
                         # write fasta
-                        with open("tmp.fasta", "w") as output_file:
+                        with open(args.root + "/tmp.fasta", "w") as output_file:
                             output_file.writelines(">%s_template_deepnano\n" % filename)
                             output_file.writelines(seqs + "\n")
 
@@ -459,13 +459,14 @@ if __name__ == '__main__':
 
                         if not args.ref_from_file or args.select_agree:
                             ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
-                            exex = "bwa mem -x ont2d  %s  tmp.fasta > tmp.sam" % ref
+                            exex = "bwa mem -x ont2d  %s  %s/tmp.fasta > %s/tmp.sam" % (
+                                ref, args.root, args.root)
                             subprocess.call(exex, shell=True)
 
                             # read from bwa
 
                             ref, succes, X1, P1 = get_seq(
-                                "tmp.sam", ref="data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa", ret_pos=True)
+                                args.root + "/tmp.sam", ref="data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa", ret_pos=True)
 
                             if not succes:
                                 continue
