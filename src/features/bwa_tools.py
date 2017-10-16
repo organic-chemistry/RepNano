@@ -54,7 +54,10 @@ def get_seq(sam, ref, ret_pos=False):
         while s != '':
             ss = s.split()
             # print(ss)
+            if len(ss) < 5:
+                continue
             if ss[0] != '@SQ' and ss[0] != '@PG':
+
                 if ss[1] == '0' or ss[1] == '16':  # take only main alignment (not chimeric)
                     Bit = ss[1]
                     Chrom = ss[2]
