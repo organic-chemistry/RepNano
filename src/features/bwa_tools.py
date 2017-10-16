@@ -53,9 +53,10 @@ def get_seq(sam, ref, ret_pos=False):
         s = f.readline()  # read the 1st line
         while s != '':
             ss = s.split()
-            # print(ss)
             if len(ss) < 5:
+                s = f.readline()
                 continue
+
             if ss[0] != '@SQ' and ss[0] != '@PG':
 
                 if ss[1] == '0' or ss[1] == '16':  # take only main alignment (not chimeric)
