@@ -263,7 +263,8 @@ if __name__ == '__main__':
                                    ctc_length=ctc_length, input_length=input_length, n_output=n_output_network)
 
     if args.Nbases == 8:
-        old_predictor, old_ntwk = build_models(args.size, nbase=1)
+        old_predictor, old_ntwk = build_models(
+            args.size, nbase=1, ctc_length=ctc_length, input_length=input_length, n_output=n_output_network)
 
     os.makedirs(args.root, exist_ok=True)
 
@@ -368,7 +369,9 @@ if __name__ == '__main__':
                 ntwk.load_weights(args.pre_trained_weight)
                 predictor.load_weights(args.pre_trained_weight)
             else:
+                print("Loading weights")
                 old_predictor.load_weights(args.pre_trained_weight)
+                old_ntwk.load_weights(args.pre_trained_weight)
 
             from ..features.extract_events import extract_events, scale
             import h5py
@@ -424,6 +427,7 @@ if __name__ == '__main__':
                             continue
                         # print(len(events))
                         if args.test and len(events) > 2500:
+                            print("Skip test")
                             continue
                         if args.test and len(data_x) > (iline + 1) * 10:
                             break
@@ -436,19 +440,22 @@ if __name__ == '__main__':
 
                         if args.Nbases == 5:
                             o1 = predictor.predict(np.array(x)[np.newaxis, ::, ::])
+                            #print("New", o1[0].shape)
                         elif args.Nbases == 8:
                             o1 = old_predictor.predict(np.array(x)[np.newaxis, ::, ::])
+                            #print("Old", o1[0].shape)
                         o1 = o1[0]
                         om = np.argmax(o1, axis=-1)
 
                         alph = "ACGTN"
-                        if args.Nbases == 5:
+                        if args.Nbases in [5, 8]:
                             alph = "ACGTTN"
-                        if args.Nbases == 8:
-                            alph = "ACGTTTTTN"
+                        # if args.Nbases == 8:
+                        #    alph = "ACGTTTTTN"
 
                         seq = "".join(map(lambda x: alph[x], om))
                         seqs = seq.replace("N", "")
+                        print(seqs)
 
                         # write fasta
                         with open(args.root + "/tmp.fasta", "w") as output_file:
@@ -809,7 +816,7 @@ if __name__ == '__main__':
                         #print(ss2, ss1, delta, len(ss2.replace("-", "")))
                         # print("Skip")
                         continue
-                    #print("Keep", delta, ss2, ss1)
+                    print("Keep", delta, ss2, ss1, len(data_x))
                     Length.append(l)
 
                     test = False

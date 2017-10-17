@@ -10,7 +10,7 @@ from keras.optimizers import SGD, Adadelta
 import keras
 
 
-def build_models(size=20, nbase=1, trainable=False, ctc_length=40, ctc=True,
+def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                  uniform=True, input_length=None, n_output=1):
     if keras.backend.backend() == 'tensorflow':
         import tensorflow as tf
@@ -47,6 +47,8 @@ def build_models(size=20, nbase=1, trainable=False, ctc_length=40, ctc=True,
     out_layer2 = None
     inputs = Input(shape=(input_length, 4))
     Nbases = 4 + nbase + 1
+
+    print("Trainable ???", trainable)
 
     l1 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable),
                        merge_mode='concat')(inputs)

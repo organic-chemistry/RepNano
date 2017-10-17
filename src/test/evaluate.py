@@ -26,10 +26,12 @@ weights = "data/training/my_model_weights-3390-removed-bad-B.h5"
 weights = "data/cluster/training/allign-agree-five-clean-B/my_model_weights-3990.h5"
 #weights = "data/cluster/training/test-single-various-w-size-8bases/my_model_weights-30.h5"
 #weights = "data/training/test-single-base-bis/my_model_weights-0.h5"
-
+weights = "data/cluster/training/test-single-various-w-size-8bases-smallerw/my_model_weights-1800.h5"
+weights = "data/cluster/training/allign-agree-five-clean-B-smallB/my_model_weights-5990.h5"
+weights = "data/cluster/training/allign-agree-five-clean-B-smallB-test-ssample/my_model_weights-470.h5"
 
 basename = "results/v9p5-best-B-20170908-R9.5-newchem-test-clean-window_size/"
-basename = "results/v9p5-best-B-20170908-R9.5-froms-two-200-seg-last-smaller/"
+basename = "results/v9p5-best-B-20170908-R9.5-froms-two-200-seg-last-smaller-explo-sm/"
 
 ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
 redo = 1
@@ -49,7 +51,7 @@ for dire, out, w in list_dir[:3]:  # + list_dir[4:]:
     if redo:
         process(weights, directory="data/raw/%s/" % dire,
                 output="data/processed/{0}{1}.fasta".format(basename, out), Nbases=5, reads="",
-                filter=None, already_detected=False, Nmax=200, size=20,
+                filter=None, already_detected=False, Nmax=20, size=20,
                 n_output_network=1, n_input=1, chemistry="rf", window_size=w)
         # filter="data/processed/%s.InDeepNano.test" % outz , already_detected=False)
 
