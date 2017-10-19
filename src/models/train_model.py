@@ -223,7 +223,6 @@ if __name__ == '__main__':
     parser.add_argument('--filter', nargs='+', dest="filter", type=str, default=[])
 
     args = parser.parse_args()
-
     data_x = []
     data_y = []
     data_y2 = []
@@ -792,6 +791,7 @@ if __name__ == '__main__':
                                 skip = True
 
                     if skip:
+                        print("Skip")
                         continue
                     length = subseq_size
                     start = r
