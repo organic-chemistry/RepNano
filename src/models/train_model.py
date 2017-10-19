@@ -223,6 +223,9 @@ if __name__ == '__main__':
     parser.add_argument('--filter', nargs='+', dest="filter", type=str, default=[])
 
     args = parser.parse_args()
+
+    print(args.filter)
+
     data_x = []
     data_y = []
     data_y2 = []
