@@ -250,7 +250,7 @@ if __name__ == '__main__':
     n_output = args.n_output
     n_input = args.n_input
 
-    subseq_size = 50
+    subseq_size = 20
 
     from .model import build_models
     ctc_length = subseq_size
