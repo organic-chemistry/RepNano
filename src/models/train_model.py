@@ -745,6 +745,7 @@ if __name__ == '__main__':
         stats = defaultdict(int)
         megas = ""
         stats = defaultdict(int)
+        infostat = {}
 
         while len(X_new) < 200:
             print(len(X_new))
@@ -816,7 +817,8 @@ if __name__ == '__main__':
                         #print(ss2, ss1, delta, len(ss2.replace("-", "")))
                         # print("Skip")
                         continue
-                    print("Keep", delta, ss2, ss1, len(data_x))
+                    print("Keep", delta, ss2, ss1, len(data_x), [
+                        l in refs[s2] for l in ["B", "L", "E", "I"]])
                     Length.append(l)
 
                     test = False
@@ -838,6 +840,10 @@ if __name__ == '__main__':
                         megas += seg.replace("T", "B")
                     else:
                         megas += seg
+
+                    for l in ["T", "B", "L", "E", "I"]:
+                        if l in refs[s2]:
+                            infostat[l] = infostat.get(l, 0) + seg.count("T")
 
                     seg = seg + "A" * (maxi - len(seg))
                     for l in ["B", "L", "E", "I"]:
@@ -891,7 +897,8 @@ if __name__ == '__main__':
                     args.root, 'my_model_weights-%i.h5' % epoch))
 
         if args.ctc:
-            print(megas.count("B") / len(megas), megas.count("T") / len(megas))
+            #print(megas.count("B") / len(megas), megas.count("T") / len(megas))
+            print(infostat)
 
             Label = np.array(Label)
             Length = np.array(Length)
