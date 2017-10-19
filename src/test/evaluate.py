@@ -54,14 +54,15 @@ basename = "results/ref/"
 weights = "data/cluster/training/allign-agree-85555-ctc20/my_model_weights-510.h5"
 basename = "results/v9p5-best-B-20170908-R9.5-froms-two-200-seg-last-smaller-explo-bw-ctc20/"
 
-weights = "data/cluster/training/allign-agree-85555-8b/my_model_weights-1480.h5"
+weights = "data/cluster/training/allign-agree-85555-8b/my_model_weights-1960.h5"
 basename = "results/v9p5-best-B-20170908-R9.5-froms-two-200-seg-last-smaller-explo-8test/"
 
-weights = "data/cluster/training/allign-agree-85555/my_model_weights-3900.h5"
-basename = "results/v9p5-best-B-20170908-R9.5-froms-two-200-seg-last-smaller-explo-bw/"
+
+#weights = "data/cluster/training/allign-agree-85555/my_model_weights-3900.h5"
+#basename = "results/v9p5-best-B-20170908-R9.5-froms-two-200-seg-last-smaller-explo-bw/"
 
 ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
-redo = 0
+redo = 1
 # Evaluate all the sample
 list_dir = [["substituted", "sub_template", 5], ["control", "control_template", 5],
             ["control-k47211", "control-k47211_template", 5]]
@@ -74,7 +75,7 @@ list_dir = [["20170908-R9.5/AD-basecalled", "20170908-R9.5/prout", 5],
             ["20170908-R9.5/AI-CldU/0/", "20170908-R9.5/BTF_AI_ONT_1_FAH14242_A-select_pass", 5],
             ["20170908-R9.5/AK-EdU/0/", "20170908-R9.5/BTF_AK_ONT_1_FAH14211_A-select_pass", 5],
             ["20170908-R9.5/AL-IdU/0/", "20170908-R9.5/BTF_AL_ONT_1_FAH14352_A-select_pass", 5]]
-for dire, out, w in list_dir[:3]:  # + list_dir[5:]:  # + list_dir[5:]:
+for dire, out, w in list_dir[:3] + list_dir[5:]:  # + list_dir[5:]:
     if redo:
         process(weights, directory="data/raw/%s/" % dire,
                 output="data/processed/{0}{1}.fasta".format(basename, out), Nbases=8, reads="",

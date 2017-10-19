@@ -220,6 +220,7 @@ if __name__ == '__main__':
     parser.add_argument('--f-size', nargs='+', dest="f_size", type=int, default=None)
     parser.add_argument('--skip-new', dest="skip_new", action="store_true")
     parser.add_argument('--force-clean', dest="force_clean", action="store_true")
+    parser.add_argument('--filter', nargs='+', dest="filter", type=str, default=[])
 
     args = parser.parse_args()
 
@@ -784,6 +785,12 @@ if __name__ == '__main__':
                         for l in ["L", "E", "I"]:
                             if l in refs[s2]:
                                 skip = True
+
+                    if args.filter != []:
+                        for l in args.filter:
+                            if l in refs[s2]:
+                                skip = True
+
                     if skip:
                         continue
                     length = subseq_size
