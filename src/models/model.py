@@ -11,7 +11,7 @@ import keras
 
 
 def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
-                 uniform=True, input_length=None, n_output=1):
+                 uniform=True, input_length=None, n_output=1, n_feat=4):
     if keras.backend.backend() == 'tensorflow':
         import tensorflow as tf
 
@@ -45,7 +45,7 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
 
     input_length = input_length
     out_layer2 = None
-    inputs = Input(shape=(input_length, 4))
+    inputs = Input(shape=(input_length, n_feat))
     Nbases = 4 + nbase + 1
 
     print("Trainable ???", trainable)

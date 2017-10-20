@@ -44,6 +44,7 @@ def basecall_one_file(filename, output_file, ntwk, alph, already_detected,
     std = events["stdv"]
     length = events["length"]
     X = scale(np.array(np.vstack([mean, mean * mean, std, length]).T, dtype=np.float32))
+    # return
     if n_input == 2:
         X = []
         for m, s, l in zip(mean, std, length):

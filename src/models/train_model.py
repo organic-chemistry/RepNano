@@ -9,6 +9,7 @@ import keras
 from Bio import pairwise2
 import _pickle as cPickle
 import copy
+from ..features.helpers import scale_clean
 
 
 def print_stats(o):
@@ -114,7 +115,7 @@ def rebuild_alignemnt_from_bam(ref, filename="./tmp.sam", debug=False):
                 print("Break")
                 break
             if y01.islower() or y01.upper() == to_match[index]:
-                #same or mismatch
+                # same or mismatch
                 to_build.append(y01.upper())
                 index += 1
 
@@ -222,12 +223,14 @@ if __name__ == '__main__':
     parser.add_argument('--force-clean', dest="force_clean", action="store_true")
     parser.add_argument('--filter', nargs='+', dest="filter", type=str, default=[])
     parser.add_argument('--ctc-length', dest="ctc_length", type=int, default=20)
+    parser.add_argument('--normalize-window-length', dest="nwl", action="store_true")
 
     args = parser.parse_args()
 
     print(args.filter)
 
     data_x = []
+    data_x_clean = []
     data_y = []
     data_y2 = []
 
@@ -444,10 +447,10 @@ if __name__ == '__main__':
 
                         if args.Nbases == 5:
                             o1 = predictor.predict(np.array(x)[np.newaxis, ::, ::])
-                            #print("New", o1[0].shape)
+                            # print("New", o1[0].shape)
                         elif args.Nbases == 8:
                             o1 = old_predictor.predict(np.array(x)[np.newaxis, ::, ::])
-                            #print("Old", o1[0].shape)
+                            # print("Old", o1[0].shape)
                         o1 = o1[0]
                         om = np.argmax(o1, axis=-1)
 
@@ -616,6 +619,32 @@ if __name__ == '__main__':
     sys.stdout.flush()
     # print(len(refs[0]),len(data_x[0]),len(data_y[0]))
     # exit()
+    import h5py
+    from ..features.extract_events import extract_events
+    for filename, x in zip(names, data_x):
+        print(filename)
+        h5 = h5py.File(filename, "r")
+        window_size = 5
+        if "AG-Thy" in filename:
+            window_size = 8
+
+        events = extract_events(h5, "rf", window_size=window_size)
+        events = events[1: -1]
+        mean = events["mean"]
+        std = events["stdv"]
+        length = events["length"]
+        x_clean = scale_clean(
+            np.array(np.vstack([mean, mean * mean, std, length]).T, dtype=np.float32))
+        assert (len(x_clean[:, 0]) == len(x[:, 0]))
+        data_x_clean.append(x_clean)
+    data_x = data_x_clean
+
+    predictor, ntwk = build_models(args.size, nbase=args.Nbases - 4,
+                                   ctc_length=ctc_length, input_length=input_length, n_output=n_output_network, n_feat=2)
+
+    if args.nwl:
+        for i in range(len(data_x)):
+            data_x[i][:, 3] = 0.05 * data_x[i][:, 3] / np.median(data_x[i][:3])
 
     s_arr = []
     p_arr = []
@@ -825,7 +854,7 @@ if __name__ == '__main__':
 
                     if delta > args.deltaseq or \
                             len(ss2.replace("-", "")) < args.forcelength * subseq_size or len(ss1.replace("-", "")) < args.forcelength * subseq_size:
-                        #print(ss2, ss1, delta, len(ss2.replace("-", "")))
+                        # print(ss2, ss1, delta, len(ss2.replace("-", "")))
                         # print("Skip")
                         continue
                     print("Keep", delta, ss2, ss1, len(data_x), [
@@ -908,7 +937,7 @@ if __name__ == '__main__':
                     args.root, 'my_model_weights-%i.h5' % epoch))
 
         if args.ctc:
-            #print(megas.count("B") / len(megas), megas.count("T") / len(megas))
+            # print(megas.count("B") / len(megas), megas.count("T") / len(megas))
             print(infostat)
 
             Label = np.array(Label)
