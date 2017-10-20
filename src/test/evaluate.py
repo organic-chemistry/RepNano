@@ -44,23 +44,28 @@ basename = "results/v9p5-best-B-20170908-R9.5-froms-two-200-seg-last-smaller-exp
 
 
 
-weights = "data/cluster/training/allign-agree-63333-8b/my_model_weights-1400.h5"
-basename = "results/v9p5-best-B-20170908-R9.5-froms-two-200-seg-last-smaller-explo-8test/"
 """
-
 weights = "data/training/my_model_weights-3390-removed-bad-B.h5"
 basename = "results/ref/"
 
-weights = "data/cluster/training/allign-agree-85555-ctc20/my_model_weights-510.h5"
+weights = "data/cluster/training/allign-agree-85555-ctc20/my_model_weights-3990.h5"
 basename = "results/v9p5-best-B-20170908-R9.5-froms-two-200-seg-last-smaller-explo-bw-ctc20/"
 
+"""
 weights = "data/cluster/training/allign-agree-85555-8b/my_model_weights-1960.h5"
 basename = "results/v9p5-best-B-20170908-R9.5-froms-two-200-seg-last-smaller-explo-8test/"
 
-
+"""
 #weights = "data/cluster/training/allign-agree-85555/my_model_weights-3900.h5"
 #basename = "results/v9p5-best-B-20170908-R9.5-froms-two-200-seg-last-smaller-explo-bw/"
+"""
+weights = "data/cluster/training/allign-agree-85555-BI-ctc20/my_model_weights-1990.h5"
+basename = "results/v9p5-best-B-20170908-R9.5-froms-two-200-seg-last-smaller-explo-bw-ctc20-BI/"
 
+
+weights = "data/cluster/training/allign-agree-63333-8b/my_model_weights-1950.h5"
+basename = "results/v9p5-best-B-20170908-R9.5-froms-two-200-seg-last-smaller-explo-8test/"
+"""
 ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
 redo = 1
 # Evaluate all the sample
@@ -68,7 +73,7 @@ list_dir = [["substituted", "sub_template", 5], ["control", "control_template", 
             ["control-k47211", "control-k47211_template", 5]]
 
 list_dir = [["20170908-R9.5/AD-basecalled", "20170908-R9.5/prout", 5],
-            ["20170908-R9.5/AG-basecalled", "20170908-R9.5/BTF_AG_ONT_1_FAH14273_A-select_pass", 8],
+            ["20170908-R9.5/AG-basecalled", "20170908-R9.5/BTF_AG_ONT_1_FAH14273_A-select_pass", 5],
             ["20170908-R9.5/AH-basecalled", "20170908-R9.5/BTF_AH_ONT_1_FAH14319_A-select_pass", 5],
             ["20170908-R9.5/AG-Thy/", "20170908-R9.5/BTF_AG_ONT_1_FAH14273_A-select_pass", 5],
             ["20170908-R9.5/AH-BrdU/", "20170908-R9.5/BTF_AH_ONT_1_FAH14319_A-select_pass", 5],
@@ -78,8 +83,8 @@ list_dir = [["20170908-R9.5/AD-basecalled", "20170908-R9.5/prout", 5],
 for dire, out, w in list_dir[:3] + list_dir[5:]:  # + list_dir[5:]:
     if redo:
         process(weights, directory="data/raw/%s/" % dire,
-                output="data/processed/{0}{1}.fasta".format(basename, out), Nbases=8, reads="",
-                filter=None, already_detected=False, Nmax=10, size=20,
+                output="data/processed/{0}{1}.fasta".format(basename, out), Nbases=5, reads="",
+                filter=None, already_detected=False, Nmax=200, size=20,
                 n_output_network=1, n_input=1, chemistry="rf", window_size=w)
         # filter="data/processed/%s.InDeepNano.test" % outz , already_detected=False)
 
