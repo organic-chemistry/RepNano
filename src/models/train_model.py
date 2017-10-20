@@ -221,7 +221,7 @@ if __name__ == '__main__':
     parser.add_argument('--skip-new', dest="skip_new", action="store_true")
     parser.add_argument('--force-clean', dest="force_clean", action="store_true")
     parser.add_argument('--filter', nargs='+', dest="filter", type=str, default=[])
-    parser.add_argument('--ctc-lencth', dest="ctc_length", type=int, default=20)
+    parser.add_argument('--ctc-length', dest="ctc_length", type=int, default=20)
 
     args = parser.parse_args()
 
