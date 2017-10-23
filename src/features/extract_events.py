@@ -1,5 +1,5 @@
 import numpy as np
-from .helpers import scale
+from .helpers import scale, scale_clean
 
 defs = {
     'r9.4': {

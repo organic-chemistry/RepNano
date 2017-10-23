@@ -640,7 +640,7 @@ if __name__ == '__main__':
     data_x = data_x_clean
 
     predictor, ntwk = build_models(args.size, nbase=args.Nbases - 4,
-                                   ctc_length=ctc_length, input_length=input_length, n_output=n_output_network, n_feat=2)
+                                   ctc_length=ctc_length, input_length=input_length, n_output=n_output_network, n_feat=3)
 
     if args.nwl:
         for i in range(len(data_x)):

@@ -44,12 +44,14 @@ def scale_clean(X, normalise_window=True):
 
     ret = np.array(X)
 
+    print("std", np.mean(ret[:, 2]))
     ret[:, 0] = (X[:, 0] - 100) / 50
     ret[:, 1] = ret[:, 3] / np.mean(ret[:, 3]) - 1
+    ret[:, 2] = X[:, 2] / 35
 
     #ret[:, 3] = 0.002 * ret[:, 3] / np.mean(ret[:, 3])
     print("Mean window scale_clean", np.mean(ret[:, : 2], axis=0), np.std(ret[:, : 2], axis=0))
-    return ret[:, :2]
+    return ret[:, :3]
 
 
 def preproc_event(mean, std, length):

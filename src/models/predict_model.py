@@ -3,7 +3,7 @@ import argparse
 import os
 import numpy as np
 from .model import build_models
-from ..features.extract_events import extract_events, scale
+from ..features.extract_events import extract_events, scale, scale_clean
 
 
 def get_events(h5, already_detected=True, chemistry="r9.5", window_size=None):
@@ -23,7 +23,7 @@ def get_events(h5, already_detected=True, chemistry="r9.5", window_size=None):
 
 
 def basecall_one_file(filename, output_file, ntwk, alph, already_detected,
-                      n_input=1, filter_size=None, chemistry="r9.5", window_size=None):
+                      n_input=1, filter_size=None, chemistry="r9.5", window_size=None, clean=False):
     # try:
     assert(os.path.exists(filename)), "File %s does no exists" % filename
     h5 = h5py.File(filename, "r")
@@ -43,8 +43,13 @@ def basecall_one_file(filename, output_file, ntwk, alph, already_detected,
     mean = events["mean"]
     std = events["stdv"]
     length = events["length"]
-    X = scale(np.array(np.vstack([mean, mean * mean, std, length]).T, dtype=np.float32))
+    if clean:
+
+        X = scale_clean(np.array(np.vstack([mean, mean * mean, std, length]).T, dtype=np.float32))
+    else:
+        X = scale(np.array(np.vstack([mean, mean * mean, std, length]).T, dtype=np.float32))
     # return
+    print(X.shape)
     if n_input == 2:
         X = []
         for m, s, l in zip(mean, std, length):
@@ -96,7 +101,7 @@ def basecall_one_file(filename, output_file, ntwk, alph, already_detected,
 
 def process(weights, Nbases, output, directory, reads=[], filter="",
             already_detected=True, Nmax=None, size=20, n_output_network=1, n_input=1, filter_size=None,
-            chemistry="r9.5", window_size=None):
+            chemistry="r9.5", window_size=None, clean=False):
     assert len(reads) != 0 or len(directory) != 0, "Nothing to basecall"
 
     alph = "ACGTN"
@@ -108,7 +113,10 @@ def process(weights, Nbases, output, directory, reads=[], filter="",
     import sys
     sys.path.append("../training/")
 
-    ntwk, _ = build_models(size, Nbases - 4, n_output=n_output_network)
+    n_feat = 4
+    if clean:
+        n_feat = 2
+    ntwk, _ = build_models(size, Nbases - 4, n_output=n_output_network, n_feat=n_feat)
     assert(os.path.exists(weights)), "Weights %s does not exist" % weights
     ntwk.load_weights(weights)
     print("loaded")
@@ -151,7 +159,8 @@ def process(weights, Nbases, output, directory, reads=[], filter="",
                     continue
             print("Processing read %s" % read)
             basecall_one_file(read, fo, ntwk, alph, already_detected,
-                              n_input=n_input, filter_size=filter_size, chemistry=chemistry, window_size=window_size)
+                              n_input=n_input, filter_size=filter_size,
+                              chemistry=chemistry, window_size=window_size, clean=clean)
 
             if Nmax and i >= Nmax:
                 break
