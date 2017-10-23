@@ -11,7 +11,7 @@ import keras
 
 
 def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
-                 uniform=True, input_length=None, n_output=1, n_feat=4):
+                 uniform=True, input_length=None, n_output=1, n_feat=4, recurrent_dropout=0):
     if keras.backend.backend() == 'tensorflow':
         import tensorflow as tf
 
@@ -50,13 +50,13 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
 
     print("Trainable ???", trainable)
 
-    l1 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable),
+    l1 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable, recurrent_dropout=recurrent_dropout),
                        merge_mode='concat')(inputs)
-    l2 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable),
+    l2 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable, recurrent_dropout=recurrent_dropout),
                        merge_mode='concat')(l1)
 
     if n_output == 1:
-        l3 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable),
+        l3 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable, recurrent_dropout=recurrent_dropout),
                            merge_mode='concat')(l2)
 
         out_layer1 = TimeDistributed(Dense(Nbases, activation="softmax"), name="out_layer1")(l3)
