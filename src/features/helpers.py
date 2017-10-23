@@ -54,6 +54,25 @@ def scale_clean(X, normalise_window=True):
     return ret[:, :3]
 
 
+def scale_clean_two(X, normalise_window=True):
+
+    ret = np.array(X)
+
+    print("std", np.mean(ret[:, 2]))
+    ret[:, 0] = X[:, 0] - np.median(X[:, 0])
+    ret[:, 0] = ret[:, 0] / np.std(ret[:, 0])
+
+    ret[:, 1] = X[:, 2] - np.median(X[:, 2])
+    ret[:, 1] = ret[:, 1] / np.std(ret[:, 1])
+
+    ret[:, 2] = X[:, 3] - np.median(X[:, 3])
+    ret[:, 2] = ret[:, 2] / np.std(ret[:, 2])
+
+    #ret[:, 3] = 0.002 * ret[:, 3] / np.mean(ret[:, 3])
+    print("Mean window scale_clean", np.mean(ret[:, : 2], axis=0), np.std(ret[:, : 2], axis=0))
+    return ret[:, :3]
+
+
 def preproc_event(mean, std, length):
     mean = mean / 100.0 - 0.66
     std = std - 1

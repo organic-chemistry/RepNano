@@ -9,7 +9,7 @@ import keras
 from Bio import pairwise2
 import _pickle as cPickle
 import copy
-from ..features.helpers import scale_clean
+from ..features.helpers import scale_clean, scale_clean_two
 
 
 def print_stats(o):
@@ -638,12 +638,12 @@ if __name__ == '__main__':
             np.array(np.vstack([mean, mean * mean, std, length]).T, dtype=np.float32))
         assert (len(x_clean[:, 0]) == len(x[:, 0]))
         data_x_clean.append(x_clean)
-    """
+
     data_x = data_x_clean
 
     predictor, ntwk = build_models(args.size, nbase=args.Nbases - 4,
                                    ctc_length=ctc_length, input_length=input_length,
-                                   n_output=n_output_network, n_feat=3, recurrent_dropout=0.25)"""
+                                   n_output=n_output_network, n_feat=3, recurrent_dropout=0.25)
 
     if args.nwl:
         for i in range(len(data_x)):
