@@ -903,6 +903,7 @@ if __name__ == '__main__':
                     Label.append([mapping[base] for base in seg])
 
                     X_new.append(x)
+                    # print(x)
 
         X_new = np.array(X_new)
         Y_new = np.array(Y_new)
@@ -946,6 +947,7 @@ if __name__ == '__main__':
             Label = np.array(Label)
             Length = np.array(Length)
             print(X_new.shape)
+            print(X.dtype, Y.dtype, Label.dtype, Length.dtype)
 
             # To balance class weight
 
