@@ -634,7 +634,7 @@ if __name__ == '__main__':
         mean = events["mean"]
         std = events["stdv"]
         length = events["length"]
-        x_clean = scale_clean(
+        x_clean = scale_clean_two(
             np.array(np.vstack([mean, mean * mean, std, length]).T, dtype=np.float32))
         assert (len(x_clean[:, 0]) == len(x[:, 0]))
         data_x_clean.append(x_clean)
