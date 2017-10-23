@@ -74,7 +74,7 @@ basename = "results/v9p5-best-B-20170908-R9.5-froms-two-200-seg-last-smaller-exp
 weights = "data/cluster/training//clean_scale_85555-ctc50-8B/my_model_weights-1990.h5"
 basename = "results/clean-ctc50-8B/"
 
-weights = "data/cluster/training//clean_scale_l3_85555-ctc50/my_model_weights-120.h5"
+weights = "data/cluster/training//clean_scale_l3_85555-ctc50-8B/my_model_weights-350.h5"
 basename = "results/clean-l3-ctc50/"
 
 ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
@@ -94,7 +94,7 @@ list_dir = [["20170908-R9.5/AD-basecalled", "20170908-R9.5/prout", 5],
 for dire, out, w in list_dir[:3] + list_dir[5:]:  # + list_dir[5:]:
     if redo:
         process(weights, directory="data/raw/%s/" % dire,
-                output="data/processed/{0}{1}.fasta".format(basename, out), Nbases=5, reads="",
+                output="data/processed/{0}{1}.fasta".format(basename, out), Nbases=8, reads="",
                 filter=None, already_detected=False, Nmax=20, size=20,
                 n_output_network=1, n_input=1, chemistry="rf", window_size=w, clean=True)
         # filter="data/processed/%s.InDeepNano.test" % outz , already_detected=False)
