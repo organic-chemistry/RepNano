@@ -77,8 +77,8 @@ basename = "results/clean-ctc50-8B/"
 weights = "data/cluster/training//clean_scale_l3_85555-ctc50/my_model_weights-790.h5"
 basename = "results/clean-l3-ctc50/"
 
-#weights = "data/cluster/training/ref_85555-ctc50-drop/my_model_weights-90.h5"
-#basename = "results/ref/"
+weights = "data/cluster/training/ref_85555-ctc50-drop/my_model_weights-220.h5"
+basename = "results/ref/"
 
 
 ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
@@ -95,12 +95,12 @@ list_dir = [["20170908-R9.5/AD-basecalled", "20170908-R9.5/prout", 5],
             ["20170908-R9.5/AI-CldU/0/", "20170908-R9.5/BTF_AI_ONT_1_FAH14242_A-select_pass", 5],
             ["20170908-R9.5/AK-EdU/0/", "20170908-R9.5/BTF_AK_ONT_1_FAH14211_A-select_pass", 5],
             ["20170908-R9.5/AL-IdU/0/", "20170908-R9.5/BTF_AL_ONT_1_FAH14352_A-select_pass", 5]]
-for dire, out, w in list_dir[:3] + list_dir[5:]:  # + list_dir[5:]:
+for dire, out, w in list_dir[2:3]:  # + list_dir[5:]:  # + list_dir[5:]:
     if redo:
         process(weights, directory="data/raw/%s/" % dire,
                 output="data/processed/{0}{1}.fasta".format(basename, out), Nbases=5, reads="",
-                filter=None, already_detected=False, Nmax=20, size=20,
-                n_output_network=1, n_input=1, chemistry="rf", window_size=w, clean=True)
+                filter=None, already_detected=False, Nmax=200, size=20,
+                n_output_network=1, n_input=1, chemistry="rf", window_size=w, clean=False)
         # filter="data/processed/%s.InDeepNano.test" % outz , already_detected=False)
 
     exex = "python src/test/get_fasta_from_train-test.py data/processed/{0}{1}.fasta all data/processed/{0}{1}_test".format(

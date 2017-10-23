@@ -51,6 +51,8 @@ def scale_clean(X, normalise_window=True):
 
     #ret[:, 3] = 0.002 * ret[:, 3] / np.mean(ret[:, 3])
     print("Mean window scale_clean", np.mean(ret[:, : 2], axis=0), np.std(ret[:, : 2], axis=0))
+
+    scale_clean_two(X)
     return ret[:, :3]
 
 
@@ -68,8 +70,10 @@ def scale_clean_two(X, normalise_window=True):
     ret[:, 2] = X[:, 3] - np.median(X[:, 3])
     ret[:, 2] = ret[:, 2] / np.std(ret[:, 2])
 
+    ret = ret[:, :3]
+    print(ret.shape)
     #ret[:, 3] = 0.002 * ret[:, 3] / np.mean(ret[:, 3])
-    print("Mean window scale_clean", np.mean(ret[:, : 2], axis=0), np.std(ret[:, : 2], axis=0))
+    print("Mean window scale_clean_two", np.mean(ret[:, : 3], axis=0), np.std(ret[:, : 3], axis=0))
     return ret[:, :3]
 
 
