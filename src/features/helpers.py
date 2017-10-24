@@ -52,7 +52,7 @@ def scale_clean(X, normalise_window=True):
     #ret[:, 3] = 0.002 * ret[:, 3] / np.mean(ret[:, 3])
     print("Mean window scale_clean", np.mean(ret[:, : 2], axis=0), np.std(ret[:, : 2], axis=0))
 
-    scale_clean_two(X)
+    # scale_clean_two(X)
     return ret[:, :3]
 
 
