@@ -947,7 +947,7 @@ if __name__ == '__main__':
             Label = np.array(Label)
             Length = np.array(Length)
             print(X_new.shape)
-            print(X.dtype, Y.dtype, Label.dtype, Length.dtype)
+            print(X_new.dtype, Y_new.dtype, Label.dtype, Length.dtype)
 
             # To balance class weight
 
