@@ -80,6 +80,9 @@ basename = "results/clean-l3-ctc50/"
 weights = "data/cluster/training/ref_85555-ctc50-drop/my_model_weights-2670.h5"
 basename = "results/ref/"
 
+weights = "data/cluster/training/clean_two_scale_l3_85555-ctc50-drop/my_model_weights-560.h5"
+basename = "results/clean-l3-clean/"
+
 
 ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
 redo = 1
@@ -87,7 +90,8 @@ redo = 1
 list_dir = [["substituted", "sub_template", 5], ["control", "control_template", 5],
             ["control-k47211", "control-k47211_template", 5]]
 
-list_dir = [["20170908-R9.5/AD-basecalled", "20170908-R9.5/prout", 5],
+list_dir = [["20170908-R9.5/AB-2minBrdU", "20170908-R9.5/prout_2", 5],
+            ["20170908-R9.5/AD-basecalled", "20170908-R9.5/prout", 5],
             ["20170908-R9.5/AG-basecalled", "20170908-R9.5/BTF_AG_ONT_1_FAH14273_A-select_pass", 8],
             ["20170908-R9.5/AH-basecalled", "20170908-R9.5/BTF_AH_ONT_1_FAH14319_A-select_pass", 5],
             ["20170908-R9.5/AG-Thy/", "20170908-R9.5/BTF_AG_ONT_1_FAH14273_A-select_pass", 5],
@@ -95,12 +99,12 @@ list_dir = [["20170908-R9.5/AD-basecalled", "20170908-R9.5/prout", 5],
             ["20170908-R9.5/AI-CldU/0/", "20170908-R9.5/BTF_AI_ONT_1_FAH14242_A-select_pass", 5],
             ["20170908-R9.5/AK-EdU/0/", "20170908-R9.5/BTF_AK_ONT_1_FAH14211_A-select_pass", 5],
             ["20170908-R9.5/AL-IdU/0/", "20170908-R9.5/BTF_AL_ONT_1_FAH14352_A-select_pass", 5]]
-for dire, out, w in list_dir[:3]:  # + list_dir[5:]:  # + list_dir[5:]:
+for dire, out, w in list_dir[1:4]:  # + list_dir[5:]:  # + list_dir[5:]:
     if redo:
         process(weights, directory="data/raw/%s/" % dire,
                 output="data/processed/{0}{1}.fasta".format(basename, out), Nbases=5, reads="",
-                filter=None, already_detected=False, Nmax=200, size=20,
-                n_output_network=1, n_input=1, chemistry="rf", window_size=w, clean=False)
+                filter=None, already_detected=False, Nmax=20, size=20,
+                n_output_network=1, n_input=1, chemistry="rf", window_size=w, clean=True)
         # filter="data/processed/%s.InDeepNano.test" % outz , already_detected=False)
 
     exex = "python src/test/get_fasta_from_train-test.py data/processed/{0}{1}.fasta all data/processed/{0}{1}_test".format(

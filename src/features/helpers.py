@@ -33,8 +33,8 @@ def scale(X, normalise_window=True):
         print("Norm")
         #ret[:, 3] = 0.002 * ret[:, 3] / np.mean(ret[:, 3])
     print("Mean window length", np.mean(ret[:, 3]), np.std(ret[:, 3]), np.median(ret[:, 3]))
-    print(scale, shift)
-    print((me75 - me25) / (m75 - m25), me25 - m25, se50 / s50)
+    #print(scale, shift)
+    #print((me75 - me25) / (m75 - m25), me25 - m25, se50 / s50)
 
     scale_clean(X)
     return ret
