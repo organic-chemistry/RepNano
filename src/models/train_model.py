@@ -622,7 +622,7 @@ if __name__ == '__main__':
 
     import h5py
     from ..features.extract_events import extract_events
-    for filename, x in zip(names, data_x[:10]):
+    for filename, x in zip(names, data_x):
         print(filename)
         h5 = h5py.File(filename, "r")
         window_size = 5
