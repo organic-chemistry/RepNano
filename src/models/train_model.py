@@ -224,6 +224,7 @@ if __name__ == '__main__':
     parser.add_argument('--filter', nargs='+', dest="filter", type=str, default=[])
     parser.add_argument('--ctc-length', dest="ctc_length", type=int, default=20)
     parser.add_argument('--normalize-window-length', dest="nwl", action="store_true")
+    parser.add_argument('--lr', dest="lr", type=float, default=0.01)
 
     args = parser.parse_args()
 
@@ -643,7 +644,7 @@ if __name__ == '__main__':
 
     predictor, ntwk = build_models(args.size, nbase=args.Nbases - 4,
                                    ctc_length=ctc_length, input_length=input_length,
-                                   n_output=n_output_network, n_feat=3, recurrent_dropout=0.25)
+                                   n_output=n_output_network, n_feat=3, recurrent_dropout=0.25, lr=args.lr)
     try:
         try:
             ntwk.load_weights(args.pre_trained_weight)

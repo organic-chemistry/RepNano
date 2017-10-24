@@ -80,7 +80,7 @@ basename = "results/clean-l3-ctc50/"
 weights = "data/cluster/training/ref_85555-ctc50-drop/my_model_weights-2670.h5"
 basename = "results/ref/"
 
-weights = "data/cluster/training/clean_two_scale_l3_85555-ctc50-drop/my_model_weights-560.h5"
+weights = "data/cluster/training/clean_two_scale_l3_85555-ctc50-drop/my_model_weights-140.h5"
 basename = "results/clean-l3-clean/"
 
 
