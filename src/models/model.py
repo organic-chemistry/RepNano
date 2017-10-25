@@ -11,7 +11,7 @@ import keras
 
 
 def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
-                 uniform=True, input_length=None, n_output=1, n_feat=4, recurrent_dropout=0, lr=0.01):
+                 uniform=True, input_length=None, n_output=1, n_feat=4, recurrent_dropout=0, lr=0.01, res=False):
     if keras.backend.backend() == 'tensorflow':
         import tensorflow as tf
 
@@ -50,14 +50,27 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
 
     print("Trainable ???", trainable)
 
+    if res:
+        merge_mode = "sum"
+
+    else:
+        merge_mode = "concat"
+
     l1 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable, recurrent_dropout=recurrent_dropout),
-                       merge_mode='concat')(inputs)
+                       merge_mode=merge_mode)(inputs)
+    if res:
+        l1 = Concatenate([l1, inputs], mode='sum')
     l2 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable, recurrent_dropout=recurrent_dropout),
-                       merge_mode='concat')(l1)
+                       merge_mode=merge_mode)(l1)
+    if res:
+        l2 = Concatenate([l2, l1], mode='sum')
 
     if n_output == 1:
         l3 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable, recurrent_dropout=recurrent_dropout),
-                           merge_mode='concat')(l2)
+                           merge_mode=merge_mode)(l2)
+
+        if res:
+            l3 = Concatenate([l3, l2], mode='sum')
 
         out_layer1 = TimeDistributed(Dense(Nbases, activation="softmax"), name="out_layer1")(l3)
 

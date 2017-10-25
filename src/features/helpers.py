@@ -61,13 +61,13 @@ def scale_clean_two(X, normalise_window=True):
     ret = np.array(X)
 
     print("std", np.mean(ret[:, 2]))
-    ret[:, 0] = X[:, 0] - np.median(X[:, 0])
+    ret[:, 0] = X[:, 0] - np.mean(X[:, 0])
     ret[:, 0] = ret[:, 0] / np.std(ret[:, 0])
 
-    ret[:, 1] = X[:, 2] - np.median(X[:, 2])
+    ret[:, 1] = X[:, 2] - np.mean(X[:, 2])
     ret[:, 1] = ret[:, 1] / np.std(ret[:, 1])
 
-    ret[:, 2] = X[:, 3] - np.median(X[:, 3])
+    ret[:, 2] = X[:, 3] - np.mean(X[:, 3]) + 0.001 * np.random.rand()
     ret[:, 2] = ret[:, 2] / np.std(ret[:, 2])
 
     ret = ret[:, :3]

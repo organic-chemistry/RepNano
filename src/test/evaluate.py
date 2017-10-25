@@ -81,7 +81,7 @@ basename = "results/clean-l3-ctc50/"
 weights = "data/cluster/training/ref_85555-ctc50-drop/my_model_weights-2670.h5"
 basename = "results/ref/"
 
-weights = "data/cluster/training/clean_two_scale_l3_85555-ctc50-drop-clean-B-lr0p001/my_model_weights-660.h5"
+weights = "data/cluster/training/clean_two_scale_l3_85555-ctc50-drop-clean-B-lr0p001/my_model_weights-810.h5"
 basename = "results/clean-l3-clean/"
 
 
@@ -100,7 +100,7 @@ list_dir = [["20170908-R9.5/AB-2minBrdU", "20170908-R9.5/prout_2", 5],
             ["20170908-R9.5/AI-CldU/0/", "20170908-R9.5/BTF_AI_ONT_1_FAH14242_A-select_pass", 5],
             ["20170908-R9.5/AK-EdU/0/", "20170908-R9.5/BTF_AK_ONT_1_FAH14211_A-select_pass", 5],
             ["20170908-R9.5/AL-IdU/0/", "20170908-R9.5/BTF_AL_ONT_1_FAH14352_A-select_pass", 5]]
-for dire, out, w in list_dir[3:4]:  # + list_dir[5:]:  # + list_dir[5:]:
+for dire, out, w in list_dir[1:3]:  # + list_dir[5:]:  # + list_dir[5:]:
     if redo:
         process(weights, directory="data/raw/%s/" % dire,
                 output="data/processed/{0}{1}.fasta".format(basename, out), Nbases=5, reads="",
