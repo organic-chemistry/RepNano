@@ -268,7 +268,9 @@ if __name__ == '__main__':
         ctc_length = 2 * subseq_size
 
     predictor, ntwk = build_models(args.size, nbase=args.Nbases - 4,
-                                   ctc_length=ctc_length, input_length=input_length, n_output=n_output_network)
+                                   ctc_length=ctc_length,
+                                   input_length=input_length, n_output=n_output_network,
+                                   lr=args.lr)
 
     if args.Nbases == 8:
         old_predictor, old_ntwk = build_models(
@@ -443,7 +445,7 @@ if __name__ == '__main__':
                         mean = events["mean"]
                         std = events["stdv"]
                         length = events["length"]
-                        x = scale(
+                        x = scale_clean_two(
                             np.array(np.vstack([mean, mean * mean, std, length]).T, dtype=np.float32))
 
                         if args.Nbases == 5:
@@ -620,7 +622,7 @@ if __name__ == '__main__':
     sys.stdout.flush()
     # print(len(refs[0]),len(data_x[0]),len(data_y[0]))
     # exit()
-
+"""
     import h5py
     from ..features.extract_events import extract_events
     for filename, x in zip(names, data_x):
@@ -653,7 +655,7 @@ if __name__ == '__main__':
         predictor.load_weights(args.pre_trained_weight)
     except:
         print("Learning from scratch")
-
+"""
     if args.nwl:
         for i in range(len(data_x)):
             data_x[i][:, 3] = 0.05 * data_x[i][:, 3] / np.median(data_x[i][:3])

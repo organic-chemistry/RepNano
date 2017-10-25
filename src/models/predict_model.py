@@ -4,6 +4,7 @@ import os
 import numpy as np
 from .model import build_models
 from ..features.extract_events import extract_events, scale, scale_clean
+from ..features.helpers import scale_clean_two
 
 
 def get_events(h5, already_detected=True, chemistry="r9.5", window_size=None):
@@ -45,7 +46,8 @@ def basecall_one_file(filename, output_file, ntwk, alph, already_detected,
     length = events["length"]
     if clean:
 
-        X = scale_clean(np.array(np.vstack([mean, mean * mean, std, length]).T, dtype=np.float32))
+        X = scale_clean_two(
+            np.array(np.vstack([mean, mean * mean, std, length]).T, dtype=np.float32))
     else:
         X = scale(np.array(np.vstack([mean, mean * mean, std, length]).T, dtype=np.float32))
     # return
