@@ -622,7 +622,7 @@ if __name__ == '__main__':
     sys.stdout.flush()
     # print(len(refs[0]),len(data_x[0]),len(data_y[0]))
     # exit()
-"""
+    """
     import h5py
     from ..features.extract_events import extract_events
     for filename, x in zip(names, data_x):
@@ -655,7 +655,7 @@ if __name__ == '__main__':
         predictor.load_weights(args.pre_trained_weight)
     except:
         print("Learning from scratch")
-"""
+    """
     if args.nwl:
         for i in range(len(data_x)):
             data_x[i][:, 3] = 0.05 * data_x[i][:, 3] / np.median(data_x[i][:3])
