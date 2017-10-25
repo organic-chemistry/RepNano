@@ -10,6 +10,8 @@ from Bio import pairwise2
 import _pickle as cPickle
 import copy
 from ..features.helpers import scale_clean, scale_clean_two
+from .helper import lrd
+import keras.backend as K
 
 
 def print_stats(o):
@@ -678,6 +680,7 @@ if __name__ == '__main__':
 
 
 # ntwk.load_weights("./my_model_weights.h5")
+    Schedul = lrd(waiting_time=10, start_lr=0.01, min_lr=0.0001, factor=2)
     for epoch in range(10000):
 
         # Test to see if realignment is interesting:
@@ -980,14 +983,22 @@ if __name__ == '__main__':
                 args.root, "training.log"), append=True)
 
             # print(len(data_x), np.mean(Length), np.max(Length))
-            ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size] * len(Length))[:maxin], Length[:maxin]],
-                     Label[:maxin], nb_epoch=1, batch_size=batch_size, callbacks=[reduce_lr, Log],
-                     validation_data=([X_new[maxin:maxin + val],
-                                       Label[maxin:maxin + val],
-                                       np.array([subseq_size] *
-                                                len(Length))[maxin:maxin + val],
-                                       Length[maxin:maxin + val]],
-                                      Label[maxin:maxin + val]))
+            r = ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size] * len(Length))[:maxin], Length[:maxin]],
+                         Label[:maxin], nb_epoch=1, batch_size=batch_size, callbacks=[reduce_lr, Log],
+                         validation_data=([X_new[maxin:maxin + val],
+                                           Label[maxin:maxin + val],
+                                           np.array([subseq_size] *
+                                                    len(Length))[maxin:maxin + val],
+                                           Length[maxin:maxin + val]],
+                                          Label[maxin:maxin + val]))
+            #from IPython import embed
+            # embed()
+            # print(r)
+            lr = Schedul.set_new_lr(r.history["loss"][0])
+            K.set_value(ntwk.optimizer.lr, lr)
+            print(lr)
+            if Schedul.stop:
+                exit()
 
             # if epoch == 0:
             #    ntwk.fit(X_new,[Y_new,Y2_new],nb_epoch=1, batch_size=10,validation_split=0.05)
