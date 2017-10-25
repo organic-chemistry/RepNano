@@ -445,7 +445,7 @@ if __name__ == '__main__':
                         mean = events["mean"]
                         std = events["stdv"]
                         length = events["length"]
-                        x = scale_clean_two(
+                        x = scale(
                             np.array(np.vstack([mean, mean * mean, std, length]).T, dtype=np.float32))
 
                         if args.Nbases == 5:
