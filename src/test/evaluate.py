@@ -71,7 +71,7 @@ basename = "results/v9p5-best-B-20170908-R9.5-froms-two-200-seg-last-smaller-exp
 weights = "data/cluster/training/allign-agree-85555-ctc200/my_model_weights-280.h5"
 basename = "results/v9p5-best-B-20170908-R9.5-froms-two-200-seg-last-smaller-explo-bw-ctc200/"
 
-
+"""
 weights = "data/cluster/training//clean_scale_85555-ctc50-8B/my_model_weights-1990.h5"
 basename = "results/clean-ctc50-8B/"
 
@@ -83,6 +83,20 @@ basename = "results/ref/"
 
 weights = "data/cluster/training/clean_two_scale_l3_85555-ctc50-drop-clean-B-lr0p001/my_model_weights-810.h5"
 basename = "results/clean-l3-clean/"
+
+weights = "data/cluster/training/clean_two_scale_l3_85555-ctc200-agree-align-cleanB/my_model_weights-160.h5"
+basename = "results/clean-l3-noise/"
+
+weights = "data/cluster/training/agree-align-cleanB-ctc200//my_model_weights-110.h5"
+basename = "results/clean-ctc200-ramp/"
+
+"""
+"""
+weights = "data/cluster/training/allign-no-agree-85555-ctc200/my_model_weights-190.h5"
+basename = "results/no-agree-ctc200-no-agree/"
+"""
+weights = "data/cluster/training/clean_two_scale_l3_85555-ctc200-agree-align-cleanB/my_model_weights-160.h5"
+basename = "results/clean-l3-noise/"
 
 
 ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
@@ -100,7 +114,7 @@ list_dir = [["20170908-R9.5/AB-2minBrdU", "20170908-R9.5/prout_2", 5],
             ["20170908-R9.5/AI-CldU/0/", "20170908-R9.5/BTF_AI_ONT_1_FAH14242_A-select_pass", 5],
             ["20170908-R9.5/AK-EdU/0/", "20170908-R9.5/BTF_AK_ONT_1_FAH14211_A-select_pass", 5],
             ["20170908-R9.5/AL-IdU/0/", "20170908-R9.5/BTF_AL_ONT_1_FAH14352_A-select_pass", 5]]
-for dire, out, w in list_dir[1:3]:  # + list_dir[5:]:  # + list_dir[5:]:
+for dire, out, w in list_dir[1:4]:  # + list_dir[5:]:  # + list_dir[5:]:
     if redo:
         process(weights, directory="data/raw/%s/" % dire,
                 output="data/processed/{0}{1}.fasta".format(basename, out), Nbases=5, reads="",

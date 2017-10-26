@@ -154,6 +154,8 @@ def process(weights, Nbases, output, directory, reads=[], filter="",
         # print(Files)
         # print(files)
         # exit()
+        if Nmax != None:
+            files = files[-Nmax:]
         for i, read in enumerate(files):
 
             if Files != []:
@@ -163,9 +165,6 @@ def process(weights, Nbases, output, directory, reads=[], filter="",
             basecall_one_file(read, fo, ntwk, alph, already_detected,
                               n_input=n_input, filter_size=filter_size,
                               chemistry=chemistry, window_size=window_size, clean=clean)
-
-            if Nmax and i >= Nmax:
-                break
 
         fo.close()
 

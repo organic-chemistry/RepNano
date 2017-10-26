@@ -227,6 +227,7 @@ if __name__ == '__main__':
     parser.add_argument('--ctc-length', dest="ctc_length", type=int, default=20)
     parser.add_argument('--normalize-window-length', dest="nwl", action="store_true")
     parser.add_argument('--lr', dest="lr", type=float, default=0.01)
+    parser.add_argument('--clean', dest="clean", action="store_true")
 
     args = parser.parse_args()
 
@@ -625,38 +626,39 @@ if __name__ == '__main__':
     # print(len(refs[0]),len(data_x[0]),len(data_y[0]))
     # exit()
 
-    import h5py
-    from ..features.extract_events import extract_events
-    for filename, x in zip(names, data_x):
-        print(filename)
-        h5 = h5py.File(filename, "r")
-        window_size = 5
-        if "AG-Thy" in filename:
-            window_size = 8
+    if args.clean:
+        import h5py
+        from ..features.extract_events import extract_events
+        for filename, x in zip(names, data_x):
+            print(filename)
+            h5 = h5py.File(filename, "r")
+            window_size = 5
+            if "AG-Thy" in filename:
+                window_size = 8
 
-        events = extract_events(h5, "rf", window_size=window_size)
-        events = events[1: -1]
-        mean = events["mean"]
-        std = events["stdv"]
-        length = events["length"]
-        x_clean = scale_clean_two(
-            np.array(np.vstack([mean, mean * mean, std, length]).T, dtype=np.float32))
-        assert (len(x_clean[:, 0]) == len(x[:, 0]))
-        data_x_clean.append(x_clean)
+            events = extract_events(h5, "rf", window_size=window_size)
+            events = events[1: -1]
+            mean = events["mean"]
+            std = events["stdv"]
+            length = events["length"]
+            x_clean = scale_clean_two(
+                np.array(np.vstack([mean, mean * mean, std, length]).T, dtype=np.float32))
+            assert (len(x_clean[:, 0]) == len(x[:, 0]))
+            data_x_clean.append(x_clean)
 
-    data_x = data_x_clean
+        data_x = data_x_clean
 
-    predictor, ntwk = build_models(args.size, nbase=args.Nbases - 4,
-                                   ctc_length=ctc_length, input_length=input_length,
-                                   n_output=n_output_network, n_feat=3, recurrent_dropout=0.25, lr=args.lr)
-    try:
+        predictor, ntwk = build_models(args.size, nbase=args.Nbases - 4,
+                                       ctc_length=ctc_length, input_length=input_length,
+                                       n_output=n_output_network, n_feat=3, recurrent_dropout=0.25, lr=args.lr)
         try:
-            ntwk.load_weights(args.pre_trained_weight)
+            try:
+                ntwk.load_weights(args.pre_trained_weight)
+            except:
+                print("Only predictor loaded (normal if no ctc)")
+            predictor.load_weights(args.pre_trained_weight)
         except:
-            print("Only predictor loaded (normal if no ctc)")
-        predictor.load_weights(args.pre_trained_weight)
-    except:
-        print("Learning from scratch")
+            print("Learning from scratch")
 
     if args.nwl:
         for i in range(len(data_x)):
@@ -680,7 +682,7 @@ if __name__ == '__main__':
 
 
 # ntwk.load_weights("./my_model_weights.h5")
-    Schedul = lrd(waiting_time=10, start_lr=0.01, min_lr=0.0001, factor=2)
+    Schedul = lrd(waiting_time=200, start_lr=0.01, min_lr=0.0001, factor=2)
     for epoch in range(10000):
 
         # Test to see if realignment is interesting:
