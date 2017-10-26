@@ -769,6 +769,8 @@ if __name__ == '__main__':
                         print()
 
                 if subts and nc[type_sub] / (nc["T"] + nc[type_sub]) < 0.2:
+                    if args.force_clean and type_sub != "B":
+                        continue
                     refs[s] = refs[s].replace(type_sub, "T")
                     switch += 1
                     print("Swich")
