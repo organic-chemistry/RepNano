@@ -49,6 +49,7 @@ def SeqInRef(Chrom, pos, bit, Lenght, ref):
 
 def get_seq(sam, ref, ret_pos=False):
     ret = ["", 0, None, None]
+    maxlen = 0
     with open(sam, 'r') as f:
         s = f.readline()  # read the 1st line
         while s != '':
@@ -72,13 +73,17 @@ def get_seq(sam, ref, ret_pos=False):
                     # print ss[0]
                     # print Q
                     #print(Chrom, pos, Bit, LenghtOnRef(CIGAR), ref)
+                    Len = LenghtOnRef(CIGAR)
+                    if Len < maxlen:
+                        continue
                     Seq = SeqInRef(Chrom, pos, Bit, LenghtOnRef(CIGAR), ref)
                     #print("Inside", Seq)
                     if ss[2] == '*' or "chr" not in ss[2]:
                         Chrom = None
                     else:
                         Chrom = int(ss[2][3:])
-                    ret = [Seq, 1, Chrom, pos]
+                    ret = [Seq + "", 1, Chrom + 0, pos + 0]
+                    maxlen = max(len(Seq), maxlen)
 
                 else:
 

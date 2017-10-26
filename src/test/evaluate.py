@@ -87,22 +87,23 @@ basename = "results/clean-l3-clean/"
 weights = "data/cluster/training/clean_two_scale_l3_85555-ctc200-agree-align-cleanB/my_model_weights-160.h5"
 basename = "results/clean-l3-noise/"
 
+"""
+
 weights = "data/cluster/training/agree-align-cleanB-ctc200//my_model_weights-110.h5"
 basename = "results/clean-ctc200-ramp/"
 
 """
-
 weights = "data/cluster/training/allign-no-agree-85555-ctc200/my_model_weights-190.h5"
 basename = "results/no-agree-ctc200-no-agree/"
-"""
+
 weights = "data/cluster/training/clean_two_scale_l3_85555-ctc200-agree-align-cleanB/my_model_weights-160.h5"
 basename = "results/clean-l3-noise/"
-"""
+
 weights = "data/cluster/training/allign-no-agree-85555-ctc200/my_model_weights-300.h5"
 basename = "results/no-agree-ctc200-no-agree-w300/"
-
+"""
 ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
-redo = 1
+redo = 0
 # Evaluate all the sample
 list_dir = [["substituted", "sub_template", 5], ["control", "control_template", 5],
             ["control-k47211", "control-k47211_template", 5]]
