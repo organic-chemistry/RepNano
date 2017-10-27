@@ -60,8 +60,8 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
 
     l1 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable, recurrent_dropout=recurrent_dropout),
                        merge_mode=merge_mode)(inputs)
-    if res:
-        l1 = Add()([l1, inputs])
+    # if res:
+    #l1 = Add()([l1, inputs])
     l2 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable, recurrent_dropout=recurrent_dropout),
                        merge_mode=merge_mode)(l1)
     if res:
