@@ -289,7 +289,7 @@ if __name__ == '__main__':
 
     os.makedirs(args.root, exist_ok=True)
 
-    if not os.path.exists():
+    if not os.path.exists(allignment_file):
         end = None
         if args.test:
             end = 80
@@ -614,10 +614,10 @@ if __name__ == '__main__':
                 cPickle.dump([data_x, data_index, data_alignment, refs, names], f)
     else:
         if args.ctc:
-            with open(os.path.join(args.root, "Allignements-bis"), "rb") as f:
+            with open(allignment_file, "rb") as f:
                 data_x, data_index, data_alignment, refs, names = cPickle.load(f)
         else:
-            with open(os.path.join(args.root, "Allignements-bis"), "rb") as f:
+            with open(allignment_file, "rb") as f:
                 data_x, data_y, data_y2, refs, names = cPickle.load(f)
 
     if args.pre_trained_weight is not None:
