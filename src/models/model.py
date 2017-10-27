@@ -1,5 +1,5 @@
 from keras.layers import Input, Dense
-from keras.layers.merge import Concatenate
+from keras.layers.merge import Add
 
 from keras.models import Model
 from keras.layers.recurrent import LSTM
@@ -61,18 +61,18 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
     l1 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable, recurrent_dropout=recurrent_dropout),
                        merge_mode=merge_mode)(inputs)
     if res:
-        l1 = Concatenate([l1, inputs], mode='sum')
+        l1 = Add()([l1, inputs])
     l2 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable, recurrent_dropout=recurrent_dropout),
                        merge_mode=merge_mode)(l1)
     if res:
-        l2 = Concatenate([l2, l1], mode='sum')
+        l2 = Add()([l2, l1])
 
     if n_output == 1:
         l3 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable, recurrent_dropout=recurrent_dropout),
                            merge_mode=merge_mode)(l2)
 
         if res:
-            l3 = Concatenate([l3, l2], mode='sum')
+            l3 = Add()([l3, l2])
 
         if attention:
             out_layer1 = AttentionDecoder(size, Nbases, name="out_layer1")(l3)
