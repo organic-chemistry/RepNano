@@ -8,10 +8,12 @@ from keras import backend as K
 from keras.layers.core import Lambda, Reshape
 from keras.optimizers import SGD, Adadelta
 import keras
+from .attention import AttentionDecoder
 
 
 def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
-                 uniform=True, input_length=None, n_output=1, n_feat=4, recurrent_dropout=0, lr=0.01, res=False):
+                 uniform=True, input_length=None, n_output=1,
+                 n_feat=4, recurrent_dropout=0, lr=0.01, res=False, attention=False):
     if keras.backend.backend() == 'tensorflow':
         import tensorflow as tf
 
@@ -72,13 +74,18 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
         if res:
             l3 = Concatenate([l3, l2], mode='sum')
 
-        out_layer1 = TimeDistributed(Dense(Nbases, activation="softmax"), name="out_layer1")(l3)
+        if attention:
+            out_layer1 = AttentionDecoder(size, Nbases, name="out_layer1")(l3)
+
+        else:
+            out_layer1 = TimeDistributed(Dense(Nbases, activation="softmax"), name="out_layer1")(l3)
 
     else:
         l3 = Bidirectional(LSTM(2 * size, return_sequences=True, trainable=trainable),
                            merge_mode='concat')(l2)
 
         if input_length != None:
+
             TD = TimeDistributed(Dense(Nbases, activation="softmax"), name="out_layer1")
             r = Reshape((input_length * 2, 2 * size))(l3)
             out_layer1 = TD(r)
