@@ -230,7 +230,7 @@ if __name__ == '__main__':
     parser.add_argument('--clean', dest="clean", action="store_true")
     parser.add_argument('--attention', dest="attention", action="store_true")
     parser.add_argument('--residual', dest="res", action="store_true")
-    parser.add_argument('--allignment-file', dest="allignment_file", default="Allignements-bis")
+    parser.add_argument('--all-file', dest="allignment_file", default="Allignements-bis")
 
     args = parser.parse_args()
 
