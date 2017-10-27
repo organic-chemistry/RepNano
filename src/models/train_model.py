@@ -230,8 +230,14 @@ if __name__ == '__main__':
     parser.add_argument('--clean', dest="clean", action="store_true")
     parser.add_argument('--attention', dest="attention", action="store_true")
     parser.add_argument('--residuel', dest="res", action="store_true")
+    parser.add_argument('--allignment-file', dest="allignment_file", default="Allignements-bis")
 
     args = parser.parse_args()
+
+    if args.allignment_file == "Allignements-bis":
+        allignment_file = os.path.join(args.root, "Allignements-bis")
+    else:
+        allignment_file = args.allignment_file
 
     print(args.filter)
 
@@ -283,7 +289,7 @@ if __name__ == '__main__':
 
     os.makedirs(args.root, exist_ok=True)
 
-    if not os.path.exists(os.path.join(args.root, "Allignements-bis")):
+    if not os.path.exists():
         end = None
         if args.test:
             end = 80
