@@ -229,7 +229,7 @@ if __name__ == '__main__':
     parser.add_argument('--lr', dest="lr", type=float, default=0.01)
     parser.add_argument('--clean', dest="clean", action="store_true")
     parser.add_argument('--attention', dest="attention", action="store_true")
-    parser.add_argument('--residuel', dest="res", action="store_true")
+    parser.add_argument('--residual', dest="res", action="store_true")
     parser.add_argument('--allignment-file', dest="allignment_file", default="Allignements-bis")
 
     args = parser.parse_args()
