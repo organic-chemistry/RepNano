@@ -102,8 +102,12 @@ basename = "results/clean-l3-noise/"
 weights = "data/cluster/training/allign-no-agree-85555-ctc200/my_model_weights-300.h5"
 basename = "results/no-agree-ctc200-no-agree-w300/"
 """
+
+weights = "data/cluster/training/allign-agree-85555/my_model_weights-3900.h5"
+basename = "results/v9p5-best-B-20170908-R9.5-froms-two-200-seg-last-smaller-explo-bw/"
+
 ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
-redo = 0
+redo = 1
 # Evaluate all the sample
 list_dir = [["substituted", "sub_template", 5], ["control", "control_template", 5],
             ["control-k47211", "control-k47211_template", 5]]

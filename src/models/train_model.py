@@ -552,6 +552,8 @@ if __name__ == '__main__':
                             continue
                         bio = True
                         if succes and bio:
+                            if np.abs(len(ref) - len(seq.replace("N", ""))) > 300:
+                                continue
                             alignments = pairwise2.align.globalxx(
                                 ref, seqs, one_alignment_only=True)
                             # print("la", len(alignments), len(alignments[0]))

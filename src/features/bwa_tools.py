@@ -81,9 +81,9 @@ def get_seq(sam, ref, ret_pos=False):
                     if ss[2] == '*' or "chr" not in ss[2]:
                         Chrom = None
                     else:
-                        Chrom = int(ss[2][3:])
-                    ret = [Seq + "", 1, Chrom + 0, pos + 0]
-                    maxlen = max(len(Seq), maxlen)
+                        Chrom = int(ss[2][3:]) + 0
+                        ret = [Seq + "", 1, Chrom + 0, pos + 0]
+                        maxlen = max(len(Seq), maxlen)
 
                 else:
 
