@@ -229,6 +229,7 @@ if __name__ == '__main__':
     parser.add_argument('--lr', dest="lr", type=float, default=0.01)
     parser.add_argument('--clean', dest="clean", action="store_true")
     parser.add_argument('--attention', dest="attention", action="store_true")
+    parser.add_argument('--residuel', dest="res", action="store_true")
 
     args = parser.parse_args()
 
@@ -274,7 +275,7 @@ if __name__ == '__main__':
     predictor, ntwk = build_models(args.size, nbase=args.Nbases - 4,
                                    ctc_length=ctc_length,
                                    input_length=input_length, n_output=n_output_network,
-                                   lr=args.lr, attention=args.attention)
+                                   lr=args.lr, res=args.res, attention=args.attention)
 
     if args.Nbases == 8:
         old_predictor, old_ntwk = build_models(
