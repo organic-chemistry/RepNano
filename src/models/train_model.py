@@ -273,7 +273,7 @@ if __name__ == '__main__':
 
     from .model import build_models
     ctc_length = subseq_size
-    input_length = ctc_length
+    input_length = None
     if n_output_network == 2:
         input_length = subseq_size
         ctc_length = 2 * subseq_size
@@ -429,6 +429,7 @@ if __name__ == '__main__':
                             raise "Invalid substitution"
 
                     for ifilename, filename in enumerate(glob.glob(direct + "/*")):
+                        print(filename)
                         if args.max_file is not None and ifilename > args.max_file:
                             continue
                         h5 = h5py.File(filename, "r")
