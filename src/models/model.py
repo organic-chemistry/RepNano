@@ -8,7 +8,7 @@ from keras import backend as K
 from keras.layers.core import Lambda, Reshape
 from keras.optimizers import SGD, Adadelta
 import keras
-from .attention import AttentionDecoder
+from .nAttention import AttentionDecoder
 from .attentionBis import Attention
 
 

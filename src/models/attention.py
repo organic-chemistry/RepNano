@@ -1,11 +1,11 @@
-import tensorflow as tf
+#import tensorflow as tf
 # Code from https://github.com/datalogue/keras-attention/edit/master/models/custom_recurrents.py
 from keras import backend as K
 from keras import regularizers, constraints, initializers, activations
 from keras.layers.recurrent import Recurrent, _time_distributed_dense
 from keras.engine import InputSpec
 
-tfPrint = lambda d, T: tf.Print(input_=T, data=[T, tf.shape(T)], message=d)
+#tfPrint = lambda d, T: tf.Print(input_=T, data=[T, tf.shape(T)], message=d)
 
 
 class AttentionDecoder(Recurrent):
@@ -51,6 +51,8 @@ class AttentionDecoder(Recurrent):
         self.recurrent_constraint = constraints.get(kernel_constraint)
         self.bias_constraint = constraints.get(bias_constraint)
 
+        self.window_length = 5
+
         super(AttentionDecoder, self).__init__(**kwargs)
         self.name = name
         self.return_sequences = True  # must return sequences
@@ -66,7 +68,7 @@ class AttentionDecoder(Recurrent):
         if self.stateful:
             super(AttentionDecoder, self).reset_states()
 
-        self.states = [None, None, None]  # y, s
+        self.states = [None, None, 0]  # y, s
 
         """
             Matrices for creating the context vector
@@ -209,6 +211,9 @@ class AttentionDecoder(Recurrent):
                                              timesteps=self.timesteps,
                                              output_dim=self.units)
 
+        if self.window_length is not None:
+            self._uxpb = K.temporal_padding(self._uxpb, (self.window_length, self.window_length))
+
         return super(AttentionDecoder, self).call(x)
 
     def get_initial_state(self, inputs):
@@ -224,23 +229,36 @@ class AttentionDecoder(Recurrent):
         y0 = K.expand_dims(y0)  # (samples, 1)
         y0 = K.tile(y0, [1, self.output_dim])
 
-        return [y0, s0, 0.]
+        return [y0, s0, 0]
 
     def step(self, x, states):
 
         ytm, stm, pos = states
 
-        pos += 1.
         # repeat the hidden state to the length of the sequence
         #pos = tfPrint("pos", pos)
-        stm = stm + pos
+        stm = stm
         #stm = tfPrint("stm", stm)
-        self.window_length = 5
 
+        #self.window_length = None
+        """
         if self.window_length is not None:
-            _stm = K.repeat(stm, self.window_length * 2 + 1)
+            pos = K.cast(pos, "int32")
+            wl = 2 * self.window_length + 1
+            _stm = K.repeat(stm, wl)
             _Wxstm = K.dot(_stm, self.W_a)
+            crop = self._uxpb[:, pos:pos + wl, :]
+            et = K.dot(activations.tanh(_Wxstm + crop),
+                       K.expand_dims(self.V_a))
+            at = K.exp(et)
+            at_sum = K.sum(at, axis=1)
+            at_sum_repeated = K.repeat(at_sum, wl)
+            at /= at_sum_repeated  # vector of size (batchsize, timesteps, 1)
 
+            # calculate the context vector
+            context = K.squeeze(K.batch_dot(at, self.x_seq[:, pos:pos + wl, :], axes=1), axis=1)
+            pos += 1
+        """
         if self.window_length is None:
             _stm = K.repeat(stm, K.shape(self._uxpb)[1])
             #_stm = K.expand_dims(stm, 1)
