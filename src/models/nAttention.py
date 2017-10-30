@@ -127,17 +127,21 @@ class AttentionDecoder(Recurrent):
 
     def get_initial_state(self, inputs):
 
-        return [0]
+        return [0.]
 
     def step(self, x, states):
 
         pos = states[0]
         self.window_length = 10
         # this relates how much other timesteps contributed to this one.
-        exp_win = K.exp(- (K.arange(0, K.shape(self._uxpb)[1], 1) - pos)**2 / self.window_length)
+        exp_win = K.exp(- (K.arange(0, K.shape(self._uxpb)
+                                    [1], 1, dtype="float32") - pos)**2 / self.window_length)
 
-        exp_win = K.tile(exp_win, K.shape(self._uxpb)[0] * K.shape(self._uxpb)[2])
-        exp_win = K.reshape(exp_win, K.shape(self._uxpb))
+        exp_win = K.expand_dims(exp_win, 0)
+        exp_win = K.expand_dims(exp_win, -1)
+
+        #exp_win = K.tile(exp_win, K.shape(self._uxpb)[0] * K.shape(self._uxpb)[2])
+        #exp_win = K.reshape(exp_win, K.shape(self._uxpb))
         """
         exp_win = K.expand_dims(exp_win, 0)
         exp_win = K.repeat_elements(exp_win, K.shape(self._uxpb)[0], 0)
@@ -158,9 +162,9 @@ class AttentionDecoder(Recurrent):
         yt = activations.softmax(K.dot(context, self.C_o) + self.b_o)
 
         if self.return_probabilities:
-            return at, [pos]
+            return at, [pos + 1.]
         else:
-            return yt, [pos]
+            return yt, [pos + 1.]
 
     def compute_output_shape(self, input_shape):
         """
