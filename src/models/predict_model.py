@@ -118,7 +118,8 @@ def process(weights, Nbases, output, directory, reads=[], filter="",
     n_feat = 4
     if clean:
         n_feat = 3
-    ntwk, _ = build_models(size, Nbases - 4, n_output=n_output_network, n_feat=n_feat)
+    ntwk, _ = build_models(size, Nbases - 4, n_output=n_output_network, n_feat=n_feat,
+                           res=False, attention=True)
     assert(os.path.exists(weights)), "Weights %s does not exist" % weights
     ntwk.load_weights(weights)
     print("loaded")

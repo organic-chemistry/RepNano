@@ -92,19 +92,30 @@ basename = "results/clean-l3-noise/"
 weights = "data/cluster/training/agree-align-cleanB-ctc200//my_model_weights-110.h5"
 basename = "results/clean-ctc200-ramp/"
 
-"""
+
 weights = "data/cluster/training/allign-no-agree-85555-ctc200/my_model_weights-190.h5"
 basename = "results/no-agree-ctc200-no-agree/"
-
+"""
 weights = "data/cluster/training/clean_two_scale_l3_85555-ctc200-agree-align-cleanB/my_model_weights-160.h5"
 basename = "results/clean-l3-noise/"
 
 weights = "data/cluster/training/allign-no-agree-85555-ctc200/my_model_weights-300.h5"
 basename = "results/no-agree-ctc200-no-agree-w300/"
-"""
+
 
 weights = "data/cluster/training/allign-agree-85555/my_model_weights-3900.h5"
 basename = "results/v9p5-best-B-20170908-R9.5-froms-two-200-seg-last-smaller-explo-bw/"
+
+
+weights = "data/cluster/training/allign-agree-85555-ctc200-residual/my_model_weights-1060.h5"
+basename = "results/resid/"
+
+weights = "data/cluster/training//allign-no-agree-85555-ctc200-from-improoved/my_model_weights-390.h5"
+basename = "results/from-improved/"
+"""
+
+weights = "data/cluster/training/allign-agree-85555-ctc20-attention/my_model_weights-1990.h5"
+basename = "results/attention/"
 
 ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
 redo = 1
@@ -125,7 +136,7 @@ for dire, out, w in list_dir[1:4]:  # + list_dir[5:]:
     if redo:
         process(weights, directory="data/raw/%s/" % dire,
                 output="data/processed/{0}{1}.fasta".format(basename, out), Nbases=5, reads="",
-                filter=None, already_detected=False, Nmax=200, size=20,
+                filter=None, already_detected=False, Nmax=20, size=20,
                 n_output_network=1, n_input=1, chemistry="rf", window_size=w, clean=False)
         # filter="data/processed/%s.InDeepNano.test" % outz , already_detected=False)
 

@@ -1,11 +1,11 @@
-#import tensorflow as tf
+import tensorflow as tf
 # Code from https://github.com/datalogue/keras-attention/edit/master/models/custom_recurrents.py
 from keras import backend as K
 from keras import regularizers, constraints, initializers, activations
 from keras.layers.recurrent import Recurrent, _time_distributed_dense
 from keras.engine import InputSpec
 
-#tfPrint = lambda d, T: tf.Print(input_=T, data=[T, tf.shape(T)], message=d)
+tfPrint = lambda d, T: tf.Print(input_=T, data=[T, tf.shape(T)], message=d)
 
 
 class AttentionDecoder(Recurrent):
@@ -66,7 +66,7 @@ class AttentionDecoder(Recurrent):
         if self.stateful:
             super(AttentionDecoder, self).reset_states()
 
-        self.states = [None, None]  # y, s
+        self.states = [None, None, None]  # y, s
 
         """
             Matrices for creating the context vector
@@ -212,7 +212,7 @@ class AttentionDecoder(Recurrent):
         return super(AttentionDecoder, self).call(x)
 
     def get_initial_state(self, inputs):
-        print('inputs shape:', inputs.get_shape())
+        #print('inputs shape:', inputs.get_shape())
 
         # apply the matrix on the first time step to get the initial s0.
         s0 = activations.tanh(K.dot(inputs[:, 0], self.W_s))
@@ -224,29 +224,45 @@ class AttentionDecoder(Recurrent):
         y0 = K.expand_dims(y0)  # (samples, 1)
         y0 = K.tile(y0, [1, self.output_dim])
 
-        return [y0, s0]
+        return [y0, s0, 0.]
 
     def step(self, x, states):
 
-        ytm, stm = states
+        ytm, stm, pos = states
 
+        pos += 1.
         # repeat the hidden state to the length of the sequence
-        _stm = K.repeat(stm, self.timesteps)
+        #pos = tfPrint("pos", pos)
+        stm = stm + pos
+        #stm = tfPrint("stm", stm)
+        self.window_length = 5
 
-        # now multiplty the weight matrix with the repeated hidden state
-        _Wxstm = K.dot(_stm, self.W_a)
+        if self.window_length is not None:
+            _stm = K.repeat(stm, self.window_length * 2 + 1)
+            _Wxstm = K.dot(_stm, self.W_a)
 
-        # calculate the attention probabilities
-        # this relates how much other timesteps contributed to this one.
-        et = K.dot(activations.tanh(_Wxstm + self._uxpb),
-                   K.expand_dims(self.V_a))
-        at = K.exp(et)
-        at_sum = K.sum(at, axis=1)
-        at_sum_repeated = K.repeat(at_sum, self.timesteps)
-        at /= at_sum_repeated  # vector of size (batchsize, timesteps, 1)
+        if self.window_length is None:
+            _stm = K.repeat(stm, K.shape(self._uxpb)[1])
+            #_stm = K.expand_dims(stm, 1)
+            #_stm = K.repeat_elements(_stm, self.timesteps, 1)
 
-        # calculate the context vector
-        context = K.squeeze(K.batch_dot(at, self.x_seq, axes=1), axis=1)
+            # now multiplty the weight matrix with the repeated hidden state
+            #self._uxpb = tfPrint("uxpb", self._uxpb)
+            #_stm = tfPrint("_smt", _stm)
+
+            _Wxstm = K.dot(_stm, self.W_a)
+
+            # calculate the attention probabilities
+            # this relates how much other timesteps contributed to this one.
+            et = K.dot(activations.tanh(_Wxstm + self._uxpb),
+                       K.expand_dims(self.V_a))
+            at = K.exp(et)
+            at_sum = K.sum(at, axis=1)
+            at_sum_repeated = K.repeat(at_sum, K.shape(self._uxpb)[1])
+            at /= at_sum_repeated  # vector of size (batchsize, timesteps, 1)
+
+            # calculate the context vector
+            context = K.squeeze(K.batch_dot(at, self.x_seq, axes=1), axis=1)
         # ~~~> calculate new hidden state
         # first calculate the "r" gate:
 
@@ -280,9 +296,9 @@ class AttentionDecoder(Recurrent):
             + self.b_o)
 
         if self.return_probabilities:
-            return at, [yt, st]
+            return at, [yt, st, pos]
         else:
-            return yt, [yt, st]
+            return yt, [yt, st, pos]
 
     def compute_output_shape(self, input_shape):
         """

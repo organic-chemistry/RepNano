@@ -405,6 +405,7 @@ if __name__ == '__main__':
             with open(args.pre_trained_dir_list, "r") as f:
                 idirect = 0
                 for iline, line in enumerate(f.readlines()):
+                    print(line)
                     if not args.ref_from_file:
                         if len(line.split()) not in [2, 3]:
                             print("Skipping ", line)
