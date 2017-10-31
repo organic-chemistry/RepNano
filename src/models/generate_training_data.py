@@ -529,7 +529,7 @@ if __name__ == '__main__':
                     if args.fraction is not None and ifilename / len(all_files) > args.fraction:
                         break
 
-                    if args.fractions is not None:
+                    if args.fractions is not []:
                         tmp_frac = ifilename / len(all_files)
                         if not(tmp_frac > args.fractions[0] and tmp_frac < args.fractions[1]):
                             continue
