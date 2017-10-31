@@ -331,7 +331,8 @@ if __name__ == '__main__':
     parser.add_argument('--attention', dest="attention", action="store_true")
     parser.add_argument('--residual', dest="res", action="store_true")
     parser.add_argument('--all-file', dest="allignment_file", default="Allignements-bis")
-    parser.add_argument('--fraction', dest="fraction", type=float, default=0.6)
+    parser.add_argument('--fraction', dest="fraction", type=float, default=None)
+    parser.add_argument('--fractions', nargs='+', dest="fractions", type=float, default=[])
 
     args = parser.parse_args()
 
@@ -530,8 +531,14 @@ if __name__ == '__main__':
                     if args.max_file is not None and ifilename > args.max_file:
                         continue
 
-                    if ifilename / len(all_files) > args.fraction:
-                        continue
+                    if args.fraction is not None and ifilename / len(all_files) > args.fraction:
+                        break
+
+                    if args.fractions is not None:
+                        tmp_frac = ifilename / len(all_files)
+                        if not(tmp_frac > args.fractions[0] and tmp_frac < args.fractions[1]):
+                            continue
+
                     h5 = h5py.File(filename, "r")
 
                     if args.f_size is not None:
