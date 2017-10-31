@@ -139,7 +139,7 @@ redo = 1
 # Evaluate all the sample
 list_dir = [["substituted", "sub_template", 5], ["control", "control_template", 5],
             ["control-k47211", "control-k47211_template", 5]]
-"""
+
 list_dir = [["20170908-R9.5/AB-2minBrdU", "20170908-R9.5/prout_2", 5],
             ["20170908-R9.5/AD-basecalled", "20170908-R9.5/prout", 5],
             ["20170908-R9.5/AG-basecalled", "20170908-R9.5/BTF_AG_ONT_1_FAH14273_A-select_pass", 8],
@@ -149,8 +149,8 @@ list_dir = [["20170908-R9.5/AB-2minBrdU", "20170908-R9.5/prout_2", 5],
             ["20170908-R9.5/AI-CldU/0/", "20170908-R9.5/BTF_AI_ONT_1_FAH14242_A-select_pass", 5],
             ["20170908-R9.5/AK-EdU/0/", "20170908-R9.5/BTF_AK_ONT_1_FAH14211_A-select_pass", 5],
             ["20170908-R9.5/AL-IdU/0/", "20170908-R9.5/BTF_AL_ONT_1_FAH14352_A-select_pass", 5]]
-"""
-for dire, out, w in list_dir:  # [1:4]:  # + list_dir[5:]:
+
+for dire, out, w in list_dir[3:4]:  # [1:4]:  # + list_dir[5:]:
     if redo:
         process(weights, directory="data/raw/%s/" % dire,
                 output="data/processed/{0}{1}.fasta".format(basename, out), Nbases=5, reads="",

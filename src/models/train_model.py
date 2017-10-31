@@ -314,10 +314,10 @@ if __name__ == '__main__':
 
     if args.clean:
 
-        for filename, x in zip(names, original):
+        for filename, ori in zip(names, original):
 
-            x_clean = scale_clean_two(original)
-            assert (len(x_clean[:, 0]) == len(x[:, 0]))
+            x_clean = scale_clean_two(ori)
+            #assert (len(x_clean[:, 0]) == len(x[:, 0]))
             data_x_clean.append(x_clean)
 
         data_x = data_x_clean
