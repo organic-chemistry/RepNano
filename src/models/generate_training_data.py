@@ -195,7 +195,7 @@ def get_al(se0, ref, tmpfile="./tmp.sam", check=False):
     return start, end, seq[istart:iend], match[istart:iend], success
 
 
-def realignment()
+def realignment():
     ntwk.save_weights(os.path.join(
         args.root, 'tmp.h5'))
 
@@ -351,7 +351,7 @@ if __name__ == '__main__':
     data_alignment = []
     refs = []
     names = []
-    converted = []
+    convert = []
 
     log_total_length = os.path.join(args.root, "total_length.log")
     if keras.backend.backend() != 'tensorflow':
@@ -524,20 +524,20 @@ if __name__ == '__main__':
                     if sub not in mapping:
                         raise "Invalid substitution"
 
-                total_file = glob.glob(direct + "/*")
-                for ifilename, filename in enumerat(total_file)):
+                all_files = glob.glob(direct + "/*")
+                for ifilename, filename in enumerate(all_files):
                     print(filename)
                     if args.max_file is not None and ifilename > args.max_file:
                         continue
 
-                    if ifilename / len(total_file) > args.fraction:
+                    if ifilename / len(all_files) > args.fraction:
                         continue
-                    h5=h5py.File(filename, "r")
+                    h5 = h5py.File(filename, "r")
 
                     if args.f_size is not None:
-                        events=extract_events(h5, "rf", window_size = args.f_size[iline])
+                        events = extract_events(h5, "rf", window_size=args.f_size[iline])
                     else:
-                        events=extract_events(h5, "r9.5")
+                        events = extract_events(h5, "r9.5")
 
                     if events is None:
                         print("No events in file %s" % filename)
@@ -554,36 +554,37 @@ if __name__ == '__main__':
                         continue
                     if args.test and len(data_x) > (iline + 1) * 10:
                         break
-                    events=events[1:-1]
-                    mean=events["mean"]
-                    std=events["stdv"]
-                    length=events["length"]
-                    Original=np.array(np.vstack([mean, mean * mean, std, length]).T)
-                    x=scale(Original, dtype = np.float32)
+                    events = events[1:-1]
+                    mean = events["mean"]
+                    std = events["stdv"]
+                    length = events["length"]
+                    Original = np.array(
+                        np.vstack([mean, mean * mean, std, length]).T, dtype=np.float32)
+                    x = scale(Original)
 
-                    o1=predictor.predict(np.array(x)[np.newaxis, ::, ::])
+                    o1 = predictor.predict(np.array(x)[np.newaxis, ::, ::])
                     # print("New", o1[0].shape)
 
                     # print("Old", o1[0].shape)
-                    o1=o1[0]
-                    om=np.argmax(o1, axis = -1)
-                    conv=False
+                    o1 = o1[0]
+                    om = np.argmax(o1, axis=-1)
+                    conv = False
                     if sub is not None:
-                        percent=om.count(mapping[sub]) / (om.count(mapping["T"] + om.count(mapping["B"] + 0.1)
+                        oml = om.tolist()
+                        percent = oml.count(
+                            mapping[sub]) / (oml.count(mapping["T"]) + oml.count(mapping["B"]) + 0.1)
 
                         if args.force_clean and percent < 0.3:
-                            conv=True
+                            conv = True
 
-
-
-                    alph="ACGTN"
+                    alph = "ACGTN"
                     if args.Nbases in [5, 8]:
-                        alph="ACGTTN"
+                        alph = "ACGTTN"
                     # if args.Nbases == 8:
                     #    alph = "ACGTTTTTN"
 
-                    seq="".join(map(lambda x: alph[x], om))
-                    seqs=seq.replace("N", "")
+                    seq = "".join(map(lambda x: alph[x], om))
+                    seqs = seq.replace("N", "")
                     print(seqs)
 
                     # write fasta
@@ -594,33 +595,33 @@ if __name__ == '__main__':
                     # execute bwa
 
                     if not args.ref_from_file or args.select_agree:
-                        ref="data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
-                        exex="bwa mem -x ont2d  %s  %s/tmp.fasta > %s/tmp.sam" % (
+                        ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
+                        exex = "bwa mem -x ont2d  %s  %s/tmp.fasta > %s/tmp.sam" % (
                             ref, args.root, args.root)
                         subprocess.call(exex, shell=True)
 
                         # read from bwa
 
-                        ref, succes, X1, P1=get_seq(
+                        ref, succes, X1, P1 = get_seq(
                             args.root + "/tmp.sam", ref="data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa", ret_pos=True)
 
                         if not succes:
                             continue
 
                     if args.ref_from_file or args.select_agree:
-                        k=filename.split("/")[-1]
-                        read, ch=k.split("_")[9], k.split("_")[11]
-                        succes=False
-                        Ref=[]
+                        k = filename.split("/")[-1]
+                        read, ch = k.split("_")[9], k.split("_")[11]
+                        succes = False
+                        Ref = []
                         with open(ref_file, "r") as f:
                             for line in f.readlines():
-                                sp=line.split()
+                                sp = line.split()
 
                                 if len(sp) > 1 and sp[0].startswith("@ch"):
-                                    kp=sp[0].split("/")[-1]
+                                    kp = sp[0].split("/")[-1]
 
-                                    chp=kp.split("_")[0][3:]
-                                    readp=kp.split("_")[1][4:]
+                                    chp = kp.split("_")[0][3:]
+                                    readp = kp.split("_")[1][4:]
 
                                     if read == readp and ch == chp:
                                         print(k, kp)
@@ -628,23 +629,23 @@ if __name__ == '__main__':
                                         if sp[2] == '*' or "chr" not in sp[2]:
                                             continue
 
-                                        X2=int(sp[2][3:])
-                                        P2=int(sp[3])
-                                        ref=sp[9]
+                                        X2 = int(sp[2][3:])
+                                        P2 = int(sp[3])
+                                        ref = sp[9]
                                         Ref.append(["" + ref, X2, P2])
-                                        succes=True
+                                        succes = True
                                         # break
                         if succes:
                             if not args.select_agree:
-                                ref=list(sorted(Ref, key=lambda x: len(x[0])))[-1][0]
+                                ref = list(sorted(Ref, key=lambda x: len(x[0])))[-1][0]
                                 print([len(iRef[0]) for iRef in Ref])
 
                                 print(len(ref), len(seqs))
                             else:
-                                found=False
+                                found = False
                                 for seq2, X2, P2 in Ref:
                                     if X1 == X2 and abs(P1 - P2) < 5000:
-                                        found=True
+                                        found = True
                                         print("Agreee")
                                 if not found:
                                     continue
@@ -652,7 +653,7 @@ if __name__ == '__main__':
                             continue
 
                         if abs(len(ref) - len(seqs)) > 1000:
-                            succes=False
+                            succes = False
 
                         if not succes:
                             continue
@@ -666,13 +667,13 @@ if __name__ == '__main__':
                     if len(ref) > 30000:
                         print("out", len(ref))
                         continue
-                    bio=True
-                    if not success:
+                    bio = True
+                    if not succes:
                         continue
                     if bio:
                         if np.abs(len(ref) - len(seq.replace("N", ""))) > 300:
                             continue
-                        alignments=pairwise2.align.globalxx(
+                        alignments = pairwise2.align.globalxx(
                             ref, seqs, one_alignment_only=True)
                         # print("la", len(alignments), len(alignments[0]))
                         if len(alignments) > 0 and len(alignments[0]) >= 2:
@@ -686,18 +687,18 @@ if __name__ == '__main__':
 
                             data_alignment.append(alignments[0][:2])
                             if sub is not None and not conv:
-                                ref=ref.replace("T", sub)
+                                ref = ref.replace("T", sub)
                             convert.append([conv, sub])
                             # print(ref)
                             refs.append(ref)
                             # print(len(seqs), len(ref))
                             print(len(alignments[0][0]), len(ref), len(seqs), alignments[0][2:])
                     else:
-                        start, end, seq_all, ref_all, success=get_al(seq, ref)
+                        start, end, seq_all, ref_all, success = get_al(seq, ref)
                         if not success:
                             continue
 
-                        nb=0
+                        nb = 0
                         for istart, iseq in enumerate(seq):
                             if iseq != "N":
                                 nb += 1
@@ -705,8 +706,8 @@ if __name__ == '__main__':
                             if nb == start:
                                 break
                         if end is None:
-                            end=0
-                        end=-end
+                            end = 0
+                        end = -end
                         for iend, iseq in enumerate(seq[::-1]):
                             if iseq != "N":
                                 nb += 1
@@ -719,12 +720,13 @@ if __name__ == '__main__':
                             np.array([s for s in seq[istart:iend]]) != "N"])
                         data_alignment.append([ref_all, seq_all])
                         if sub is not None:
-                            ref_all=ref_all.replace("T", sub)
+                            ref_all = ref_all.replace("T", sub)
                         # print(ref)
                         refs.append(ref_all)
 
         with open(os.path.join(args.root, "Allignements-bis"), "wb") as f:
-            cPickle.dump([data_original, converted data_x, data_index, data_alignment, refs, names], f)
+            cPickle.dump([data_original, convert, data_x,
+                          data_index, data_alignment, refs, names], f)
 
             #
             # x_clean = scale_clean_two(
