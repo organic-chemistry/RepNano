@@ -122,6 +122,13 @@ class AttentionDecoder(Recurrent):
 
         # if self.window_length is not None:
     #        self._uxpb = K.temporal_padding(self._uxpb, (self.window_length, self.window_length))
+        if K.backend() == 'tensorflow':
+            self._window_uxpb = K.extract_image_patches(K.expand(self._uxpb, 1),
+                                                        ksizes=(1, 1, 2 * self.window_length,
+                                                                K.shape(self._uxpb)[-1]),
+                                                        strides=(1, 1, 1, 1), rates=(1, 1, 1, 1),
+                                                        padding="SAME")
+            self._window_uxpb = K.squeeze(self._window_uxpb)
 
         return super(AttentionDecoder, self).call(x)
 

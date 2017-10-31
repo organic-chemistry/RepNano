@@ -117,6 +117,16 @@ basename = "results/from-improved/"
 weights = "data/cluster/training/allign-agree-85555-ctc20-attention/my_model_weights-1990.h5"
 basename = "results/attention/"
 
+
+weights = "data/cluster/training/allign-agree-85555-ctc200-residual-attention/my_model_weights-460.h5"
+basename = "results/res-attention/"
+
+weights = "data/cluster/training/allign-agree-85555-ctc200-other-bases/my_model_weights-1070.h5"
+basename = "results/other-base/"
+
+weights = "data/cluster/training/allign-agree-85555-ctc200-clean-test/my_model_weights-10.h5"
+basename = "results/clean-test/"
+
 ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
 redo = 1
 # Evaluate all the sample
@@ -132,12 +142,13 @@ list_dir = [["20170908-R9.5/AB-2minBrdU", "20170908-R9.5/prout_2", 5],
             ["20170908-R9.5/AI-CldU/0/", "20170908-R9.5/BTF_AI_ONT_1_FAH14242_A-select_pass", 5],
             ["20170908-R9.5/AK-EdU/0/", "20170908-R9.5/BTF_AK_ONT_1_FAH14211_A-select_pass", 5],
             ["20170908-R9.5/AL-IdU/0/", "20170908-R9.5/BTF_AL_ONT_1_FAH14352_A-select_pass", 5]]
+
 for dire, out, w in list_dir[1:4]:  # + list_dir[5:]:
     if redo:
         process(weights, directory="data/raw/%s/" % dire,
                 output="data/processed/{0}{1}.fasta".format(basename, out), Nbases=5, reads="",
-                filter=None, already_detected=False, Nmax=20, size=20,
-                n_output_network=1, n_input=1, chemistry="rf", window_size=w, clean=False)
+                filter=None, already_detected=False, Nmax=200, size=20,
+                n_output_network=1, n_input=1, chemistry="rf", window_size=w, clean=True)
         # filter="data/processed/%s.InDeepNano.test" % outz , already_detected=False)
 
     exex = "python src/test/get_fasta_from_train-test.py data/processed/{0}{1}.fasta all data/processed/{0}{1}_test".format(
