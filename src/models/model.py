@@ -76,7 +76,14 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
             l3 = Add()([l3, l2])
 
         if attention:
-            out_layer1 = AttentionDecoder(size, Nbases, name="out_layer1")(l3)
+            if input_length is not None:
+                inp = 2 * size
+                if res:
+                    inp = size
+                out_layer1 = AttentionDecoder(
+                    size, Nbases, name="out_layer1", input_shape=(input_length, inp))(l3)
+            else:
+                out_layer1 = AttentionDecoder(size, Nbases, name="out_layer1")(l3)
 
         else:
             out_layer1 = TimeDistributed(Dense(Nbases, activation="softmax"), name="out_layer1")(l3)

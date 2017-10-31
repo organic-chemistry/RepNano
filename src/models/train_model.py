@@ -212,20 +212,13 @@ if __name__ == '__main__':
     parser.add_argument('--deltaseq', dest='deltaseq', type=int, default=10)
     parser.add_argument('--forcelength', dest='forcelength', type=float, default=0.5)
     parser.add_argument('--oversampleb', dest='oversampleb', type=int, default=3)
-    parser.add_argument('--ref-from-file', dest="ref_from_file", type=bool, default=False)
-    parser.add_argument('--select-agree', dest="select_agree", action="store_true")
-    parser.add_argument('--max-file', dest="max_file", type=int, default=None)
     parser.add_argument('--ctc', dest='ctc', action="store_true")
-    parser.add_argument('--convert-to-t', dest='convert_to_t', type=float, default=None)
     parser.add_argument('--n-input', dest="n_input", type=int, default=1)
     parser.add_argument('--n-output', dest="n_output", type=int, default=1)
     parser.add_argument('--n-output-network', dest="n_output_network", type=int, default=1)
-    parser.add_argument('--f-size', nargs='+', dest="f_size", type=int, default=None)
-    parser.add_argument('--skip-new', dest="skip_new", action="store_true")
     parser.add_argument('--force-clean', dest="force_clean", action="store_true")
     parser.add_argument('--filter', nargs='+', dest="filter", type=str, default=[])
     parser.add_argument('--ctc-length', dest="ctc_length", type=int, default=20)
-    parser.add_argument('--normalize-window-length', dest="nwl", action="store_true")
     parser.add_argument('--lr', dest="lr", type=float, default=0.01)
     parser.add_argument('--clean', dest="clean", action="store_true")
     parser.add_argument('--attention', dest="attention", action="store_true")
@@ -258,7 +251,7 @@ if __name__ == '__main__':
 
     from .model import build_models
     ctc_length = subseq_size
-    input_length = None
+    input_length = ctc_length
     if n_output_network == 2:
         input_length = subseq_size
         ctc_length = 2 * subseq_size
@@ -347,7 +340,7 @@ if __name__ == '__main__':
 
 
 # ntwk.load_weights("./my_model_weights.h5")
-    Schedul = lrd(waiting_time=30, start_lr=0.01, min_lr=0.0001, factor=2)
+    Schedul = lrd(waiting_time=30, start_lr=args.lr, min_lr=0.0001, factor=2)
     for epoch in range(20000):
 
         # Test to see if realignment is interesting:
@@ -498,20 +491,7 @@ if __name__ == '__main__':
                         ret = [0 for b in range(n_classes)]
                         ret[base] = 1
                         return ret
-                    skip = False
-                    if args.skip_new:
-                        for l in ["L", "E", "I"]:
-                            if l in refs[s2]:
-                                skip = True
 
-                    if args.filter != []:
-                        for l in args.filter:
-                            if l in refs[s2]:
-                                skip = True
-
-                    if skip:
-                        print("Skip")
-                        continue
                     length = subseq_size
                     start = r
                     Index = data_index[s2]
@@ -646,14 +626,13 @@ if __name__ == '__main__':
                 maxin = 10 * (int(len(X_new) // 10) - 3)
                 val = 30
                 batch_size = 10
-            reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.2,
-                                                          patience=5, min_lr=0.0001)
+
             Log = keras.callbacks.CSVLogger(filename=os.path.join(
                 args.root, "training.log"), append=True)
 
             # print(len(data_x), np.mean(Length), np.max(Length))
             r = ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size] * len(Length))[:maxin], Length[:maxin]],
-                         Label[:maxin], nb_epoch=1, batch_size=batch_size, callbacks=[reduce_lr, Log],
+                         Label[:maxin], nb_epoch=1, batch_size=batch_size, callbacks=[Log],
                          validation_data=([X_new[maxin:maxin + val],
                                            Label[maxin:maxin + val],
                                            np.array([subseq_size] *

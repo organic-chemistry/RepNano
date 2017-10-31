@@ -1,11 +1,11 @@
-# import tensorflow as tf
+import tensorflow as tf
 # Code from https://github.com/datalogue/keras-attention/edit/master/models/custom_recurrents.py
 from keras import backend as K
 from keras import regularizers, constraints, initializers, activations
 from keras.layers.recurrent import Recurrent, _time_distributed_dense
 from keras.engine import InputSpec
 
-# tfPrint = lambda d, T: tf.Print(input_=T, data=[T, tf.shape(T)], message=d)
+tfPrint = lambda d, T: tf.Print(input_=T, data=[T, tf.shape(T)], message=d)
 
 
 class AttentionDecoder(Recurrent):
@@ -123,14 +123,21 @@ class AttentionDecoder(Recurrent):
         # if self.window_length is not None:
     #        self._uxpb = K.temporal_padding(self._uxpb, (self.window_length, self.window_length))
         if K.backend() == 'tensorflow':
-            self._window_uxpb = K.extract_image_patches(K.expand(self._uxpb, 1),
-                                                        ksizes=(1, 1, 2 * self.window_length,
-                                                                K.shape(self._uxpb)[-1]),
-                                                        strides=(1, 1, 1, 1), rates=(1, 1, 1, 1),
-                                                        padding="SAME")
-            self._window_uxpb = K.squeeze(self._window_uxpb)
 
-        return super(AttentionDecoder, self).call(x)
+            #self._uxpb = tfPrint("_uxpb", self._uxpb)
+
+            # equivalent to K.expand_dims(self.x_seq) but it does not work for training
+            xr = K.reshape(self.x_seq, (-1, 1, self.timesteps, self.input_dim))
+
+            self._window_uxpb = tf.extract_image_patches(xr,
+                                                         ksizes=(
+                                                             1, 1, 2 * self.window_length + 1, 1),
+                                                         strides=(1, 1, 1, 1), rates=(1, 1, 1, 1),
+                                                         padding="SAME")
+            self._window_uxpb = K.squeeze(self._window_uxpb, 1)
+            #self._window_uxpb = tfPrint("_window_uxpb", self._window_uxpb)
+
+        return super(AttentionDecoder, self).call(self._window_uxpb)
 
     def get_initial_state(self, inputs):
 
@@ -139,32 +146,34 @@ class AttentionDecoder(Recurrent):
     def step(self, x, states):
 
         pos = states[0]
-        self.window_length = 10
         # this relates how much other timesteps contributed to this one.
+        wl = 2 * self.window_length + 1
+        x = K.reshape(x, (-1, wl, self.input_dim))
+        #x = tfPrint("_x", x)
+        xpb = _time_distributed_dense(x, self.U_a, b=self.b_a,
+                                      input_dim=self.input_dim,
+                                      timesteps=wl,
+                                      output_dim=self.units)
+
+        # Exponential window:
+        """
         exp_win = K.exp(- (K.arange(0, K.shape(self._uxpb)
                                     [1], 1, dtype="float32") - pos)**2 / self.window_length)
 
         exp_win = K.expand_dims(exp_win, 0)
         exp_win = K.expand_dims(exp_win, -1)
-
-        #exp_win = K.tile(exp_win, K.shape(self._uxpb)[0] * K.shape(self._uxpb)[2])
-        #exp_win = K.reshape(exp_win, K.shape(self._uxpb))
         """
-        exp_win = K.expand_dims(exp_win, 0)
-        exp_win = K.repeat_elements(exp_win, K.shape(self._uxpb)[0], 0)
-        exp_win = K.expand_dims(exp_win)
-        exp_win = K.repeat_elements(exp_win, K.shape(self._uxpb)[2], 2)"""
 
-        #exp_win = K.ones_like(self._uxpb)
-        et = K.dot(activations.tanh(self._uxpb * exp_win),
+        # exp_win = K.ones_like(self._uxpb)
+        et = K.dot(activations.tanh(xpb),
                    K.expand_dims(self.V_a))
         at = K.exp(et)
         at_sum = K.sum(at, axis=1)
-        at_sum_repeated = K.repeat(at_sum, K.shape(self._uxpb)[1])
+        at_sum_repeated = K.repeat(at_sum, wl)
         at /= at_sum_repeated  # vector of size (batchsize, timesteps, 1)
 
         # calculate the context vector
-        context = K.squeeze(K.batch_dot(at, self.x_seq, axes=1), axis=1)
+        context = K.squeeze(K.batch_dot(at, x, axes=1), axis=1)
 
         yt = activations.softmax(K.dot(context, self.C_o) + self.b_o)
 
