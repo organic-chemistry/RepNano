@@ -263,10 +263,25 @@ if __name__ == '__main__':
         input_length = subseq_size
         ctc_length = 2 * subseq_size
 
+    n_feat = 4
+    if args.clean:
+        n_feat = 3
+
     predictor, ntwk = build_models(args.size, nbase=args.Nbases - 4,
                                    ctc_length=ctc_length,
                                    input_length=input_length, n_output=n_output_network,
-                                   lr=args.lr, res=args.res, attention=args.attention)
+                                   lr=args.lr, res=args.res, attention=args.attention, n_feat=n_feat)
+
+    if args.pre_trained_weight is not None:
+
+        try:
+            try:
+                ntwk.load_weights(args.pre_trained_weight)
+            except:
+                print("Only predictor loaded (normal if no ctc)")
+            predictor.load_weights(args.pre_trained_weight)
+        except:
+            print("Learning from scratch")
 
     os.makedirs(args.root, exist_ok=True)
 
@@ -299,17 +314,6 @@ if __name__ == '__main__':
         with open(allignment_file, "rb") as f:
             data_x, data_y, data_y2, refs, names = cPickle.load(f)
 
-    if args.pre_trained_weight is not None:
-
-        try:
-            try:
-                ntwk.load_weights(args.pre_trained_weight)
-            except:
-                print("Only predictor loaded (normal if no ctc)")
-            predictor.load_weights(args.pre_trained_weight)
-        except:
-            print("Learning from scratch")
-
     print("done", sum(len(x) for x in refs))
     sys.stdout.flush()
     # print(len(refs[0]),len(data_x[0]),len(data_y[0]))
@@ -324,18 +328,6 @@ if __name__ == '__main__':
             data_x_clean.append(x_clean)
 
         data_x = data_x_clean
-
-        predictor, ntwk = build_models(args.size, nbase=args.Nbases - 4,
-                                       ctc_length=ctc_length, input_length=input_length,
-                                       n_output=n_output_network, n_feat=3, recurrent_dropout=0.0, lr=args.lr)
-        try:
-            try:
-                ntwk.load_weights(args.pre_trained_weight)
-            except:
-                print("Only predictor loaded (normal if no ctc)")
-            predictor.load_weights(args.pre_trained_weight)
-        except:
-            print("Learning from scratch")
 
     s_arr = []
     p_arr = []
