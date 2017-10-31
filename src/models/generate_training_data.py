@@ -359,12 +359,7 @@ if __name__ == '__main__':
         print("Must use tensorflow to train")
         exit()
 
-    if args.Nbases == 4:
-        mapping = {"A": 0, "C": 1, "G": 2, "T": 3, "N": 4}  # Modif
-    elif args.Nbases == 5:
-        mapping = {"A": 0, "C": 1, "G": 2, "T": 3, "B": 4, "N": 5}  # Modif
-    elif args.Nbases == 8:
-        mapping = {"A": 0, "C": 1, "G": 2, "T": 3, "B": 4, "L": 5, "E": 6, "I": 7, "N": 8}  # Modif
+    mapping = {"A": 0, "C": 1, "G": 2, "T": 3, "B": 4, "L": 5, "E": 6, "I": 7, "N": 8}  # Modif
 
     n_classes = len(mapping.keys())
 
