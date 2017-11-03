@@ -29,7 +29,7 @@ defs = {
     'rf': {
         'ed_params': {
             'window_lengths': [4, 6], 'thresholds': [1.4, 1.1],  # [1.4, 1.1],
-            'peak_height': 0.8  # 1.2
+            'peak_height': 1.2  # 1.2
         }
     }
 
