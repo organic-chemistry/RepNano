@@ -333,6 +333,7 @@ if __name__ == '__main__':
     parser.add_argument('--all-file', dest="allignment_file", default="Allignements-bis")
     parser.add_argument('--fraction', dest="fraction", type=float, default=None)
     parser.add_argument('--fractions', nargs='+', dest="fractions", type=float, default=[])
+    parser.add_argument('--include_short', dest="include_short", action="store_true")
 
     args = parser.parse_args()
 
@@ -546,7 +547,7 @@ if __name__ == '__main__':
                         h5.close()
                         continue
 
-                    if len(events) < 300:
+                    if not args.include_short and len(events) < 300:
                         print("Read %s too short, not basecalling" % filename)
                         h5.close()
                         continue

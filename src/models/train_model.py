@@ -631,8 +631,10 @@ if __name__ == '__main__':
                 args.root, "training.log"), append=True)
 
             # print(len(data_x), np.mean(Length), np.max(Length))
+            reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.2,
+                                                          patience=5, min_lr=0.001)  # To record lr
             r = ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size] * len(Length))[:maxin], Length[:maxin]],
-                         Label[:maxin], nb_epoch=1, batch_size=batch_size, callbacks=[Log],
+                         Label[:maxin], nb_epoch=1, batch_size=batch_size, callbacks=[Log, reduce_lr],
                          validation_data=([X_new[maxin:maxin + val],
                                            Label[maxin:maxin + val],
                                            np.array([subseq_size] *

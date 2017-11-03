@@ -28,8 +28,8 @@ defs = {
     },
     'rf': {
         'ed_params': {
-            'window_lengths': [4, 6], 'thresholds': [1.4, 1.1],
-            'peak_height': 1.2
+            'window_lengths': [4, 6], 'thresholds': [1.4, 1.1],  # [1.4, 1.1],
+            'peak_height': 0.8  # 1.2
         }
     }
 
@@ -224,7 +224,7 @@ def peak_detect(short_data, long_data, short_window, long_window, short_threshol
 
     return peaks
 
-
+"""
 def generate_events(ss1, ss2, peaks, sample_rate):
     peaks.append(len(ss1))
     events = np.empty(len(peaks), dtype=[('start', float), ('length', float),
@@ -239,11 +239,37 @@ def generate_events(ss1, ss2, peaks, sample_rate):
         m = (ss1[e - 1] - s1) / l
         events[i]["mean"] = m
         v = max(0.0, (ss2[e - 1] - s2) / l - m * m)
+
         events[i]["stdv"] = np.sqrt(v)
         s = e
         s1 = ss1[e - 1]
         s2 = ss2[e - 2]
+    print("Generate")
+    events["start"] /= sample_rate
+    events["length"] /= sample_rate
 
+    return events
+"""
+
+
+def generate_events(ss1, ss2, peaks, sample_rate, raw):
+    peaks.append(len(ss1))
+    events = np.empty(len(peaks), dtype=[('start', float), ('length', float),
+                                         ('mean', float), ('stdv', float)])
+    s = 0
+
+    for i, e in enumerate(peaks):
+        events[i]["start"] = s
+        l = e - s
+        events[i]["length"] = l
+
+        m = np.mean(raw[s:s + l])
+        events[i]["mean"] = m
+
+        events[i]["stdv"] = np.sqrt(np.mean((raw[s:s + l] - m)**2))
+        #print(l, sample_rate)
+        s = e
+    print("Generate")
     events["start"] /= sample_rate
     events["length"] /= sample_rate
 
@@ -270,6 +296,6 @@ def event_detect(raw_data, sample_rate, window_lengths=[16, 40], thresholds=[8.0
 
     peaks = peak_detect(tstats[0], tstats[1], window_lengths[0], window_lengths[1], thresholds[0],
                         thresholds[1], peak_height)
-    events = generate_events(sums, sumsqs, peaks, sample_rate)
+    events = generate_events(sums, sumsqs, peaks, sample_rate, raw_data)
 
     return events
