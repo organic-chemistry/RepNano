@@ -8,8 +8,8 @@ from keras import backend as K
 from keras.layers.core import Lambda, Reshape
 from keras.optimizers import SGD, Adadelta
 import keras
-from .nAttention import AttentionDecoder
-from .attentionBis import Attention
+from .attention import AttentionDecoder
+#from .attentionBis import Attention
 
 
 def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,

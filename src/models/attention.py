@@ -5,7 +5,7 @@ from keras import regularizers, constraints, initializers, activations
 from keras.layers.recurrent import Recurrent, _time_distributed_dense
 from keras.engine import InputSpec
 
-#tfPrint = lambda d, T: tf.Print(input_=T, data=[T, tf.shape(T)], message=d)
+tfPrint = lambda d, T: tf.Print(input_=T, data=[T, tf.shape(T)], message=d)
 
 
 class AttentionDecoder(Recurrent):
@@ -208,7 +208,7 @@ class AttentionDecoder(Recurrent):
         # apply the a dense layer over the time dimension of the sequence
         # do it here because it doesn't depend on any previous steps
         # thefore we can save computation time:
-        if self.window_lengths is None:
+        if self.window_length is None:
             self._uxpb = _time_distributed_dense(self.x_seq, self.U_a, b=self.b_a,
                                                  input_dim=self.input_dim,
                                                  timesteps=self.timesteps,
@@ -238,6 +238,9 @@ class AttentionDecoder(Recurrent):
         #print('inputs shape:', inputs.get_shape())
 
         # apply the matrix on the first time step to get the initial s0.
+        if self.window_length is not None:
+            inputs = inputs[:, :, self.window_length *
+                            self.input_dim:(self.window_length + 1) * self.input_dim]
         s0 = activations.tanh(K.dot(inputs[:, 0], self.W_s))
 
         # from keras.layers.recurrent to initialize a vector of (batchsize,
@@ -251,7 +254,7 @@ class AttentionDecoder(Recurrent):
 
     def step(self, x, states):
 
-        ytm, stm, pos = states
+        ytm, stm = states
 
         # repeat the hidden state to the length of the sequence
         #pos = tfPrint("pos", pos)
@@ -336,9 +339,9 @@ class AttentionDecoder(Recurrent):
             + self.b_o)
 
         if self.return_probabilities:
-            return at, [yt, st, pos]
+            return at, [yt, st]
         else:
-            return yt, [yt, st, pos]
+            return yt, [yt, st]
 
     def compute_output_shape(self, input_shape):
         """

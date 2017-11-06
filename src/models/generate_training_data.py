@@ -561,8 +561,8 @@ if __name__ == '__main__':
 
                     events = events[1:-1]
 
-                    if len(events) > 50000:
-                        events = events[:50000]
+                    if len(events) > 40000:
+                        events = events[:40000]
                     mean = events["mean"]
                     std = events["stdv"]
                     length = events["length"]
