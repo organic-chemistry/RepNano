@@ -676,9 +676,9 @@ if __name__ == '__main__':
                     if not succes:
                         continue
                     if bio:
-                        if np.abs(len(ref) - len(seq.replace("N", "")) / len(ref) > 0.15:
+                        if np.abs(len(ref) - len(seq.replace("N", ""))) / len(ref) > 0.15:
                             continue
-                        alignments=pairwise2.align.globalxx(
+                        alignments = pairwise2.align.globalxx(
                             ref, seqs, one_alignment_only=True)
                         # print("la", len(alignments), len(alignments[0]))
                         if len(alignments) > 0 and len(alignments[0]) >= 2:
@@ -692,18 +692,18 @@ if __name__ == '__main__':
 
                             data_alignment.append(alignments[0][:2])
                             if sub is not None and not conv:
-                                ref=ref.replace("T", sub)
+                                ref = ref.replace("T", sub)
                             convert.append([conv, sub, percent])
                             # print(ref)
                             refs.append(ref)
                             # print(len(seqs), len(ref))
                             print(len(alignments[0][0]), len(ref), len(seqs), alignments[0][2:])
                     else:
-                        start, end, seq_all, ref_all, success=get_al(seq, ref)
+                        start, end, seq_all, ref_all, success = get_al(seq, ref)
                         if not success:
                             continue
 
-                        nb=0
+                        nb = 0
                         for istart, iseq in enumerate(seq):
                             if iseq != "N":
                                 nb += 1
@@ -711,8 +711,8 @@ if __name__ == '__main__':
                             if nb == start:
                                 break
                         if end is None:
-                            end=0
-                        end=-end
+                            end = 0
+                        end = -end
                         for iend, iseq in enumerate(seq[::-1]):
                             if iseq != "N":
                                 nb += 1
@@ -725,7 +725,7 @@ if __name__ == '__main__':
                             np.array([s for s in seq[istart:iend]]) != "N"])
                         data_alignment.append([ref_all, seq_all])
                         if sub is not None:
-                            ref_all=ref_all.replace("T", sub)
+                            ref_all = ref_all.replace("T", sub)
                         # print(ref)
                         refs.append(ref_all)
 
