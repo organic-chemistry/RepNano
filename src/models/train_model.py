@@ -11,6 +11,7 @@ import _pickle as cPickle
 import copy
 from ..features.helpers import scale_clean, scale_clean_two
 from .helper import lrd
+import csv
 import keras.backend as K
 
 
@@ -317,7 +318,7 @@ if __name__ == '__main__':
         for filename, ori in zip(names, original):
 
             x_clean = scale_clean_two(ori)
-            #assert (len(x_clean[:, 0]) == len(x[:, 0]))
+            # assert (len(x_clean[:, 0]) == len(x[:, 0]))
             data_x_clean.append(x_clean)
 
         data_x = data_x_clean
@@ -626,27 +627,34 @@ if __name__ == '__main__':
                 maxin = 10 * (int(len(X_new) // 10) - 3)
                 val = 30
                 batch_size = 10
-
-            Log = keras.callbacks.CSVLogger(filename=os.path.join(
-                args.root, "training.log"), append=True)
-
-            # print(len(data_x), np.mean(Length), np.max(Length))
-            reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.2,
-                                                          patience=5, min_lr=0.001)  # To record lr
+ # To record lr
             r = ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size] * len(Length))[:maxin], Length[:maxin]],
-                         Label[:maxin], nb_epoch=1, batch_size=batch_size, callbacks=[Log, reduce_lr],
+                         Label[:maxin], nb_epoch=1, batch_size=batch_size,
                          validation_data=([X_new[maxin:maxin + val],
                                            Label[maxin:maxin + val],
                                            np.array([subseq_size] *
                                                     len(Length))[maxin:maxin + val],
                                            Length[maxin:maxin + val]],
                                           Label[maxin:maxin + val]))
-            #from IPython import embed
-            # embed()
-            # print(r)
+            csv_keys = ["epoch", "loss", "val_loss"]
+
             lr = Schedul.set_new_lr(r.history["loss"][0])
             K.set_value(ntwk.optimizer.lr, lr)
             print(lr)
+
+            if epoch == 0:
+                with open(os.path.join(args.root, "training.log"), "w") as csv_file:
+                    writer = csv.writer(csv_file)
+                    #from IPython import embed
+                    # embed()
+                    # print(r)
+                    writer.writerow(csv_keys + ["lr"])
+                    writer.writerow([epoch] + [r.history[k][-1] for k in csv_keys[1:]] + [lr])
+            else:
+                with open(os.path.join(args.root, "training.log"), "a") as csv_file:
+                    writer = csv.writer(csv_file)
+                    #writer.writerow(k + ["lr"])
+                    writer.writerow([epoch] + [r.history[k][-1] for k in csv_keys[1:]] + [lr])
             if Schedul.stop:
                 exit()
 

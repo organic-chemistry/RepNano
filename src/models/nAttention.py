@@ -127,7 +127,8 @@ class AttentionDecoder(Recurrent):
             #self._uxpb = tfPrint("_uxpb", self._uxpb)
 
             # equivalent to K.expand_dims(self.x_seq) but it does not work for training
-            xr = K.reshape(self.x_seq, (-1, 1, self.timesteps, self.input_dim))
+            #xr = K.reshape(self.x_seq, (-1, 1, self.timesteps, self.input_dim))
+            xr = K.expand_dims(self.x_seq, 1)
 
             self._window_uxpb = tf.extract_image_patches(xr,
                                                          ksizes=(

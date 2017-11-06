@@ -90,7 +90,9 @@ def scale_clean_two(X, normalise_window=True):
 
     ret = np.array(X)
 
-    print("std", np.mean(ret[:, 2]))
+    print("std", np.std(ret[:, 0]), np.std(ret[:, 2]), np.std(ret[:, 3]))
+    print("mean", np.mean(ret[:, 0]), np.mean(ret[:, 2]), np.mean(ret[:, 3]))
+
     nw = 100
     #print(pd.rolling_mean(X[:, 0], nw))
 

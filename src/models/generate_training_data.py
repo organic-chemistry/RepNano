@@ -572,6 +572,7 @@ if __name__ == '__main__':
                     o1 = o1[0]
                     om = np.argmax(o1, axis=-1)
                     conv = False
+                    percent = None
                     if sub is not None:
                         oml = om.tolist()
                         percent = oml.count(
@@ -691,7 +692,7 @@ if __name__ == '__main__':
                             data_alignment.append(alignments[0][:2])
                             if sub is not None and not conv:
                                 ref = ref.replace("T", sub)
-                            convert.append([conv, sub])
+                            convert.append([conv, sub, percent])
                             # print(ref)
                             refs.append(ref)
                             # print(len(seqs), len(ref))
