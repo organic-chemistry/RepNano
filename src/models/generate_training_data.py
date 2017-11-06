@@ -669,9 +669,9 @@ if __name__ == '__main__':
                             continue
                         if len(data_x) > 20 * idirect:
                             break
-                    if len(ref) > 30000:
-                        print("out", len(ref))
-                        continue
+                    # if len(ref) > 30000:
+                    #    print("out", len(ref))
+                    #    continue
                     bio = True
                     if not succes:
                         continue
