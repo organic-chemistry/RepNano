@@ -117,10 +117,10 @@ class AttentionDecoder(Recurrent):
         # apply the a dense layer over the time dimension of the sequence
         # do it here because it doesn't depend on any previous steps
         # thefore we can save computation time:
-        self._uxpb = _time_distributed_dense(self.x_seq, self.U_a, b=self.b_a,
-                                             input_dim=self.input_dim,
-                                             timesteps=self.timesteps,
-                                             output_dim=self.units)
+        # self._uxpb = _time_distributed_dense(self.x_seq, self.U_a, b=self.b_a,
+        #                                     input_dim=self.input_dim,
+        #                                     timesteps=self.timesteps,
+        #                                     output_dim=self.units)
 
         # if self.window_length is not None:
     #        self._uxpb = K.temporal_padding(self._uxpb, (self.window_length, self.window_length))

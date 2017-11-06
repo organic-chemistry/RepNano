@@ -558,7 +558,11 @@ if __name__ == '__main__':
                         continue
                     if args.test and len(data_x) > (iline + 1) * 10:
                         break
+
                     events = events[1:-1]
+
+                    if len(events) > 50000:
+                        events = events[:50000]
                     mean = events["mean"]
                     std = events["stdv"]
                     length = events["length"]

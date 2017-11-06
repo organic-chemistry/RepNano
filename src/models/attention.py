@@ -1,4 +1,4 @@
-#import tensorflow as tf
+import tensorflow as tf
 # Code from https://github.com/datalogue/keras-attention/edit/master/models/custom_recurrents.py
 from keras import backend as K
 from keras import regularizers, constraints, initializers, activations
@@ -22,7 +22,8 @@ class AttentionDecoder(Recurrent):
                  activity_regularizer=None,
                  kernel_constraint=None,
                  bias_constraint=None,
-                 **kwargs):
+                 to_apply=False,
+                 ** kwargs):
         """
         Implements an AttentionDecoder that takes in a sequence encoded by an
         encoder and outputs the decoded states
@@ -50,6 +51,7 @@ class AttentionDecoder(Recurrent):
         self.kernel_constraint = constraints.get(kernel_constraint)
         self.recurrent_constraint = constraints.get(kernel_constraint)
         self.bias_constraint = constraints.get(bias_constraint)
+        self.apply = to_apply
 
         self.window_length = 5
 
@@ -68,7 +70,7 @@ class AttentionDecoder(Recurrent):
         if self.stateful:
             super(AttentionDecoder, self).reset_states()
 
-        self.states = [None, None, 0]  # y, s
+        self.states = [None, None]  # y, s
 
         """
             Matrices for creating the context vector
@@ -206,15 +208,31 @@ class AttentionDecoder(Recurrent):
         # apply the a dense layer over the time dimension of the sequence
         # do it here because it doesn't depend on any previous steps
         # thefore we can save computation time:
-        self._uxpb = _time_distributed_dense(self.x_seq, self.U_a, b=self.b_a,
-                                             input_dim=self.input_dim,
-                                             timesteps=self.timesteps,
-                                             output_dim=self.units)
+        if self.window_lengths is None:
+            self._uxpb = _time_distributed_dense(self.x_seq, self.U_a, b=self.b_a,
+                                                 input_dim=self.input_dim,
+                                                 timesteps=self.timesteps,
+                                                 output_dim=self.units)
+            return super(AttentionDecoder, self).call(x)
 
-        if self.window_length is not None:
-            self._uxpb = K.temporal_padding(self._uxpb, (self.window_length, self.window_length))
+        else:
 
-        return super(AttentionDecoder, self).call(x)
+            if K.backend() == 'tensorflow':
+
+                if self.apply:
+                    xr = K.expand_dims(self.x_seq, 1)
+                else:
+                    xr = K.reshape(self.x_seq, (-1, 1, self.timesteps, self.input_dim))
+
+                self._window_uxpb = tf.extract_image_patches(xr,
+                                                             ksizes=(
+                                                                 1, 1, 2 * self.window_length + 1, 1),
+                                                             strides=(1, 1, 1, 1), rates=(1, 1, 1, 1),
+                                                             padding="SAME")
+                self._window_uxpb = K.squeeze(self._window_uxpb, 1)
+                #self._window_uxpb = tfPrint("_window_uxpb", self._window_uxpb)
+
+                return super(AttentionDecoder, self).call(self._window_uxpb)
 
     def get_initial_state(self, inputs):
         #print('inputs shape:', inputs.get_shape())
@@ -229,7 +247,7 @@ class AttentionDecoder(Recurrent):
         y0 = K.expand_dims(y0)  # (samples, 1)
         y0 = K.tile(y0, [1, self.output_dim])
 
-        return [y0, s0, 0]
+        return [y0, s0]
 
     def step(self, x, states):
 
@@ -237,18 +255,23 @@ class AttentionDecoder(Recurrent):
 
         # repeat the hidden state to the length of the sequence
         #pos = tfPrint("pos", pos)
-        stm = stm
         #stm = tfPrint("stm", stm)
 
         #self.window_length = None
-        """
+
         if self.window_length is not None:
-            pos = K.cast(pos, "int32")
+            # Preprocess
             wl = 2 * self.window_length + 1
-            _stm = K.repeat(stm, wl)
+            x = K.reshape(x, (-1, wl, self.input_dim))
+            xpb = _time_distributed_dense(x, self.U_a, b=self.b_a,
+                                          input_dim=self.input_dim,
+                                          timesteps=wl,
+                                          output_dim=self.units)
+
+            _stm = K.repeat(stm, K.shape(xpb)[1])
             _Wxstm = K.dot(_stm, self.W_a)
-            crop = self._uxpb[:, pos:pos + wl, :]
-            et = K.dot(activations.tanh(_Wxstm + crop),
+
+            et = K.dot(activations.tanh(_Wxstm + xpb),
                        K.expand_dims(self.V_a))
             at = K.exp(et)
             at_sum = K.sum(at, axis=1)
@@ -256,9 +279,8 @@ class AttentionDecoder(Recurrent):
             at /= at_sum_repeated  # vector of size (batchsize, timesteps, 1)
 
             # calculate the context vector
-            context = K.squeeze(K.batch_dot(at, self.x_seq[:, pos:pos + wl, :], axes=1), axis=1)
-            pos += 1
-        """
+            context = K.squeeze(K.batch_dot(at, x, axes=1), axis=1)
+
         if self.window_length is None:
             _stm = K.repeat(stm, K.shape(self._uxpb)[1])
             #_stm = K.expand_dims(stm, 1)
