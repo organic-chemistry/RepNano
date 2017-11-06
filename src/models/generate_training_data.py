@@ -482,7 +482,7 @@ if __name__ == '__main__':
         predictor, ntwk = build_models(args.size, nbase=args.Nbases - 4,
                                        ctc_length=ctc_length,
                                        input_length=input_length, n_output=n_output_network,
-                                       lr=args.lr, res=args.res, attention=args.attention)
+                                       res=args.res, attention=args.attention)
 
         ntwk.load_weights(args.pre_trained_weight)
         predictor.load_weights(args.pre_trained_weight)
