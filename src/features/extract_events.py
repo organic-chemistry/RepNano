@@ -130,11 +130,12 @@ def get_tstat(s, s2, wl):
     return np.concatenate([np.zeros(wl), np.abs(delta / np.sqrt(deltav)), np.zeros(wl - 1)])
 
 
-def extract_events(h5, chem, window_size=None):
+def extract_events(h5, chem, window_size=None, old=True):
     # print("ed")
     raw, sl = get_raw(h5)
 
     param = defs[chem]["ed_params"]
+    param["old"] = old
     if window_size is not None:
         param['window_lengths'] = [window_size - 1, window_size + 1]
         print("Modif length", window_size)
@@ -224,8 +225,8 @@ def peak_detect(short_data, long_data, short_window, long_window, short_threshol
 
     return peaks
 
-"""
-def generate_events(ss1, ss2, peaks, sample_rate):
+
+def generate_events_old(ss1, ss2, peaks, sample_rate):
     peaks.append(len(ss1))
     events = np.empty(len(peaks), dtype=[('start', float), ('length', float),
                                          ('mean', float), ('stdv', float)])
@@ -249,10 +250,10 @@ def generate_events(ss1, ss2, peaks, sample_rate):
     events["length"] /= sample_rate
 
     return events
-"""
 
 
 def generate_events(ss1, ss2, peaks, sample_rate, raw):
+    print("New")
     peaks.append(len(ss1))
     events = np.empty(len(peaks), dtype=[('start', float), ('length', float),
                                          ('mean', float), ('stdv', float)])
@@ -276,7 +277,8 @@ def generate_events(ss1, ss2, peaks, sample_rate, raw):
     return events
 
 
-def event_detect(raw_data, sample_rate, window_lengths=[16, 40], thresholds=[8.0, 4.0], peak_height=1.0):
+def event_detect(raw_data, sample_rate,
+                 window_lengths=[16, 40], thresholds=[8.0, 4.0], peak_height=1.0, old=True):
     """Basic, standard even detection using two t-tests
 
     :param raw_data: ADC values
@@ -296,6 +298,9 @@ def event_detect(raw_data, sample_rate, window_lengths=[16, 40], thresholds=[8.0
 
     peaks = peak_detect(tstats[0], tstats[1], window_lengths[0], window_lengths[1], thresholds[0],
                         thresholds[1], peak_height)
-    events = generate_events(sums, sumsqs, peaks, sample_rate, raw_data)
+    if old:
+        events = generate_events_old(sums, sumsqs, peaks, sample_rate)
+    else:
+        events = generate_events(sums, sumsqs, peaks, sample_rate, raw_data)
 
     return events

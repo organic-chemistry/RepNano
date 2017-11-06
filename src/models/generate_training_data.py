@@ -326,14 +326,14 @@ if __name__ == '__main__':
     parser.add_argument('--filter', nargs='+', dest="filter", type=str, default=[])
     parser.add_argument('--ctc-length', dest="ctc_length", type=int, default=20)
     parser.add_argument('--normalize-window-length', dest="nwl", action="store_true")
-    parser.add_argument('--lr', dest="lr", type=float, default=0.01)
     parser.add_argument('--clean', dest="clean", action="store_true")
     parser.add_argument('--attention', dest="attention", action="store_true")
     parser.add_argument('--residual', dest="res", action="store_true")
     parser.add_argument('--all-file', dest="allignment_file", default="Allignements-bis")
     parser.add_argument('--fraction', dest="fraction", type=float, default=None)
     parser.add_argument('--fractions', nargs='+', dest="fractions", type=float, default=[])
-    parser.add_argument('--include_short', dest="include_short", action="store_true")
+    parser.add_argument('--include-short', dest="include_short", action="store_true")
+    parser.add_argument('--old', dest="old", action="store_true")
 
     args = parser.parse_args()
 
@@ -538,7 +538,8 @@ if __name__ == '__main__':
                     h5 = h5py.File(filename, "r")
 
                     if args.f_size is not None:
-                        events = extract_events(h5, "rf", window_size=args.f_size[iline])
+                        events = extract_events(h5, "rf", window_size=args.f_size[
+                                                iline], old=args.old)
                     else:
                         events = extract_events(h5, "r9.5")
 
@@ -576,9 +577,9 @@ if __name__ == '__main__':
                     if sub is not None:
                         oml = om.tolist()
                         percent = oml.count(
-                            mapping[sub]) / (oml.count(mapping["T"]) + oml.count(mapping["B"]) + 0.1)
+                            mapping[sub]) / (oml.count(mapping["T"]) + oml.count(mapping["B"]) + 0.05)
 
-                        if args.force_clean and percent < 0.3:
+                        if args.force_clean and percent < 0.1:
                             conv = True
 
                     alph = "ACGTN"

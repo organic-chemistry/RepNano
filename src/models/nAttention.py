@@ -22,7 +22,8 @@ class AttentionDecoder(Recurrent):
                  activity_regularizer=None,
                  kernel_constraint=None,
                  bias_constraint=None,
-                 **kwargs):
+                 to_apply=False,
+                 ** kwargs):
         """
         Implements an AttentionDecoder that takes in a sequence encoded by an
         encoder and outputs the decoded states
@@ -52,6 +53,7 @@ class AttentionDecoder(Recurrent):
         self.bias_constraint = constraints.get(bias_constraint)
 
         self.window_length = 5
+        self.apply = to_apply
 
         super(AttentionDecoder, self).__init__(**kwargs)
         self.name = name
@@ -127,8 +129,11 @@ class AttentionDecoder(Recurrent):
             #self._uxpb = tfPrint("_uxpb", self._uxpb)
 
             # equivalent to K.expand_dims(self.x_seq) but it does not work for training
-            xr = K.reshape(self.x_seq, (-1, 1, self.timesteps, self.input_dim))
-            #xr = K.expand_dims(self.x_seq, 1)
+
+            if self.apply:
+                xr = K.expand_dims(self.x_seq, 1)
+            else:
+                xr = K.reshape(self.x_seq, (-1, 1, self.timesteps, self.input_dim))
 
             self._window_uxpb = tf.extract_image_patches(xr,
                                                          ksizes=(

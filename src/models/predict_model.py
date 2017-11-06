@@ -7,7 +7,7 @@ from ..features.extract_events import extract_events, scale, scale_clean
 from ..features.helpers import scale_clean_two
 
 
-def get_events(h5, already_detected=True, chemistry="r9.5", window_size=None):
+def get_events(h5, already_detected=True, chemistry="r9.5", window_size=None, old=True):
     if already_detected:
         try:
             e = h5["Analyses/Basecall_RNN_1D_000/BaseCalled_template/Events"]
@@ -20,15 +20,15 @@ def get_events(h5, already_detected=True, chemistry="r9.5", window_size=None):
         except:
             pass
     else:
-        return extract_events(h5, chemistry, window_size)
+        return extract_events(h5, chemistry, window_size, old=old)
 
 
 def basecall_one_file(filename, output_file, ntwk, alph, already_detected,
-                      n_input=1, filter_size=None, chemistry="r9.5", window_size=None, clean=False):
+                      n_input=1, filter_size=None, chemistry="r9.5", window_size=None, clean=False, old=True):
     # try:
     assert(os.path.exists(filename)), "File %s does no exists" % filename
     h5 = h5py.File(filename, "r")
-    events = get_events(h5, already_detected, chemistry, window_size)
+    events = get_events(h5, already_detected, chemistry, window_size, old=old)
     if events is None:
         print("No events in file %s" % filename)
         h5.close()
@@ -103,7 +103,7 @@ def basecall_one_file(filename, output_file, ntwk, alph, already_detected,
 
 def process(weights, Nbases, output, directory, reads=[], filter="",
             already_detected=True, Nmax=None, size=20, n_output_network=1, n_input=1, filter_size=None,
-            chemistry="r9.5", window_size=None, clean=False):
+            chemistry="r9.5", window_size=None, clean=False, old=True):
     assert len(reads) != 0 or len(directory) != 0, "Nothing to basecall"
 
     alph = "ACGTN"
@@ -165,7 +165,7 @@ def process(weights, Nbases, output, directory, reads=[], filter="",
             print("Processing read %s" % read)
             basecall_one_file(read, fo, ntwk, alph, already_detected,
                               n_input=n_input, filter_size=filter_size,
-                              chemistry=chemistry, window_size=window_size, clean=clean)
+                              chemistry=chemistry, window_size=window_size, clean=clean, old=old)
 
         fo.close()
 
@@ -185,10 +185,11 @@ if __name__ == "__main__":
     parser.add_argument('--filter-size', dest="filter_size", type=int, default=None)
     parser.add_argument('--chemistry', type=str, default='r9.5')
     parser.add_argument('--window-size', type=int, default=6, dest="window_size")
+    parser.add_argument('--not-old',  dest="old", action="store_false")
 
     args = parser.parse_args()
     # exit()
     process(weights=args.weights, Nbases=args.Nbases, output=args.output,
             directory=args.directory, reads=args.reads, filter=args.filter,
             already_detected=args.already_detected, filter_size=args.filter_size,
-            chemistry=args.chemistry, window_size=args.window_size)
+            chemistry=args.chemistry, window_size=args.window_size, old=args.old)
