@@ -676,7 +676,8 @@ if __name__ == '__main__':
                     if not succes:
                         continue
                     if bio:
-                        if np.abs(len(ref) - len(seq.replace("N", ""))) / len(ref) > 0.15:
+                        delta = np.abs(len(ref) - len(seq.replace("N", ""))) / len(ref)
+                        if delta > 0.15:
                             continue
                         alignments = pairwise2.align.globalxx(
                             ref, seqs, one_alignment_only=True)
@@ -693,7 +694,7 @@ if __name__ == '__main__':
                             data_alignment.append(alignments[0][:2])
                             if sub is not None and not conv:
                                 ref = ref.replace("T", sub)
-                            convert.append([conv, sub, percent])
+                            convert.append([conv, sub, percent, delta])
                             # print(ref)
                             refs.append(ref)
                             # print(len(seqs), len(ref))
