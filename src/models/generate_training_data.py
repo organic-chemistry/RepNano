@@ -534,8 +534,10 @@ if __name__ == '__main__':
                         tmp_frac = ifilename / len(all_files)
                         if not(tmp_frac > args.fractions[0] and tmp_frac < args.fractions[1]):
                             continue
-
-                    h5 = h5py.File(filename, "r")
+                    try:
+                        h5 = h5py.File(filename, "r")
+                    except OSError:
+                        print("Invalid file")
 
                     if args.f_size is not None:
                         events = extract_events(h5, "rf", window_size=args.f_size[
