@@ -103,7 +103,7 @@ def basecall_one_file(filename, output_file, ntwk, alph, already_detected,
 
 def process(weights, Nbases, output, directory, reads=[], filter="",
             already_detected=True, Nmax=None, size=20, n_output_network=1, n_input=1, filter_size=None,
-            chemistry="r9.5", window_size=None, clean=False, old=True):
+            chemistry="r9.5", window_size=None, clean=False, old=True, res=False, attention=False):
     assert len(reads) != 0 or len(directory) != 0, "Nothing to basecall"
 
     alph = "ACGTN"
@@ -119,7 +119,7 @@ def process(weights, Nbases, output, directory, reads=[], filter="",
     if clean:
         n_feat = 3
     ntwk, _ = build_models(size, Nbases - 4, n_output=n_output_network, n_feat=n_feat,
-                           res=False, attention=False)
+                           res=res, attention=attention)
     assert(os.path.exists(weights)), "Weights %s does not exist" % weights
     ntwk.load_weights(weights)
     print("loaded")
@@ -186,10 +186,12 @@ if __name__ == "__main__":
     parser.add_argument('--chemistry', type=str, default='r9.5')
     parser.add_argument('--window-size', type=int, default=6, dest="window_size")
     parser.add_argument('--not-old',  dest="old", action="store_false")
+    parser.add_argument('--res', dest="res", action="store_true")
+    parser.add_argument('--attention', dest="attention", action="store_true")
 
     args = parser.parse_args()
     # exit()
     process(weights=args.weights, Nbases=args.Nbases, output=args.output,
             directory=args.directory, reads=args.reads, filter=args.filter,
             already_detected=args.already_detected, filter_size=args.filter_size,
-            chemistry=args.chemistry, window_size=args.window_size, old=args.old)
+            chemistry=args.chemistry, window_size=args.window_size, old=args.old, res=args.res, attention=args.attention)

@@ -179,6 +179,14 @@ basename = "results/from_best_resi_cleanctc200/"
 weights = "data/training/my_model_weights-3390-removed-bad-B.h5"
 basename = "results/ref-std-clean/"
 
+weights = "data/cluster/training/training_correct-std_0p1_residual_clean_ctc200/my_model_weights-490.h5"
+basename = "results/std-clean/"
+
+#weights = "data/cluster/training/training_correct-std_0p1_residual_clean_ctc20/my_model_weights-330.h5"
+#basename = "results/std-clean-ctc20/"
+
+#weights = "data/cluster/training/training_correct-std_0p1_residual_attention_clean_ctc20/my_model_weights-300.h5"
+#basename = "results/std-clean-att-ctc20/"
 
 ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
 redo = 1
@@ -201,7 +209,8 @@ for dire, out, w in list_dir[1:4]:  # [1:4]:  # + list_dir[5:]:
         process(weights, directory="data/raw/%s/" % dire,
                 output="data/processed/{0}{1}.fasta".format(basename, out), Nbases=5, reads="",
                 filter=None, already_detected=False, Nmax=200, size=20,
-                n_output_network=1, n_input=1, chemistry="rf", window_size=w, clean=False, old=False)
+                n_output_network=1, n_input=1, chemistry="rf", window_size=w, clean=True, old=False, res=True,
+                attention=False)
         # filter="data/processed/%s.InDeepNano.test" % outz , already_detected=False)
 
     exex = "python src/test/get_fasta_from_train-test.py data/processed/{0}{1}.fasta all data/processed/{0}{1}_test".format(
