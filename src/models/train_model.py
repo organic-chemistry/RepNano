@@ -341,12 +341,12 @@ if __name__ == '__main__':
 
 
 # ntwk.load_weights("./my_model_weights.h5")
-    Schedul = lrd(waiting_time=30, start_lr=args.lr, min_lr=0.0001, factor=2)
+    Schedul = lrd(waiting_time=300, start_lr=args.lr, min_lr=0.0001, factor=2)
     for epoch in range(20000):
 
         # Test to see if realignment is interesting:
 
-        if args.ctc and epoch % 5000 == 0 and (epoch != 0 or args.force_clean):
+        if args.ctc and epoch % 300 == 0 and (epoch != 0 or args.force_clean):
             ntwk.save_weights(os.path.join(
                 args.root, 'tmp.h5'))
 
@@ -427,7 +427,7 @@ if __name__ == '__main__':
                         new_length += len(old_align[0])
                         print()
 
-                if subts and nc[type_sub] / (nc["T"] + nc[type_sub]) < 0.2:
+                if subts and nc[type_sub] / (nc["T"] + nc[type_sub]) < 0.1:
                     if args.force_clean and type_sub != "B":
                         continue
                     refs[s] = refs[s].replace(type_sub, "T")
