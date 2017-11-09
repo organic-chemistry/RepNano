@@ -53,7 +53,7 @@ class AttentionDecoder(Recurrent):
         self.bias_constraint = constraints.get(bias_constraint)
         self.apply = to_apply
 
-        self.window_length = 5
+        self.window_length = 20
 
         super(AttentionDecoder, self).__init__(**kwargs)
         self.name = name
