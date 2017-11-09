@@ -261,10 +261,14 @@ if __name__ == '__main__':
     if args.clean:
         n_feat = 3
 
-    predictor, ntwk = build_models(args.size, nbase=args.Nbases - 4,
-                                   ctc_length=ctc_length,
-                                   input_length=input_length, n_output=n_output_network,
-                                   lr=args.lr, res=args.res, attention=args.attention, n_feat=n_feat)
+    _, ntwk = build_models(args.size, nbase=args.Nbases - 4,
+                           ctc_length=ctc_length,
+                           input_length=input_length, n_output=n_output_network,
+                           lr=args.lr, res=args.res, attention=args.attention, n_feat=n_feat)
+    predictor, _ = build_models(args.size, nbase=args.Nbases - 4,
+                                ctc_length=ctc_length,
+                                input_length=None, n_output=n_output_network,
+                                lr=args.lr, res=args.res, attention=args.attention, n_feat=n_feat)
 
     if args.pre_trained_weight is not None:
 
