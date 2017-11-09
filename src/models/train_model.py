@@ -345,12 +345,12 @@ if __name__ == '__main__':
 
 
 # ntwk.load_weights("./my_model_weights.h5")
-    Schedul = lrd(waiting_time=320, start_lr=args.lr, min_lr=0.0001, factor=2)
+    Schedul = lrd(waiting_time=3200, start_lr=args.lr, min_lr=0.0001, factor=2)
     for epoch in range(20000):
 
         # Test to see if realignment is interesting:
 
-        if args.ctc and epoch % 300 == 0 and (epoch != 0 or args.force_clean):
+        if args.ctc and epoch % 3000 == 0 and (epoch != 0 or args.force_clean):
             ntwk.save_weights(os.path.join(
                 args.root, 'tmp.h5'))
 
