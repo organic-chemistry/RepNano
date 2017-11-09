@@ -406,7 +406,11 @@ if __name__ == '__main__':
                 if re_align:
                     old_align = data_alignment[s]
                     # new_align = pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))[0][:2]
-                    new_align = pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))
+                    try:
+                        new_align = pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))
+                    except MemoryError:
+                        print("Out of memory")
+                        continue
                     if len(new_align) == 0 or len(new_align[0]) < 2:
                         new_length += len(old_align[0])
                         print()

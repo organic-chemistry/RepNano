@@ -197,8 +197,12 @@ basename = "results/std-clean-delta200/"
 weights = "data/cluster/training/training_correct-std_0p1_residual_clean_ctc200-delta400-b8-realign/my_model_weights-290.h5"
 basename = "results/std-clean-b8/"
 
+#weights = "data/cluster/training/training_correct-std_0p1_residual_clean_ctc200-delta400-realign/my_model_weights-290.h5"
+#basename = "results/std-clean-delta400/"
+
+
 ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
-redo = 1
+redo = 0
 
 
 # Evaluate all the sample
@@ -215,11 +219,11 @@ list_dir = [["20170908-R9.5/AB-2minBrdU", "20170908-R9.5/prout_2", 5],
             ["20170908-R9.5/AK-EdU/0/", "20170908-R9.5/BTF_AK_ONT_1_FAH14211_A-select_pass", 5],
             ["20170908-R9.5/AL-IdU/0/", "20170908-R9.5/BTF_AL_ONT_1_FAH14352_A-select_pass", 5]]
 
-for dire, out, w in list_dir[6:]:  # + list_dir[6:]:
+for dire, out, w in list_dir[1:4] + list_dir[6:]:
     if redo:
         process(weights, directory="data/raw/%s/" % dire,
-                output="data/processed/{0}{1}.fasta".format(basename, out), Nbases=8, reads="",
-                filter=None, already_detected=False, Nmax=20, size=40,
+                output="data/processed/{0}{1}.fasta".format(basename, out), Nbases=5, reads="",
+                filter=None, already_detected=False, Nmax=200, size=40,
                 n_output_network=1, n_input=1, chemistry="rf", window_size=w, clean=True, old=False, res=True,
                 attention=False)
         # filter="data/processed/%s.InDeepNano.test" % outz , already_detected=False)
