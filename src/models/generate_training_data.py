@@ -575,7 +575,7 @@ if __name__ == '__main__':
 
                     Original = np.array(
                         np.vstack([mean, mean * mean, std, length]).T, dtype=np.float32)
-                    if args.clean:
+                    if not args.clean:
                         x = scale(Original)
                     else:
                         x = scale_clean_two(Original)
