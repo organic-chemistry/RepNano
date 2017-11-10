@@ -200,7 +200,7 @@ basename = "results/std-clean-b8/"
 #weights = "data/cluster/training/training_correct-std_0p1_residual_clean_ctc200-delta400-realign/my_model_weights-290.h5"
 #basename = "results/std-clean-delta400/"
 
-weights = "data/cluster/training/training_correct-std_0p1_residual_clean_ctc200-delta400-bTBI-realign/my_model_weights-240.h5"
+weights = "data/cluster/training/training_correct-std_0p1_residual_clean_ctc200-delta400-bTBI-realign/my_model_weights-290.h5"
 basename = "results/std-clean-bTBI/"
 
 ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"

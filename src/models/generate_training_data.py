@@ -334,6 +334,7 @@ if __name__ == '__main__':
     parser.add_argument('--fractions', nargs='+', dest="fractions", type=float, default=[])
     parser.add_argument('--include-short', dest="include_short", action="store_true")
     parser.add_argument('--old', dest="old", action="store_true")
+    parser.add_argument('--clean', dest="clean", action="store_true")
 
     args = parser.parse_args()
 
@@ -568,9 +569,13 @@ if __name__ == '__main__':
                     mean = events["mean"]
                     std = events["stdv"]
                     length = events["length"]
+
                     Original = np.array(
                         np.vstack([mean, mean * mean, std, length]).T, dtype=np.float32)
-                    x = scale(Original)
+                    if args.clean:
+                        x = scale(Original)
+                    else:
+                        x = scale_clean_two(Original)
 
                     o1 = predictor.predict(np.array(x)[np.newaxis, ::, ::])
                     # print("New", o1[0].shape)
