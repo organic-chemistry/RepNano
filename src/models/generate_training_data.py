@@ -599,8 +599,8 @@ if __name__ == '__main__':
                     alph = "ACGTN"
                     if args.Nbases in [5, 8]:
                         alph = "ACGTTN"
-                    # if args.Nbases == 8:
-                    #    alph = "ACGTTTTTN"
+                    if args.Nbases == 8:
+                        alph = "ACGTTTTTN"
 
                     seq = "".join(map(lambda x: alph[x], om))
                     seqs = seq.replace("N", "")
