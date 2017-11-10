@@ -591,7 +591,7 @@ if __name__ == '__main__':
                     if sub is not None:
                         oml = om.tolist()
                         percent = oml.count(
-                            mapping[sub]) / (oml.count(mapping["T"]) + oml.count(mapping["B"]) + 0.05)
+                            mapping[sub]) / (oml.count(mapping["T"]) + oml.count(mapping[sub]) + 0.05)
 
                         if args.force_clean and percent < 0.1:
                             conv = True
