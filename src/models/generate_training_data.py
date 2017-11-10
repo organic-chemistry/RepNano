@@ -377,9 +377,13 @@ if __name__ == '__main__':
         input_length = subseq_size
         ctc_length = 2 * subseq_size
 
+    n_feat = 4
+    if args.clean:
+        n_feat = 3
+
     if args.Nbases == 8:
         old_predictor, old_ntwk = build_models(
-            args.size, nbase=1, ctc_length=ctc_length, input_length=input_length, n_output=n_output_network)
+            args.size, nbase=1, ctc_length=ctc_length, input_length=input_length, n_output=n_output_network, n_feat=n_feat)
 
     os.makedirs(args.root, exist_ok=True)
 
