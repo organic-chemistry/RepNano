@@ -326,7 +326,6 @@ if __name__ == '__main__':
     parser.add_argument('--filter', nargs='+', dest="filter", type=str, default=[])
     parser.add_argument('--ctc-length', dest="ctc_length", type=int, default=20)
     parser.add_argument('--normalize-window-length', dest="nwl", action="store_true")
-    parser.add_argument('--clean', dest="clean", action="store_true")
     parser.add_argument('--attention', dest="attention", action="store_true")
     parser.add_argument('--residual', dest="res", action="store_true")
     parser.add_argument('--all-file', dest="allignment_file", default="Allignements-bis")
