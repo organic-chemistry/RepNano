@@ -203,9 +203,16 @@ basename = "results/std-clean-b8/"
 weights = "data/cluster/training/training_correct-std_0p1_residual_clean_ctc200-delta400-bTBI-realign/my_model_weights-290.h5"
 basename = "results/std-clean-bTBI/"
 
+weights = "data/cluster/training/training_correct-std_0p1_residual_clean_ctc200-delta400-bTBI-clean-I-realign/my_model_weights-580.h5"
+basename = "results/std-clean-bTBI-cleanI/"
+
+weights = "data/cluster/training/training_correct-std_0p1_residual_clean_ctc200-delta400-bTBE-clean-E-realign/my_model_weights-500.h5"
+basename = "results/std-clean-bTBE-cleanE/"
+#weights = "data/cluster/training/training_correct-std_0p1_residual_clean_ctc200-delta400-b8-realign/my_model_weights-290.h5"
+#basename = "results/std-clean-b8/"
+
 ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
 redo = 1
-
 
 # Evaluate all the sample
 list_dir = [["substituted", "sub_template", 5], ["control", "control_template", 5],
