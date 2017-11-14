@@ -2,7 +2,7 @@ from keras.layers import Input, Dense
 from keras.layers.merge import Add
 
 from keras.models import Model
-from keras.layers.recurrent import LSTM, simpleRNN
+from keras.layers.recurrent import LSTM, SimpleRNN
 from keras.layers.wrappers import Bidirectional, TimeDistributed
 from keras import backend as K
 from keras.layers.core import Lambda, Reshape
@@ -60,7 +60,7 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
         merge_mode = "concat"
 
     if simple:
-        LSTM = simpleRNN
+        LSTM = SimpleRNN
 
     l1 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable, recurrent_dropout=recurrent_dropout),
                        merge_mode=merge_mode)(inputs)
