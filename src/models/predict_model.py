@@ -75,10 +75,11 @@ def basecall_one_file(filename, output_file, ntwk, alph, already_detected,
         o1 = p[0]
         om = np.argmax(o1, axis=-1)
 
-        # rBT = o1[::, 4] / o1[::, 3]
-        # r = (0.5 < rBT) & (rBT < 2) & ((om == 3) | (om == 4))
+        rBT = o1[::, 4] / o1[::, 3]
+        d = 200
+        r = (1 / d < rBT) & (rBT < d) & ((om == 3) | (om == 4))
 
-        # om[r] = 6
+        om[r] = 6
     # print(o1[:20])
     # print(o2[:20])
     # exit()
@@ -90,7 +91,7 @@ def basecall_one_file(filename, output_file, ntwk, alph, already_detected,
                                             ), output.count("L") / (1 + output.count("T")),
           output.count("E") / (1 + output.count("T")), output.count("I") / (1 + output.count("T")))
     print(output.count("T"), output.count("B"), output.count(
-        "L"), output.count("E"), output.count("I"))
+        "L"), output.count("E"), output.count("I"), output.count("U"))
 
     if filter_size is not None and len(output) < filter_size:
         print("Out too small", filter_size)

@@ -17,6 +17,7 @@ L = 0
 E = 0
 I = 0
 T = 0
+U = 0
 found = []
 lost = []
 with open(out_network, "r") as f:
@@ -35,12 +36,14 @@ with open(out_network, "r") as f:
 
             cut.append(fi + seq)
 
+            U += seq.count("U")
             B += seq.count("B")
             L += seq.count("L")
             E += seq.count("E")
             I += seq.count("I")
 
             T += seq.count("T")
+            seq = seq.replace("U", "T")
             seq = seq.replace("B", "T")
             seq = seq.replace("L", "T")
             seq = seq.replace("E", "T")
@@ -77,3 +80,9 @@ if T != 0:
     r = I / 1.0 / T
 
 print("Number of T %i, number of I %i, ratio %f" % (T, I, r))
+
+r = 0
+if T != 0:
+    r = U / 1.0 / T
+
+print("Number of T %i, number of U %i, ratio %f" % (T, U, r))

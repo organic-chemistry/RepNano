@@ -11,21 +11,21 @@ KTF.set_session(S)
 
 weights = "data/cluster/training/v9p5delta10-bis/my_model_weights-940.h5"
 # weights = "data/cluster/training/v9p5delta10-new-weight-longer/my_model_weights-60.h5"  # a lot of B
-#weights = "data/cluster/training//v9p5-delta10-oversamplingL/my_model_weights-190.h5"
-#weights = "data/cluster/training//v9p5-delta10-ref-from-file-only-T/my_model_weights-470.h5"
-#weights = "data/cluster/training//v9p5-delta10-ref-from-file/my_model_weights-50.h5"
+# weights = "data/cluster/training//v9p5-delta10-oversamplingL/my_model_weights-190.h5"
+# weights = "data/cluster/training//v9p5-delta10-ref-from-file-only-T/my_model_weights-470.h5"
+# weights = "data/cluster/training//v9p5-delta10-ref-from-file/my_model_weights-50.h5"
 
-#weights = "data/cluster/training/v9p5-delta10-oversamplingB/my_model_weights-20.h5"
+# weights = "data/cluster/training/v9p5-delta10-oversamplingB/my_model_weights-20.h5"
 weights = "data/cluster/training/v9p5-delta10-ref-from-file-bis-max-files/my_model_weights-9300.h5"
 weights = "data/training/al-8-bases/my_model_weights-90.h5"
 weights = "data/training/test-single-base/my_model_weights-180.h5"
 weights = "data/cluster/training/test-single-base-filter/my_model_weights-60.h5"
 weights = "data/training/my_model_weights-3390-removed-bad-B.h5"
-#weights = "data/cluster/training/skip-new/my_model_weights-7590.h5"
-#weights = "data/cluster/training/allign-agree-five/my_model_weights-2560.h5"
+# weights = "data/cluster/training/skip-new/my_model_weights-7590.h5"
+# weights = "data/cluster/training/allign-agree-five/my_model_weights-2560.h5"
 weights = "data/cluster/training/allign-agree-five-clean-B/my_model_weights-3990.h5"
-#weights = "data/cluster/training/test-single-various-w-size-8bases/my_model_weights-30.h5"
-#weights = "data/training/test-single-base-bis/my_model_weights-0.h5"
+# weights = "data/cluster/training/test-single-various-w-size-8bases/my_model_weights-30.h5"
+# weights = "data/training/test-single-base-bis/my_model_weights-0.h5"
 weights = "data/cluster/training/test-single-various-w-size-8bases-smallerw/my_model_weights-1800.h5"
 weights = "data/cluster/training/allign-agree-five-clean-B-smallB/my_model_weights-5990.h5"
 weights = "data/cluster/training/allign-agree-five-clean-B-smallB-test-ssample/my_model_weights-2480.h5"
@@ -56,8 +56,8 @@ weights = "data/cluster/training/allign-agree-85555-8b/my_model_weights-1960.h5"
 basename = "results/v9p5-best-B-20170908-R9.5-froms-two-200-seg-last-smaller-explo-8test/"
 
 """
-#weights = "data/cluster/training/allign-agree-85555/my_model_weights-3900.h5"
-#basename = "results/v9p5-best-B-20170908-R9.5-froms-two-200-seg-last-smaller-explo-bw/"
+# weights = "data/cluster/training/allign-agree-85555/my_model_weights-3900.h5"
+# basename = "results/v9p5-best-B-20170908-R9.5-froms-two-200-seg-last-smaller-explo-bw/"
 """
 weights = "data/cluster/training/allign-agree-85555-BI-ctc20/my_model_weights-1990.h5"
 basename = "results/v9p5-best-B-20170908-R9.5-froms-two-200-seg-last-smaller-explo-bw-ctc20-BI/"
@@ -128,8 +128,8 @@ weights = "data/cluster/training/allign-agree-85555-ctc200-clean-test/my_model_w
 basename = "results/clean-test/"
 
 
-#weights = "data/training/my_model_weights-3390-removed-bad-B.h5"
-#basename = "results/ref-nodetect/"
+# weights = "data/training/my_model_weights-3390-removed-bad-B.h5"
+# basename = "results/ref-nodetect/"
 
 weights = "data/cluster/training/allign-no-agree-85555-ctc200/my_model_weights-190.h5"
 basename = "results/no-agree-ctc200-no-agree/"
@@ -169,11 +169,11 @@ basename = "results/no-agree-ctc200-no-agree-clean-std/"
 weights = "data/cluster/training//training_set_from_best_so_far_residual_clean_ctc200/my_model_weights-60.h5"
 basename = "results/from_best_resi_cleanctc200/"
 
-#weights = "data/cluster/training/training_set_from_best_so_far_residual_clean_ctc20/my_model_weights-280.h5"
-#basename = "results/from_best_resi_cleanctc20/"
+# weights = "data/cluster/training/training_set_from_best_so_far_residual_clean_ctc20/my_model_weights-280.h5"
+# basename = "results/from_best_resi_cleanctc20/"
 
-#weights = "data/cluster/training/training_set_from_best_so_far_residual_attention_clean_ctc20/my_model_weights-280.h5"
-#basename = "results/from_best_resi_att_cleanctc20/"
+# weights = "data/cluster/training/training_set_from_best_so_far_residual_attention_clean_ctc20/my_model_weights-280.h5"
+# basename = "results/from_best_resi_att_cleanctc20/"
 """
 
 weights = "data/training/my_model_weights-3390-removed-bad-B.h5"
@@ -182,11 +182,11 @@ basename = "results/ref-std-clean/"
 weights = "data/cluster/training/training_correct-std_0p1_residual_clean_ctc200/my_model_weights-490.h5"
 basename = "results/std-clean/"
 
-#weights = "data/cluster/training/training_correct-std_0p1_residual_clean_ctc20/my_model_weights-330.h5"
-#basename = "results/std-clean-ctc20/"
+# weights = "data/cluster/training/training_correct-std_0p1_residual_clean_ctc20/my_model_weights-330.h5"
+# basename = "results/std-clean-ctc20/"
 
-#weights = "data/cluster/training/training_correct-std_0p1_residual_attention_clean_ctc20/my_model_weights-300.h5"
-#basename = "results/std-clean-att-ctc20/"
+# weights = "data/cluster/training/training_correct-std_0p1_residual_attention_clean_ctc20/my_model_weights-300.h5"
+# basename = "results/std-clean-att-ctc20/"
 
 weights = "data/cluster/training/training_correct-std_0p1_residual_clean_ctc200-b8/my_model_weights-540.h5"
 basename = "results/std-clean-b8/"
@@ -197,8 +197,8 @@ basename = "results/std-clean-delta200/"
 weights = "data/cluster/training/training_correct-std_0p1_residual_clean_ctc200-delta400-b8-realign/my_model_weights-290.h5"
 basename = "results/std-clean-b8/"
 
-#weights = "data/cluster/training/training_correct-std_0p1_residual_clean_ctc200-delta400-realign/my_model_weights-290.h5"
-#basename = "results/std-clean-delta400/"
+# weights = "data/cluster/training/training_correct-std_0p1_residual_clean_ctc200-delta400-realign/my_model_weights-290.h5"
+# basename = "results/std-clean-delta400/"
 
 weights = "data/cluster/training/training_correct-std_0p1_residual_clean_ctc200-delta400-bTBI-realign/my_model_weights-290.h5"
 basename = "results/std-clean-bTBI/"
@@ -208,11 +208,22 @@ basename = "results/std-clean-bTBI-cleanI/"
 
 weights = "data/cluster/training/training_correct-std_0p1_residual_clean_ctc200-delta400-bTBE-clean-E-realign/my_model_weights-500.h5"
 basename = "results/std-clean-bTBE-cleanE/"
-#weights = "data/cluster/training/training_correct-std_0p1_residual_clean_ctc200-delta400-b8-realign/my_model_weights-290.h5"
-#basename = "results/std-clean-b8/"
+# weights = "data/cluster/training/training_correct-std_0p1_residual_clean_ctc200-delta400-b8-realign/my_model_weights-290.h5"
+# basename = "results/std-clean-b8/"
 
+weights = "data/cluster/training/training_correct-std_0p1_residual_clean_ctc200-delta400-bTBI-clean-I-realign-longer/my_model_weights-450.h5"
+basename = "results/std-clean-bTBI-cleanI-longer/"
+
+weights = "data/cluster/training/training_correct-std_0p1_residual_clean_ctc200-delta400-realign/my_model_weights-290.h5"
+basename = "results/std-clean-delta400/"
+
+weights = "data/cluster/training/training_correct-std_0p1_residual_clean_ctc200-delta400-realign/my_model_weights-290.h5"
+basename = "results/std-clean-delta400-test/"
 ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
 redo = 1
+
+# ref = "data/external/chromFa/*.fa"
+# redo = 0
 
 # Evaluate all the sample
 list_dir = [["substituted", "sub_template", 5], ["control", "control_template", 5],
@@ -227,12 +238,13 @@ list_dir = [["20170908-R9.5/AB-2minBrdU", "20170908-R9.5/prout_2", 5],
             ["20170908-R9.5/AI-CldU/0/", "20170908-R9.5/BTF_AI_ONT_1_FAH14242_A-select_pass", 5],
             ["20170908-R9.5/AK-EdU/0/", "20170908-R9.5/BTF_AK_ONT_1_FAH14211_A-select_pass", 5],
             ["20170908-R9.5/AL-IdU/0/", "20170908-R9.5/BTF_AL_ONT_1_FAH14352_A-select_pass", 5]]
-
-for dire, out, w in list_dir[1:4] + list_dir[-1:]:
+list_dir1 = [["20170908-R9.5/Human_AR", "20170908-R9.5/human_ar", 5]]
+list_dir1 += [["20170908-R9.5/Human_HQ", "20170908-R9.5/human_hq", 5]]
+for dire, out, w in list_dir[1:4] + list_dir1:  # + list_dir[-1:]:
     if redo:
         process(weights, directory="data/raw/%s/" % dire,
-                output="data/processed/{0}{1}.fasta".format(basename, out), Nbases=8, reads="",
-                filter=None, already_detected=False, Nmax=200, size=40,
+                output="data/processed/{0}{1}.fasta".format(basename, out), Nbases=5, reads="",
+                filter=None, already_detected=False, Nmax=100, size=40,
                 n_output_network=1, n_input=1, chemistry="rf", window_size=w, clean=True, old=False, res=True,
                 attention=False)
         # filter="data/processed/%s.InDeepNano.test" % outz , already_detected=False)

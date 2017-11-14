@@ -225,6 +225,7 @@ if __name__ == '__main__':
     parser.add_argument('--attention', dest="attention", action="store_true")
     parser.add_argument('--residual', dest="res", action="store_true")
     parser.add_argument('--all-file', nargs='+', dest="allignment_files", default=[], type=str)
+    parser.add_argument('--simple', dest="simple", action="store_true")
 
     args = parser.parse_args()
 

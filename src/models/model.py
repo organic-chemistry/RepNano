@@ -2,7 +2,7 @@ from keras.layers import Input, Dense
 from keras.layers.merge import Add
 
 from keras.models import Model
-from keras.layers.recurrent import LSTM
+from keras.layers.recurrent import LSTM, simpleRNN
 from keras.layers.wrappers import Bidirectional, TimeDistributed
 from keras import backend as K
 from keras.layers.core import Lambda, Reshape
@@ -14,7 +14,7 @@ from .attention import AttentionDecoder
 
 def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                  uniform=True, input_length=None, n_output=1,
-                 n_feat=4, recurrent_dropout=0, lr=0.01, res=False, attention=False):
+                 n_feat=4, recurrent_dropout=0, lr=0.01, res=False, attention=False, simple=False):
     if keras.backend.backend() == 'tensorflow':
         import tensorflow as tf
 
@@ -58,6 +58,9 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
 
     else:
         merge_mode = "concat"
+
+    if simple:
+        LSTM = simpleRNN
 
     l1 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable, recurrent_dropout=recurrent_dropout),
                        merge_mode=merge_mode)(inputs)
