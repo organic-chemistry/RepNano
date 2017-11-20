@@ -226,6 +226,7 @@ if __name__ == '__main__':
     parser.add_argument('--residual', dest="res", action="store_true")
     parser.add_argument('--all-file', nargs='+', dest="allignment_files", default=[], type=str)
     parser.add_argument('--simple', dest="simple", action="store_true")
+    parser.add_argument('--all-T', dest="all_T", action="store_true")
 
     args = parser.parse_args()
 
@@ -562,11 +563,12 @@ if __name__ == '__main__':
                             infostat[l] = infostat.get(l, 0) + seg.count("T")
 
                     seg = seg + "A" * (maxi - len(seg))
-                    for l in ["B", "L", "E", "I"]:
-                        if l in refs[s2]:
+                    if not args.all_T:
+                        for l in ["B", "L", "E", "I"]:
+                            if l in refs[s2]:
 
-                            seg = seg.replace("T", l)
-                            break
+                                seg = seg.replace("T", l)
+                                break
 
                     # print(ss1, ss2, seg)
 

@@ -74,15 +74,15 @@ def basecall_one_file(filename, output_file, ntwk, alph, already_detected,
     else:
         o1 = p[0]
         om = np.argmax(o1, axis=-1)
-
+        """
         rBT = o1[::, 4] / o1[::, 3]
         d = 200
         r = (1 / d < rBT) & (rBT < d) & ((om == 3) | (om == 4))
 
-        om[r] = 6
-    # print(o1[:20])
-    # print(o2[:20])
-    # exit()
+        om[r] = 6"""
+# print(o1[:20])
+# print(o2[:20])
+# exit()
 
     output = "".join(map(lambda x: str(alph + "U")[x], om)).replace("N", "")
 
