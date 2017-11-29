@@ -7,7 +7,10 @@ from keras import backend as K
 from keras.layers.core import Lambda, Reshape
 from keras.optimizers import SGD, Adadelta
 import keras
-from .attention import AttentionDecoder
+try:
+    from .attention import AttentionDecoder
+except:
+    print("Loading theano no attention")
 #from .attentionBis import Attention
 
 

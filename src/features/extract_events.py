@@ -149,7 +149,7 @@ def extract_events(h5, chem, window_size=None, old=True):
 
     first_event, last_event = find_stall(
         events, start_threshold=8.5, end_threshold=4, raw=raw, sampling_rate=sl, max_under_threshold=750)
-
+    print("First event", first_event)
     return events[first_event:]
 
 

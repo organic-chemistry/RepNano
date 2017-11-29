@@ -219,9 +219,23 @@ basename = "results/std-clean-delta400/"
 
 weights = "data/cluster/training/training_correct-std_0p1_residual_clean_ctc200-delta400-realign/my_model_weights-290.h5"
 basename = "results/std-clean-delta400-test/"
+
+
+weights = "data/cluster/training_correct-std_0p1_residual_clean_ctc200-delta400-all-T/my_model_weights-480.h5"
+basename = "results/std-clean-delta400-test-allT/"
+
+weights = "data/training/training_correct-std_0p1_residual_clean_ctc200-delta400-realign_my_model_weights-290.h5"
+basename = "results/test"
+
+weights = "data/training/my_model_weights-3390-removed-bad-B.h5"
+basename = "results/test/"
+
+#weights = "data/training/my_model_weights-3390-removed-bad-B.h5"
+#basename = "results/ref-std-clean/"
+
+
 ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
 redo = 1
-
 # ref = "data/external/chromFa/*.fa"
 # redo = 0
 
@@ -238,14 +252,15 @@ list_dir = [["20170908-R9.5/AB-2minBrdU", "20170908-R9.5/prout_2", 5],
             ["20170908-R9.5/AI-CldU/0/", "20170908-R9.5/BTF_AI_ONT_1_FAH14242_A-select_pass", 5],
             ["20170908-R9.5/AK-EdU/0/", "20170908-R9.5/BTF_AK_ONT_1_FAH14211_A-select_pass", 5],
             ["20170908-R9.5/AL-IdU/0/", "20170908-R9.5/BTF_AL_ONT_1_FAH14352_A-select_pass", 5]]
+
 list_dir1 = [["20170908-R9.5/Human_AR", "20170908-R9.5/human_ar", 5]]
 list_dir1 += [["20170908-R9.5/Human_HQ", "20170908-R9.5/human_hq", 5]]
-for dire, out, w in list_dir[1:4] + list_dir1:  # + list_dir[-1:]:
+for dire, out, w in list_dir1:  # [1:4]:  # + list_dir[-3:]:  # + list_dir1:  # + list_dir[-1:]:
     if redo:
         process(weights, directory="data/raw/%s/" % dire,
                 output="data/processed/{0}{1}.fasta".format(basename, out), Nbases=5, reads="",
-                filter=None, already_detected=False, Nmax=100, size=40,
-                n_output_network=1, n_input=1, chemistry="rf", window_size=w, clean=True, old=False, res=True,
+                filter=None, already_detected=False, Nmax=20, size=20,
+                n_output_network=1, n_input=1, chemistry="rf", window_size=w, clean=False, old=False, res=False,
                 attention=False)
         # filter="data/processed/%s.InDeepNano.test" % outz , already_detected=False)
 

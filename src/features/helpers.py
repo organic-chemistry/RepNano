@@ -76,7 +76,6 @@ def scale_clean_two(X, normalise_window=True):
     ret[:, 2] = X[:, 3] - np.mean(X[:, 3]) + 0.001 * np.random.rand()
     ret[:, 2] = ret[:, 2] / np.std(ret[:, 2])
 
-
     ret = ret[:, :3]
     print(ret.shape)
     #ret[:, 3] = 0.002 * ret[:, 3] / np.mean(ret[:, 3])
@@ -96,14 +95,17 @@ def scale_clean_two(X, normalise_window=True):
     nw = 100
     #print(pd.rolling_mean(X[:, 0], nw))
 
+    #
     ret[:, 0] = X[:, 0] - pd.Series(X[:, 0]).rolling(nw, center=True, min_periods=1).median()
+    #print(np.std(ret[:, 0]))
     ret[:, 0] = ret[:, 0] / np.std(ret[:, 0])
+    #ret[:, 0] = ret[:, 0] / np.std(ret[:, 0])
 
     ret[:, 1] = X[:, 2] - pd.Series(X[:, 2]).rolling(nw, center=True, min_periods=1).median()
     ret[:, 1] = ret[:, 1] / np.std(ret[:, 1])
 
     ret[:, 2] = X[:, 3] - pd.Series(X[:, 3]).rolling(nw, center=True,
-                                                     min_periods=1).median() + 0.001 * np.random.rand()
+                                                     min_periods=1).median()  # + 0.001 * np.random.rand()
     ret[:, 2] = ret[:, 2] / np.std(ret[:, 2])
 
     ret = ret[:, :3]
