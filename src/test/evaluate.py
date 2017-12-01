@@ -230,7 +230,12 @@ basename = "results/test"
 weights = "data/training/my_model_weights-3390-removed-bad-B.h5"
 basename = "results/test/"
 
-#weights = "data/training/my_model_weights-3390-removed-bad-B.h5"
+weights = "../../..//tmp/test/my_model_weights-70.h5"
+basename = "results/test-2/"
+
+weights = "data/training/hybrid-ctc200.h5"
+basename = "results/test-hybrid-thres20/"
+#weights = "data/training/my_model_weights-3390-removed                                                                                                                                                                                                 -bad-B.h5"
 #basename = "results/ref-std-clean/"
 
 
@@ -255,12 +260,13 @@ list_dir = [["20170908-R9.5/AB-2minBrdU", "20170908-R9.5/prout_2", 5],
 
 list_dir1 = [["20170908-R9.5/Human_AR", "20170908-R9.5/human_ar", 5]]
 list_dir1 += [["20170908-R9.5/Human_HQ", "20170908-R9.5/human_hq", 5]]
-for dire, out, w in list_dir1:  # [1:4]:  # + list_dir[-3:]:  # + list_dir1:  # + list_dir[-1:]:
+# + list_dir[-3:]:  # + list_dir1:  # + list_dir[-1:]:
+for dire, out, w in list_dir[1:4] + list_dir1:
     if redo:
         process(weights, directory="data/raw/%s/" % dire,
                 output="data/processed/{0}{1}.fasta".format(basename, out), Nbases=5, reads="",
-                filter=None, already_detected=False, Nmax=20, size=20,
-                n_output_network=1, n_input=1, chemistry="rf", window_size=w, clean=False, old=False, res=False,
+                filter=None, already_detected=False, Nmax=200, size=40,
+                n_output_network=1, n_input=1, chemistry="rf", window_size=w, clean=True, old=False, res=True,
                 attention=False)
         # filter="data/processed/%s.InDeepNano.test" % outz , already_detected=False)
 

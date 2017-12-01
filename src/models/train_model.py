@@ -227,6 +227,7 @@ if __name__ == '__main__':
     parser.add_argument('--all-file', nargs='+', dest="allignment_files", default=[], type=str)
     parser.add_argument('--simple', dest="simple", action="store_true")
     parser.add_argument('--all-T', dest="all_T", action="store_true")
+    parser.add_argument('--hybrid', dest="hybrid", action="store_true")
 
     args = parser.parse_args()
 
@@ -274,14 +275,14 @@ if __name__ == '__main__':
 
     if args.pre_trained_weight is not None:
 
-        try:
-            try:
-                ntwk.load_weights(args.pre_trained_weight)
-            except:
-                print("Only predictor loaded (normal if no ctc)")
-            predictor.load_weights(args.pre_trained_weight)
-        except:
-            print("Learning from scratch")
+        # try:
+            # try:
+        ntwk.load_weights(args.pre_trained_weight)
+        # except:
+        #print("Only predictor loaded (normal if no ctc)")
+        predictor.load_weights(args.pre_trained_weight)
+        # except:
+        #    print("Learning from scratch")
 
     os.makedirs(args.root, exist_ok=True)
 
@@ -299,17 +300,30 @@ if __name__ == '__main__':
 
     if args.ctc:
         for allignment_file in args.allignment_files:
-            with open(allignment_file, "rb") as f:
-                t_original, t_convert, t_data_x, t_data_index, t_data_alignment, t_refs, t_names = cPickle.load(
-                    f)
 
-            original += t_original
-            convert += t_convert
-            data_x += t_data_x
-            data_index += t_data_index
-            data_alignment += t_data_alignment
-            refs += t_refs
-            names += t_names
+            if args.hybrid:
+                with open(allignment_file, "rb") as f:
+                    t_data_x, t_data_alignment, t_data_index = cPickle.load(f)
+
+                data_x += t_data_x
+                data_index += t_data_index
+                data_alignment += t_data_alignment
+
+                for ref, _ in t_data_alignment:
+                    refs.append(ref.replace("_", ""))
+
+            else:
+                with open(allignment_file, "rb") as f:
+                    t_original, t_convert, t_data_x, t_data_index, t_data_alignment, t_refs, t_names = cPickle.load(
+                        f)
+
+                original += t_original
+                convert += t_convert
+                data_x += t_data_x
+                data_index += t_data_index
+                data_alignment += t_data_alignment
+                refs += t_refs
+                names += t_names
     else:
         with open(allignment_file, "rb") as f:
             data_x, data_y, data_y2, refs, names = cPickle.load(f)
@@ -319,7 +333,7 @@ if __name__ == '__main__':
     # print(len(refs[0]),len(data_x[0]),len(data_y[0]))
     # exit()
 
-    if args.clean:
+    if args.clean and not args.hybrid:
 
         for filename, ori in zip(names, original):
 
@@ -559,15 +573,16 @@ if __name__ == '__main__':
                         megas += seg
 
                     for l in ["T", "B", "L", "E", "I"]:
-                        if l in refs[s2]:
-                            infostat[l] = infostat.get(l, 0) + seg.count("T")
+                        if l in seg:
+                            infostat[l] = infostat.get(l, 0) + seg.count(l)
 
                     seg = seg + "A" * (maxi - len(seg))
+
                     if not args.all_T:
                         for l in ["B", "L", "E", "I"]:
                             if l in refs[s2]:
-
-                                seg = seg.replace("T", l)
+                                if not args.hybrid:
+                                    seg = seg.replace("T", l)
                                 break
 
                     # print(ss1, ss2, seg)
