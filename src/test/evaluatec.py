@@ -67,7 +67,8 @@ for dire, out, w in default:
         process(weights, directory="data/raw/%s/" % dire,
                 output="data/processed/{0}{1}.fasta".format(basename, out), Nbases=args.Nbases, reads="",
                 filter=None, already_detected=False, Nmax=args.sample, size=args.size,
-                n_output_network=1, n_input=1, chemistry="rf", window_size=w, clean=args.clean, old=False, res=args.residual,
+                n_output_network=1, n_input=1, chemistry="rf", window_size=w, clean=args.clean, old=False,
+                res=args.res,
                 attention=args.attention)
         # filter="data/processed/%s.InDeepNano.test" % outz , already_detected=False)
 
