@@ -74,6 +74,8 @@ if __name__ == '__main__':
         tr = 100
         for c in range(tr):
             choice = np.random.randint(len(seqs))
+            if len(seqs[choice]) <= input_length:
+                continue
             part = np.random.randint(len(seqs[choice]) - input_length)
 
             s_tmp = seqs[choice][part:part + input_length]
