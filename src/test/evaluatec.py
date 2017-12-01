@@ -57,7 +57,7 @@ list_dir1 = [["20170908-R9.5/Human_AR", "20170908-R9.5/human_ar", 5]]
 list_dir1 += [["20170908-R9.5/Human_HQ", "20170908-R9.5/human_hq", 5]]
 # + list_dir[-3:]:  # + list_dir1:  # + list_dir[-1:]:
 default = list_dir[1:4]
-if args.Human:
+if args.H:
     default += list_dir1
 if args.I:
     default.append(["20170908-R9.5/AI-CldU/0/",
