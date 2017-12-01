@@ -19,6 +19,8 @@ parser.add_argument('--weight', dest='weight', type=str, default=None)
 parser.add_argument('--clean', dest="clean", action="store_true")
 parser.add_argument('--attention', dest="attention", action="store_true")
 parser.add_argument('--residual', dest="res", action="store_true")
+parser.add_argument('--I', dest="I", action="store_true")
+parser.add_argument('--Human', dest="H", action="store_true")
 
 
 args = parser.parse_args()
@@ -28,7 +30,7 @@ S = tf.Session(config=tf.ConfigProto(intra_op_parallelism_threads=1))
 KTF.set_session(S)
 
 
-weights = args.weights
+weights = args.weight
 basename = args.root
 
 
@@ -54,7 +56,13 @@ list_dir = [["20170908-R9.5/AB-2minBrdU", "20170908-R9.5/prout_2", 5],
 list_dir1 = [["20170908-R9.5/Human_AR", "20170908-R9.5/human_ar", 5]]
 list_dir1 += [["20170908-R9.5/Human_HQ", "20170908-R9.5/human_hq", 5]]
 # + list_dir[-3:]:  # + list_dir1:  # + list_dir[-1:]:
-for dire, out, w in list_dir[1:4] + list_dir1:
+default = list_dir[1:4]
+if args.Human:
+    default += list_dir1
+if args.I:
+    default.append(["20170908-R9.5/AI-CldU/0/",
+                    "20170908-R9.5/BTF_AI_ONT_1_FAH14242_A-select_pass", 5])
+for dire, out, w in default:
     if redo:
         process(weights, directory="data/raw/%s/" % dire,
                 output="data/processed/{0}{1}.fasta".format(basename, out), Nbases=args.nbases, reads="",
