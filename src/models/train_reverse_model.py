@@ -50,6 +50,7 @@ if __name__ == '__main__':
     parser.add_argument('--all-T', dest="all_T", action="store_true")
     parser.add_argument('--hybrid', dest="hybrid", action="store_true")
     parser.add_argument('--feat', dest='feat', type=str)
+    parser.add_argument('--hot', dest='hot', action="store_true")
 
     args = parser.parse_args()
 
@@ -61,7 +62,10 @@ if __name__ == '__main__':
         feat = cPickle.load(f)
 
     input_length = 100
-    model = build_models(input_length=input_length, n_feat=2)
+    if not args.hot:
+        model = build_models(input_length=input_length, n_feat=2)
+    else:
+        model = build_models(input_length=input_length, n_feat=4, hot=True)
 
     Schedul = lrd(waiting_time=100, start_lr=args.lr, min_lr=0.0001, factor=2)
 
@@ -79,8 +83,12 @@ if __name__ == '__main__':
             part = np.random.randint(len(seqs[choice]) - input_length)
 
             s_tmp = seqs[choice][part:part + input_length]
+            if not args.hot:
+                X_new.append([feat[st] for st in s_tmp])
+            else:
+                feat = {"A": [1, 0, 0, 0], "T": [0, 1, 0, 0], "C": [0, 0, 1, 0], "G": [0, 0, 0, 1]}
+                X_new.append([feat[st] for st in s_tmp])
 
-            X_new.append([feat[st] for st in s_tmp])
             Y_new.append(signal[choice][part:part + input_length])
 
         X_new = np.array(X_new)

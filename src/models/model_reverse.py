@@ -15,36 +15,69 @@ except:
 
 def build_models(size=4, nbase=1, trainable=True, ctc_length=40, ctc=True,
                  uniform=True, input_length=None, n_output=1,
-                 n_feat=4, recurrent_dropout=0, lr=0.01, res=False, attention=False, simple=False, w=10):
+                 n_feat=4, recurrent_dropout=0, lr=0.01, res=False, attention=False, simple=False, w=10, hot=False):
 
     input_length = input_length
-    inputs = Input(shape=(input_length, w, w, n_feat))
 
-    print("Trainable ???", trainable)
+    if not hot:
+        inputs = Input(shape=(input_length, w, w, n_feat))
 
-    merge_mode = "sum"
+        print("Trainable ???", trainable)
 
-    from keras.layers import ConvLSTM2D as LSTM
+        merge_mode = "sum"
 
-    l1 = Bidirectional(LSTM(size,
-                            kernel_size=3, padding="same", return_sequences=True, data_format="channels_last",
-                            trainable=trainable, recurrent_dropout=recurrent_dropout),
-                       merge_mode=merge_mode)(inputs)
-    # if res:
-    # l1 = Add()([l1, inputs])
-    l2 = Bidirectional(LSTM(size,
-                            kernel_size=3, padding="same", return_sequences=True, data_format="channels_last",
-                            trainable=trainable, recurrent_dropout=recurrent_dropout),
-                       merge_mode=merge_mode)(l1)
-    l2 = Add()([l2, l1])
-    l2 = Reshape((input_length, w * w * size))(l2)
+        from keras.layers import ConvLSTM2D as LSTM
 
-    out_layer1 = TimeDistributed(Dense(3, activation="linear"), name="out_layer1")(l2)
+        l1 = Bidirectional(LSTM(size,
+                                kernel_size=3, padding="same", return_sequences=True, data_format="channels_last",
+                                trainable=trainable, recurrent_dropout=recurrent_dropout),
+                           merge_mode=merge_mode)(inputs)
+        # if res:
+        # l1 = Add()([l1, inputs])
+        l2 = Bidirectional(LSTM(size,
+                                kernel_size=3, padding="same", return_sequences=True, data_format="channels_last",
+                                trainable=trainable, recurrent_dropout=recurrent_dropout),
+                           merge_mode=merge_mode)(l1)
+        l2 = Add()([l2, l1])
+        l2 = Reshape((input_length, w * w * size))(l2)
 
-    model = Model(inputs=inputs, outputs=out_layer1)
+        out_layer1 = TimeDistributed(Dense(3, activation="linear"), name="out_layer1")(l2)
 
-    ada = Adadelta(lr=.2, rho=0.95, epsilon=1e-08, decay=0.0)
+        model = Model(inputs=inputs, outputs=out_layer1)
 
-    model.compile(optimizer='adadelta', loss='MSE')
+        ada = Adadelta(lr=lr, rho=0.95, epsilon=1e-08, decay=0.0)
 
-    return model
+        model.compile(optimizer='adadelta', loss='MSE')
+
+        return model
+
+    else:
+
+        inputs = Input(shape=(input_length, n_feat))
+
+        print("Trainable ???", trainable)
+
+        merge_mode = "sum"
+
+        from keras.layers.recurrent import LSTM
+
+        l1 = Bidirectional(LSTM(size, return_sequences=True,
+                                trainable=trainable, recurrent_dropout=recurrent_dropout),
+                           merge_mode=merge_mode)(inputs)
+        # if res:
+        # l1 = Add()([l1, inputs])
+        l2 = Bidirectional(LSTM(size, return_sequences=True,
+                                trainable=trainable, recurrent_dropout=recurrent_dropout),
+                           merge_mode=merge_mode)(l1)
+        l2 = Add()([l2, l1])
+        #l2 = Reshape((input_length, w * w * size))(l2)
+
+        out_layer1 = TimeDistributed(Dense(3, activation="linear"), name="out_layer1")(l2)
+
+        model = Model(inputs=inputs, outputs=out_layer1)
+
+        ada = Adadelta(lr=lr, rho=0.95, epsilon=1e-08, decay=0.0)
+
+        model.compile(optimizer='adadelta', loss='MSE')
+
+        return model
