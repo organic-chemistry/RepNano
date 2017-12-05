@@ -65,7 +65,7 @@ if __name__ == '__main__':
     if not args.hot:
         model = build_models(input_length=input_length, n_feat=2)
     else:
-        model = build_models(input_length=input_length, n_feat=4, hot=True)
+        model = build_models(input_length=input_length, n_feat=5, hot=True)
 
     Schedul = lrd(waiting_time=100, start_lr=args.lr, min_lr=0.0001, factor=2)
 
@@ -86,7 +86,8 @@ if __name__ == '__main__':
             if not args.hot:
                 X_new.append([feat[st] for st in s_tmp])
             else:
-                feat = {"A": [1, 0, 0, 0], "T": [0, 1, 0, 0], "C": [0, 0, 1, 0], "G": [0, 0, 0, 1]}
+                feat = {"A": [1, 0, 0, 0, 0], "C": [0, 1, 0, 0, 0],
+                        "G": [0, 0, 1, 0, 0], "T": [0, 0, 0, 1, 0], "B": [0, 0, 0, 0, 1]}
                 X_new.append([feat[st] for st in s_tmp])
 
             Y_new.append(signal[choice][part:part + input_length])
