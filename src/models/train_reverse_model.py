@@ -51,6 +51,7 @@ if __name__ == '__main__':
     parser.add_argument('--hybrid', dest="hybrid", action="store_true")
     parser.add_argument('--feat', dest='feat', type=str)
     parser.add_argument('--hot', dest='hot', action="store_true")
+    parser.add_argument('--nepoch', dest="nepoch", default=1000, type=int)
 
     args = parser.parse_args()
 
@@ -67,11 +68,14 @@ if __name__ == '__main__':
     else:
         model = build_models(input_length=input_length, n_feat=5, hot=True)
 
+    if args.pre_trained_weight is not None:
+        model.load_weights(args.pre_trained_weight)
+
     Schedul = lrd(waiting_time=100, start_lr=args.lr, min_lr=0.0001, factor=2)
 
     os.makedirs(args.root, exist_ok=True)
 
-    for epoch in range(1000):
+    for epoch in range(args.nepoch):
         X_new = []
         Y_new = []
 
