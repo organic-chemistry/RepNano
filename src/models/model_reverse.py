@@ -41,7 +41,7 @@ def build_models(size=4, nbase=1, trainable=True, ctc_length=40, ctc=True,
         l2 = Add()([l2, l1])
         l2 = Reshape((input_length, w * w * size))(l2)
 
-        out_layer1 = TimeDistributed(Dense(3, activation="linear"), name="out_layer1")(l2)
+        out_layer1 = TimeDistributed(Dense(1, activation="linear"), name="out_layer1")(l2)
 
         model = Model(inputs=inputs, outputs=out_layer1)
 
