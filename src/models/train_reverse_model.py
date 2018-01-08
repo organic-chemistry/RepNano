@@ -71,7 +71,7 @@ if __name__ == '__main__':
     if args.pre_trained_weight is not None:
         model.load_weights(args.pre_trained_weight)
 
-    Schedul = lrd(waiting_time=100, start_lr=args.lr, min_lr=0.0001, factor=2)
+    Schedul = lrd(waiting_time=500, start_lr=args.lr, min_lr=0.0001, factor=2)
 
     os.makedirs(args.root, exist_ok=True)
 
