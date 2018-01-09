@@ -94,17 +94,30 @@ def scale_clean_two(X, normalise_window=True, nw=100):
 
     #print(pd.rolling_mean(X[:, 0], nw))
 
-    #
-    ret[:, 0] = X[:, 0] - pd.Series(X[:, 0]).rolling(nw, center=True, min_periods=1).median()
+    if nw is None:
+        minus = np.mean(X[:, 0])
+    else:
+        minus = pd.Series(X[:, 0]).rolling(nw, center=True, min_periods=1).median()
+
+    ret[:, 0] = X[:, 0] - minus
     #print(np.std(ret[:, 0]))
     ret[:, 0] = ret[:, 0] / np.std(ret[:, 0])
     #ret[:, 0] = ret[:, 0] / np.std(ret[:, 0])
 
-    ret[:, 1] = X[:, 2] - pd.Series(X[:, 2]).rolling(nw, center=True, min_periods=1).median()
+    if nw is None:
+        minus = np.mean(X[:, 2])
+    else:
+        minus = pd.Series(X[:, 2]).rolling(nw, center=True, min_periods=1).median()
+
+    ret[:, 1] = X[:, 2] - minus
     ret[:, 1] = ret[:, 1] / np.std(ret[:, 1])
 
-    ret[:, 2] = X[:, 3] - pd.Series(X[:, 3]).rolling(nw, center=True,
-                                                     min_periods=1).median()  # + 0.001 * np.random.rand()
+    if nw is None:
+        minus = np.mean(X[:, 3])
+    else:
+        minus = pd.Series(X[:, 3]).rolling(nw, center=True, min_periods=1).median()
+
+    ret[:, 2] = X[:, 3] - minus  # + 0.001 * np.random.rand()
     ret[:, 2] = ret[:, 2] / np.std(ret[:, 2])
 
     ret = ret[:, :3]
