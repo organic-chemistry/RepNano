@@ -264,10 +264,10 @@ def generate_events(ss1, ss2, peaks, sample_rate, raw):
         l = e - s
         events[i]["length"] = l
 
-        m = np.median(raw[s:s + l])
+        m = np.mean(raw[s:s + l])
         events[i]["mean"] = m
 
-        events[i]["stdv"] = np.sqrt(np.median((raw[s:s + l] - m)**2))
+        events[i]["stdv"] = np.sqrt(np.mean((raw[s:s + l] - m)**2))
         #print(l, sample_rate)
         s = e
     print("Generate med")
