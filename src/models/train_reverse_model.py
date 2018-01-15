@@ -79,7 +79,7 @@ if __name__ == '__main__':
         X_new = []
         Y_new = []
 
-        tr = 100
+        tr = 500
         for c in range(tr):
             choice = np.random.randint(len(seqs))
             if len(seqs[choice]) <= input_length:
@@ -99,7 +99,7 @@ if __name__ == '__main__':
         X_new = np.array(X_new)
         Y_new = np.array(Y_new)
 
-        r = model.fit(X_new, Y_new[::, ::, :1], nb_epoch=1, batch_size=10, validation_split=0.05)
+        r = model.fit(X_new, Y_new[::, ::, :1], nb_epoch=1, batch_size=50, validation_split=0.05)
         # ntwk.fit(X_new, Y_new, nb_epoch=1, batch_size=10, validation_split=0.05,
         #          sample_weight={"out_layer2": w2}, )
 
