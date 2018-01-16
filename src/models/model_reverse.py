@@ -65,14 +65,19 @@ def build_models(size=4, nbase=1, trainable=True, ctc_length=40, ctc=True,
                                 trainable=trainable, recurrent_dropout=recurrent_dropout),
                            merge_mode=merge_mode)(inputs)
         # if res:
-        # l1 = Add()([l1, inputs])
+        l1 = Add()([l1, inputs])
         l2 = Bidirectional(LSTM(size, return_sequences=True,
                                 trainable=trainable, recurrent_dropout=recurrent_dropout),
                            merge_mode=merge_mode)(l1)
         l2 = Add()([l2, l1])
+
+        l3 = Bidirectional(LSTM(size, return_sequences=True,
+                                trainable=trainable, recurrent_dropout=recurrent_dropout),
+                           merge_mode=merge_mode)(l2)
+        l3 = Add()([l3, l2])
         #l2 = Reshape((input_length, w * w * size))(l2)
 
-        out_layer1 = TimeDistributed(Dense(n_output, activation="linear"), name="out_layer1")(l2)
+        out_layer1 = TimeDistributed(Dense(n_output, activation="linear"), name="out_layer1")(l3)
 
         model = Model(inputs=inputs, outputs=out_layer1)
 
