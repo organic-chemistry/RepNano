@@ -5,7 +5,6 @@ Here we choose the chromosome 11 to be the test
 need bwa
 """
 
-
 import os
 import subprocess
 

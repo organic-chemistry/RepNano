@@ -10,9 +10,14 @@ chars = "ACGT"
 mapping = {"A": 0, "C": 1, "G": 2, "T": 3, "N": 4}
 
 
+def scale_simple(X):
+
+    return np.array((X["mean"][::, np.newaxis] - 100) / 15)
+
+
 def scale(X, normalise_window=True):
 
-    print("means", np.mean(X[:, :4], axis=0))
+    print("means", np.mean(X[:, : 4], axis=0))
 
     m25 = np.percentile(X[:, 0], 25)
     m75 = np.percentile(X[:, 0], 75)
@@ -25,7 +30,7 @@ def scale(X, normalise_window=True):
     m25 *= scale
     shift = me25 - m25
 
-    #scale = 0.0019
+    # scale = 0.0019
     ret[:, 0] = X[:, 0] * scale + shift
     ret[:, 1] = ret[:, 0]**2
 
@@ -34,12 +39,12 @@ def scale(X, normalise_window=True):
     ret[:, 2] = X[:, 2] * sscale
     if normalise_window:
         print("Norm")
-        #ret[:, 3] = 0.002 * ret[:, 3] / np.mean(ret[:, 3])
+        # ret[:, 3] = 0.002 * ret[:, 3] / np.mean(ret[:, 3])
     #print("Mean window length")#
-    print("means", np.mean(ret[:, :4], axis=0))
-    print("std", np.std(ret[:, :4], axis=0))  # , np.std(ret[:, 3]), np.median(ret[:, 3]))
-    #print(scale, shift)
-    #print((me75 - me25) / (m75 - m25), me25 - m25, se50 / s50)
+    print("means", np.mean(ret[:, : 4], axis=0))
+    print("std", np.std(ret[:, : 4], axis=0))  # , np.std(ret[:, 3]), np.median(ret[:, 3]))
+    # print(scale, shift)
+    # print((me75 - me25) / (m75 - m25), me25 - m25, se50 / s50)
 
     scale_clean(X)
     return ret
@@ -49,16 +54,16 @@ def scale_clean(X, normalise_window=True):
 
     ret = np.array(X)
 
-    #print("std", np.mean(ret[:, 2]))
+    # print("std", np.mean(ret[:, 2]))
     ret[:, 0] = (X[:, 0] - 100) / 50
     ret[:, 1] = ret[:, 3] / np.mean(ret[:, 3]) - 1
     ret[:, 2] = X[:, 2] / 35
 
-    #ret[:, 3] = 0.002 * ret[:, 3] / np.mean(ret[:, 3])
+    # ret[:, 3] = 0.002 * ret[:, 3] / np.mean(ret[:, 3])
     print("Mean window scale_clean", np.mean(ret[:, : 4], axis=0), np.std(ret[:, : 4], axis=0))
 
     # scale_clean_two(X)
-    return ret[:, :3]
+    return ret[:, : 3]
 
 """
 def scale_clean_two(X, normalise_window=True):
@@ -78,7 +83,7 @@ def scale_clean_two(X, normalise_window=True):
 
     ret = ret[:, :3]
     print(ret.shape)
-    #ret[:, 3] = 0.002 * ret[:, 3] / np.mean(ret[:, 3])
+    # ret[:, 3] = 0.002 * ret[:, 3] / np.mean(ret[:, 3])
     print("Mean window scale_clean_two", np.mean(ret[:, : 3], axis=0), np.std(ret[:, : 3], axis=0))
     return ret[:, :3]
 """
@@ -92,7 +97,7 @@ def scale_clean_two(X, normalise_window=True, nw=100):
     print("std", np.std(ret[:, 0]), np.std(ret[:, 2]), np.std(ret[:, 3]))
     print("mean", np.mean(ret[:, 0]), np.mean(ret[:, 2]), np.mean(ret[:, 3]))
 
-    #print(pd.rolling_mean(X[:, 0], nw))
+    # print(pd.rolling_mean(X[:, 0], nw))
 
     if nw is None:
         minus = np.mean(X[:, 0])
@@ -100,9 +105,9 @@ def scale_clean_two(X, normalise_window=True, nw=100):
         minus = pd.Series(X[:, 0]).rolling(nw, center=True, min_periods=1).median()
 
     ret[:, 0] = X[:, 0] - minus
-    #print(np.std(ret[:, 0]))
+    # print(np.std(ret[:, 0]))
     ret[:, 0] = ret[:, 0] / np.std(ret[:, 0])
-    #ret[:, 0] = ret[:, 0] / np.std(ret[:, 0])
+    # ret[:, 0] = ret[:, 0] / np.std(ret[:, 0])
 
     if nw is None:
         minus = np.mean(X[:, 2])
@@ -120,11 +125,11 @@ def scale_clean_two(X, normalise_window=True, nw=100):
     ret[:, 2] = X[:, 3] - minus  # + 0.001 * np.random.rand()
     ret[:, 2] = ret[:, 2] / np.std(ret[:, 2])
 
-    ret = ret[:, :3]
+    ret = ret[:, : 3]
     print(ret.shape)
-    #ret[:, 3] = 0.002 * ret[:, 3] / np.mean(ret[:, 3])
+    # ret[:, 3] = 0.002 * ret[:, 3] / np.mean(ret[:, 3])
     print("Mean window scale_clean_two", np.mean(ret[:, : 3], axis=0), np.std(ret[:, : 3], axis=0))
-    return ret[:, :3]
+    return ret[:, : 3]
 
 
 def preproc_event(mean, std, length):

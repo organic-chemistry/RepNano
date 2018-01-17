@@ -222,6 +222,7 @@ if __name__ == '__main__':
     parser.add_argument('--ctc-length', dest="ctc_length", type=int, default=20)
     parser.add_argument('--lr', dest="lr", type=float, default=0.01)
     parser.add_argument('--clean', dest="clean", action="store_true")
+    parser.add_argument('--sclean', dest="sclean", action="store_true")
     parser.add_argument('--attention', dest="attention", action="store_true")
     parser.add_argument('--residual', dest="res", action="store_true")
     parser.add_argument('--all-file', nargs='+', dest="allignment_files", default=[], type=str)
@@ -263,6 +264,9 @@ if __name__ == '__main__':
     n_feat = 4
     if args.clean:
         n_feat = 3
+
+    if args.sclean:
+        n_feat = 1
 
     _, ntwk = build_models(args.size, nbase=args.Nbases - 4,
                            ctc_length=ctc_length,
@@ -325,8 +329,19 @@ if __name__ == '__main__':
                 refs += t_refs
                 names += t_names
     else:
-        with open(allignment_file, "rb") as f:
-            data_x, data_y, data_y2, refs, names = cPickle.load(f)
+        from ..data.dataset import Dataset
+        from ..features.helpers import scale_simple
+        root = "data/raw/20170908-R9.5/"
+        D = Dataset(samfile=root + "BTF_AG_ONT_1_FAH14273_A-select.sam",
+                    root_files=root + "AG-basecalled/")
+        D.populate(maxf=None, filter_not_alligned=True, filter_ch=range(1, 11))
+        data_x = []
+        for strand in D.strands:
+            strand.segmentation(w=8)
+            transfered = strand.transfer(strand.signal_bc, strand.segments)
+
+            data_x.append(scale_simple(transfered))
+            data_y.append([mapping[b] for b in transfered["seq"]])
 
     print("done", sum(len(x) for x in refs))
     sys.stdout.flush()

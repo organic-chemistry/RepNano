@@ -1,6 +1,7 @@
 
 # read the ref file
 import re
+import io
 
 
 def LenghtOnRef(CIGAR):
@@ -47,10 +48,16 @@ def SeqInRef(Chrom, pos, bit, Lenght, ref):
 
 # read the sam file and write the input file for deepnano
 
-def get_seq(sam, ref, ret_pos=False):
+def get_seq(sam, ref, ret_pos=False, from_line=False):
     ret = ["", 0, None, None]
     maxlen = 0
-    with open(sam, 'r') as f:
+
+    if from_line:
+        op = io.StringIO(sam)
+    else:
+        op = open(sam, 'r')
+
+    with op as f:
         s = f.readline()  # read the 1st line
         while s != '':
             ss = s.split()
