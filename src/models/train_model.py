@@ -334,7 +334,7 @@ if __name__ == '__main__':
         root = "data/raw/20170908-R9.5/"
         D = Dataset(samfile=root + "BTF_AG_ONT_1_FAH14273_A-select.sam",
                     root_files=root + "AG-basecalled/")
-        D.populate(maxf=None, filter_not_alligned=True, filter_ch=range(1, 11))
+        D.populate(maxf=3, filter_not_alligned=True, filter_ch=range(1, 11))
         data_x = []
         for strand in D.strands:
             strand.segmentation(w=8)
@@ -638,7 +638,7 @@ if __name__ == '__main__':
             w2 = np.array(w2)
 
         if not args.ctc:
-            predictor.fit(X_new, Y_new, nb_epoch=1, batch_size=10, validation_split=0.05)
+            r = predictor.fit(X_new, Y_new, nb_epoch=1, batch_size=10, validation_split=0.05)
             # ntwk.fit(X_new, Y_new, nb_epoch=1, batch_size=10, validation_split=0.05,
             #          sample_weight={"out_layer2": w2}, )
             if epoch % 10 == 0:
@@ -677,32 +677,36 @@ if __name__ == '__main__':
                                                     len(Length))[maxin:maxin + val],
                                            Length[maxin:maxin + val]],
                                           Label[maxin:maxin + val]))
-            csv_keys = ["epoch", "loss", "val_loss"]
-
-            lr = Schedul.set_new_lr(r.history["loss"][0])
-            K.set_value(ntwk.optimizer.lr, lr)
-            print(lr)
-
-            if epoch == 0:
-                with open(os.path.join(args.root, "training.log"), "w") as csv_file:
-                    writer = csv.writer(csv_file)
-                    #from IPython import embed
-                    # embed()
-                    # print(r)
-                    writer.writerow(csv_keys + ["lr"])
-                    writer.writerow([epoch] + [r.history[k][-1] for k in csv_keys[1:]] + [lr])
-            else:
-                with open(os.path.join(args.root, "training.log"), "a") as csv_file:
-                    writer = csv.writer(csv_file)
-                    #writer.writerow(k + ["lr"])
-                    writer.writerow([epoch] + [r.history[k][-1] for k in csv_keys[1:]] + [lr])
-            if Schedul.stop:
-                exit()
-
-            # if epoch == 0:
-            #    ntwk.fit(X_new,[Y_new,Y2_new],nb_epoch=1, batch_size=10,validation_split=0.05)
             if epoch % 10 == 0:
                 ntwk.save_weights(os.path.join(
                     args.root, 'my_model_weights-%i.h5' % epoch))
+
+        csv_keys = ["epoch", "loss", "val_loss"]
+
+        lr = Schedul.set_new_lr(r.history["loss"][0])
+
+        K.set_value(ntwk.optimizer.lr, lr)
+        K.set_value(predictor.optimizer.lr, lr)
+
+        print(lr)
+
+        if epoch == 0:
+            with open(os.path.join(args.root, "training.log"), "w") as csv_file:
+                writer = csv.writer(csv_file)
+                #from IPython import embed
+                # embed()
+                # print(r)
+                writer.writerow(csv_keys + ["lr"])
+                writer.writerow([epoch] + [r.history[k][-1] for k in csv_keys[1:]] + [lr])
+        else:
+            with open(os.path.join(args.root, "training.log"), "a") as csv_file:
+                writer = csv.writer(csv_file)
+                #writer.writerow(k + ["lr"])
+                writer.writerow([epoch] + [r.history[k][-1] for k in csv_keys[1:]] + [lr])
+        if Schedul.stop:
+            exit()
+
+        # if epoch == 0:
+        #    ntwk.fit(X_new,[Y_new,Y2_new],nb_epoch=1, batch_size=10,validation_split=0.05)
 
 #  print "out", np.min(out_gc), np.median(out_gc), np.max(out_gc), len(out_gc)

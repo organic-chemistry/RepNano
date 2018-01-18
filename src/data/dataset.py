@@ -1,11 +1,17 @@
 
 import glob
-from ..features.bwa_tools import get_seq
-from ..features.extract_events import get_raw, extract_events
+try:
+    from ..features.bwa_tools import get_seq
+    from ..features.extract_events import get_raw, extract_events
+except:
+    from features.bwa_tools import get_seq
+    from features.extract_events import get_raw, extract_events
 import h5py
 import numpy as np
 from Bio import pairwise2
 import pylab
+import subprocess
+import pandas as pd
 
 
 class NotAllign(Exception):
@@ -18,9 +24,10 @@ REF = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
 
 class Dataset:
 
-    def __init__(self, samfile, root_files):
+    def __init__(self, samfile, root_files, metadata=""):
         self.root_files = root_files
         self.samfile = samfile
+        self.metadata = ""
 
     def populate(self, maxf=None, minion=True, basecall=True, filter_not_alligned=False, filter_ch=None):
         self.strands = []
@@ -95,7 +102,7 @@ def compare_metrichor(file_netw,type_b="B",show_identical=False,ntwk=None):
                 datan[sp[0].split("/")[-1]] = sp[1:4]
             else:
                 pass
-                #print(sp)
+                # print(sp)
 
 """
 
@@ -126,40 +133,37 @@ class Strand:
                 state = "%s" % ms.tostring()
                 state = state[2:-1]  # to remove b' and '
                 # print(s)
-                #state = state[2]
+                # state = state[2]
 
                 if move == 1:
                     s2 += state[2]
                     state = state[2]
-                    self.signal_bc.append((state, m, stdv, length, s))
+                    self.signal_bc.append([state, m, stdv, length, s])
                     left = None
                 elif move >= 2:
                     s2 += state[1:3]
                     state = state[1:3]
 
                     if self.signal_bc[-1][0] == "N":
-                        self.signal_bc[-1] = list(self.signal_bc[-1])
                         self.signal_bc[-1][0] = state[0]
-                        self.signal_bc[-1] = tuple(self.signal_bc[-1])
-
-                        self.signal_bc.append((state[1], m, stdv, length, s))
+                        self.signal_bc.append([state[1], m, stdv, length, s])
                     else:
-                        self.signal_bc.append((state[0], m, stdv, length, s))
+                        self.signal_bc.append([state[0], m, stdv, length, s])
                         left = state[1]
                 elif move == 0:
-                    self.signal_bc.append(("N", m, stdv, length, s))
+                    self.signal_bc.append(["N", m, stdv, length, s])
                     if left is not None:
-                        self.signal_bc[-1] = list(self.signal_bc[-1])
                         self.signal_bc[-1][0] = left
-                        self.signal_bc[-1] = tuple(self.signal_bc[-1])
                     left = None
                 else:
                     left = None
 
-            self.signal_bc = np.array(self.signal_bc, dtype=[('seq', np.str_, 2), ('mean', 'f4'),
-                                                             ('stdv', 'f4'), ('length', 'f4'), ('start', 'f4')])
+            names = ["seq", "mean", "stdv", "length", "start"]
+            self.signal_bc = pd.DataFrame({n: v for n, v in zip(
+                names, np.array(self.signal_bc).T)}).convert_objects(convert_numeric=True)
 
             self.allign_basecall_raw()
+            # print(self.signal_bc)
 
             self.signal_bc["start"] += (self.imin / self.sampling_rate - self.signal_bc["start"][0])
 
@@ -169,6 +173,19 @@ class Strand:
         s1 = self.seq_from_minion
         s2 = self.seq_from_basecall
         self.score(s1, s2, maxlen=maxlen)
+
+    def get_ref(self, sequence):
+
+        with open("./" + "/tmp.fasta", "w") as output_file:
+            filename = "tmp"
+            output_file.writelines(">%s_template_deepnano\n" % filename)
+            output_file.writelines(sequence.replace("B", "T") + "\n")
+
+        exex = "bwa mem -x ont2d  %s  %s/tmp.fasta > %s/tmp.sam" % (REF, "./", "./")
+        subprocess.call(exex, shell=True)
+        ref, succes, X1, P1 = get_seq("./tmp.sam", ref=REF, ret_pos=True)
+        print(X1, P1)
+        return ref
 
     def score(self, s1, s2, maxlen=1000):
 
@@ -253,6 +270,18 @@ class Strand:
         h5 = h5py.File(self.filename, "r")
         self.segments = extract_events(h5, chem="rf", window_size=w)
 
+    def analyse_segmentation(self, ntwk, signal, n=5):
+        if n == 4:
+            alph = "ACGTN"
+        if n == 5:
+            alph = "ACGTBN"
+        if n == 8:
+            alph = "ACGTBLEIN"
+
+        b = np.argmax(ntwk.predict(signal[np.newaxis, ::, ::])[0], axis=-1)
+        output = np.array(list(map(lambda x: str(alph + "T")[x], b)))[::, np.newaxis]
+        return np.concatenate((output, signal), axis=-1)
+
     def transfer(self, root_signal, signal_to_label, center_of_mass=False):
         # Compute center:
 
@@ -276,17 +305,18 @@ class Strand:
                     s = (r_center[ib] > signal_to_label["start"]) &  \
                         (r_center[ib] < (signal_to_label["start"] + signal_to_label["length"]))
 
-                    #where = np.argmin( np.abs(stl_center-r_center[ib]))
+                    # where = np.argmin( np.abs(stl_center-r_center[ib]))
                     where = np.argmax(s)
                     stl_base[where] = b
 
         new_signal = []
         for s, m, std, l, start in zip(stl_base, signal_to_label["mean"], signal_to_label["stdv"],
                                        signal_to_label["length"], signal_to_label["start"]):
-            new_signal.append((s, m, std, l, start))
+            new_signal.append([s, m, std, l, start])
 
-        return np.array(new_signal, dtype=[('seq', np.str_, 2), ('mean', 'f4'),
-                                           ('stdv', 'f4'), ('length', 'f4'), ('start', 'f4')])
+        names = ["seq", "mean", "stdv", "length", "start"]
+        return pd.DataFrame({n: v for n, v in zip(
+            names, np.array(new_signal).T)}).convert_objects(convert_numeric=True)
 
 """
 ref = "../../data/processed/results/ctc_20170908-R9.5/BTF_AG_ONT_1_FAH14273_A-select_pass_test_T.sam"
