@@ -376,7 +376,7 @@ if __name__ == '__main__':
 
 
 # ntwk.load_weights("./my_model_weights.h5")
-    Schedul = lrd(waiting_time=500, start_lr=args.lr, min_lr=0.0001, factor=2)
+    Schedul = lrd(waiting_time=2000, start_lr=args.lr, min_lr=0.0001, factor=2)
     for epoch in range(20000):
 
         # Test to see if realignment is interesting:
