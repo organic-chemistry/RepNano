@@ -334,7 +334,7 @@ if __name__ == '__main__':
         root = "data/raw/20170908-R9.5/"
         D = Dataset(samfile=root + "BTF_AG_ONT_1_FAH14273_A-select.sam",
                     root_files=root + "AG-basecalled/")
-        D.populate(maxf=3, filter_not_alligned=True, filter_ch=range(1, 11))
+        D.populate(maxf=None, filter_not_alligned=True, filter_ch=range(1, 11))
         data_x = []
         for strand in D.strands:
             strand.segmentation(w=8)
