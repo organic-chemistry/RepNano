@@ -76,9 +76,9 @@ class Dataset:
                     if minion:
                         if realign:
                             self.strands[-1].seq_from_minion = self.strands[-1].get_ref(
-                                self.strands[-1].seq_from_basecall)
+                                self.strands[-1].seq_from_basecall, correct=True)
                         else:
-                            self.strands[-1].get_seq(f="Minion")
+                            self.strands[-1].get_seq(f="Minion", correct=True)
 
             """
             chp = kp.split("_")[0][3:]
@@ -121,9 +121,9 @@ class Strand:
         self.t_from_Minion = t_from_Minion
         self.sam_line_minion = sam_line_minion
 
-    def get_seq(self, f):
+    def get_seq(self, f, correct=False):
         if f == "Minion":
-            seq, sucess = get_seq(self.sam_line_minion, ref=REF, from_line=True)
+            seq, sucess = get_seq(self.sam_line_minion, ref=REF, from_line=True, correct=correct)
             self.seq_from_minion = seq
 
         if f == "BaseCall":
@@ -180,7 +180,7 @@ class Strand:
         s2 = self.seq_from_basecall
         self.score(s1, s2, maxlen=maxlen)
 
-    def get_ref(self, sequence):
+    def get_ref(self, sequence, correct=False):
 
         with open("./" + "/tmp.fasta", "w") as output_file:
             filename = "tmp"
@@ -189,7 +189,7 @@ class Strand:
 
         exex = "bwa mem -x ont2d  %s  %s/tmp.fasta > %s/tmp.sam" % (REF, "./", "./")
         subprocess.call(exex, shell=True)
-        ref, succes, X1, P1 = get_seq("./tmp.sam", ref=REF, ret_pos=True)
+        ref, succes, X1, P1 = get_seq("./tmp.sam", ref=REF, ret_pos=True, correct=correct)
         #print(X1, P1)
         return ref
 
@@ -242,6 +242,52 @@ class Strand:
         self.to_match = to_match
         self.raw = raw
         self.sampling_rate = amp
+
+    def give_map(self, ref, allgn):
+        """
+        given a ref from basecall or network, and an allignment with
+        the true sequence, return a new ref, matching more closely
+        the true sequence
+        """
+        indexes = [i for i, l in enumerate(ref) if l != "N"]
+        # print(indexes)
+        i = 0
+        alb = []
+        for l in allgn[0]:
+            if l != "-":
+                alb.append(indexes[i])
+                i += 1
+            else:
+
+                # if in alb there are "-" which are surrounded by non adjacent integer we
+                # can add letters:
+                if alb != [] and type(alb[-1]) == int and indexes[i] - 1 > alb[-1]:
+                    alb.append(alb[-1] + 1)
+                else:
+                    alb.append("-")
+
+        """print(allgn[0])
+        print("".join(map(str, alb)))
+        print(allgn[1])"""
+
+        # Look for numeric which correspend to "-" to see if we can insert more of the sequence
+        # Look for diagonal pattern of "-"
+        switch = []
+        for ind, (num, nump, l, lp) in enumerate(zip(alb[:-1], alb[1:], allgn[1][:-1], allgn[1][1:])):
+
+            if (num == "-" and lp == "-") or (nump == "-" and l == "-"):
+                switch.append(ind)
+        # print(switch)
+        for ind in switch:
+            alb[ind], alb[ind + 1] = alb[ind + 1], alb[ind]
+
+        mapped = ["N" for l in ref]
+        for num, l in zip(alb, allgn[1]):
+            if type(num) == int:
+                if l != "-":
+                    mapped[num] = l
+
+        return "".join(mapped)
 
     def show_segmentation_bc(self):
         self.allign_basecall_raw()

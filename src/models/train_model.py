@@ -229,6 +229,7 @@ if __name__ == '__main__':
     parser.add_argument('--simple', dest="simple", action="store_true")
     parser.add_argument('--all-T', dest="all_T", action="store_true")
     parser.add_argument('--hybrid', dest="hybrid", action="store_true")
+    parser.add_argument('--correct-ref', dest="correct_ref", action="store_true")
 
     args = parser.parse_args()
 
@@ -334,11 +335,30 @@ if __name__ == '__main__':
         root = "data/raw/20170908-R9.5/"
         D = Dataset(samfile=root + "BTF_AG_ONT_1_FAH14273_A-select.sam",
                     root_files=root + "AG-basecalled/")
-        D.populate(maxf=None, filter_not_alligned=True, filter_ch=range(1, 11))
+        maxf = None
+        if args.test:
+            maxf = 10
+        D.populate(maxf=maxf, filter_not_alligned=True, filter_ch=range(1, 11))
         data_x = []
+        correct_ref = args.correct_ref
         for strand in D.strands:
-            strand.segmentation(w=8)
-            transfered = strand.transfer(strand.signal_bc, strand.segments)
+
+            if args.correct_ref:
+                strand.segmentation(w=8)
+
+                transfered = strand.transfer(strand.signal_bc, strand.segments)
+
+                # map the transefered:
+                ref = strand.get_ref("".join(transfered["seq"].replace("N", "")), correct=True)
+                # allign the ref on the transefered
+                al = strand.score("".join(transfered["seq"]).replace("N", ""), ref, all_info=True)
+
+                mapped_ref = strand.give_map("".join(transfered["seq"]), al[:2])
+
+                transfered["seq"] = np.array([s for s in mapped_ref])
+            else:
+                strand.segmentation(w=8)
+                transfered = strand.transfer(strand.signal_bc, strand.segments)
 
             data_x.append(scale_simple(transfered))
             data_y.append([mapping[b] for b in transfered["seq"]])

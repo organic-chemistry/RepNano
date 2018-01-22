@@ -38,7 +38,7 @@ def SeqInRef(Chrom, pos, bit, Lenght, ref):
             s = f.readline()
     if bit == '16' or bit == '2064':
         revcompl = lambda x: ''.join([{'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}[B] for B in x][::-1])
-        #Ref = revcompl(Ref)
+        # Ref = revcompl(Ref)
     f.close()
     SeqInRef = ''.join(Ref[pos:pos + Lenght])
     if bit == '16' or bit == '2064':
@@ -49,7 +49,7 @@ def SeqInRef(Chrom, pos, bit, Lenght, ref):
 
 # read the sam file and write the input file for deepnano
 
-def get_seq(sam, ref, ret_pos=False, from_line=False):
+def get_seq(sam, ref, ret_pos=False, from_line=False, correct=False):
     ret = ["", 0, None, None]
     maxlen = 0
 
@@ -80,12 +80,30 @@ def get_seq(sam, ref, ret_pos=False, from_line=False):
                     # SamSeq = ss[9]
                     # print ss[0]
                     # print Q
-                    #print(Chrom, pos, Bit, LenghtOnRef(CIGAR), ref)
+                    # print(Chrom, pos, Bit, LenghtOnRef(CIGAR), ref)
                     Len = len(cigar.Cigar(CIGAR))
+                    offset_start = 0
+                    offset_end = 0
+
+                    if correct:
+                        offset_start = CIGAR.split("S")[0]
+                        try:
+                            offset_start = int(offset_start)
+                        except:
+                            offset_start = 0
+                        # print(offset_start)
+                        offset_end = re.split('[a-zA-Z]', CIGAR)[-2]
+                        try:
+                            offset_end = int(offset_end)
+                        except:
+                            offset_end = 0
+
                     if Len < maxlen:
                         continue
-                    Seq = SeqInRef(Chrom, pos, Bit, LenghtOnRef(CIGAR), ref)
-                    #print("Inside", Seq)
+                    Seq = SeqInRef(Chrom, pos - offset_start, Bit,
+                                   LenghtOnRef(CIGAR) + offset_end, ref)
+                    # print("Inside", Seq)
+
                     if ss[2] == '*' or "chr" not in ss[2]:
                         Chrom = None
                     else:
