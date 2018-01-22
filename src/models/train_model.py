@@ -358,8 +358,8 @@ if __name__ == '__main__':
                 transfered["seq"] = np.array([s for s in mapped_ref])
 
                 print(strand.score("".join(transfered["seq"]).replace(
-                    "N", ""), ref, all_info=False))
-                print(transfered["seq"])
+                    "N", ""), ref, all_info=False), len(ref))
+                # print(transfered["seq"])
 
             else:
                 strand.segmentation(w=8)
