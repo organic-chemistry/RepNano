@@ -29,7 +29,8 @@ class Dataset:
         self.samfile = samfile
         self.metadata = ""
 
-    def populate(self, maxf=None, minion=True, basecall=True, filter_not_alligned=False, filter_ch=None):
+    def populate(self, maxf=None, minion=True, basecall=True,
+                 filter_not_alligned=False, filter_ch=None, realign=False):
         self.strands = []
         lstrand = glob.glob(self.root_files + "/*")
 
@@ -62,8 +63,7 @@ class Dataset:
                                                X_from_Minion=int(X),
                                                t_from_Minion=0,
                                                sam_line_minion=line))
-                    if minion:
-                        self.strands[-1].get_seq(f="Minion")
+
                     if basecall:
                         try:
                             self.strands[-1].get_seq(f="BaseCall")
@@ -73,6 +73,12 @@ class Dataset:
                             if filter_not_alligned:
                                 print("Removed")
                                 self.strands.pop(-1)
+                    if minion:
+                        if realign:
+                            self.strands[-1].seq_from_minion = self.strands[-1].get_ref(
+                                self.strands[-1].seq_from_basecall)
+                        else:
+                            self.strands[-1].get_seq(f="Minion")
 
             """
             chp = kp.split("_")[0][3:]
@@ -184,10 +190,10 @@ class Strand:
         exex = "bwa mem -x ont2d  %s  %s/tmp.fasta > %s/tmp.sam" % (REF, "./", "./")
         subprocess.call(exex, shell=True)
         ref, succes, X1, P1 = get_seq("./tmp.sam", ref=REF, ret_pos=True)
-        print(X1, P1)
+        #print(X1, P1)
         return ref
 
-    def score(self, s1, s2, maxlen=1000):
+    def score(self, s1, s2, maxlen=1000, all_info=False):
 
         if s1 == "":
             return None
@@ -198,9 +204,12 @@ class Strand:
             s1 = s1[:maxlen]
             s2 = s2[:maxlen]
 
-        al = pairwise2.align.globalxs(s1, s2, -0.5, -0.5, one_alignment_only=True)[0][2]
+        al = pairwise2.align.globalxs(s1, s2, -0.5, -0.5, one_alignment_only=True)[0]
 
-        return al / len(s1)
+        if all_info:
+            return al
+        else:
+            return al[2] / len(s1)
 
     def allign_basecall_raw(self):
 

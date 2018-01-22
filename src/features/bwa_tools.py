@@ -2,6 +2,7 @@
 # read the ref file
 import re
 import io
+import cigar
 
 
 def LenghtOnRef(CIGAR):
@@ -80,7 +81,7 @@ def get_seq(sam, ref, ret_pos=False, from_line=False):
                     # print ss[0]
                     # print Q
                     #print(Chrom, pos, Bit, LenghtOnRef(CIGAR), ref)
-                    Len = LenghtOnRef(CIGAR)
+                    Len = len(cigar.Cigar(CIGAR))
                     if Len < maxlen:
                         continue
                     Seq = SeqInRef(Chrom, pos, Bit, LenghtOnRef(CIGAR), ref)
