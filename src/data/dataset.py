@@ -261,7 +261,7 @@ class Strand:
 
                 # if in alb there are "-" which are surrounded by non adjacent integer we
                 # can add letters:
-                if alb != [] and type(alb[-1]) == int and indexes[i] - 1 > alb[-1]:
+                if alb != [] and type(alb[-1]) == int and i < len(indexes) and indexes[i] - 1 > alb[-1]:
                     alb.append(alb[-1] + 1)
                 else:
                     alb.append("-")
