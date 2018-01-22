@@ -344,21 +344,25 @@ if __name__ == '__main__':
         for strand in D.strands:
 
             if args.correct_ref:
-                strand.segmentation(w=8)
+                try:
+                    strand.segmentation(w=8)
 
-                transfered = strand.transfer(strand.signal_bc, strand.segments)
+                    transfered = strand.transfer(strand.signal_bc, strand.segments)
 
-                # map the transefered:
-                ref = strand.get_ref("".join(transfered["seq"].replace("N", "")), correct=True)
-                # allign the ref on the transefered
-                al = strand.score("".join(transfered["seq"]).replace("N", ""), ref, all_info=True)
+                    # map the transefered:
+                    ref = strand.get_ref("".join(transfered["seq"].replace("N", "")), correct=True)
+                    # allign the ref on the transefered
+                    al = strand.score("".join(transfered["seq"]).replace(
+                        "N", ""), ref, all_info=True)
 
-                mapped_ref = strand.give_map("".join(transfered["seq"]), al[:2])
+                    mapped_ref = strand.give_map("".join(transfered["seq"]), al[:2])
 
-                transfered["seq"] = np.array([s for s in mapped_ref])
+                    transfered["seq"] = np.array([s for s in mapped_ref])
 
-                print(strand.score("".join(transfered["seq"]).replace(
-                    "N", ""), ref, all_info=False), len(ref))
+                    print(strand.score("".join(transfered["seq"]).replace(
+                        "N", ""), ref, all_info=False), len(ref))
+                except:
+                    print("Failed")
                 # print(transfered["seq"])
 
             else:
