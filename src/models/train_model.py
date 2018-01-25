@@ -332,21 +332,21 @@ if __name__ == '__main__':
 
                 transfered = strand.transfer(strand.signal_bc, strand.segments)
                 strand.transfered_bc = copy.deepcopy(transfered)
-                if "".join(transfered["seq"].replace("N", "") > 20000:
+                if "".join(transfered["seq"]).replace("N", "") > 20000:
                     continue
                 # get the ref from transefered:
-                ref=strand.get_ref("".join(transfered["seq"].replace("N", "")), correct=True)
+                ref = strand.get_ref("".join(transfered["seq"].replace("N", "")), correct=True)
                 # allign the ref on the transefered
-                bc_strand="".join(transfered["seq"]).replace("N", "")
-                al=strand.score(bc_strand, ref, all_info=True)
-                strand.score_bc_ref=al[2] / len(bc_strand)
+                bc_strand = "".join(transfered["seq"]).replace("N", "")
+                al = strand.score(bc_strand, ref, all_info=True)
+                strand.score_bc_ref = al[2] / len(bc_strand)
 
-                mapped_ref, correction=strand.give_map("".join(transfered["seq"]), al[:2])
+                mapped_ref, correction = strand.give_map("".join(transfered["seq"]), al[:2])
 
-                transfered["seq"]=np.array([s for s in mapped_ref])
-                transfered["seq_correction"]=np.array([s for s in correction])
+                transfered["seq"] = np.array([s for s in mapped_ref])
+                transfered["seq_correction"] = np.array([s for s in correction])
 
-                strand.transfered_seq=transfered
+                strand.transfered_seq = transfered
 
                 print(strand.score("".join(transfered["seq"]).replace(
                     "N", ""), ref, all_info=False), len(ref))
@@ -356,7 +356,7 @@ if __name__ == '__main__':
 
         else:
             strand.segmentation(w=8)
-            transfered=strand.transfer(strand.signal_bc, strand.segments)
+            transfered = strand.transfer(strand.signal_bc, strand.segments)
 
         if args.sclean:
             data_x.append(scale_simple(transfered))
@@ -375,31 +375,31 @@ if __name__ == '__main__':
 
         for filename, ori in zip(names, original):
 
-            x_clean=scale_clean_two(ori)
+            x_clean = scale_clean_two(ori)
             # assert (len(x_clean[:, 0]) == len(x[:, 0]))
             data_x_clean.append(x_clean)
 
-        data_x=data_x_clean
+        data_x = data_x_clean
 
-    s_arr=[]
-    p_arr=[]
+    s_arr = []
+    p_arr = []
     for s in range(len(data_x)):
         s_arr += [s]
         p_arr += [len(data_x[s]) - subseq_size]
 
-    sum_p=sum(p_arr)
+    sum_p = sum(p_arr)
     for i in range(len(p_arr)):
-        p_arr[i]=1. * p_arr[i] / sum_p
+        p_arr[i] = 1. * p_arr[i] / sum_p
 
-    batch_size=1
-    n_batches=len(data_x) / batch_size
+    batch_size = 1
+    n_batches = len(data_x) / batch_size
     # print(len(data_x), batch_size, n_batches, datetime.datetime.now())
 
-    boring=False
+    boring = False
 
 
 # ntwk.load_weights("./my_model_weights.h5")
-    Schedul=lrd(waiting_time=2000, start_lr=args.lr, min_lr=0.0001, factor=2)
+    Schedul = lrd(waiting_time=2000, start_lr=args.lr, min_lr=0.0001, factor=2)
     for epoch in range(20000):
 
         # Test to see if realignment is interesting:
@@ -414,54 +414,54 @@ if __name__ == '__main__':
             # predictor.load_weights("data/training/my_model_weights-1990.h5")
 
             print("Realign")
-            New_seq=[]
-            change=0
-            old_length=0
-            new_length=0
-            total_length=0
-            current_length=0
-            switch=0
+            New_seq = []
+            change = 0
+            old_length = 0
+            new_length = 0
+            total_length = 0
+            current_length = 0
+            switch = 0
             for s in range(len(data_x)):
 
-                new_seq=np.argmax(predictor.predict(np.array([data_x[s]]))[0], axis=-1)
+                new_seq = np.argmax(predictor.predict(np.array([data_x[s]]))[0], axis=-1)
                 # print(args.Nbases)
                 if args.Nbases == 8:
-                    alph="ACGTBLEIN"   # use T to Align
+                    alph = "ACGTBLEIN"   # use T to Align
                 if args.Nbases == 5:
-                    alph="ACGTBN"   # use T to Align
+                    alph = "ACGTBN"   # use T to Align
                 if args.Nbases == 4:
-                    alph="ACGTN"
+                    alph = "ACGTN"
                 New_seq.append("".join(list(map(lambda x: alph[x], new_seq))))
 
-                nc={}
+                nc = {}
 
                 for l in ["B", "L", "E", "I", "T"]:
-                    nc[l]=New_seq[-1].count(l)
+                    nc[l] = New_seq[-1].count(l)
 
                 for l in ["B", "L", "E", "I"]:
-                    New_seq[-1]=New_seq[-1].replace(l, "T")
+                    New_seq[-1] = New_seq[-1].replace(l, "T")
 
             # Here maybe realign with bwa
             # for s in range(len(data_x)):
-                type_sub="T"
-                subts=False
-                ref="" + refs[s]
+                type_sub = "T"
+                subts = False
+                ref = "" + refs[s]
 
                 for l in ["B", "L", "E", "I"]:
                     if l in refs[s]:
-                        type_sub=l
-                        subts=True
+                        type_sub = l
+                        subts = True
                         break
                 if subts:
-                    ref=ref.replace(type_sub, "T")
+                    ref = ref.replace(type_sub, "T")
 
-                re_align=True
+                re_align = True
 
                 if re_align:
-                    old_align=data_alignment[s]
+                    old_align = data_alignment[s]
                     # new_align = pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))[0][:2]
                     try:
-                        new_align=pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))
+                        new_align = pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))
                     except MemoryError:
                         print("Out of memory")
                         continue
@@ -469,7 +469,7 @@ if __name__ == '__main__':
                         new_length += len(old_align[0])
                         print()
                         continue
-                    new_align=new_align[0][:2]
+                    new_align = new_align[0][:2]
                     print("Old", len(old_align[0]), "New", len(new_align[0]), subts, len(
                         ref), (len(ref) - len(New_seq[s].replace("N", ""))) / len(ref), nc[type_sub] / (nc["T"] + 1))
 
@@ -479,9 +479,9 @@ if __name__ == '__main__':
                     if len(new_align[0]) < len(old_align[0]) and (len(ref) - len(New_seq[s].replace("N", ""))) / len(ref) < 0.05:
                         print("Keep!")
                         change += 1
-                        data_alignment[s]=new_align
+                        data_alignment[s] = new_align
 
-                        data_index[s]=np.arange(len(New_seq[s]))[
+                        data_index[s] = np.arange(len(New_seq[s]))[
                             np.array([ss for ss in New_seq[s]]) != "N"]
                         new_length += len(new_align[0])
 
@@ -492,7 +492,7 @@ if __name__ == '__main__':
                 if subts and nc[type_sub] / (nc["T"] + nc[type_sub]) < 0.1:
                     if args.force_clean and type_sub != "B":
                         continue
-                    refs[s]=refs[s].replace(type_sub, "T")
+                    refs[s] = refs[s].replace(type_sub, "T")
                     switch += 1
                     print("Swich")
             print("Change", change, len(data_x))
@@ -506,39 +506,39 @@ if __name__ == '__main__':
 
             # Keep new alignment
 
-        taken_gc=[]
-        out_gc=[]
-        tc=0
-        tc2=0
-        tc3=0
+        taken_gc = []
+        out_gc = []
+        tc = 0
+        tc2 = 0
+        tc3 = 0
 
-        X_new=[]
-        Y_new=[]
-        Y2_new=[]
-        Label=[]
-        Length=[]
-        stats=defaultdict(int)
-        megas=""
-        stats=defaultdict(int)
-        infostat={}
+        X_new = []
+        Y_new = []
+        Y2_new = []
+        Label = []
+        Length = []
+        stats = defaultdict(int)
+        megas = ""
+        stats = defaultdict(int)
+        infostat = {}
 
         while len(X_new) < 200:
             print(len(X_new))
             for s in range(len(data_x)):
-                s2=np.random.choice(s_arr, p=p_arr)
+                s2 = np.random.choice(s_arr, p=p_arr)
                 # print(s2)
                 # print(data_x[s2].shape[0])
-                r=np.random.randint(0, data_x[s2].shape[0] - subseq_size)
-                x=data_x[s2][r:r + subseq_size]
+                r = np.random.randint(0, data_x[s2].shape[0] - subseq_size)
+                x = data_x[s2][r:r + subseq_size]
 
                 if not args.ctc:
 
                     def domap(base):
-                        ret=[0 for b in range(args.Nbases + 1)]
-                        ret[base]=1
+                        ret = [0 for b in range(args.Nbases + 1)]
+                        ret[base] = 1
                         return ret
 
-                    y=[domap(base) for base in data_y[s2][r: r + subseq_size]]
+                    y = [domap(base) for base in data_y[s2][r: r + subseq_size]]
 
                     X_new.append(x)
                     Y_new.append(y)
@@ -548,7 +548,7 @@ if __name__ == '__main__':
 
                 if args.ctc:
 
-                    y=[base for base in data_y[s2][r: r + subseq_size] if base != mapping["N"]]
+                    y = [base for base in data_y[s2][r: r + subseq_size] if base != mapping["N"]]
                     if y == []:
                         continue
 
@@ -564,34 +564,34 @@ if __name__ == '__main__':
 
                 if args.ctc and False:
                     def domap(base):
-                        ret=[0 for b in range(n_classes)]
-                        ret[base]=1
+                        ret = [0 for b in range(n_classes)]
+                        ret[base] = 1
                         return ret
 
-                    length=subseq_size
-                    start=r
-                    Index=data_index[s2]
-                    alignment=data_alignment[s2]
-                    f=1
+                    length = subseq_size
+                    start = r
+                    Index = data_index[s2]
+                    alignment = data_alignment[s2]
+                    f = 1
                     if n_input == 1 and n_output == 2:
-                        f=2
+                        f = 2
 
-                    start_index_on_seqs=find_closest(start * f, Index)
-                    end_index_on_seqs=find_closest(start * f + length * f, Index)
+                    start_index_on_seqs = find_closest(start * f, Index)
+                    end_index_on_seqs = find_closest(start * f + length * f, Index)
                     # from IPython import embed
                     # embed()
                     # print(start, start_index_on_seqs, end_index_on_seqs,
                     #      len(alignment[0]), len(alignment[1]))
-                    seg, ss1, ss2, success=get_segment(
+                    seg, ss1, ss2, success = get_segment(
                         alignment, start_index_on_seqs, end_index_on_seqs)
 
                     # print(ss2, ss1, seg, [l in refs[s2] for l in ["B", "L", "E", "I"]])
 
                     if not success:
                         continue
-                    maxi=f * subseq_size
-                    l=min(max(len(seg), 1), maxi - 1)
-                    delta=abs(len(ss2.replace("-", "")) - len(ss2)) + \
+                    maxi = f * subseq_size
+                    l = min(max(len(seg), 1), maxi - 1)
+                    delta = abs(len(ss2.replace("-", "")) - len(ss2)) + \
                         abs(len(ss1.replace("-", "")) - len(ss1))
 
                     if delta > args.deltaseq or \
@@ -603,20 +603,20 @@ if __name__ == '__main__':
                         l in refs[s2] for l in ["B", "L", "E", "I"]])
                     Length.append(l)
 
-                    test=False
+                    test = False
                     if test:
                         # print(len(data_x[s2]))
-                        o1=predictor.predict(np.array(x)[np.newaxis, ::, ::])
-                        o1=o1[0]
-                        om=np.argmax(o1, axis=-1)
+                        o1 = predictor.predict(np.array(x)[np.newaxis, ::, ::])
+                        o1 = o1[0]
+                        om = np.argmax(o1, axis=-1)
 
-                        alph="ACGTTN"
-                        seq_tmp="".join(map(lambda x: alph[x], om))
+                        alph = "ACGTTN"
+                        seq_tmp = "".join(map(lambda x: alph[x], om))
                         print(seq_tmp.replace("N", ""))
 
                     # print(len(s))
                     if len(seg) > maxi - 1:
-                        seg=seg[:maxi - 1]
+                        seg = seg[:maxi - 1]
 
                     if "B" in refs[s2]:
                         megas += seg.replace("T", "B")
@@ -625,15 +625,15 @@ if __name__ == '__main__':
 
                     for l in ["T", "B", "L", "E", "I"]:
                         if l in seg:
-                            infostat[l]=infostat.get(l, 0) + seg.count(l)
+                            infostat[l] = infostat.get(l, 0) + seg.count(l)
 
-                    seg=seg + "A" * (maxi - len(seg))
+                    seg = seg + "A" * (maxi - len(seg))
 
                     if not args.all_T:
                         for l in ["B", "L", "E", "I"]:
                             if l in refs[s2]:
                                 if not args.hybrid:
-                                    seg=seg.replace("T", l)
+                                    seg = seg.replace("T", l)
                                 break
 
                     # print(ss1, ss2, seg)
@@ -646,35 +646,35 @@ if __name__ == '__main__':
                     X_new.append(x)
                     # print(x)
 
-        X_new=np.array(X_new)
-        Y_new=np.array(Y_new)
+        X_new = np.array(X_new)
+        Y_new = np.array(Y_new)
 
         if not args.ctc:
-            sum1=0
+            sum1 = 0
             for k in stats.keys():
                 sum1 += stats[k]
 
             if epoch == 0:
-                weight=[0 for k in stats.keys()]
+                weight = [0 for k in stats.keys()]
 
                 for k in stats.keys():
-                    weight[k]=stats[k] / 1.0 / sum1
-                    weight[k]=1 / weight[k]
-                weight=np.array(weight)
-                weight=weight * len(stats.keys()) / np.sum(weight)
+                    weight[k] = stats[k] / 1.0 / sum1
+                    weight[k] = 1 / weight[k]
+                weight = np.array(weight)
+                weight = weight * len(stats.keys()) / np.sum(weight)
             # weight[4] *= 100
 
-            w2=[]
+            w2 = []
 
             for y in Y2_new:
                 w2.append([])
                 for arr in y:
                     w2[-1].append(weight[np.argmax(arr)])
 
-            w2=np.array(w2)
+            w2 = np.array(w2)
 
         if not args.ctc:
-            r=predictor.fit(X_new, Y_new, nb_epoch=1, batch_size=10, validation_split=0.05)
+            r = predictor.fit(X_new, Y_new, nb_epoch=1, batch_size=10, validation_split=0.05)
             # ntwk.fit(X_new, Y_new, nb_epoch=1, batch_size=10, validation_split=0.05,
             #          sample_weight={"out_layer2": w2}, )
             if epoch % 10 == 0:
@@ -685,8 +685,8 @@ if __name__ == '__main__':
             # print(megas.count("B") / len(megas), megas.count("T") / len(megas))
             print(infostat)
 
-            Label=np.array(Label)
-            Length=np.array(Length)
+            Label = np.array(Label)
+            Length = np.array(Length)
             print(X_new.shape)
             print(X_new.dtype, Y_new.dtype, Label.dtype, Length.dtype)
 
@@ -697,15 +697,15 @@ if __name__ == '__main__':
             #    [length] * len(Length)).shape, Length.shape)
 
             if args.test:
-                maxin=8
-                val=2
-                batch_size=8
+                maxin = 8
+                val = 2
+                batch_size = 8
             else:
-                maxin=10 * (int(len(X_new) // 10) - 3)
-                val=30
-                batch_size=10
+                maxin = 10 * (int(len(X_new) // 10) - 3)
+                val = 30
+                batch_size = 10
  # To record lr
-            r=ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size] * len(Length))[:maxin], Length[:maxin]],
+            r = ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size] * len(Length))[:maxin], Length[:maxin]],
                          Label[:maxin], nb_epoch=1, batch_size=batch_size,
                          validation_data=([X_new[maxin:maxin + val],
                                            Label[maxin:maxin + val],
@@ -717,9 +717,9 @@ if __name__ == '__main__':
                 ntwk.save_weights(os.path.join(
                     args.root, 'my_model_weights-%i.h5' % epoch))
 
-        csv_keys=["epoch", "loss", "val_loss"]
+        csv_keys = ["epoch", "loss", "val_loss"]
 
-        lr=Schedul.set_new_lr(r.history["loss"][0])
+        lr = Schedul.set_new_lr(r.history["loss"][0])
 
         K.set_value(ntwk.optimizer.lr, lr)
         K.set_value(predictor.optimizer.lr, lr)
@@ -728,7 +728,7 @@ if __name__ == '__main__':
 
         if epoch == 0:
             with open(os.path.join(args.root, "training.log"), "w") as csv_file:
-                writer=csv.writer(csv_file)
+                writer = csv.writer(csv_file)
                 # from IPython import embed
                 # embed()
                 # print(r)
@@ -736,7 +736,7 @@ if __name__ == '__main__':
                 writer.writerow([epoch] + [r.history[k][-1] for k in csv_keys[1:]] + [lr])
         else:
             with open(os.path.join(args.root, "training.log"), "a") as csv_file:
-                writer=csv.writer(csv_file)
+                writer = csv.writer(csv_file)
                 # writer.writerow(k + ["lr"])
                 writer.writerow([epoch] + [r.history[k][-1] for k in csv_keys[1:]] + [lr])
         if Schedul.stop:
