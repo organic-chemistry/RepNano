@@ -239,6 +239,8 @@ if __name__ == '__main__':
     repo = Repo("./")
     argparse_dict["commit"] = str(repo.head.commit)
 
+    os.makedirs(args.root, exist_ok=True)
+
     with open(args.root + '/params.json', 'w') as fp:
         json.dump(argparse_dict, fp, indent=True)
     # print(args.filter)
