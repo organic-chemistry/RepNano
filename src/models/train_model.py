@@ -313,78 +313,51 @@ if __name__ == '__main__':
     refs = []
     names = []
 
-    if args.ctc:
-        for allignment_file in args.allignment_files:
+    from ..data.dataset import Dataset
+    from ..features.helpers import scale_simple, scale_named
+    root = "data/raw/20170908-R9.5/"
+    D = Dataset(samfile=root + "BTF_AG_ONT_1_FAH14273_A-select.sam",
+                root_files=root + "AG-basecalled/")
+    maxf = None
+    if args.test:
+        maxf = 2
+    D.populate(maxf=maxf, filter_not_alligned=True, filter_ch=range(1, 11))
+    data_x = []
+    correct_ref = args.correct_ref
+    for strand in D.strands:
 
-            if args.hybrid:
-                with open(allignment_file, "rb") as f:
-                    t_data_x, t_data_alignment, t_data_index = cPickle.load(f)
-
-                data_x += t_data_x
-                data_index += t_data_index
-                data_alignment += t_data_alignment
-
-                for ref, _ in t_data_alignment:
-                    refs.append(ref.replace("_", ""))
-
-            else:
-                with open(allignment_file, "rb") as f:
-                    t_original, t_convert, t_data_x, t_data_index, t_data_alignment, t_refs, t_names = cPickle.load(
-                        f)
-
-                original += t_original
-                convert += t_convert
-                data_x += t_data_x
-                data_index += t_data_index
-                data_alignment += t_data_alignment
-                refs += t_refs
-                names += t_names
-    else:
-        from ..data.dataset import Dataset
-        from ..features.helpers import scale_simple, scale_named
-        root = "data/raw/20170908-R9.5/"
-        D = Dataset(samfile=root + "BTF_AG_ONT_1_FAH14273_A-select.sam",
-                    root_files=root + "AG-basecalled/")
-        maxf = None
-        if args.test:
-            maxf = 2
-        D.populate(maxf=maxf, filter_not_alligned=True, filter_ch=range(1, 11))
-        data_x = []
-        correct_ref = args.correct_ref
-        for strand in D.strands:
-
-            if args.correct_ref:
-                try:
-                    strand.segmentation(w=8)
-
-                    transfered = strand.transfer(strand.signal_bc, strand.segments)
-
-                    # map the transefered:
-                    ref = strand.get_ref("".join(transfered["seq"].replace("N", "")), correct=True)
-                    # allign the ref on the transefered
-                    al = strand.score("".join(transfered["seq"]).replace(
-                        "N", ""), ref, all_info=True)
-
-                    mapped_ref = strand.give_map("".join(transfered["seq"]), al[:2])
-
-                    transfered["seq"] = np.array([s for s in mapped_ref])
-
-                    print(strand.score("".join(transfered["seq"]).replace(
-                        "N", ""), ref, all_info=False), len(ref))
-                except:
-                    print("Failed")
-                # print(transfered["seq"])
-
-            else:
+        if args.correct_ref:
+            try:
                 strand.segmentation(w=8)
+
                 transfered = strand.transfer(strand.signal_bc, strand.segments)
 
-            if args.sclean:
-                data_x.append(scale_simple(transfered))
-            else:
-                data_x.append(scale_named(transfered))
+                # map the transefered:
+                ref = strand.get_ref("".join(transfered["seq"].replace("N", "")), correct=True)
+                # allign the ref on the transefered
+                al = strand.score("".join(transfered["seq"]).replace(
+                    "N", ""), ref, all_info=True)
 
-            data_y.append([mapping[b] for b in transfered["seq"]])
+                mapped_ref = strand.give_map("".join(transfered["seq"]), al[:2])
+
+                transfered["seq"] = np.array([s for s in mapped_ref])
+
+                print(strand.score("".join(transfered["seq"]).replace(
+                    "N", ""), ref, all_info=False), len(ref))
+            except:
+                print("Failed")
+            # print(transfered["seq"])
+
+        else:
+            strand.segmentation(w=8)
+            transfered = strand.transfer(strand.signal_bc, strand.segments)
+
+        if args.sclean:
+            data_x.append(scale_simple(transfered))
+        else:
+            data_x.append(scale_named(transfered))
+
+        data_y.append([mapping[b] for b in transfered["seq"]])
 
     print("done", sum(len(x) for x in refs))
     sys.stdout.flush()
@@ -425,7 +398,7 @@ if __name__ == '__main__':
 
         # Test to see if realignment is interesting:
 
-        if args.ctc and epoch % 3000 == 0 and (epoch != 0 or args.force_clean):
+        if False and args.ctc and epoch % 3000 == 0 and (epoch != 0 or args.force_clean):
             ntwk.save_weights(os.path.join(
                 args.root, 'tmp.h5'))
 
@@ -566,13 +539,24 @@ if __name__ == '__main__':
 
                     for xx in data_y[s2][r:r + subseq_size]:
                         stats[xx] += 1
+
+                if args.ctc:
+
+                    y = [base for base in data_y[s2][r: r + subseq_size] if base != mapping["N"]]
+                    if y == []:
+                        continue
+
+                    X_new.append(x)
+                    Label.append(y + [0] * (subseq_size - len(y)))
+                    Length.append(len(y))
                 # x[:,0] += np.random.binomial(n=1, p=0.1, size=x.shape[0]) *
                 # np.random.normal(scale=0.01, size=x.shape[0])
 
                 # oversampleb
                 # if "B" not in refs[s2] and np.random.randint(args.oversampleb) != 0:
             #        continue
-                if args.ctc:
+
+                if args.ctc and False:
                     def domap(base):
                         ret = [0 for b in range(n_classes)]
                         ret[base] = 1
