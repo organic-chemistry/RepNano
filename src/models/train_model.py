@@ -331,16 +331,20 @@ if __name__ == '__main__':
                 strand.segmentation(w=8)
 
                 transfered = strand.transfer(strand.signal_bc, strand.segments)
-
-                # map the transefered:
+                strand.transfered_bc = copy.deepcopy(transfered)
+                # get the ref from transefered:
                 ref = strand.get_ref("".join(transfered["seq"].replace("N", "")), correct=True)
                 # allign the ref on the transefered
-                al = strand.score("".join(transfered["seq"]).replace(
-                    "N", ""), ref, all_info=True)
+                bc_strand = "".join(transfered["seq"]).replace("N", "")
+                al = strand.score(bc_strand, ref, all_info=True)
+                strand.score_bc_ref = al[2] / len(bc_strand)
 
-                mapped_ref = strand.give_map("".join(transfered["seq"]), al[:2])
+                mapped_ref, correction = strand.give_map("".join(transfered["seq"]), al[:2])
 
                 transfered["seq"] = np.array([s for s in mapped_ref])
+                transfered["seq_correction"] = np.array([s for s in correction])
+
+                strand.transfered_seq = transfered
 
                 print(strand.score("".join(transfered["seq"]).replace(
                     "N", ""), ref, all_info=False), len(ref))

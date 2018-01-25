@@ -190,10 +190,10 @@ class Strand:
         exex = "bwa mem -x ont2d  %s  %s/tmp.fasta > %s/tmp.sam" % (REF, "./", "./")
         subprocess.call(exex, shell=True)
         ref, succes, X1, P1 = get_seq("./tmp.sam", ref=REF, ret_pos=True, correct=correct)
-        #print(X1, P1)
+        # print(X1, P1)
         return ref
 
-    def score(self, s1, s2, maxlen=1000, all_info=False):
+    def score(self, s1, s2, maxlen=None, all_info=False):
 
         if s1 == "":
             return None
@@ -273,7 +273,7 @@ class Strand:
             else:
 
                 # if in alb there are "-" which are surrounded by non adjacent integer we
-                # can add letters:
+                # can add insert letters:
                 if alb != [] and type(alb[-1]) == int and i < len(indexes) and indexes[i] - 1 > alb[-1]:
                     alb.append(alb[-1] + 1)
                 else:
@@ -300,7 +300,13 @@ class Strand:
                 if l != "-":
                     mapped[num] = l
 
-        return "".join(mapped)
+        correction = ["N" for l in ref]
+        for ind, (num, nump, l, lp) in enumerate(zip(alb[:-1], alb[1:], allgn[1][:-1], allgn[1][1:])):
+
+            if num != "-" and nump == "-" and lp != "-":
+                correction[num] = lp
+
+        return "".join(mapped), "".join(correction)
 
     def show_segmentation_bc(self):
         self.allign_basecall_raw()
