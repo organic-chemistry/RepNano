@@ -198,6 +198,8 @@ def get_al(se0, ref, tmpfile="./tmp.sam", check=False):
 if __name__ == '__main__':
 
     import argparse
+    import json
+    from git import Repo
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--Nbases', type=int, choices=[4, 5, 8], default=4)
@@ -233,7 +235,13 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    print(args.filter)
+    argparse_dict = vars(args)
+    repo = Repo("./")
+    argparse_dict["commit"] = str(repo.head.commit)
+
+    with open(args.root + '/params.json', 'w') as fp:
+        json.dump(argparse_dict, fp, indent=True)
+    # print(args.filter)
 
     log_total_length = os.path.join(args.root, "total_length.log")
     if keras.backend.backend() != 'tensorflow':
@@ -263,8 +271,8 @@ if __name__ == '__main__':
         ctc_length = 2 * subseq_size
 
     n_feat = 4
-    if args.clean:
-        n_feat = 3
+    # if args.clean:
+#        n_feat = 3
 
     if args.sclean:
         n_feat = 1
@@ -331,13 +339,13 @@ if __name__ == '__main__':
                 names += t_names
     else:
         from ..data.dataset import Dataset
-        from ..features.helpers import scale_simple
+        from ..features.helpers import scale_simple, scale_named
         root = "data/raw/20170908-R9.5/"
         D = Dataset(samfile=root + "BTF_AG_ONT_1_FAH14273_A-select.sam",
                     root_files=root + "AG-basecalled/")
         maxf = None
         if args.test:
-            maxf = 10
+            maxf = 2
         D.populate(maxf=maxf, filter_not_alligned=True, filter_ch=range(1, 11))
         data_x = []
         correct_ref = args.correct_ref
@@ -369,11 +377,16 @@ if __name__ == '__main__':
                 strand.segmentation(w=8)
                 transfered = strand.transfer(strand.signal_bc, strand.segments)
 
-            data_x.append(scale_simple(transfered))
+            if args.sclean:
+                data_x.append(scale_simple(transfered))
+            else:
+                data_x.append(scale_named(transfered))
+
             data_y.append([mapping[b] for b in transfered["seq"]])
 
     print("done", sum(len(x) for x in refs))
     sys.stdout.flush()
+    #rint(data_x, data_x[0].shape)
     # print(len(refs[0]),len(data_x[0]),len(data_y[0]))
     # exit()
 
@@ -399,7 +412,7 @@ if __name__ == '__main__':
 
     batch_size = 1
     n_batches = len(data_x) / batch_size
-    print(len(data_x), batch_size, n_batches, datetime.datetime.now())
+    #print(len(data_x), batch_size, n_batches, datetime.datetime.now())
 
     boring = False
 
@@ -532,6 +545,8 @@ if __name__ == '__main__':
             print(len(X_new))
             for s in range(len(data_x)):
                 s2 = np.random.choice(s_arr, p=p_arr)
+                # print(s2)
+                # print(data_x[s2].shape[0])
                 r = np.random.randint(0, data_x[s2].shape[0] - subseq_size)
                 x = data_x[s2][r:r + subseq_size]
 

@@ -243,6 +243,19 @@ class Strand:
         self.raw = raw
         self.sampling_rate = amp
 
+    def get_seq_mean(self, motif, ref, short=True, void="N"):
+
+        seq = "".join(ref["seq"].replace(void, ""))
+        if motif in seq:
+            num = [i for i, l in(enumerate(ref["seq"])) if l != void]
+            index = seq.index(motif)
+            if short:
+                return motif, np.array(ref["mean"][num[index:index + len(motif)]])
+            else:
+                return motif, np.array(ref["mean"][num[index]:num[index + len(motif)]])
+        else:
+            return motif, None
+
     def give_map(self, ref, allgn):
         """
         given a ref from basecall or network, and an allignment with

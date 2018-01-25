@@ -46,8 +46,12 @@ def scale(X, normalise_window=True):
     # print(scale, shift)
     # print((me75 - me25) / (m75 - m25), me25 - m25, se50 / s50)
 
-    scale_clean(X)
+    # scale_clean(X)
     return ret
+
+
+def scale_named(X, normalise_window=True):
+    return scale(np.array([X["mean"], X["mean"]**2, X["stdv"], X["length"]]).T)
 
 
 def scale_clean(X, normalise_window=True):
@@ -88,6 +92,10 @@ def scale_clean_two(X, normalise_window=True):
     return ret[:, :3]
 """
 import pandas as pd
+
+
+def scale_clean_two_pd(X):
+    return scale_clean_two(np.array([X["mean"], X["mean"]**2, X["stdv"], X["length"]]))
 
 
 def scale_clean_two(X, normalise_window=True, nw=100):

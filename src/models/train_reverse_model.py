@@ -52,6 +52,7 @@ if __name__ == '__main__':
     parser.add_argument('--feat', dest='feat', type=str)
     parser.add_argument('--hot', dest='hot', action="store_true")
     parser.add_argument('--nepoch', dest="nepoch", default=1000, type=int)
+    parser.add_argument('--correct-ref', dest="correct_ref", action="store_true")
 
     args = parser.parse_args()
 
@@ -64,7 +65,7 @@ if __name__ == '__main__':
                 root_files=root + "AG-basecalled/")
     maxf = None
     if args.test:
-        maxf = 10
+        maxf = 3
     D.populate(maxf=maxf, filter_not_alligned=True, filter_ch=range(1, 11))
     data_x = []
     data_y = []
@@ -72,31 +73,36 @@ if __name__ == '__main__':
     for strand in D.strands:
 
         if args.correct_ref:
-            strand.segmentation(w=8)
+            try:
+                strand.segmentation(w=8)
 
-            transfered = strand.transfer(strand.signal_bc, strand.segments)
+                transfered = strand.transfer(strand.signal_bc, strand.segments)
 
-            # map the transefered:
-            ref = strand.get_ref("".join(transfered["seq"].replace("N", "")), correct=True)
-            # allign the ref on the transefered
-            al = strand.score("".join(transfered["seq"]).replace("N", ""), ref, all_info=True)
+                # map the transefered:
+                ref = strand.get_ref("".join(transfered["seq"].replace("N", "")), correct=True)
+                # allign the ref on the transefered
+                al = strand.score("".join(transfered["seq"]).replace("N", ""), ref, all_info=True)
 
-            mapped_ref = strand.give_map("".join(transfered["seq"]), al[:2])
+                mapped_ref = strand.give_map("".join(transfered["seq"]), al[:2])
 
-            transfered["seq"] = np.array([s for s in mapped_ref])
+                transfered["seq"] = np.array([s for s in mapped_ref])
+            except:
+                print("Failed")
         else:
             strand.segmentation(w=8)
             transfered = strand.transfer(strand.signal_bc, strand.segments)
 
         select = transfered["seq"] != "N"
         data_x.append(scale_simple(transfered)[select])
-        data_y.append(transfered["seq"][select])
+        data_y.append(np.array(transfered["seq"][select]))
 
-    seqs = data_x
-    signal = data_y
+    # print(data_y[-1])
+    seqs = data_y
+    signal = data_x
 
-    with open(args.feat, "rb") as f:
-        feat = cPickle.load(f)
+    if not args.hot:
+        with open(args.feat, "rb") as f:
+            feat = cPickle.load(f)
 
     input_length = 100
     if not args.hot:

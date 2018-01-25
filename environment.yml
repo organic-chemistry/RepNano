@@ -1,110 +1,115 @@
-name: keras3
-channels:
-- glotzer
-- defaults
-dependencies:
-- biopython=1.69=np112py35_0
-- bleach=1.5.0=py35_0
-- certifi=2016.2.28=py35_0
-- cycler=0.10.0=py35_0
-- dbus=1.10.20=0
-- decorator=4.1.2=py35_0
-- entrypoints=0.2.3=py35_0
-- expat=2.1.0=0
-- fontconfig=2.12.1=3
-- freetype=2.5.5=2
-- glib=2.50.2=1
-- gst-plugins-base=1.8.0=0
-- gstreamer=1.8.0=0
-- h5py=2.7.0=np112py35_0
-- hdf5=1.8.17=1
-- html5lib=0.9999999=py35_0
-- icu=54.1=0
-- ipykernel=4.6.1=py35_0
-- ipython=6.1.0=py35_0
-- ipython_genutils=0.2.0=py35_0
-- ipywidgets=6.0.0=py35_0
-- jedi=0.10.2=py35_2
-- jinja2=2.9.6=py35_0
-- jpeg=9b=0
-- jsonschema=2.6.0=py35_0
-- jupyter=1.0.0=py35_3
-- jupyter_client=5.1.0=py35_0
-- jupyter_console=5.2.0=py35_0
-- jupyter_core=4.3.0=py35_0
-- keras=2.0.5=py35_0
-- libffi=3.2.1=1
-- libgcc=5.2.0=0
-- libgfortran=3.0.0=1
-- libgpuarray=0.6.4=0
-- libiconv=1.14=0
-- libpng=1.6.30=1
-- libprotobuf=3.2.0=0
-- libsodium=1.0.10=0
-- libxcb=1.12=1
-- libxml2=2.9.4=0
-- mako=1.0.6=py35_0
-- markupsafe=1.0=py35_0
-- matplotlib=2.0.2=np112py35_0
-- mistune=0.7.4=py35_0
-- mkl=2017.0.1=0
-- mkl-service=1.1.2=py35_3
-- nbconvert=5.2.1=py35_0
-- nbformat=4.4.0=py35_0
-- nose=1.3.7=py35_1
-- notebook=5.0.0=py35_0
-- numpy=1.12.1=py35_0
-- openssl=1.0.2l=0
-- pandas=0.20.3=py35_0
-- pandocfilters=1.4.2=py35_0
-- path.py=10.3.1=py35_0
-- pcre=8.39=1
-- pexpect=4.2.1=py35_0
-- pickleshare=0.7.4=py35_0
-- pip=9.0.1=py35_1
-- prompt_toolkit=1.0.15=py35_0
-- protobuf=3.2.0=py35_0
-- ptyprocess=0.5.2=py35_0
-- pygments=2.2.0=py35_0
-- pygpu=0.6.4=py35_1
-- pyparsing=2.2.0=py35_0
-- pyqt=5.6.0=py35_2
-- python=3.5.4=0
-- python-dateutil=2.6.1=py35_0
-- pytz=2017.2=py35_0
-- pyyaml=3.12=py35_0
-- pyzmq=16.0.2=py35_0
-- qt=5.6.2=5
-- qtconsole=4.3.1=py35_0
-- readline=6.2=2
-- scipy=0.19.1=np112py35_0
-- setuptools=36.4.0=py35_1
-- simplegeneric=0.8.1=py35_1
-- sip=4.18=py35_0
-- six=1.10.0=py35_0
-- sqlite=3.13.0=0
-- tensorflow=1.1.0=np112py35_0
-- terminado=0.6=py35_0
-- testpath=0.3.1=py35_0
-- theano=0.9.0=py35_0
-- tk=8.5.18=0
-- tornado=4.5.2=py35_0
-- traitlets=4.3.2=py35_0
-- wcwidth=0.1.7=py35_0
-- werkzeug=0.12.2=py35_0
-- wheel=0.29.0=py35_0
-- widgetsnbextension=3.0.2=py35_0
-- xz=5.2.2=1
-- yaml=0.1.6=0
-- zeromq=4.1.5=0
-- zlib=1.2.8=3
-- pip:
-  - ipython-genutils==0.2.0
-  - jupyter-client==5.1.0
-  - jupyter-console==5.2.0
-  - jupyter-core==4.3.0
-  - parso==0.1.0
-  - prompt-toolkit==1.0.15
-  - pysam==0.12.0.1
-prefix: /home/jarbona/miniconda3/envs/keras3
-
+# This file may be used to create an environment using:
+# $ conda create --name <env> --file <this file>
+# platform: linux-64
+@EXPLICIT
+https://repo.continuum.io/pkgs/main/linux-64/backports-1.0-py35hd471ac7_1.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/backports.weakref-1.0rc1-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/biopython-1.69-np113py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/bleach-1.5.0-py35_0.tar.bz2
+https://conda.anaconda.org/rdkit/linux-64/boost-1.63.0-py35_1.tar.bz2
+https://repo.continuum.io/pkgs/main/linux-64/bzip2-1.0.6-h6d464ef_2.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/cairo-1.14.8-0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/certifi-2016.2.28-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/cycler-0.10.0-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/dbus-1.10.20-0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/decorator-4.1.2-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/entrypoints-0.2.3-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/expat-2.1.0-0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/fontconfig-2.12.1-3.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/freetype-2.5.5-2.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/glib-2.50.2-1.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/gst-plugins-base-1.8.0-0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/gstreamer-1.8.0-0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/h5py-2.7.0-np113py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/hdf5-1.8.17-1.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/html5lib-0.9999999-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/icu-54.1-0.tar.bz2
+https://repo.continuum.io/pkgs/main/linux-64/intel-openmp-2018.0.0-hc7b2577_8.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/ipykernel-4.6.1-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/ipython-6.1.0-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/ipython_genutils-0.2.0-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/ipywidgets-6.0.0-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/main/linux-64/jbig-2.1-hdba287a_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/jedi-0.10.2-py35_2.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/jinja2-2.9.6-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/jpeg-9b-0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/jsonschema-2.6.0-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/jupyter-1.0.0-py35_3.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/jupyter_client-5.1.0-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/jupyter_console-5.2.0-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/jupyter_core-4.3.0-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/keras-2.0.5-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/libffi-3.2.1-1.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/libgcc-5.2.0-0.tar.bz2
+https://repo.continuum.io/pkgs/main/linux-64/libgcc-ng-7.2.0-h7cc24e2_2.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/libgfortran-3.0.0-1.tar.bz2
+https://repo.continuum.io/pkgs/main/linux-64/libgfortran-ng-7.2.0-h9f7466a_2.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/libgpuarray-0.6.4-0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/libiconv-1.14-0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/libpng-1.6.30-1.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/libprotobuf-3.2.0-0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/libsodium-1.0.10-0.tar.bz2
+https://repo.continuum.io/pkgs/main/linux-64/libstdcxx-ng-7.2.0-h7a57d05_2.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/libtiff-4.0.6-3.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/libxcb-1.12-1.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/libxml2-2.9.4-0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/mako-1.0.6-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/markdown-2.6.9-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/markupsafe-1.0-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/matplotlib-2.0.2-np113py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/mistune-0.7.4-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/main/linux-64/mkl-2018.0.1-h19d6760_4.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/mkl-service-1.1.2-py35_3.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/nbconvert-5.2.1-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/nbformat-4.4.0-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/nose-1.3.7-py35_1.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/notebook-5.0.0-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/main/linux-64/numpy-1.13.3-py35hd829ed6_0.tar.bz2
+https://repo.continuum.io/pkgs/main/linux-64/olefile-0.44-py35h2c86149_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/openssl-1.0.2l-0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/pandas-0.20.3-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/pandocfilters-1.4.2-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/path.py-10.3.1-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/pcre-8.39-1.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/pexpect-4.2.1-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/pickleshare-0.7.4-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/pillow-4.2.1-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/pip-9.0.1-py35_1.tar.bz2
+https://repo.continuum.io/pkgs/main/linux-64/pixman-0.34.0-hceecf20_3.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/prompt_toolkit-1.0.15-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/protobuf-3.2.0-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/ptyprocess-0.5.2-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/pygments-2.2.0-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/pygpu-0.6.4-py35_1.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/pyparsing-2.2.0-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/pyqt-5.6.0-py35_2.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/python-3.5.4-0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/python-dateutil-2.6.1-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/pytz-2017.2-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/pyyaml-3.12-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/pyzmq-16.0.2-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/qt-5.6.2-5.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/qtconsole-4.3.1-py35_0.tar.bz2
+https://conda.anaconda.org/rdkit/linux-64/rdkit-2017.09.1-py35_1.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/readline-6.2-2.tar.bz2
+https://repo.continuum.io/pkgs/main/linux-64/scipy-1.0.0-py35hcbbe4a2_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/setuptools-36.4.0-py35_1.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/simplegeneric-0.8.1-py35_1.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/sip-4.18-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/six-1.10.0-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/sqlite-3.13.0-0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/tensorflow-1.2.1-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/terminado-0.6-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/testpath-0.3.1-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/theano-0.9.0-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/tk-8.5.18-0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/tornado-4.5.2-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/traitlets-4.3.2-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/wcwidth-0.1.7-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/werkzeug-0.12.2-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/wheel-0.29.0-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/widgetsnbextension-3.0.2-py35_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/xz-5.2.2-1.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/yaml-0.1.6-0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/zeromq-4.1.5-0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/zlib-1.2.8-3.tar.bz2
