@@ -85,7 +85,7 @@ if __name__ == "__main__":
             # get the ref from transefered:
             ref = strand.get_ref("".join(transfered["seq"].replace("N", "")), correct=True)
             if ref == "":
-                return (None)
+                return [None, None]
             # allign the ref on the transefered
             bc_strand = "".join(transfered["seq"]).replace("N", "")
             al = strand.score(bc_strand, ref, all_info=True)
@@ -102,7 +102,7 @@ if __name__ == "__main__":
             return transfered, al[2] / len(bc_strand), strand.score("".join(transfered["seq"]).replace(
                 "N", ""), ref, all_info=False), len(ref)
         except:
-            return (None)
+            return [None, None]
 
     with Pool(n_cpu) as p:
         res = p.map(compute_attributes, D.strands)
