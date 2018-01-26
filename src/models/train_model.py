@@ -227,11 +227,12 @@ if __name__ == '__main__':
     parser.add_argument('--sclean', dest="sclean", action="store_true")
     parser.add_argument('--attention', dest="attention", action="store_true")
     parser.add_argument('--residual', dest="res", action="store_true")
-    parser.add_argument('--all-file', nargs='+', dest="allignment_files", default=[], type=str)
+    parser.add_argument('--all-datasets', nargs='+', dest="all_datasets", default=[], type=str)
     parser.add_argument('--simple', dest="simple", action="store_true")
     parser.add_argument('--all-T', dest="all_T", action="store_true")
     parser.add_argument('--hybrid', dest="hybrid", action="store_true")
     parser.add_argument('--correct-ref', dest="correct_ref", action="store_true")
+    parser.add_argument('--all-quality', dest="all_quality", type=float, default=0.)
 
     args = parser.parse_args()
 
@@ -316,54 +317,29 @@ if __name__ == '__main__':
     from ..data.dataset import Dataset
     from ..features.helpers import scale_simple, scale_named
     root = "data/raw/20170908-R9.5/"
-    D = Dataset(samfile=root + "BTF_AG_ONT_1_FAH14273_A-select.sam",
-                root_files=root + "AG-basecalled/")
-    maxf = None
-    if args.test:
-        maxf = 2
-    D.populate(maxf=maxf, filter_not_alligned=True, filter_ch=range(1, 11))
+    Datasets = []
+    for d in args.all_datasets:
+        with open(d, "rb") as fich:
+            Datasets.append(cPickle.load(fich))
+
     data_x = []
     correct_ref = args.correct_ref
-    for strand in D.strands:
+    for D in Datasets:
+        for strand in D.strands:
+            if strand.transfered is None:
+                continue
 
-        if args.correct_ref:
-            try:
-                strand.segmentation(w=8)
+            if args.sclean:
+                data_x.append(scale_simple(strand.transfered))
+            else:
+                data_x.append(scale_named(strand.transfered))
 
-                transfered = strand.transfer(strand.signal_bc, strand.segments)
-                strand.transfered_bc = copy.deepcopy(transfered)
-                if "".join(transfered["seq"]).replace("N", "") > 20000:
-                    continue
-                # get the ref from transefered:
-                ref = strand.get_ref("".join(transfered["seq"].replace("N", "")), correct=True)
-                # allign the ref on the transefered
-                bc_strand = "".join(transfered["seq"]).replace("N", "")
-                al = strand.score(bc_strand, ref, all_info=True)
-                strand.score_bc_ref = al[2] / len(bc_strand)
+            if args.correct_ref:
+                data_y.append([mapping[b] for b in strand.transfered["seq"]])
+            else:
+                data_y.append([mapping[b] for b in strand.transfered["seq_ref"]])
 
-                mapped_ref, correction = strand.give_map("".join(transfered["seq"]), al[:2])
-
-                transfered["seq"] = np.array([s for s in mapped_ref])
-                transfered["seq_correction"] = np.array([s for s in correction])
-
-                strand.transfered_seq = transfered
-
-                print(strand.score("".join(transfered["seq"]).replace(
-                    "N", ""), ref, all_info=False), len(ref))
-            except:
-                print("Failed")
-            # print(transfered["seq"])
-
-        else:
-            strand.segmentation(w=8)
-            transfered = strand.transfer(strand.signal_bc, strand.segments)
-
-        if args.sclean:
-            data_x.append(scale_simple(transfered))
-        else:
-            data_x.append(scale_named(transfered))
-
-        data_y.append([mapping[b] for b in transfered["seq"]])
+    del Datasets
 
     print("done", sum(len(x) for x in refs))
     sys.stdout.flush()
