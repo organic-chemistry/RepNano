@@ -12,6 +12,8 @@ from Bio import pairwise2
 import pylab
 import subprocess
 import pandas as pd
+import tempfile
+import os
 
 
 class NotAllign(Exception):
@@ -66,7 +68,9 @@ class Dataset:
 
                     if basecall:
                         try:
-                            self.strands[-1].get_seq(f="BaseCall")
+                            self.strands[-1].signal_bc, self.strands[-1].seq_from_basecall, self.strands[-1].imin,
+                            self.strands[-1].raw, self.strands[-1].to_match, self.strands[
+                                -1].sampling_rate = self.strands[-1].get_seq(f="BaseCall")
                         except NotAllign:
                             print("Strand %i raw not alligned to basecall" % len(self.strands))
 
@@ -78,7 +82,8 @@ class Dataset:
                             self.strands[-1].seq_from_minion = self.strands[-1].get_ref(
                                 self.strands[-1].seq_from_basecall, correct=True)
                         else:
-                            self.strands[-1].get_seq(f="Minion", correct=True)
+                            self.strands[-1].seq_from_minion = self.strands[-1].get_seq(
+                                f="Minion", correct=True)
 
             """
             chp = kp.split("_")[0][3:]
@@ -125,6 +130,7 @@ class Strand:
         if f == "Minion":
             seq, sucess = get_seq(self.sam_line_minion, ref=REF, from_line=True, correct=correct)
             self.seq_from_minion = seq
+            return self.seq_from_minion
 
         if f == "BaseCall":
             h5 = h5py.File(self.filename, "r")
@@ -175,6 +181,8 @@ class Strand:
 
             self.seq_from_basecall = s2
 
+            return self.signal_bc, self.seq_from_basecall, self.imin, self.raw, self.to_match, self.sampling_rate
+
     def score_ref(self, maxlen=1000):
         s1 = self.seq_from_minion
         s2 = self.seq_from_basecall
@@ -182,15 +190,19 @@ class Strand:
 
     def get_ref(self, sequence, correct=False):
 
-        with open("./" + "/tmp.fasta", "w") as output_file:
+        h, name = tempfile.mkstemp(prefix="", dir="./")
+        with open(name + ".fasta", "w") as output_file:
             filename = "tmp"
             output_file.writelines(">%s_template_deepnano\n" % filename)
             output_file.writelines(sequence.replace("B", "T") + "\n")
 
-        exex = "bwa mem -x ont2d  %s  %s/tmp.fasta > %s/tmp.sam" % (REF, "./", "./")
+        exex = "bwa mem -x ont2d  %s  %s.fasta > %s.sam" % (REF, name, name)
         subprocess.call(exex, shell=True)
-        ref, succes, X1, P1 = get_seq("./tmp.sam", ref=REF, ret_pos=True, correct=correct)
+        ref, succes, X1, P1 = get_seq("%s.sam" % name, ref=REF, ret_pos=True, correct=correct)
         # print(X1, P1)
+        os.remove("%s.sam" % name)
+        os.remove("%s.fasta" % name)
+        os.remove(name)
         return ref
 
     def score(self, s1, s2, maxlen=None, all_info=False):
@@ -239,8 +251,8 @@ class Strand:
             raise NotAllign(mini)
         # print(delta,imin)
         self.imin = imin
-        self.to_match = to_match
-        self.raw = raw
+        self.to_match = np.array(to_match, dtype=np.float16)
+        self.raw = np.array(raw, dtype=np.float16)
         self.sampling_rate = amp
 
     def get_seq_mean(self, motif, ref, short=True, void="N"):
@@ -310,10 +322,10 @@ class Strand:
 
     def show_segmentation_bc(self):
         self.allign_basecall_raw()
-        l = len(self.to_match)
-        x = np.arange(l) + self.imin
+        #l = len(self.to_match)
 
-        pylab.plot(self.raw[:l + self.imin])
+        #pylab.plot(self.raw[:l + self.imin])
+        pylab.plot(self.raw)
 
         pylab.plot(*self.segmentation_to_plot(self.signal_bc, shift=self.imin))
 
