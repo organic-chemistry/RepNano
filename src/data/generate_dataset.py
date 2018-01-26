@@ -25,7 +25,7 @@ if __name__ == "__main__":
     argparse_dict["commit"] = str(repo.head.commit)
 
     os.makedirs(args.root, exist_ok=True)
-    os.makedirs(os.path.split(args.name, exist_ok=True)[0])
+    os.makedirs(os.path.split(args.name)[0], exist_ok=True)
 
     with open(args.root + '/params.json', 'w') as fp:
         json.dump(argparse_dict, fp, indent=True)
