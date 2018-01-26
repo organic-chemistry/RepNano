@@ -16,6 +16,7 @@ if __name__ == "__main__":
     parser.add_argument('--size', type=int, default=20)
     parser.add_argument("--metadata", type=str, default=None)
     parser.add_argument("--n-cpu", dest="n_cpu", type=int, default=None)
+    parser.add_argument("--name", dest="name", type=str, default='dataset.pick')
 
     args = parser.parse_args()
 
@@ -24,6 +25,7 @@ if __name__ == "__main__":
     argparse_dict["commit"] = str(repo.head.commit)
 
     os.makedirs(args.root, exist_ok=True)
+    os.makedirs(os.path.split(args.name)[0])
 
     with open(args.root + '/params.json', 'w') as fp:
         json.dump(argparse_dict, fp, indent=True)
@@ -112,7 +114,7 @@ if __name__ == "__main__":
         else:
             s.transfered = None
     import _pickle as cPickle
-    with open("saved.pick", "wb") as fich:
+    with open(args.name, "wb") as fich:
         cPickle.dump(D, fich)
     """
     for strand in D.strands:
