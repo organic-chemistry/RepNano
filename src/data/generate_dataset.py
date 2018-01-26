@@ -17,6 +17,7 @@ if __name__ == "__main__":
     parser.add_argument("--metadata", type=str, default=None)
     parser.add_argument("--n-cpu", dest="n_cpu", type=int, default=None)
     parser.add_argument("--name", dest="name", type=str, default='dataset.pick')
+    parser.add_argument("--target", dest="target", type=str, default='T')
 
     args = parser.parse_args()
 
@@ -36,8 +37,14 @@ if __name__ == "__main__":
         n_cpu = os.cpu_count()
 
     root = "data/raw/20170908-R9.5/"
-    D = Dataset(samfile=root + "BTF_AG_ONT_1_FAH14273_A-select.sam",
-                root_files=root + "AG-basecalled/")
+    if args.target == "T":
+        samf = "BTF_AG_ONT_1_FAH14273_A-select.sam"
+        rf = "AG-basecalled/"
+    if args.target == "B":
+        samf = "BTF_AH_ONT_1_FAH14319_A-select.sam"
+        rf = "AH-basecalled/"
+    D = Dataset(samfile=root + samf,
+                root_files=root + rf)
 
     maxf = None
     maxlen = 20000
