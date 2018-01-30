@@ -164,6 +164,6 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
 
             sgd = SGD(lr=lr, decay=1e-6, momentum=0.9, nesterov=True, clipnorm=5)
             # rms = RMSprop(lr=0.0005, rho=0.9, epsilon=1e-08, decay=0.0, clipvalue=0.05)
-            model2.compile(loss={'ctc': lambda y_true, y_pred: y_pred}, optimizer=sgd)
+            model2.compile(loss={'ctc': lambda y_true, y_pred: y_pred}, optimizer="adadelta")
 
     return model, model2

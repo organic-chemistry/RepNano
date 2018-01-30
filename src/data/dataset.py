@@ -196,9 +196,21 @@ class Strand:
             output_file.writelines(">%s_template_deepnano\n" % filename)
             output_file.writelines(sequence.replace("B", "T") + "\n")
 
-        exex = "bwa mem -x ont2d  %s  %s.fasta > %s.sam" % (REF, name, name)
-        subprocess.call(exex, shell=True)
-        ref, succes, X1, P1 = get_seq("%s.sam" % name, ref=REF, ret_pos=True, correct=correct)
+        # try to add some prefix to the ref:
+        if not os.path.exists(REF):
+            if os.path.exists("../../" + REF):
+                pre = "../../"
+            else:
+                print(REF, "not found")
+        else:
+            pre = ""
+        exex = "bwa mem -x ont2d  %s  %s.fasta > %s.sam" % (pre + REF, name, name)
+        try:
+            subprocess.check_output(exex, shell=True, stderr=subprocess.STDOUT)
+        except subprocess.CalledProcessError as e:
+            print(e.output)
+            print(exex)
+        ref, succes, X1, P1 = get_seq("%s.sam" % name, ref=pre + REF, ret_pos=True, correct=correct)
         # print(X1, P1)
         os.remove("%s.sam" % name)
         os.remove("%s.fasta" % name)
@@ -352,8 +364,8 @@ class Strand:
                 pylab.text((s + l / 2) * sl - 1.5, m + up, base,
                            color=color)  # 1.5 size of character
 
-    def segmentation(self, chem="rf", w=5):
-        h5 = h5py.File(self.filename, "r")
+    def segmentation(self, chem="rf", w=5, prefix=""):
+        h5 = h5py.File(prefix + self.filename, "r")
         self.segments = extract_events(h5, chem="rf", window_size=w)
 
     def analyse_segmentation(self, ntwk, signal, n=5):
