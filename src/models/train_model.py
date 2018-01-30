@@ -235,6 +235,7 @@ if __name__ == '__main__':
     parser.add_argument('--correct-ref', dest="correct_ref", action="store_true")
     parser.add_argument('--all-quality', dest="all_quality", type=float, default=0.)
     parser.add_argument('--num-threads', dest="num_threads", type=int, default=1)
+    parser.add_argument('--batch-size', dest="batch_size", type=int, default=10)
 
     args = parser.parse_args()
 
@@ -692,7 +693,7 @@ if __name__ == '__main__':
             else:
                 maxin = 10 * (int(len(X_new) // 10) - 3)
                 val = 30
-                batch_size = 50
+                batch_size = args.batch_size
  # To record lr
             r = ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size] * len(Length))[:maxin], Length[:maxin]],
                          Label[:maxin], nb_epoch=1, batch_size=batch_size,
