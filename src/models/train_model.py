@@ -335,9 +335,10 @@ if __name__ == '__main__':
                 data_x.append(scale_named(strand.transfered))
 
             if args.correct_ref:
-                data_y.append([mapping[b] for b in strand.transfered["seq"]])
-            else:
                 data_y.append([mapping[b] for b in strand.transfered["seq_ref"]])
+                data_y2.append([mapping[b] for b in strand.transfered["seq_ref_correction"]])
+            else:
+                data_y.append([mapping[b] for b in strand.transfered["seq"]])
 
     del Datasets
 
@@ -524,8 +525,14 @@ if __name__ == '__main__':
 
                 if args.ctc:
 
-                    y = [base for base in data_y[s2][r: r + subseq_size] if base != mapping["N"]]
-                    if y == []:
+                    #y = [base for base in data_y[s2][r: r + subseq_size] if base != mapping["N"]]
+                    y = []
+                    for b1, b2 in zip(data_y[s2][r: r + subseq_size], data_y2[s2][r: r + subseq_size]):
+                        if b1 != mapping["N"]:
+                            y.append(b1)
+                        if b2 != mapping["N"]:
+                            y.append(b2)
+                    if y == [] or len(y) > subseq_size:
                         continue
 
                     X_new.append(x)
