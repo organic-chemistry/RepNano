@@ -236,12 +236,13 @@ if __name__ == '__main__':
     parser.add_argument('--all-quality', dest="all_quality", type=float, default=0.)
     parser.add_argument('--num-threads', dest="num_threads", type=int, default=1)
 
-    sess = tf.Session(config=tf.ConfigProto(
-        intra_op_parallelism_threads=args.num_threads))
-
     args = parser.parse_args()
 
     argparse_dict = vars(args)
+
+    sess = tf.Session(config=tf.ConfigProto(
+        intra_op_parallelism_threads=args.num_threads))
+
     repo = Repo("./")
     argparse_dict["commit"] = str(repo.head.commit)
 
