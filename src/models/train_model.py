@@ -679,7 +679,7 @@ if __name__ == '__main__':
             else:
                 maxin = 10 * (int(len(X_new) // 10) - 3)
                 val = 30
-                batch_size = 10
+                batch_size = 50
  # To record lr
             r = ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size] * len(Length))[:maxin], Length[:maxin]],
                          Label[:maxin], nb_epoch=1, batch_size=batch_size,
