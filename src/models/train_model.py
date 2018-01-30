@@ -200,6 +200,7 @@ if __name__ == '__main__':
     import argparse
     import json
     from git import Repo
+    import tensorflow as tf
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--Nbases', type=int, choices=[4, 5, 8], default=4)
@@ -233,6 +234,10 @@ if __name__ == '__main__':
     parser.add_argument('--hybrid', dest="hybrid", action="store_true")
     parser.add_argument('--correct-ref', dest="correct_ref", action="store_true")
     parser.add_argument('--all-quality', dest="all_quality", type=float, default=0.)
+    parser.add_argument('--num-threads', dest="num_threads", type=int, default=1)
+
+    sess = tf.Session(config=tf.ConfigProto(
+        intra_op_parallelism_threads=args.num_threads))
 
     args = parser.parse_args()
 
