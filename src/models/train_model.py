@@ -334,7 +334,11 @@ if __name__ == '__main__':
     correct_ref = args.correct_ref
     for D in Datasets:
         for strand in D.strands:
+
             if strand.transfered is None:
+                continue
+
+            if not(strand.score_bc_ref > args.all_quality):
                 continue
 
             if args.sclean:
