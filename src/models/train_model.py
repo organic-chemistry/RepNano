@@ -236,6 +236,7 @@ if __name__ == '__main__':
     parser.add_argument('--all-quality', dest="all_quality", type=float, default=0.)
     parser.add_argument('--num-threads', dest="num_threads", type=int, default=1)
     parser.add_argument('--batch-size', dest="batch_size", type=int, default=10)
+    parser.add_argument('--supcorre', dest="supcorre", action='store_true')
 
     args = parser.parse_args()
 
@@ -537,7 +538,7 @@ if __name__ == '__main__':
                     for b1, b2 in zip(data_y[s2][r: r + subseq_size], data_y2[s2][r: r + subseq_size]):
                         if b1 != mapping["N"]:
                             y.append(b1)
-                        if b2 != mapping["N"]:
+                        if args.supcorre and b2 != mapping["N"]:
                             y.append(b2)
                     if y == [] or len(y) > subseq_size:
                         continue
