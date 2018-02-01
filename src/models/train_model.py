@@ -532,14 +532,15 @@ if __name__ == '__main__':
                         stats[xx] += 1
 
                 if args.ctc:
-
-                    #y = [base for base in data_y[s2][r: r + subseq_size] if base != mapping["N"]]
-                    y = []
-                    for b1, b2 in zip(data_y[s2][r: r + subseq_size], data_y2[s2][r: r + subseq_size]):
-                        if b1 != mapping["N"]:
-                            y.append(b1)
-                        if args.supcorre and b2 != mapping["N"]:
-                            y.append(b2)
+                    if not args.correct:
+                        y = [base for base in data_y[s2][r: r + subseq_size] if base != mapping["N"]]
+                    if args.correct:
+                        y = []
+                        for b1, b2 in zip(data_y[s2][r: r + subseq_size], data_y2[s2][r: r + subseq_size]):
+                            if b1 != mapping["N"]:
+                                y.append(b1)
+                            if args.supcorre and b2 != mapping["N"]:
+                                y.append(b2)
                     if y == [] or len(y) > subseq_size:
                         continue
 
