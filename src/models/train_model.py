@@ -532,9 +532,9 @@ if __name__ == '__main__':
                         stats[xx] += 1
 
                 if args.ctc:
-                    if not args.correct:
+                    if not args.correct_ref:
                         y = [base for base in data_y[s2][r: r + subseq_size] if base != mapping["N"]]
-                    if args.correct:
+                    if args.correct_ref:
                         y = []
                         for b1, b2 in zip(data_y[s2][r: r + subseq_size], data_y2[s2][r: r + subseq_size]):
                             if b1 != mapping["N"]:
