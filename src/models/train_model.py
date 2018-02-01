@@ -338,7 +338,7 @@ if __name__ == '__main__':
             if strand.transfered is None:
                 continue
 
-            if not(strand.score_bc_ref > args.all_quality):
+            if not(strand.bc_score > args.all_quality):
                 continue
 
             if args.sclean:
