@@ -263,6 +263,9 @@ weights = "data/cluster/training_correct-std_0p1_residual_clean_ctc200-delta400-
 basename = "results/std-clean-bTBI-cleanI/"
 """
 
+weights = "data/training/training_correct-std_0p1_residual_clean_ctc200-delta400-realign_my_model_weights-290.h5"
+basename = "results/test1"
+
 ref = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
 redo = 1
 # ref = "data/external/chromFa/*.fa"
@@ -286,12 +289,12 @@ list_dir1 = [["20170908-R9.5/Human_AR", "20170908-R9.5/human_ar", 5]]
 list_dir1 += [["20170908-R9.5/Human_HQ", "20170908-R9.5/human_hq", 5]]
 # + list_dir[-3:]:  # + list_dir1:  # + list_dir[-1:]:
 default = list_dir[1:4] + list_dir[-3:-2] + list_dir1
-default = list_dir[1:4] + list_dir1
+default = list_dir[3:4]  # + list_dir1
 for dire, out, w in default:
     if redo:
         process(weights, directory="data/raw/%s/" % dire,
                 output="data/processed/{0}{1}.fasta".format(basename, out), Nbases=5, reads="",
-                filter=None, already_detected=False, Nmax=200, size=40,
+                filter=None, already_detected=False, Nmax=10, size=40,
                 n_output_network=1, n_input=1, chemistry="rf", window_size=w, clean=True, old=False, res=True,
                 attention=False)
         # filter="data/processed/%s.InDeepNano.test" % outz , already_detected=False)

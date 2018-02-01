@@ -95,7 +95,7 @@ import pandas as pd
 
 
 def scale_clean_two_pd(X):
-    return scale_clean_two(np.array([X["mean"], X["mean"]**2, X["stdv"], X["length"]]))
+    return scale_clean_two(np.array([X["mean"], X["mean"]**2, X["stdv"], X["length"]]).T)
 
 
 def scale_clean_two(X, normalise_window=True, nw=100):

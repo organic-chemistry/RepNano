@@ -191,6 +191,7 @@ class Strand:
     def get_ref(self, sequence, correct=False):
 
         h, name = tempfile.mkstemp(prefix="", dir="./")
+        os.close(h)
         with open(name + ".fasta", "w") as output_file:
             filename = "tmp"
             output_file.writelines(">%s_template_deepnano\n" % filename)
@@ -206,7 +207,7 @@ class Strand:
             pre = ""
         exex = "bwa mem -x ont2d  %s  %s.fasta > %s.sam" % (pre + REF, name, name)
         try:
-            subprocess.check_output(exex, shell=True, stderr=subprocess.STDOUT)
+            subprocess.check_output(exex, shell=True, stderr=subprocess.STDOUT, close_fds=True)
         except subprocess.CalledProcessError as e:
             print(e.output)
             print(exex)
@@ -366,18 +367,22 @@ class Strand:
 
     def segmentation(self, chem="rf", w=5, prefix=""):
         h5 = h5py.File(prefix + self.filename, "r")
-        self.segments = extract_events(h5, chem="rf", window_size=w)
+        self.segments = extract_events(h5, chem="rf", window_size=w, old=False)
 
-    def analyse_segmentation(self, ntwk, signal, n=5):
-        if n == 4:
+    def analyse_segmentation(self, ntwk, signal):
+
+        pre = ntwk.predict(signal[np.newaxis, ::, ::])[0]
+        n = pre.shape[-1]
+        # print(n)
+        if n == 4 + 1:
             alph = "ACGTN"
-        if n == 5:
+        if n == 5 + 1:
             alph = "ACGTBN"
-        if n == 8:
+        if n == 8 + 1:
             alph = "ACGTBLEIN"
 
-        b = np.argmax(ntwk.predict(signal[np.newaxis, ::, ::])[0], axis=-1)
-        output = np.array(list(map(lambda x: str(alph + "T")[x], b)))[::, np.newaxis]
+        b = np.argmax(pre, axis=-1)
+        output = np.array(list(map(lambda x: str(alph)[x], b)))[::, np.newaxis]
         return np.concatenate((output, signal), axis=-1)
 
     def transfer(self, root_signal, signal_to_label, center_of_mass=False):
