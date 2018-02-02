@@ -237,6 +237,7 @@ if __name__ == '__main__':
     parser.add_argument('--num-threads', dest="num_threads", type=int, default=1)
     parser.add_argument('--batch-size', dest="batch_size", type=int, default=10)
     parser.add_argument('--supcorre', dest="supcorre", action='store_true')
+    parser.add_argument('--waiting-time', dest="waiting_time", type=int, default=500)
 
     args = parser.parse_args()
 
@@ -388,7 +389,7 @@ if __name__ == '__main__':
 
 
 # ntwk.load_weights("./my_model_weights.h5")
-    Schedul = lrd(waiting_time=2000, start_lr=args.lr, min_lr=0.0001, factor=2)
+    Schedul = lrd(waiting_time=args.waiting_time, start_lr=args.lr, min_lr=0.0001, factor=2)
     for epoch in range(20000):
 
         # Test to see if realignment is interesting:
