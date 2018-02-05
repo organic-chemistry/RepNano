@@ -243,8 +243,8 @@ if __name__ == '__main__':
 
     argparse_dict = vars(args)
 
-    sess = tf.Session(config=tf.ConfigProto(
-        intra_op_parallelism_threads=args.num_threads))
+    # sess = tf.Session(config=tf.ConfigProto(
+#        intra_op_parallelism_threads=args.num_threads))
 
     repo = Repo("./")
     argparse_dict["commit"] = str(repo.head.commit)
