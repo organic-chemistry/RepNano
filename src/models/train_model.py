@@ -529,9 +529,11 @@ if __name__ == '__main__':
                         return ret
 
                     y = [domap(base) for base in data_y[s2][r: r + subseq_size]]
+                    y2 = [domap(base) for base in data_y2[s2][r: r + subseq_size]]
 
                     X_new.append(x)
                     Y_new.append(y)
+                    Y2_new.append(y2)
 
                     for xx in data_y[s2][r:r + subseq_size]:
                         stats[xx] += 1
@@ -645,6 +647,7 @@ if __name__ == '__main__':
 
         X_new = np.array(X_new)
         Y_new = np.array(Y_new)
+        Y2_new = np.array(Y2_new)
 
         if not args.ctc:
             sum1 = 0
@@ -671,7 +674,11 @@ if __name__ == '__main__':
             w2 = np.array(w2)
 
         if not args.ctc:
-            r = predictor.fit(X_new, Y_new, nb_epoch=1, batch_size=10, validation_split=0.05)
+            if args.n_output_network == 1:
+                r = predictor.fit(X_new, Y_new, nb_epoch=1, batch_size=10, validation_split=0.05)
+            else:
+                r = predictor.fit(X_new, [Y_new, Y2_new], nb_epoch=1,
+                                  batch_size=10, validation_split=0.05)
             # ntwk.fit(X_new, Y_new, nb_epoch=1, batch_size=10, validation_split=0.05,
             #          sample_weight={"out_layer2": w2}, )
             if epoch % 10 == 0:

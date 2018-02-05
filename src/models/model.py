@@ -102,7 +102,7 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
         if input_length != None:
 
             TD = TimeDistributed(Dense(Nbases, activation="softmax"), name="out_layer1")
-            r = Reshape((input_length * 2, 2 * size))(l3)
+            r = Reshape((input_length * 2, 2 * size))(l3)  # 2 * size because l3 is concat
             out_layer1 = TD(r)
         else:
             print("Latttt")
