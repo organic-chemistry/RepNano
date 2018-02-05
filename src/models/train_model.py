@@ -550,7 +550,7 @@ if __name__ == '__main__':
                         continue
 
                     X_new.append(x)
-                    Label.append(y + [0] * (subseq_size - len(y)))
+                    Label.append(y + [0] * (subseq_size * args.n_output_network - len(y)))
                     Length.append(len(y))
                 # x[:,0] += np.random.binomial(n=1, p=0.1, size=x.shape[0]) *
                 # np.random.normal(scale=0.01, size=x.shape[0])

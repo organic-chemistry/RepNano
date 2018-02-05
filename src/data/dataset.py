@@ -268,16 +268,16 @@ class Strand:
         self.raw = np.array(raw, dtype=np.float16)
         self.sampling_rate = amp
 
-    def get_seq_mean(self, motif, ref, short=True, void="N"):
+    def get_seq_mean(self, motif, ref, short=True, void="N", caract="mean"):
 
         seq = "".join(ref["seq"].replace(void, ""))
         if motif in seq:
             num = [i for i, l in(enumerate(ref["seq"])) if l != void]
             index = seq.index(motif)
             if short:
-                return motif, np.array(ref["mean"][num[index:index + len(motif)]])
+                return motif, np.array(ref[caract][num[index:index + len(motif)]])
             else:
-                return motif, np.array(ref["mean"][num[index]:num[index + len(motif)]])
+                return motif, np.array(ref[caract][num[index]:num[index + len(motif)]])
         else:
             return motif, None
 
