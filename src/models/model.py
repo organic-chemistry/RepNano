@@ -5,6 +5,7 @@ from keras.models import Model
 from keras.layers.wrappers import Bidirectional, TimeDistributed
 from keras import backend as K
 from keras.layers.core import Lambda, Reshape
+from keras.layers import Concatenate
 from keras.optimizers import SGD, Adadelta
 import keras
 try:
@@ -96,41 +97,59 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
             out_layer1 = TimeDistributed(Dense(Nbases, activation="softmax"), name="out_layer1")(l3)
 
     else:
-        l3 = Bidirectional(LSTM(2 * size, return_sequences=True, trainable=trainable),
-                           merge_mode='concat')(l2)
+        old = False
+        if old:
+            l3 = Bidirectional(LSTM(2 * size, return_sequences=True, trainable=trainable),
+                               merge_mode='concat')(l2)
 
-        if input_length != None:
+            if input_length != None:
 
-            TD = TimeDistributed(Dense(Nbases, activation="softmax"), name="out_layer1")
-            r = Reshape((input_length * 2, 2 * size))(l3)  # 2 * size because l3 is concat
-            out_layer1 = TD(r)
+                TD = TimeDistributed(Dense(Nbases, activation="softmax"), name="out_layer1")
+                r = Reshape((input_length * 2, 2 * size))(l3)  # 2 * size because l3 is concat
+                out_layer1 = TD(r)
+            else:
+                print("Latttt")
+
+                def slice_last_d(x):
+
+                    return x[::, ::, :2 * size]
+
+                def slice_last_u(x):
+
+                    return x[::, ::, 2 * size:]
+
+                def slice_shape(input_shape):
+                    shape = list(input_shape)
+
+                    shape[-1] = 2 * size
+                    return tuple(shape)
+
+                TD = TimeDistributed(Dense(Nbases, activation="softmax"),
+                                     name="out_layer1")
+
+                l3d = Lambda(slice_last_d, slice_shape)(l3)
+                l3u = Lambda(slice_last_u, slice_shape)(l3)
+
+                out_layer1 = TD(l3d)
+                out_layer2 = TD(l3u)
         else:
-            print("Latttt")
+            l3_0 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable),
+                                 merge_mode="sum")(l2)
+            l3_1 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable),
+                                 merge_mode="sum")(l2)
+            out_layer1 = TimeDistributed(
+                Dense(Nbases, activation="softmax"), name="out_layer1")(l3_0)
+            out_layer2 = TimeDistributed(
+                Dense(Nbases, activation="softmax"), name="out_layer2")(l3_1)
 
-            def slice_last_d(x):
+            if input_length != None:
 
-                return x[::, ::, :2 * size]
-
-            def slice_last_u(x):
-
-                return x[::, ::, 2 * size:]
-
-            def slice_shape(input_shape):
-                shape = list(input_shape)
-
-                shape[-1] = 2 * size
-                return tuple(shape)
-
-            TD = TimeDistributed(Dense(Nbases, activation="softmax"),
-                                 name="out_layer1")
-
-            l3d = Lambda(slice_last_d, slice_shape)(l3)
-            l3u = Lambda(slice_last_u, slice_shape)(l3)
-
-            out_layer1 = TD(l3d)
-            out_layer2 = TD(l3u)
+                l3 = Concatenate()([l3_0, l3_1])
+                r = Reshape((input_length * 2, size))(l3)  # 2 * size because l3 is concat
+                out_layer2 = None
 
     if out_layer2 is not None:
+        print("ici")
         model = Model(inputs=inputs, outputs=[out_layer1, out_layer2])
     else:
         model = Model(inputs=inputs, outputs=out_layer1)

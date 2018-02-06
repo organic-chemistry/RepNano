@@ -369,10 +369,21 @@ class Strand:
         h5 = h5py.File(prefix + self.filename, "r")
         self.segments = extract_events(h5, chem="rf", window_size=w, old=False)
 
-    def analyse_segmentation(self, ntwk, signal):
+    def analyse_segmentation(self, ntwk, signal, no2=False):
 
-        pre = ntwk.predict(signal[np.newaxis, ::, ::])[0]
-        n = pre.shape[-1]
+        pre = ntwk.predict(signal[np.newaxis, ::, ::])
+        if no2:
+            #print(pre[0].shape, signal.shape)
+            o1, o2 = pre
+            o1m = (np.argmax(o1[0], -1))
+            o2m = (np.argmax(o2[0], -1))
+            #b = np.vstack((o1m, o2m)).reshape((-1,), order='F')
+            n = o1[0].shape[-1]
+        else:
+            pre = pre[0]
+            b = np.argmax(pre, axis=-1)
+            n = pre.shape[-1]
+
         # print(n)
         if n == 4 + 1:
             alph = "ACGTN"
@@ -381,9 +392,15 @@ class Strand:
         if n == 8 + 1:
             alph = "ACGTBLEIN"
 
-        b = np.argmax(pre, axis=-1)
-        output = np.array(list(map(lambda x: str(alph)[x], b)))[::, np.newaxis]
-        return np.concatenate((output, signal), axis=-1)
+        if no2:
+            output1 = np.array(list(map(lambda x: str(alph)[x], o1m)))[::, np.newaxis]
+            output2 = np.array(list(map(lambda x: str(alph)[x], o2m)))[::, np.newaxis]
+
+            return np.concatenate((output1, output2, signal), axis=-1)
+        else:
+            output = np.array(list(map(lambda x: str(alph)[x], b)))[::, np.newaxis]
+
+            return np.concatenate((output, signal), axis=-1)
 
     def transfer(self, root_signal, signal_to_label, center_of_mass=False):
         # Compute center:

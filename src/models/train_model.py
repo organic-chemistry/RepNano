@@ -675,10 +675,11 @@ if __name__ == '__main__':
 
         if not args.ctc:
             if args.n_output_network == 1:
-                r = predictor.fit(X_new, Y_new, nb_epoch=1, batch_size=10, validation_split=0.05)
+                r = predictor.fit(X_new, Y_new, nb_epoch=1,
+                                  batch_size=args.batch_size, validation_split=0.05)
             else:
                 r = predictor.fit(X_new, [Y_new, Y2_new], nb_epoch=1,
-                                  batch_size=10, validation_split=0.05)
+                                  batch_size=args.batch_size, validation_split=0.05)
             # ntwk.fit(X_new, Y_new, nb_epoch=1, batch_size=10, validation_split=0.05,
             #          sample_weight={"out_layer2": w2}, )
             if epoch % 10 == 0:
