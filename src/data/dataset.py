@@ -68,9 +68,10 @@ class Dataset:
 
                     if basecall:
                         try:
-                            self.strands[-1].signal_bc, self.strands[-1].seq_from_basecall, self.strands[-1].imin,
-                            self.strands[-1].raw, self.strands[-1].to_match, self.strands[
-                                -1].sampling_rate = self.strands[-1].get_seq(f="BaseCall")
+                            r = self.strands[-1].get_seq(f="BaseCall")
+                            self.strands[-1].signal_bc, self.strands[-1].seq_from_basecall, self.strands[-1].imin, \
+                                self.strands[-1].raw, self.strands[-1].to_match, self.strands[
+                                -1].sampling_rate = r
                         except NotAllign:
                             print("Strand %i raw not alligned to basecall" % len(self.strands))
 
@@ -139,6 +140,8 @@ class Strand:
             s2 = ""
             self.signal_bc = []
             left = None
+            dimer = True
+            sup = []
             for ie, (s, length, m, ms, move, stdv) in enumerate(zip(e2bis["start"], e2bis["length"],
                                                                     e2bis["mean"], e2bis["model_state"], e2bis["move"], e2bis["stdv"])):
 
@@ -146,24 +149,28 @@ class Strand:
                 state = state[2:-1]  # to remove b' and '
                 # print(s)
                 # state = state[2]
-
+                # sup.append("N")
                 if move == 1:
                     s2 += state[2]
                     state = state[2]
-                    self.signal_bc.append([state, m, stdv, length, s])
+                    self.signal_bc.append(["N" + state, m, stdv, length, s])
                     left = None
                 elif move >= 2:
                     s2 += state[1:3]
                     state = state[1:3]
 
-                    if self.signal_bc[-1][0] == "N":
+                    if self.signal_bc[-1][0] == "N" and not dimer:
                         self.signal_bc[-1][0] = state[0]
                         self.signal_bc.append([state[1], m, stdv, length, s])
                     else:
-                        self.signal_bc.append([state[0], m, stdv, length, s])
-                        left = state[1]
+
+                        self.signal_bc.append([state, m, stdv, length, s])
+                        #sup[-1] = state[0]
+                        if not dimer:
+                            left = state[1]
+
                 elif move == 0:
-                    self.signal_bc.append(["N", m, stdv, length, s])
+                    self.signal_bc.append(["NN", m, stdv, length, s])
                     if left is not None:
                         self.signal_bc[-1][0] = left
                     left = None
@@ -180,6 +187,7 @@ class Strand:
             self.signal_bc["start"] += (self.imin / self.sampling_rate - self.signal_bc["start"][0])
 
             self.seq_from_basecall = s2
+            # print(self.signal_bc)
 
             return self.signal_bc, self.seq_from_basecall, self.imin, self.raw, self.to_match, self.sampling_rate
 
@@ -402,7 +410,7 @@ class Strand:
 
             return np.concatenate((output, signal), axis=-1)
 
-    def transfer(self, root_signal, signal_to_label, center_of_mass=False):
+    def transfer(self, root_signal, signal_to_label, center_of_mass=False, seqt="seq"):
         # Compute center:
 
         r_center = root_signal["start"] + root_signal["length"] / 2
@@ -414,27 +422,38 @@ class Strand:
 
             for c in stl_center:
                 where = np.argmin(np.abs(r_center - c))
-                stl_base.append(root_signal["seq"][where])
+                stl_base.append(root_signal[seqt][where])
 
         else:
             # Force assignation of bases
-            stl_base = ["N" for i in range(len(signal_to_label))]
-            for ib, b in enumerate(root_signal["seq"]):
-                if b != "N":
+            stl_base = ["NN" for i in range(len(signal_to_label))]
+            for ib, b in enumerate(root_signal[seqt]):
+                if b != "NN":
 
                     s = (r_center[ib] > signal_to_label["start"]) &  \
                         (r_center[ib] < (signal_to_label["start"] + signal_to_label["length"]))
 
                     # where = np.argmin( np.abs(stl_center-r_center[ib]))
                     where = np.argmax(s)
-                    stl_base[where] = b
+                    if stl_base[where] != "NN" and "N" in stl_base[where]:
+                        #print(stl_base[where], b)
+                        stl_base[where] += b
+                        stl_base[where] = stl_base[where].replace("N", "")
+                        if len(stl_base[where]) > 2 and where < len(stl_base):
+
+                            stl_base[where + 1] = stl_base[where][2:] + \
+                                "N" * (2 - len(stl_base[where][2:]))
+                        stl_base[where] = stl_base[where][:2]
+                        #print("After", stl_base[where])
+                    else:
+                        stl_base[where] = b
 
         new_signal = []
         for s, m, std, l, start in zip(stl_base, signal_to_label["mean"], signal_to_label["stdv"],
                                        signal_to_label["length"], signal_to_label["start"]):
             new_signal.append([s, m, std, l, start])
 
-        names = ["seq", "mean", "stdv", "length", "start"]
+        names = [seqt, "mean", "stdv", "length", "start"]
         return pd.DataFrame({n: v for n, v in zip(
             names, np.array(new_signal).T)}).convert_objects(convert_numeric=True)
 

@@ -90,18 +90,24 @@ if __name__ == "__main__":
             if len("".join(transfered["seq"]).replace("N", "")) > maxlen:
                 transfered = transfered[:maxlen]
             # get the ref from transefered:
-            ref = strand.get_ref("".join(transfered["seq"].replace("N", "")), correct=True)
+            ref = strand.get_ref("".join(transfered["seq"]).replace("N", ""), correct=True)
             if ref == "":
                 return [None, None]
             # allign the ref on the transefered
             bc_strand = "".join(transfered["seq"]).replace("N", "")
             al = strand.score(bc_strand, ref, all_info=True)
-            strand.score_bc_ref = al[2] / len(bc_strand)
+            #strand.score_bc_ref = al[2] / len(bc_strand)
 
             mapped_ref, correction = strand.give_map("".join(transfered["seq"]), al[:2])
 
-            transfered["seq_ref"] = np.array([s for s in mapped_ref])
-            transfered["seq_ref_correction"] = np.array([s for s in correction])
+            def order(s1, s2):
+                if s1 != "N":
+                    return s1 + s2
+                return s2 + s1
+            transfered["seq_ref"] = np.array([order(s, s1)
+                                              for s, s1 in zip(mapped_ref[::2], mapped_ref[1::2])])
+            transfered["seq_ref_correction"] = np.array([order(s, s1)
+                                                         for s, s1 in zip(correction[::2], correction[1::2])])
             strand.changed = True
 
         # strand.transfered_seq = transfered
@@ -117,6 +123,7 @@ if __name__ == "__main__":
         if v[0] is not None:
             s.transfered = v[0]
             s.bc_score = v[1]
+            s.confirm_score = v[2]
             del(s.signal_bc)
         else:
             s.transfered = None
