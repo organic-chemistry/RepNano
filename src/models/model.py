@@ -137,6 +137,7 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                                  merge_mode="sum")(l2)
             l3_1 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable),
                                  merge_mode="sum")(l2)
+
             out_layer1 = TimeDistributed(
                 Dense(Nbases, activation="softmax"), name="out_layer1")(l3_0)
             out_layer2 = TimeDistributed(
@@ -144,8 +145,9 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
 
             if input_length != None:
 
-                l3 = Concatenate()([l3_0, l3_1])
-                out_layer1 = Reshape((input_length * 2, size))(l3)  # 2 * size because l3 is concat
+                l3 = Concatenate()([out_layer1, out_layer2])
+                # 2 * size because l3 is concat
+                out_layer1 = Reshape((input_length * 2, Nbases))(l3)
                 out_layer2 = None
 
     if out_layer2 is not None:
