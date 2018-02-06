@@ -145,7 +145,7 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
             if input_length != None:
 
                 l3 = Concatenate()([l3_0, l3_1])
-                r = Reshape((input_length * 2, size))(l3)  # 2 * size because l3 is concat
+                out_layer1 = Reshape((input_length * 2, size))(l3)  # 2 * size because l3 is concat
                 out_layer2 = None
 
     if out_layer2 is not None:
