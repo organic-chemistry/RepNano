@@ -348,8 +348,8 @@ if __name__ == '__main__':
                 data_x.append(scale_named(strand.transfered))
 
             if args.correct_ref:
-                data_y.append([mapping[b] for b in strand.transfered["seq_ref"]])
-                data_y2.append([mapping[b] for b in strand.transfered["seq_ref_correction"]])
+                data_y.append([mapping[b][0] for b in strand.transfered["seq_ref"]])
+                data_y2.append([mapping[b][1] for b in strand.transfered["seq_ref"]])
             else:
                 data_y.append([mapping[b] for b in strand.transfered["seq"]])
 
