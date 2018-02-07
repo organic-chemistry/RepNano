@@ -358,6 +358,7 @@ class Strand:
             s0 = sign["start"][0]
         else:
             shift = 0
+        print("shift", shift)
         for i, (s, l, m) in enumerate(zip(sign["start"], sign["length"], sign["mean"])):
             X += [(s - s0) * sl + shift, (s - s0 + l) * sl + shift]
             Y += [m, m]

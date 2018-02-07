@@ -238,6 +238,7 @@ if __name__ == '__main__':
     parser.add_argument('--batch-size', dest="batch_size", type=int, default=10)
     parser.add_argument('--supcorre', dest="supcorre", action='store_true')
     parser.add_argument('--waiting-time', dest="waiting_time", type=int, default=500)
+    parser.add_argument('--norm2', dest="norm2", action="store_true")
 
     args = parser.parse_args()
 
@@ -288,6 +289,8 @@ if __name__ == '__main__':
 
     if args.sclean:
         n_feat = 1
+    if args.norm2:
+        n_feat = 2
 
     _, ntwk = build_models(args.size, nbase=args.Nbases - 4,
                            ctc_length=ctc_length,
@@ -324,12 +327,16 @@ if __name__ == '__main__':
     names = []
 
     from ..data.dataset import Dataset
-    from ..features.helpers import scale_simple, scale_named
+    from ..features.helpers import scale_simple, scale_named, scale_named2
     root = "data/raw/20170908-R9.5/"
     Datasets = []
     for d in args.all_datasets:
         with open(d, "rb") as fich:
             Datasets.append(cPickle.load(fich))
+
+    fnorm = scale_named
+    if args.norm2:
+        fnorm = scale_named2
 
     data_x = []
     correct_ref = args.correct_ref
@@ -345,10 +352,15 @@ if __name__ == '__main__':
             if args.sclean:
                 data_x.append(scale_simple(strand.transfered))
             else:
-                data_x.append(scale_named(strand.transfered))
+                data_x.append(fnorm(strand.transfered))
+            if args.raw:
+                sl = s.sampling_rate
+                data_x[-1] = [s.raw[int(start * sl):int((start + length) * sl)] for start,
+                              length in zip(strand.transfered["start"], strand.transfered["length"])]
 
             if args.correct_ref:
                 data_y.append([mapping[b[0]] for b in strand.transfered["seq_ref"]])
+
                 data_y2.append([mapping[b[1]] for b in strand.transfered["seq_ref"]])
             else:
                 data_y.append([mapping[b] for b in strand.transfered["seq"]])
@@ -550,6 +562,8 @@ if __name__ == '__main__':
                                 y.append(b2)
                     if y == [] or len(y) > subseq_size:
                         continue
+
+                    if args.raw:
 
                     X_new.append(x)
                     Label.append(y + [0] * (subseq_size * args.n_output_network - len(y)))

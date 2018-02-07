@@ -54,6 +54,11 @@ def scale_named(X, normalise_window=True):
     return scale(np.array([X["mean"], X["mean"]**2, X["stdv"], X["length"]]).T)
 
 
+def scale_named2(X, normalise_window=True):
+    return scale_clean2(np.array([X["mean"], X["mean"]**2, X["stdv"], X["length"]]).T)
+
+
+"""
 def scale_clean(X, normalise_window=True):
 
     ret = np.array(X)
@@ -68,6 +73,26 @@ def scale_clean(X, normalise_window=True):
 
     # scale_clean_two(X)
     return ret[:, : 3]
+"""
+
+
+def scale_clean2(X, normalise_window=True, window=500):
+
+    ret = np.array(X)
+
+    # print("std", np.mean(ret[:, 2]))
+    #p75 = pd.Series(ret[0]).rolling(window, center=True, min_periods=1).quantile(0.75)
+    p75 = pd.Series(ret[::, 0]).quantile(0.75)
+
+    ret[:, 0] = (ret[::, 0] - p75) / p75
+
+    #p75 = pd.Series(ret[2]).rolling(window, center=True, min_periods=1).quantile(0.75)
+    p75 = pd.Series(ret[2]).quantile(0.75)
+
+    ret[:, 1] = (ret[::, 2] - p75) / p75
+
+    return ret[:, : 2]
+
 
 """
 def scale_clean_two(X, normalise_window=True):
