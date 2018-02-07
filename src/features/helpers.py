@@ -58,7 +58,6 @@ def scale_named2(X, normalise_window=True):
     return scale_clean2(np.array([X["mean"], X["mean"]**2, X["stdv"], X["length"]]).T)
 
 
-"""
 def scale_clean(X, normalise_window=True):
 
     ret = np.array(X)
@@ -73,7 +72,6 @@ def scale_clean(X, normalise_window=True):
 
     # scale_clean_two(X)
     return ret[:, : 3]
-"""
 
 
 def scale_clean2(X, normalise_window=True, window=500):

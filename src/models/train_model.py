@@ -239,6 +239,7 @@ if __name__ == '__main__':
     parser.add_argument('--supcorre', dest="supcorre", action='store_true')
     parser.add_argument('--waiting-time', dest="waiting_time", type=int, default=500)
     parser.add_argument('--norm2', dest="norm2", action="store_true")
+    parser.add_argument('--raw', dest="raw", action="store_true")
 
     args = parser.parse_args()
 
@@ -562,8 +563,6 @@ if __name__ == '__main__':
                                 y.append(b2)
                     if y == [] or len(y) > subseq_size:
                         continue
-
-                    if args.raw:
 
                     X_new.append(x)
                     Label.append(y + [0] * (subseq_size * args.n_output_network - len(y)))
