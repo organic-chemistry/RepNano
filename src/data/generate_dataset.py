@@ -18,6 +18,7 @@ if __name__ == "__main__":
     parser.add_argument("--n-cpu", dest="n_cpu", type=int, default=None)
     parser.add_argument("--name", dest="name", type=str, default='dataset.pick')
     parser.add_argument("--target", dest="target", type=str, default='T')
+    parser.add_argument("--test-set", dest="test_set", action="store_true")
 
     args = parser.parse_args()
 
@@ -52,8 +53,11 @@ if __name__ == "__main__":
         maxf = 12
         maxlen = 1000
 
+    ran = range(1, 11)
+    if args.test_set:
+        ran = range(11, 17)
     D.populate(maxf=maxf, filter_not_alligned=True,
-               filter_ch=range(1, 11), basecall=False, minion=False)
+               filter_ch=ran, basecall=False, minion=False)
 
     # load from basecall
     def load_from_bc(strand):
@@ -96,7 +100,7 @@ if __name__ == "__main__":
             # allign the ref on the transefered
             bc_strand = "".join(transfered["seq"]).replace("N", "")
             al = strand.score(bc_strand, ref, all_info=True)
-            #strand.score_bc_ref = al[2] / len(bc_strand)
+            # strand.score_bc_ref = al[2] / len(bc_strand)
 
             mapped_ref, correction = strand.give_map("".join(transfered["seq"]), al[:2])
 
