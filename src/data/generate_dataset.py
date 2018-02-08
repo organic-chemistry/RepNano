@@ -30,7 +30,7 @@ if __name__ == "__main__":
     os.makedirs(args.root, exist_ok=True)
     os.makedirs(os.path.split(args.name)[0], exist_ok=True)
 
-    with open(args.root + '/params.json', 'w') as fp:
+    with open(os.path.split(args.name)[0] + '/params.json', 'w') as fp:
         json.dump(argparse_dict, fp, indent=True)
 
     if args.n_cpu is not None:
@@ -47,6 +47,7 @@ if __name__ == "__main__":
         rf = "AH-basecalled/"
     D = Dataset(samfile=root + samf,
                 root_files=root + rf)
+    D.metadata = argparse_dict
 
     maxf = None
     maxlen = 20000
