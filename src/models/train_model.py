@@ -534,11 +534,11 @@ if __name__ == '__main__':
             infostat = {}
             while len(X_new) < mini:
                 print(len(X_new))
-                if maxi is not None:
-                    if len(X_new) >= maxi:
-                        break
 
                 for s in range(len(data_x)):
+                    if maxi is not None:
+                        if len(X_new) >= maxi:
+                            break
                     s2 = np.random.choice(s_arr, p=p_arr)
                     # print(s2)
                     # print(data_x[s2].shape[0])
