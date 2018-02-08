@@ -522,9 +522,9 @@ if __name__ == '__main__':
         tc2 = 0
         tc3 = 0
 
-        def get_transformed_sets(data_x, data_y, data_y2, mini=200, maxi=None):
+        def get_transformed_sets(d_x, d_y, d_y2, mini=200, maxi=None):
 
-            print(len(data_x), (data_y))
+            print(len(d_x), len(d_y))
 
             X_new = []
             Y_new = []
@@ -539,7 +539,7 @@ if __name__ == '__main__':
                 print(len(X_new))
                 if stop:
                     break
-                for s in range(len(data_x)):
+                for s in range(len(d_x)):
                     if maxi is not None:
                         if len(X_new) >= maxi:
                             stop = True
@@ -547,8 +547,8 @@ if __name__ == '__main__':
                     s2 = np.random.choice(s_arr, p=p_arr)
                     # print(s2)
                     # print(data_x[s2].shape[0])
-                    r = np.random.randint(0, data_x[s2].shape[0] - subseq_size)
-                    x = data_x[s2][r:r + subseq_size]
+                    r = np.random.randint(0, d_x[s2].shape[0] - subseq_size)
+                    x = d_x[s2][r:r + subseq_size]
 
                     if not args.ctc:
 
@@ -557,23 +557,23 @@ if __name__ == '__main__':
                             ret[base] = 1
                             return ret
 
-                        y = [domap(base) for base in data_y[s2][r: r + subseq_size]]
-                        y2 = [domap(base) for base in data_y2[s2][r: r + subseq_size]]
+                        y = [domap(base) for base in d_y[s2][r: r + subseq_size]]
+                        y2 = [domap(base) for base in d_y2[s2][r: r + subseq_size]]
 
                         X_new.append(x)
                         Y_new.append(y)
                         Y2_new.append(y2)
 
-                        for xx in data_y[s2][r:r + subseq_size]:
+                        for xx in d_y[s2][r:r + subseq_size]:
                             stats[xx] += 1
 
                     if args.ctc:
                         if not args.correct_ref:
-                            y = [base for base in data_y[s2][
+                            y = [base for base in d_y[s2][
                                 r: r + subseq_size] if base != mapping["N"]]
                         if args.correct_ref:
                             y = []
-                            for b1, b2 in zip(data_y[s2][r: r + subseq_size], data_y2[s2][r: r + subseq_size]):
+                            for b1, b2 in zip(d_y[s2][r: r + subseq_size], d_y2[s2][r: r + subseq_size]):
                                 if b1 != mapping["N"]:
                                     y.append(b1)
                                 if args.supcorre and b2 != mapping["N"]:
@@ -599,7 +599,7 @@ if __name__ == '__main__':
 
                         length = subseq_size
                         start = r
-                        Index = data_index[s2]
+                        Index = d_index[s2]
                         alignment = data_alignment[s2]
                         f = 1
                         if n_input == 1 and n_output == 2:
