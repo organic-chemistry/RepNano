@@ -724,6 +724,11 @@ if __name__ == '__main__':
             # print(megas.count("B") / len(megas), megas.count("T") / len(megas))
 
             print(X_new.shape)
+            print(tLabel.shape, np.array([subseq_size] *
+                                         len(tLength)).shape, tLength.shape, tLabel.shape)
+            print(Label.shape, np.array([subseq_size] *
+                                        len(Length)).shape, Length.shape, Label.shape)
+
             print(X_new.dtype, Y_new.dtype, Label.dtype, Length.dtype)
 
             # To balance class weight
