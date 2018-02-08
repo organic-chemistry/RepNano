@@ -19,6 +19,7 @@ if __name__ == "__main__":
     parser.add_argument("--name", dest="name", type=str, default='dataset.pick')
     parser.add_argument("--target", dest="target", type=str, default='T')
     parser.add_argument("--test-set", dest="test_set", action="store_true")
+    parser.add_argument("--range", dest="range", nargs='+', default=[], type=float)
 
     args = parser.parse_args()
 
@@ -56,8 +57,10 @@ if __name__ == "__main__":
     ran = range(1, 11)
     if args.test_set:
         ran = range(11, 17)
+    if args.range != []:
+        ran = range(1, 17)
     D.populate(maxf=maxf, filter_not_alligned=True,
-               filter_ch=ran, basecall=False, minion=False)
+               filter_ch=ran, basecall=False, minion=False, arange=args.range)
 
     # load from basecall
     def load_from_bc(strand):

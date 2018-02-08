@@ -32,7 +32,8 @@ class Dataset:
         self.metadata = ""
 
     def populate(self, maxf=None, minion=True, basecall=True,
-                 filter_not_alligned=False, filter_ch=None, realign=False):
+                 filter_not_alligned=False,
+                 filter_ch=None, realign=False, arange=[]):
         self.strands = []
         lstrand = glob.glob(self.root_files + "/*")
 
@@ -42,7 +43,15 @@ class Dataset:
                     return st
 
         with open(self.samfile, "r") as f:
-            for line in f.readlines():
+            fich = f.readlines()
+            tot = len(fich)
+            for iline, line in enumerate(fich):
+
+                if arange != []:
+                    if iline / tot > arange[0] and iline / tot < arange[1]:
+                        pass
+                    else:
+                        continue
                 if maxf is not None and len(self.strands) >= maxf:
                     break
                 sp = line.split()
