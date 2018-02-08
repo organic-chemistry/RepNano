@@ -402,6 +402,16 @@ if __name__ == '__main__':
     for i in range(len(p_arr)):
         p_arr[i] = 1. * p_arr[i] / sum_p
 
+    ts_arr = []
+    tp_arr = []
+    for s in range(len(tdata_x)):
+        ts_arr += [s]
+        tp_arr += [len(tdata_x[s]) - subseq_size]
+
+    tsum_p = sum(tp_arr)
+    for i in range(len(tp_arr)):
+        tp_arr[i] = 1. * tp_arr[i] / tsum_p
+
     batch_size = 1
     n_batches = len(data_x) / batch_size
     # print(len(data_x), batch_size, n_batches, datetime.datetime.now())
@@ -522,7 +532,7 @@ if __name__ == '__main__':
         tc2 = 0
         tc3 = 0
 
-        def get_transformed_sets(d_x, d_y, d_y2, mini=200, maxi=None):
+        def get_transformed_sets(d_x, d_y, d_y2, s_arr, p_arr, mini=200, maxi=None):
 
             print(len(d_x), len(d_y))
 
@@ -684,9 +694,9 @@ if __name__ == '__main__':
             return X_new, Y_new, Y2_new, Label, Length, stats
 
         X_new, Y_new, Y2_new, Label, Length, stats = get_transformed_sets(
-            data_x, data_y, data_y2, mini=200)
+            data_x, data_y, data_y2, s_arr, p_arr, mini=200)
         tX_new, tY_new, tY2_new, tLabel, tLength, stats = get_transformed_sets(
-            tdata_x, tdata_y, tdata_y2, maxi=40)
+            tdata_x, tdata_y, tdata_y2,  ts_arr, tp_arr, maxi=40)
 
         if not args.ctc:
             sum1 = 0
