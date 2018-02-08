@@ -330,9 +330,9 @@ if __name__ == '__main__':
     from ..data.dataset import Dataset
     from ..features.helpers import scale_simple, scale_named, scale_named2
     root = "data/raw/20170908-R9.5/"
-    Datasets = []
 
     def load_datasets(argdatasets):
+        Datasets = []
         for d in argdatasets:
             with open(d, "rb") as fich:
                 Datasets.append(cPickle.load(fich))
