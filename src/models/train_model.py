@@ -243,6 +243,7 @@ if __name__ == '__main__':
     parser.add_argument('--waiting-time', dest="waiting_time", type=int, default=500)
     parser.add_argument('--norm2', dest="norm2", action="store_true")
     parser.add_argument('--raw', dest="raw", action="store_true")
+    parser.add_argument('--substitution', dest="substitution", action="store_true")
 
     args = parser.parse_args()
 
@@ -362,10 +363,17 @@ if __name__ == '__main__':
                     data_x[-1] = [s.raw[int(start * sl):int((start + length) * sl)] for start,
                                   length in zip(strand.transfered["start"], strand.transfered["length"])]
 
-                if args.correct_ref:
-                    data_y.append([mapping[b[0]] for b in strand.transfered["seq_ref"]])
+                def transform(b):
+                    if b != "T":
+                        return b
+                    if hasattr(D, "substitution") and D.substitution != "T":
+                        return D.substitution
+                    return "T"
 
-                    data_y2.append([mapping[b[1]] for b in strand.transfered["seq_ref"]])
+                if args.correct_ref:
+                    data_y.append([mapping[transform(b[0])] for b in strand.transfered["seq_ref"]])
+
+                    data_y2.append([mapping[transform(b[1])] for b in strand.transfered["seq_ref"]])
                 else:
                     data_y.append([mapping[b] for b in strand.transfered["seq"]])
 
@@ -373,7 +381,10 @@ if __name__ == '__main__':
         return data_x, data_y, data_y2
 
     data_x, data_y, data_y2 = load_datasets(args.all_datasets)
-    tdata_x, tdata_y, tdata_y2 = load_datasets(args.all_test_datasets)
+    if args.all_test_datasets != []:
+        tdata_x, tdata_y, tdata_y2 = load_datasets(args.all_test_datasets)
+    else:
+        tdata_x, tdata_y, tdata_y2 = data_x, data_y, data_y2
 
     print("done", sum(len(x) for x in refs))
     sys.stdout.flush()
@@ -505,13 +516,13 @@ if __name__ == '__main__':
                              (epoch, old_length, new_length, total_length, current_length, change, switch))
 
             # Keep new alignment
+        taken_gc = []
+        out_gc = []
+        tc = 0
+        tc2 = 0
+        tc3 = 0
 
-        def get_transformed_sets(data_x, data_y, data_y2, N=200):
-            taken_gc = []
-            out_gc = []
-            tc = 0
-            tc2 = 0
-            tc3 = 0
+        def get_transformed_sets(data_x, data_y, data_y2, mini=200, maxi=None):
 
             X_new = []
             Y_new = []
@@ -520,10 +531,13 @@ if __name__ == '__main__':
             Length = []
             stats = defaultdict(int)
             megas = ""
-            stats = defaultdict(int)
             infostat = {}
-            while len(X_new) < N:
+            while len(X_new) < mini:
                 print(len(X_new))
+                if maxi is not None:
+                    if len(X_new) >= maxi:
+                        break
+
                 for s in range(len(data_x)):
                     s2 = np.random.choice(s_arr, p=p_arr)
                     # print(s2)
@@ -662,7 +676,12 @@ if __name__ == '__main__':
             Label = np.array(Label)
             Length = np.array(Length)
 
-            return X_new, Y_new, Y2_new, Label, Length
+            return X_new, Y_new, Y2_new, Label, Length, stats
+
+        X_new, Y_new, Y2_new, Label, Length, stats = get_transformed_sets(
+            data_x, data_y, data_y2, mini=200)
+        tX_new, tY_new, tY2_new, tLabel, tLength, stats = get_transformed_sets(
+            tdata_x, tdata_y, tdata_y2, maxi=40)
 
         if not args.ctc:
             sum1 = 0
@@ -703,7 +722,6 @@ if __name__ == '__main__':
 
         if args.ctc:
             # print(megas.count("B") / len(megas), megas.count("T") / len(megas))
-            print(infostat)
 
             print(X_new.shape)
             print(X_new.dtype, Y_new.dtype, Label.dtype, Length.dtype)
@@ -719,25 +737,25 @@ if __name__ == '__main__':
                 val = 2
                 batch_size = 8
             else:
-                maxin = 10 * (int(len(X_new) // 10) - 3)
-                val = 30
-                batch_size = args.batch_size
+                maxin = args.batch_size * (int(len(X_new) // args.batch_size)
+                val=30
+                batch_size=args.batch_size
  # To record lr
-            r = ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size] * len(Length))[:maxin], Length[:maxin]],
+            r=ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size] * len(Length))[:maxin], Length[:maxin]],
                          Label[:maxin], nb_epoch=1, batch_size=batch_size,
-                         validation_data=([X_new[maxin:maxin + val],
-                                           Label[maxin:maxin + val],
+                         validation_data=([tX_new
+                                           tLabel,
                                            np.array([subseq_size] *
-                                                    len(Length))[maxin:maxin + val],
-                                           Length[maxin:maxin + val]],
-                                          Label[maxin:maxin + val]))
+                                                    len(tLength)),
+                                           tLength],
+                                          tLabel))
             if epoch % 10 == 0:
                 ntwk.save_weights(os.path.join(
                     args.root, 'my_model_weights-%i.h5' % epoch))
 
-        csv_keys = ["epoch", "loss", "val_loss"]
+        csv_keys=["epoch", "loss", "val_loss"]
 
-        lr = Schedul.set_new_lr(r.history["loss"][0])
+        lr=Schedul.set_new_lr(r.history["loss"][0])
 
         K.set_value(ntwk.optimizer.lr, lr)
         K.set_value(predictor.optimizer.lr, lr)
@@ -746,7 +764,7 @@ if __name__ == '__main__':
 
         if epoch == 0:
             with open(os.path.join(args.root, "training.log"), "w") as csv_file:
-                writer = csv.writer(csv_file)
+                writer=csv.writer(csv_file)
                 # from IPython import embed
                 # embed()
                 # print(r)
@@ -754,7 +772,7 @@ if __name__ == '__main__':
                 writer.writerow([epoch] + [r.history[k][-1] for k in csv_keys[1:]] + [lr])
         else:
             with open(os.path.join(args.root, "training.log"), "a") as csv_file:
-                writer = csv.writer(csv_file)
+                writer=csv.writer(csv_file)
                 # writer.writerow(k + ["lr"])
                 writer.writerow([epoch] + [r.history[k][-1] for k in csv_keys[1:]] + [lr])
         if Schedul.stop:

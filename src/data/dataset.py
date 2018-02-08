@@ -30,6 +30,7 @@ class Dataset:
         self.root_files = root_files
         self.samfile = samfile
         self.metadata = ""
+        self.substitution = "T"
 
     def populate(self, maxf=None, minion=True, basecall=True,
                  filter_not_alligned=False,

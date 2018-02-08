@@ -133,15 +133,13 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                 out_layer1 = TD(l3d)
                 out_layer2 = TD(l3u)
         else:
-            l3_0 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable),
-                                 merge_mode="sum")(l2)
-            l3_1 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable),
-                                 merge_mode="sum")(l2)
+            l3 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable),
+                               merge_mode="sum")(l2)
 
             out_layer1 = TimeDistributed(
-                Dense(Nbases, activation="softmax"), name="out_layer1")(l3_0)
+                Dense(Nbases, activation="softmax"), name="out_layer1")(l3)
             out_layer2 = TimeDistributed(
-                Dense(Nbases, activation="softmax"), name="out_layer2")(l3_1)
+                Dense(Nbases, activation="softmax"), name="out_layer2")(l3)
 
             if input_length != None:
 
