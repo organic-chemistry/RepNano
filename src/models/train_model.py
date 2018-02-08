@@ -737,13 +737,13 @@ if __name__ == '__main__':
                 val = 2
                 batch_size = 8
             else:
-                maxin = args.batch_size * (int(len(X_new) // args.batch_size)
-                val=30
-                batch_size=args.batch_size
+                maxin = args.batch_size * (int(len(X_new) // args.batch_size))
+                val = 30
+                batch_size = args.batch_size
  # To record lr
-            r=ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size] * len(Length))[:maxin], Length[:maxin]],
+            r = ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size] * len(Length))[:maxin], Length[:maxin]],
                          Label[:maxin], nb_epoch=1, batch_size=batch_size,
-                         validation_data=([tX_new
+                         validation_data=([tX_new,
                                            tLabel,
                                            np.array([subseq_size] *
                                                     len(tLength)),
@@ -753,9 +753,9 @@ if __name__ == '__main__':
                 ntwk.save_weights(os.path.join(
                     args.root, 'my_model_weights-%i.h5' % epoch))
 
-        csv_keys=["epoch", "loss", "val_loss"]
+        csv_keys = ["epoch", "loss", "val_loss"]
 
-        lr=Schedul.set_new_lr(r.history["loss"][0])
+        lr = Schedul.set_new_lr(r.history["loss"][0])
 
         K.set_value(ntwk.optimizer.lr, lr)
         K.set_value(predictor.optimizer.lr, lr)
@@ -764,7 +764,7 @@ if __name__ == '__main__':
 
         if epoch == 0:
             with open(os.path.join(args.root, "training.log"), "w") as csv_file:
-                writer=csv.writer(csv_file)
+                writer = csv.writer(csv_file)
                 # from IPython import embed
                 # embed()
                 # print(r)
@@ -772,7 +772,7 @@ if __name__ == '__main__':
                 writer.writerow([epoch] + [r.history[k][-1] for k in csv_keys[1:]] + [lr])
         else:
             with open(os.path.join(args.root, "training.log"), "a") as csv_file:
-                writer=csv.writer(csv_file)
+                writer = csv.writer(csv_file)
                 # writer.writerow(k + ["lr"])
                 writer.writerow([epoch] + [r.history[k][-1] for k in csv_keys[1:]] + [lr])
         if Schedul.stop:
