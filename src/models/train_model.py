@@ -524,6 +524,8 @@ if __name__ == '__main__':
 
         def get_transformed_sets(data_x, data_y, data_y2, mini=200, maxi=None):
 
+            print(len(data_x), (data_y))
+
             X_new = []
             Y_new = []
             Y2_new = []
