@@ -20,7 +20,7 @@ if __name__ == "__main__":
     parser.add_argument("--target", dest="target", type=str, default='T')
     parser.add_argument("--test-set", dest="test_set", action="store_true")
     parser.add_argument("--range", dest="range", nargs='+', default=[], type=float)
-    parser.add_argument("--substitution", dest="substitution", default="T", type=float)
+    parser.add_argument("--substitution", dest="substitution", default="T", type=str)
 
     args = parser.parse_args()
 
