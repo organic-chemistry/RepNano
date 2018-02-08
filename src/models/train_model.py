@@ -532,12 +532,15 @@ if __name__ == '__main__':
             stats = defaultdict(int)
             megas = ""
             infostat = {}
+            stop = False
             while len(X_new) < mini:
                 print(len(X_new))
-
+                if stop:
+                    break
                 for s in range(len(data_x)):
                     if maxi is not None:
                         if len(X_new) >= maxi:
+                            stop = True
                             break
                     s2 = np.random.choice(s_arr, p=p_arr)
                     # print(s2)
