@@ -49,7 +49,9 @@ class Dataset:
             for iline, line in enumerate(fich):
 
                 if arange != []:
+                    print(arange, iline, tot, iline / tot > arange[0] and iline / tot < arange[1])
                     if iline / tot > arange[0] and iline / tot < arange[1]:
+                        print("i")
                         pass
                     else:
                         continue
