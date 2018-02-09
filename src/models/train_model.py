@@ -330,6 +330,7 @@ if __name__ == '__main__':
 
     from ..data.dataset import Dataset
     from .. import data
+    from ..data import dataset
     from ..features.helpers import scale_simple, scale_named, scale_named2
     root = "data/raw/20170908-R9.5/"
 
