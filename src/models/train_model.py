@@ -345,7 +345,7 @@ if __name__ == '__main__':
         data_y = []
         data_y2 = []
 
-        for D in Datasets:
+        for D, named in zip(Datasets, argdatasets):
             for strand in D.strands:
 
                 if strand.transfered is None:
@@ -366,8 +366,13 @@ if __name__ == '__main__':
                 def transform(b):
                     if b != "T":
                         return b
+
+                    if not args.substitution:
+                        return "T"
                     if hasattr(D, "substitution") and D.substitution != "T":
                         return D.substitution
+                    if "B-dataset" in named:
+                        return "B"
                     return "T"
 
                 if args.correct_ref:
@@ -375,7 +380,7 @@ if __name__ == '__main__':
 
                     data_y2.append([mapping[transform(b[1])] for b in strand.transfered["seq_ref"]])
                 else:
-                    data_y.append([mapping[b] for b in strand.transfered["seq"]])
+                    data_y.append([mapping[transform(b)] for b in strand.transfered["seq"]])
 
         del Datasets
         return data_x, data_y, data_y2
