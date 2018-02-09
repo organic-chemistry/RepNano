@@ -329,6 +329,7 @@ if __name__ == '__main__':
     names = []
 
     from ..data.dataset import Dataset
+    from .. import data
     from ..features.helpers import scale_simple, scale_named, scale_named2
     root = "data/raw/20170908-R9.5/"
 
@@ -372,8 +373,7 @@ if __name__ == '__main__':
                         return "T"
                     if hasattr(D, "substitution") and D.substitution != "T":
                         return D.substitution
-                    if "B-dataset" in named:
-                        return "B"
+
                     return "T"
 
                 if args.correct_ref:
