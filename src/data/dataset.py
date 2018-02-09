@@ -51,10 +51,10 @@ class Dataset:
                 if arange != []:
                     print(arange, iline, tot, iline / tot > arange[0] and iline / tot < arange[1])
                     if iline / tot > arange[0] and iline / tot < arange[1]:
-                        print("i")
                         pass
                     else:
                         continue
+                print("p")
                 if maxf is not None and len(self.strands) >= maxf:
                     break
                 sp = line.split()
