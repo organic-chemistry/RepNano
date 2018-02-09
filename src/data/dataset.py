@@ -45,6 +45,7 @@ class Dataset:
 
         with open(self.samfile, "r") as f:
             fich = f.readlines()
+            fich = list(set(fich))
             tot = len(fich)
             for iline, line in enumerate(fich):
 
