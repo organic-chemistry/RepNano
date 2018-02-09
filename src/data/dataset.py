@@ -66,7 +66,7 @@ class Dataset:
                         X = 0
 
                     fn = "read_%s_ch_%s_" % (sp[0].split("_")[1][4:], sp[0].split("_")[0][3:])
-                    # print(fn)
+                    print(fn)
                     # print(find_strand(fn))
 
                     if filter_ch is not None and X not in filter_ch:
