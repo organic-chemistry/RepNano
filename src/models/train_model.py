@@ -243,18 +243,18 @@ if __name__ == '__main__':
     parser.add_argument('--waiting-time', dest="waiting_time", type=int, default=500)
     parser.add_argument('--norm2', dest="norm2", action="store_true")
     parser.add_argument('--raw', dest="raw", action="store_true")
-    parser.add_argument('--substitution', dest="substitution", action="store_true"
+    parser.add_argument('--substitution', dest="substitution", action="store_true")
     parser.add_argument('--maxf', dest="maxf", type=int, default=None)
 
-    args=parser.parse_args()
+    args = parser.parse_args()
 
-    argparse_dict=vars(args)
+    argparse_dict = vars(args)
 
     # sess = tf.Session(config=tf.ConfigProto(
 #        intra_op_parallelism_threads=args.num_threads))
 
-    repo=Repo("./")
-    argparse_dict["commit"]=str(repo.head.commit)
+    repo = Repo("./")
+    argparse_dict["commit"] = str(repo.head.commit)
 
     os.makedirs(args.root, exist_ok=True)
 
@@ -262,47 +262,47 @@ if __name__ == '__main__':
         json.dump(argparse_dict, fp, indent=True)
     # print(args.filter)
 
-    log_total_length=os.path.join(args.root, "total_length.log")
+    log_total_length = os.path.join(args.root, "total_length.log")
     if keras.backend.backend() != 'tensorflow':
         print("Must use tensorflow to train")
         exit()
 
     if args.Nbases == 4:
-        mapping={"A": 0, "C": 1, "G": 2, "T": 3, "N": 4}  # Modif
+        mapping = {"A": 0, "C": 1, "G": 2, "T": 3, "N": 4}  # Modif
     elif args.Nbases == 5:
-        mapping={"A": 0, "C": 1, "G": 2, "T": 3, "B": 4, "N": 5}  # Modif
+        mapping = {"A": 0, "C": 1, "G": 2, "T": 3, "B": 4, "N": 5}  # Modif
     elif args.Nbases == 8:
-        mapping={"A": 0, "C": 1, "G": 2, "T": 3, "B": 4, "L": 5, "E": 6, "I": 7, "N": 8}  # Modif
+        mapping = {"A": 0, "C": 1, "G": 2, "T": 3, "B": 4, "L": 5, "E": 6, "I": 7, "N": 8}  # Modif
 
-    n_classes=len(mapping.keys())
+    n_classes = len(mapping.keys())
 
-    n_output_network=args.n_output_network
-    n_output=args.n_output
-    n_input=args.n_input
+    n_output_network = args.n_output_network
+    n_output = args.n_output
+    n_input = args.n_input
 
-    subseq_size=args.ctc_length
+    subseq_size = args.ctc_length
 
     from .model import build_models
-    ctc_length=subseq_size
-    input_length=ctc_length
+    ctc_length = subseq_size
+    input_length = ctc_length
     if n_output_network == 2:
-        input_length=subseq_size
-        ctc_length=2 * subseq_size
+        input_length = subseq_size
+        ctc_length = 2 * subseq_size
 
-    n_feat=4
+    n_feat = 4
     # if args.clean:
 #        n_feat = 3
 
     if args.sclean:
-        n_feat=1
+        n_feat = 1
     if args.norm2:
-        n_feat=2
+        n_feat = 2
 
-    _, ntwk=build_models(args.size, nbase=args.Nbases - 4,
+    _, ntwk = build_models(args.size, nbase=args.Nbases - 4,
                            ctc_length=ctc_length,
                            input_length=input_length, n_output=n_output_network,
                            lr=args.lr, res=args.res, attention=args.attention, n_feat=n_feat, simple=args.simple)
-    predictor, _=build_models(args.size, nbase=args.Nbases - 4,
+    predictor, _ = build_models(args.size, nbase=args.Nbases - 4,
                                 ctc_length=ctc_length,
                                 input_length=None, n_output=n_output_network,
                                 lr=args.lr, res=args.res, attention=args.attention, n_feat=n_feat, simple=args.simple)
@@ -320,31 +320,31 @@ if __name__ == '__main__':
 
     os.makedirs(args.root, exist_ok=True)
 
-    original=[]
-    convert=[]
+    original = []
+    convert = []
 
-    data_index=[]
-    data_alignment=[]
-    refs=[]
-    names=[]
+    data_index = []
+    data_alignment = []
+    refs = []
+    names = []
 
     from ..data.dataset import Dataset
     from ..features.helpers import scale_simple, scale_named, scale_named2
-    root="data/raw/20170908-R9.5/"
+    root = "data/raw/20170908-R9.5/"
 
     def load_datasets(argdatasets):
-        Datasets=[]
+        Datasets = []
         for d in argdatasets:
             with open(d, "rb") as fich:
                 Datasets.append(cPickle.load(fich))
 
-        fnorm=scale_named
+        fnorm = scale_named
         if args.norm2:
-            fnorm=scale_named2
+            fnorm = scale_named2
 
-        data_x=[]
-        data_y=[]
-        data_y2=[]
+        data_x = []
+        data_y = []
+        data_y2 = []
 
         for D, named in zip(Datasets, argdatasets):
             for strand in D.strands[:args.maxf]:
@@ -360,8 +360,8 @@ if __name__ == '__main__':
                 else:
                     data_x.append(fnorm(strand.transfered))
                 if args.raw:
-                    sl=s.sampling_rate
-                    data_x[-1]=[s.raw[int(start * sl):int((start + length) * sl)] for start,
+                    sl = s.sampling_rate
+                    data_x[-1] = [s.raw[int(start * sl):int((start + length) * sl)] for start,
                                   length in zip(strand.transfered["start"], strand.transfered["length"])]
 
                 def transform(b):
@@ -386,11 +386,11 @@ if __name__ == '__main__':
         del Datasets
         return data_x, data_y, data_y2
 
-    data_x, data_y, data_y2=load_datasets(args.all_datasets)
+    data_x, data_y, data_y2 = load_datasets(args.all_datasets)
     if args.all_test_datasets != []:
-        tdata_x, tdata_y, tdata_y2=load_datasets(args.all_test_datasets)
+        tdata_x, tdata_y, tdata_y2 = load_datasets(args.all_test_datasets)
     else:
-        tdata_x, tdata_y, tdata_y2=data_x, data_y, data_y2
+        tdata_x, tdata_y, tdata_y2 = data_x, data_y, data_y2
 
     print("done", sum(len(x) for x in refs))
     sys.stdout.flush()
@@ -398,35 +398,35 @@ if __name__ == '__main__':
     # print(len(refs[0]),len(data_x[0]),len(data_y[0]))
     # exit()
 
-    s_arr=[]
-    p_arr=[]
+    s_arr = []
+    p_arr = []
     for s in range(len(data_x)):
         s_arr += [s]
         p_arr += [len(data_x[s]) - subseq_size]
 
-    sum_p=sum(p_arr)
+    sum_p = sum(p_arr)
     for i in range(len(p_arr)):
-        p_arr[i]=1. * p_arr[i] / sum_p
+        p_arr[i] = 1. * p_arr[i] / sum_p
 
-    ts_arr=[]
-    tp_arr=[]
+    ts_arr = []
+    tp_arr = []
     for s in range(len(tdata_x)):
         ts_arr += [s]
         tp_arr += [len(tdata_x[s]) - subseq_size]
 
-    tsum_p=sum(tp_arr)
+    tsum_p = sum(tp_arr)
     for i in range(len(tp_arr)):
-        tp_arr[i]=1. * tp_arr[i] / tsum_p
+        tp_arr[i] = 1. * tp_arr[i] / tsum_p
 
-    batch_size=1
-    n_batches=len(data_x) / batch_size
+    batch_size = 1
+    n_batches = len(data_x) / batch_size
     # print(len(data_x), batch_size, n_batches, datetime.datetime.now())
 
-    boring=False
+    boring = False
 
 
 # ntwk.load_weights("./my_model_weights.h5")
-    Schedul=lrd(waiting_time=args.waiting_time, start_lr=args.lr, min_lr=0.0001, factor=2)
+    Schedul = lrd(waiting_time=args.waiting_time, start_lr=args.lr, min_lr=0.0001, factor=2)
     for epoch in range(20000):
 
         # Test to see if realignment is interesting:
@@ -441,54 +441,54 @@ if __name__ == '__main__':
             # predictor.load_weights("data/training/my_model_weights-1990.h5")
 
             print("Realign")
-            New_seq=[]
-            change=0
-            old_length=0
-            new_length=0
-            total_length=0
-            current_length=0
-            switch=0
+            New_seq = []
+            change = 0
+            old_length = 0
+            new_length = 0
+            total_length = 0
+            current_length = 0
+            switch = 0
             for s in range(len(data_x)):
 
-                new_seq=np.argmax(predictor.predict(np.array([data_x[s]]))[0], axis=-1)
+                new_seq = np.argmax(predictor.predict(np.array([data_x[s]]))[0], axis=-1)
                 # print(args.Nbases)
                 if args.Nbases == 8:
-                    alph="ACGTBLEIN"   # use T to Align
+                    alph = "ACGTBLEIN"   # use T to Align
                 if args.Nbases == 5:
-                    alph="ACGTBN"   # use T to Align
+                    alph = "ACGTBN"   # use T to Align
                 if args.Nbases == 4:
-                    alph="ACGTN"
+                    alph = "ACGTN"
                 New_seq.append("".join(list(map(lambda x: alph[x], new_seq))))
 
-                nc={}
+                nc = {}
 
                 for l in ["B", "L", "E", "I", "T"]:
-                    nc[l]=New_seq[-1].count(l)
+                    nc[l] = New_seq[-1].count(l)
 
                 for l in ["B", "L", "E", "I"]:
-                    New_seq[-1]=New_seq[-1].replace(l, "T")
+                    New_seq[-1] = New_seq[-1].replace(l, "T")
 
             # Here maybe realign with bwa
             # for s in range(len(data_x)):
-                type_sub="T"
-                subts=False
-                ref="" + refs[s]
+                type_sub = "T"
+                subts = False
+                ref = "" + refs[s]
 
                 for l in ["B", "L", "E", "I"]:
                     if l in refs[s]:
-                        type_sub=l
-                        subts=True
+                        type_sub = l
+                        subts = True
                         break
                 if subts:
-                    ref=ref.replace(type_sub, "T")
+                    ref = ref.replace(type_sub, "T")
 
-                re_align=True
+                re_align = True
 
                 if re_align:
-                    old_align=data_alignment[s]
+                    old_align = data_alignment[s]
                     # new_align = pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))[0][:2]
                     try:
-                        new_align=pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))
+                        new_align = pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))
                     except MemoryError:
                         print("Out of memory")
                         continue
@@ -496,7 +496,7 @@ if __name__ == '__main__':
                         new_length += len(old_align[0])
                         print()
                         continue
-                    new_align=new_align[0][:2]
+                    new_align = new_align[0][:2]
                     print("Old", len(old_align[0]), "New", len(new_align[0]), subts, len(
                         ref), (len(ref) - len(New_seq[s].replace("N", ""))) / len(ref), nc[type_sub] / (nc["T"] + 1))
 
@@ -506,9 +506,9 @@ if __name__ == '__main__':
                     if len(new_align[0]) < len(old_align[0]) and (len(ref) - len(New_seq[s].replace("N", ""))) / len(ref) < 0.05:
                         print("Keep!")
                         change += 1
-                        data_alignment[s]=new_align
+                        data_alignment[s] = new_align
 
-                        data_index[s]=np.arange(len(New_seq[s]))[
+                        data_index[s] = np.arange(len(New_seq[s]))[
                             np.array([ss for ss in New_seq[s]]) != "N"]
                         new_length += len(new_align[0])
 
@@ -519,7 +519,7 @@ if __name__ == '__main__':
                 if subts and nc[type_sub] / (nc["T"] + nc[type_sub]) < 0.1:
                     if args.force_clean and type_sub != "B":
                         continue
-                    refs[s]=refs[s].replace(type_sub, "T")
+                    refs[s] = refs[s].replace(type_sub, "T")
                     switch += 1
                     print("Swich")
             print("Change", change, len(data_x))
@@ -532,25 +532,25 @@ if __name__ == '__main__':
                              (epoch, old_length, new_length, total_length, current_length, change, switch))
 
             # Keep new alignment
-        taken_gc=[]
-        out_gc=[]
-        tc=0
-        tc2=0
-        tc3=0
+        taken_gc = []
+        out_gc = []
+        tc = 0
+        tc2 = 0
+        tc3 = 0
 
         def get_transformed_sets(d_x, d_y, d_y2, s_arr, p_arr, mini=200, maxi=None):
 
             print(len(d_x), len(d_y))
 
-            X_new=[]
-            Y_new=[]
-            Y2_new=[]
-            Label=[]
-            Length=[]
-            stats=defaultdict(int)
-            megas=""
-            infostat={}
-            stop=False
+            X_new = []
+            Y_new = []
+            Y2_new = []
+            Label = []
+            Length = []
+            stats = defaultdict(int)
+            megas = ""
+            infostat = {}
+            stop = False
             while len(X_new) < mini:
                 print(len(X_new))
                 if stop:
@@ -558,23 +558,23 @@ if __name__ == '__main__':
                 for s in range(len(d_x)):
                     if maxi is not None:
                         if len(X_new) >= maxi:
-                            stop=True
+                            stop = True
                             break
-                    s2=np.random.choice(s_arr, p=p_arr)
+                    s2 = np.random.choice(s_arr, p=p_arr)
                     # print(s2)
                     # print(data_x[s2].shape[0])
-                    r=np.random.randint(0, d_x[s2].shape[0] - subseq_size)
-                    x=d_x[s2][r:r + subseq_size]
+                    r = np.random.randint(0, d_x[s2].shape[0] - subseq_size)
+                    x = d_x[s2][r:r + subseq_size]
 
                     if not args.ctc:
 
                         def domap(base):
-                            ret=[0 for b in range(args.Nbases + 1)]
-                            ret[base]=1
+                            ret = [0 for b in range(args.Nbases + 1)]
+                            ret[base] = 1
                             return ret
 
-                        y=[domap(base) for base in d_y[s2][r: r + subseq_size]]
-                        y2=[domap(base) for base in d_y2[s2][r: r + subseq_size]]
+                        y = [domap(base) for base in d_y[s2][r: r + subseq_size]]
+                        y2 = [domap(base) for base in d_y2[s2][r: r + subseq_size]]
 
                         X_new.append(x)
                         Y_new.append(y)
@@ -585,10 +585,10 @@ if __name__ == '__main__':
 
                     if args.ctc:
                         if not args.correct_ref:
-                            y=[base for base in d_y[s2][
+                            y = [base for base in d_y[s2][
                                 r: r + subseq_size] if base != mapping["N"]]
                         if args.correct_ref:
-                            y=[]
+                            y = []
                             for b1, b2 in zip(d_y[s2][r: r + subseq_size], d_y2[s2][r: r + subseq_size]):
                                 if b1 != mapping["N"]:
                                     y.append(b1)
@@ -609,34 +609,34 @@ if __name__ == '__main__':
 
                     if args.ctc and False:
                         def domap(base):
-                            ret=[0 for b in range(n_classes)]
-                            ret[base]=1
+                            ret = [0 for b in range(n_classes)]
+                            ret[base] = 1
                             return ret
 
-                        length=subseq_size
-                        start=r
-                        Index=d_index[s2]
-                        alignment=data_alignment[s2]
-                        f=1
+                        length = subseq_size
+                        start = r
+                        Index = d_index[s2]
+                        alignment = data_alignment[s2]
+                        f = 1
                         if n_input == 1 and n_output == 2:
-                            f=2
+                            f = 2
 
-                        start_index_on_seqs=find_closest(start * f, Index)
-                        end_index_on_seqs=find_closest(start * f + length * f, Index)
+                        start_index_on_seqs = find_closest(start * f, Index)
+                        end_index_on_seqs = find_closest(start * f + length * f, Index)
                         # from IPython import embed
                         # embed()
                         # print(start, start_index_on_seqs, end_index_on_seqs,
                         #      len(alignment[0]), len(alignment[1]))
-                        seg, ss1, ss2, success=get_segment(
+                        seg, ss1, ss2, success = get_segment(
                             alignment, start_index_on_seqs, end_index_on_seqs)
 
                         # print(ss2, ss1, seg, [l in refs[s2] for l in ["B", "L", "E", "I"]])
 
                         if not success:
                             continue
-                        maxi=f * subseq_size
-                        l=min(max(len(seg), 1), maxi - 1)
-                        delta=abs(len(ss2.replace("-", "")) - len(ss2)) + \
+                        maxi = f * subseq_size
+                        l = min(max(len(seg), 1), maxi - 1)
+                        delta = abs(len(ss2.replace("-", "")) - len(ss2)) + \
                             abs(len(ss1.replace("-", "")) - len(ss1))
 
                         if delta > args.deltaseq or \
@@ -648,20 +648,20 @@ if __name__ == '__main__':
                             l in refs[s2] for l in ["B", "L", "E", "I"]])
                         Length.append(l)
 
-                        test=False
+                        test = False
                         if test:
                             # print(len(data_x[s2]))
-                            o1=predictor.predict(np.array(x)[np.newaxis, ::, ::])
-                            o1=o1[0]
-                            om=np.argmax(o1, axis=-1)
+                            o1 = predictor.predict(np.array(x)[np.newaxis, ::, ::])
+                            o1 = o1[0]
+                            om = np.argmax(o1, axis=-1)
 
-                            alph="ACGTTN"
-                            seq_tmp="".join(map(lambda x: alph[x], om))
+                            alph = "ACGTTN"
+                            seq_tmp = "".join(map(lambda x: alph[x], om))
                             print(seq_tmp.replace("N", ""))
 
                         # print(len(s))
                         if len(seg) > maxi - 1:
-                            seg=seg[:maxi - 1]
+                            seg = seg[:maxi - 1]
 
                         if "B" in refs[s2]:
                             megas += seg.replace("T", "B")
@@ -670,15 +670,15 @@ if __name__ == '__main__':
 
                         for l in ["T", "B", "L", "E", "I"]:
                             if l in seg:
-                                infostat[l]=infostat.get(l, 0) + seg.count(l)
+                                infostat[l] = infostat.get(l, 0) + seg.count(l)
 
-                        seg=seg + "A" * (maxi - len(seg))
+                        seg = seg + "A" * (maxi - len(seg))
 
                         if not args.all_T:
                             for l in ["B", "L", "E", "I"]:
                                 if l in refs[s2]:
                                     if not args.hybrid:
-                                        seg=seg.replace("T", l)
+                                        seg = seg.replace("T", l)
                                     break
 
                         # print(ss1, ss2, seg)
@@ -691,49 +691,49 @@ if __name__ == '__main__':
                         X_new.append(x)
                         # print(x)
 
-            X_new=np.array(X_new)
-            Y_new=np.array(Y_new)
-            Y2_new=np.array(Y2_new)
-            Label=np.array(Label)
-            Length=np.array(Length)
+            X_new = np.array(X_new)
+            Y_new = np.array(Y_new)
+            Y2_new = np.array(Y2_new)
+            Label = np.array(Label)
+            Length = np.array(Length)
 
             return X_new, Y_new, Y2_new, Label, Length, stats
 
-        X_new, Y_new, Y2_new, Label, Length, stats=get_transformed_sets(
+        X_new, Y_new, Y2_new, Label, Length, stats = get_transformed_sets(
             data_x, data_y, data_y2, s_arr, p_arr, mini=200)
-        tX_new, tY_new, tY2_new, tLabel, tLength, stats=get_transformed_sets(
+        tX_new, tY_new, tY2_new, tLabel, tLength, stats = get_transformed_sets(
             tdata_x, tdata_y, tdata_y2,  ts_arr, tp_arr, maxi=40)
 
         if not args.ctc:
-            sum1=0
+            sum1 = 0
             for k in stats.keys():
                 sum1 += stats[k]
 
             if epoch == 0:
-                weight=[0 for k in stats.keys()]
+                weight = [0 for k in stats.keys()]
 
                 for k in stats.keys():
-                    weight[k]=stats[k] / 1.0 / sum1
-                    weight[k]=1 / weight[k]
-                weight=np.array(weight)
-                weight=weight * len(stats.keys()) / np.sum(weight)
+                    weight[k] = stats[k] / 1.0 / sum1
+                    weight[k] = 1 / weight[k]
+                weight = np.array(weight)
+                weight = weight * len(stats.keys()) / np.sum(weight)
             # weight[4] *= 100
 
-            w2=[]
+            w2 = []
 
             for y in Y2_new:
                 w2.append([])
                 for arr in y:
                     w2[-1].append(weight[np.argmax(arr)])
 
-            w2=np.array(w2)
+            w2 = np.array(w2)
 
         if not args.ctc:
             if args.n_output_network == 1:
-                r=predictor.fit(X_new, Y_new, nb_epoch=1,
+                r = predictor.fit(X_new, Y_new, nb_epoch=1,
                                   batch_size=args.batch_size, validation_split=0.05)
             else:
-                r=predictor.fit(X_new, [Y_new, Y2_new], nb_epoch=1,
+                r = predictor.fit(X_new, [Y_new, Y2_new], nb_epoch=1,
                                   batch_size=args.batch_size, validation_split=0.05)
             # ntwk.fit(X_new, Y_new, nb_epoch=1, batch_size=10, validation_split=0.05,
             #          sample_weight={"out_layer2": w2}, )
@@ -759,15 +759,15 @@ if __name__ == '__main__':
             #    [length] * len(Length)).shape, Length.shape)
 
             if args.test:
-                maxin=8
-                val=2
-                batch_size=8
+                maxin = 8
+                val = 2
+                batch_size = 8
             else:
-                maxin=args.batch_size * (int(len(X_new) // args.batch_size))
-                val=30
-                batch_size=args.batch_size
+                maxin = args.batch_size * (int(len(X_new) // args.batch_size))
+                val = 30
+                batch_size = args.batch_size
  # To record lr
-            r=ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size] * len(Length))[:maxin], Length[:maxin]],
+            r = ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size] * len(Length))[:maxin], Length[:maxin]],
                          Label[:maxin], nb_epoch=1, batch_size=batch_size,
                          validation_data=([tX_new,
                                            tLabel,
@@ -779,9 +779,9 @@ if __name__ == '__main__':
                 ntwk.save_weights(os.path.join(
                     args.root, 'my_model_weights-%i.h5' % epoch))
 
-        csv_keys=["epoch", "loss", "val_loss"]
+        csv_keys = ["epoch", "loss", "val_loss"]
 
-        lr=Schedul.set_new_lr(r.history["loss"][0])
+        lr = Schedul.set_new_lr(r.history["loss"][0])
 
         K.set_value(ntwk.optimizer.lr, lr)
         K.set_value(predictor.optimizer.lr, lr)
@@ -790,7 +790,7 @@ if __name__ == '__main__':
 
         if epoch == 0:
             with open(os.path.join(args.root, "training.log"), "w") as csv_file:
-                writer=csv.writer(csv_file)
+                writer = csv.writer(csv_file)
                 # from IPython import embed
                 # embed()
                 # print(r)
@@ -798,7 +798,7 @@ if __name__ == '__main__':
                 writer.writerow([epoch] + [r.history[k][-1] for k in csv_keys[1:]] + [lr])
         else:
             with open(os.path.join(args.root, "training.log"), "a") as csv_file:
-                writer=csv.writer(csv_file)
+                writer = csv.writer(csv_file)
                 # writer.writerow(k + ["lr"])
                 writer.writerow([epoch] + [r.history[k][-1] for k in csv_keys[1:]] + [lr])
         if Schedul.stop:
