@@ -254,13 +254,12 @@ if __name__ == '__main__':
 
     print(root)
 
-    os.makedirs(args.root, exist_ok=True)
+    os.makedirs(root, exist_ok=True)
 
-    with open(args.root + '/params.json', 'w') as fp:
+    with open(root + '/params.json', 'w') as fp:
         json.dump(argparse_dict, fp, indent=True)
     # print(args.filter)
 
-    log_total_length = os.path.join(args.root, "total_length.log")
     if keras.backend.backend() != 'tensorflow':
         print("Must use tensorflow to train")
         exit()
