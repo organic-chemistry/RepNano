@@ -234,7 +234,8 @@ if __name__ == '__main__':
 
     parser.add_argument('--substitution', dest="substitution", action="store_true")
     parser.add_argument('--maxf', dest="maxf", type=int, default=None)
-    parser.add_argument('--maxlen', dest="maxlen", type=int, default=10000)
+    parser.add_argument('--maxlen', dest="maxlen", type=int, default=None)
+    parser.add_argument('--maxlen_input', dest="maxlen_input", type=int, default=None)
 
     args = parser.parse_args()
 
@@ -362,7 +363,8 @@ if __name__ == '__main__':
             # sig = np.array(scale_clean_two_pd(transfered), dtype=np.float32)
 
             # print(sig.shape)
-            ns = s.analyse_segmentation(ntwk=predictor, signal=sig, no2=n_output_network == 2)
+            ns = s.analyse_segmentation(ntwk=predictor, signal=sig[
+                                        :args.maxlen_input], no2=n_output_network == 2)
             new = copy.deepcopy(transfered)
             # print(ns.shape)
             new["seq"] = ns[::, 0]
