@@ -265,6 +265,10 @@ if __name__ == '__main__':
             args.all_datasets = [
                 "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human_B/dataset.pick"]
 
+        if args.target == "H_T":
+            args.all_datasets = [
+                "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human_T/dataset.pick"]
+
     print(root)
 
     os.makedirs(root, exist_ok=True)
