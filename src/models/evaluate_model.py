@@ -405,7 +405,7 @@ if __name__ == '__main__':
             # Score["ntwk_bc"].append(s.score("".join(s.ntwk_align["seq"]).replace("N",""),s.seq_from_basecall))
             s.ref_bc = s.get_ref(s.seq_from_basecall, pos=True, correct=True)
 
-            s.score_mininion = s.score(s.seq_from_minion, s.ref_bc[0], maxlen=args.maxlen)
+            s.score_mininion = s.score(s.seq_from_basecall, s.ref_bc[0], maxlen=args.maxlen)
 
             Evaluated_dataset.strands.append(s)
 

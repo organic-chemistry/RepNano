@@ -20,6 +20,7 @@ if __name__ == "__main__":
     parser.add_argument("--target", dest="target", type=str, default='T')
     parser.add_argument("--test-set", dest="test_set", action="store_true")
     parser.add_argument("--range", dest="range", nargs='+', default=[], type=float)
+
     #parser.add_argument("--substitution", dest="substitution", default="T", type=str)
 
     args = parser.parse_args()
@@ -46,6 +47,11 @@ if __name__ == "__main__":
     if args.target == "B":
         samf = "BTF_AH_ONT_1_FAH14319_A-select.sam"
         rf = "AH-basecalled/"
+
+    if args.target == "H_B":
+        samf = ""
+        rf = "Human_AR"
+
     D = Dataset(samfile=root + samf,
                 root_files=root + rf)
     D.metadata = argparse_dict
@@ -67,24 +73,31 @@ if __name__ == "__main__":
 
     # load from basecall
     def load_from_bc(strand):
-        try:
-            bc = strand.get_seq(f="BaseCall")
-        except NotAllign:
-            bc = [None]
+        if samf != "":
+            try:
+                bc = strand.get_seq(f="BaseCall")
+            except NotAllign:
+                bc = [None]
 
-        minion = strand.get_seq(f="Minion", correct=True)
-        return [bc, minion]
+            minion = strand.get_seq(f="Minion", correct=True)
+            return [bc, minion]
+        else:
+            trans = strand.get_seq(f="no_basecall", window_size=args.window_size)
+            return [trans, None]
     with Pool(n_cpu) as p:
         res = p.map(load_from_bc, D.strands)
 
     pop = []
     for istrand, (v, s) in enumerate(zip(res, D.strands)):
-        if v[0][0] is not None:
-            s.signal_bc, s.seq_from_basecall, s.imin, s.raw, s.to_match, s.sampling_rate = v[0]
-            s.seq_from_minion = v[1]
-            s.to_match = ""
+        if samf != "":
+            if v[0][0] is not None:
+                s.signal_bc, s.seq_from_basecall, s.imin, s.raw, s.to_match, s.sampling_rate = v[0]
+                s.seq_from_minion = v[1]
+                s.to_match = ""
+            else:
+                pop.append(istrand)
         else:
-            pop.append(istrand)
+            s.transfered = v
 
     for istrand in pop[::-1]:
         D.strands.pop(istrand)
@@ -127,16 +140,17 @@ if __name__ == "__main__":
         except:
             return [None, None]
 
-    with Pool(n_cpu) as p:
-        res = p.map(compute_attributes, D.strands)
-    for v, s in zip(res, D.strands):
-        if v[0] is not None:
-            s.transfered = v[0]
-            s.bc_score = v[1]
-            s.confirm_score = v[2]
-            del(s.signal_bc)
-        else:
-            s.transfered = None
+    if samf != "":
+        with Pool(n_cpu) as p:
+            res = p.map(compute_attributes, D.strands)
+        for v, s in zip(res, D.strands):
+            if v[0] is not None:
+                s.transfered = v[0]
+                s.bc_score = v[1]
+                s.confirm_score = v[2]
+                del(s.signal_bc)
+            else:
+                s.transfered = None
     import _pickle as cPickle
     with open(args.name, "wb") as fich:
         cPickle.dump(D, fich)

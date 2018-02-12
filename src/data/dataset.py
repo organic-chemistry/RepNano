@@ -140,11 +140,14 @@ class Strand:
         self.t_from_Minion = t_from_Minion
         self.sam_line_minion = sam_line_minion
 
-    def get_seq(self, f, correct=False):
+    def get_seq(self, f, correct=False, window_size=5):
         if f == "Minion":
             seq, sucess = get_seq(self.sam_line_minion, ref=REF, from_line=True, correct=correct)
             self.seq_from_minion = seq
             return self.seq_from_minion
+
+        if f == "no_basecall":
+            return self.segmentation(w=window_size)
 
         if f == "BaseCall":
             h5 = h5py.File(self.filename, "r")
