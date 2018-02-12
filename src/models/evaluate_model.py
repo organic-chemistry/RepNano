@@ -249,7 +249,7 @@ if __name__ == '__main__':
 
     root, weight = os.path.split(args.weights)
 
-    root += "/evaluate_%i/" % weight.split("-")[-1][:-3]
+    root += "/evaluate_%s/" % weight.split("-")[-1][:-3]
     root += os.path.split(args.name)[0]
 
     os.makedirs(args.root, exist_ok=True)
