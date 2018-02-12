@@ -209,7 +209,7 @@ class Strand:
         s2 = self.seq_from_basecall
         self.score(s1, s2, maxlen=maxlen)
 
-    def get_ref(self, sequence, correct=False):
+    def get_ref(self, sequence, correct=False, pos=False):
 
         h, name = tempfile.mkstemp(prefix="", dir="./")
         os.close(h)
@@ -237,7 +237,10 @@ class Strand:
         os.remove("%s.sam" % name)
         os.remove("%s.fasta" % name)
         os.remove(name)
-        return ref
+        if not pos:
+            return ref
+        else:
+            return ref, X1, P1
 
     def score(self, s1, s2, maxlen=None, all_info=False):
 
