@@ -389,16 +389,22 @@ if __name__ == '__main__':
             new = copy.deepcopy(transfered)
             # print(ns.shape)
             new["seq"] = ns[::, 0]
-            new["seq1"] = ns[::, 1]
 
             if n_output_network == 2:
+
+                new["seq1"] = ns[::, 1]
+
                 print(np.sum(new["seq"] == "B"),)
                 print(len("".join(transfered["seq"]).replace("N", "")), len("".join(new["seq"]).replace("N", "")),
                       len("".join(new["seq1"]).replace("N", "")), len(new))
             else:
                 print(np.sum(new["seq"] == "B"),)
-                print(len("".join(transfered["seq"]).replace("N", "")), len("".join(new["seq"]).replace("N", "")),
-                      len(new))
+                if "seq" in transfered.columns:
+                    print(len("".join(transfered["seq"]).replace("N", "")), len("".join(new["seq"]).replace("N", "")),
+                          len(new))
+                else:
+                    print(len("".join(new["seq"]).replace("N", "")),
+                          len(new))
 
             s.ntwk_align = new
 
