@@ -406,6 +406,6 @@ if __name__ == '__main__':
 
             Evaluated_dataset.strands.append(s)
 
-    print(root + os.path.split(args.name)[1] + ".pick")
-    with open(root + os.path.split(args.name)[1] + ".pick", "wb") as f:
+    print(root + "/" + os.path.split(args.name)[1] + ".pick")
+    with open(root + "/" + os.path.split(args.name)[1] + ".pick", "wb") as f:
         cPickle.dump(Evaluated_dataset, f)
