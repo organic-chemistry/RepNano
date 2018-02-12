@@ -91,6 +91,7 @@ if __name__ == "__main__":
     with Pool(n_cpu) as p:
         res = p.map(load_from_bc, D.strands)
 
+    print(res)
     pop = []
     for istrand, (v, s) in enumerate(zip(res, D.strands)):
         if samf != "":
