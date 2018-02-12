@@ -102,7 +102,7 @@ if __name__ == "__main__":
             else:
                 pop.append(istrand)
         else:
-            s.transfered = v
+            s.transfered = v[0]
 
     for istrand in pop[::-1]:
         D.strands.pop(istrand)
