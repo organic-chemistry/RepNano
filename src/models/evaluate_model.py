@@ -236,6 +236,7 @@ if __name__ == '__main__':
     parser.add_argument('--maxf', dest="maxf", type=int, default=None)
     parser.add_argument('--maxlen', dest="maxlen", type=int, default=None)
     parser.add_argument('--maxlen_input', dest="maxlen_input", type=int, default=None)
+    parser.add_argument('--target', dest='target', type=str, default=None)
 
     args = parser.parse_args()
 
@@ -250,7 +251,19 @@ if __name__ == '__main__':
     root, weight = os.path.split(args.weights)
 
     root += "/evaluate_%s/" % weight.split("-")[-1][:-3]
-    root += os.path.split(args.name)[0]
+
+    root += args.target
+
+    if args.all_datasets == []:
+        if args.target == "T":
+            args.all_datasets = [
+                "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-T-dataset2-w8-second-half/dataset.pick"]
+        if args.target == "B":
+            args.all_datasets = [
+                "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-B-dataset2-w5-second-half/dataset.pick"]
+        if args.target == "H_B":
+            args.all_datasets = [
+                "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human_B/dataset.pick"]
 
     print(root)
 
@@ -403,12 +416,13 @@ if __name__ == '__main__':
             s.score_ntwk = s.score(seq, s.ref_ntwk[0], maxlen=args.maxlen)
             # print(Score)
             # Score["ntwk_bc"].append(s.score("".join(s.ntwk_align["seq"]).replace("N",""),s.seq_from_basecall))
-            s.ref_bc = s.get_ref(s.seq_from_basecall, pos=True, correct=True)
+            if hasattr(s, "seq_from_basecall"):
+                s.ref_bc = s.get_ref(s.seq_from_basecall, pos=True, correct=True)
 
-            s.score_mininion = s.score(s.seq_from_basecall, s.ref_bc[0], maxlen=args.maxlen)
+                s.score_mininion = s.score(s.seq_from_basecall, s.ref_bc[0], maxlen=args.maxlen)
 
             Evaluated_dataset.strands.append(s)
 
-    print(root + "/" + os.path.split(args.name)[1] + ".pick")
-    with open(root + "/" + os.path.split(args.name)[1] + ".pick", "wb") as f:
+    print(root + "/" + args.target + "-dataset" + ".pick")
+    with open(root + "/" + args.target + "-dataset" + ".pick", "wb") as f:
         cPickle.dump(Evaluated_dataset, f)
