@@ -400,6 +400,7 @@ class Strand:
     def segmentation(self, chem="rf", w=5, prefix=""):
         h5 = h5py.File(prefix + self.filename, "r")
         self.segments = extract_events(h5, chem="rf", window_size=w, old=False)
+        return self.segments
 
     def analyse_segmentation(self, ntwk, signal, no2=False):
 
