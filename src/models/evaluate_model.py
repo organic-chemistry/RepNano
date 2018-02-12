@@ -357,7 +357,7 @@ if __name__ == '__main__':
             # l = "I0013833_20170821_FAH14319_MN17490_sequencing_run_780_80823_read_344_ch_1_strand"
             # if not (l in s.filename):
             #    continue
-            transfered = s.transfered
+            transfered = s.transfered[:args.maxlen_input]
             if transfered is None:
                 continue
             # sig = np.array(scale_clean_two_pd(transfered), dtype=np.float32)
@@ -365,6 +365,7 @@ if __name__ == '__main__':
             # print(sig.shape)
             ns = s.analyse_segmentation(ntwk=predictor, signal=sig[
                                         :args.maxlen_input], no2=n_output_network == 2)
+
             new = copy.deepcopy(transfered)
             # print(ns.shape)
             new["seq"] = ns[::, 0]
