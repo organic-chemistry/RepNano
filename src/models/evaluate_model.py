@@ -209,7 +209,7 @@ if __name__ == '__main__':
     parser.add_argument('--size', type=int, default=20)
     parser.add_argument('--name', type=str)
 
-    parser.add_argument('--pre-trained-weight', dest='pre_trained_weight', type=str, default=None)
+    parser.add_argument('--weights', dest='weights', type=str, default=None)
 
     parser.add_argument('--n-input', dest="n_input", type=int, default=1)
     parser.add_argument('--n-output', dest="n_output", type=int, default=1)
@@ -293,7 +293,7 @@ if __name__ == '__main__':
                                 input_length=None, n_output=n_output_network,
                                 lr=args.lr, res=args.res, attention=args.attention, n_feat=n_feat, simple=args.simple)
 
-    if args.pre_trained_weight is not None:
+    if args.weights is not None:
 
         predictor.load_weights(args.pre_trained_weight)
         # except:
