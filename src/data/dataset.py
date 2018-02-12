@@ -34,7 +34,7 @@ class Dataset:
 
     def populate(self, maxf=None, minion=True, basecall=True,
                  filter_not_alligned=False,
-                 filter_ch=None, realign=False, arange=[]):
+                 filter_ch=None, realign=False, arange=[], base_call=False):
         self.strands = []
         lstrand = glob.glob(self.root_files + "/*")
 
@@ -42,6 +42,10 @@ class Dataset:
             for st in lstrand:
                 if strand in st:
                     return st
+
+        if not base_call:
+            self.strands = [Strand() for _ in lstrand]
+            return
 
         with open(self.samfile, "r") as f:
             fich = f.readlines()

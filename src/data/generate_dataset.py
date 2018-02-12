@@ -8,6 +8,7 @@ if __name__ == "__main__":
 
     from ..data.dataset import Dataset, NotAllign
     from ..features.helpers import scale_simple, scale_named
+    import glob
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--window-size', dest="window_size", type=int, choices=[4, 5, 8], default=5)
@@ -41,6 +42,7 @@ if __name__ == "__main__":
         n_cpu = os.cpu_count()
 
     root = "data/raw/20170908-R9.5/"
+    base_call = True
     if args.target == "T":
         samf = "BTF_AG_ONT_1_FAH14273_A-select.sam"
         rf = "AG-basecalled/"
@@ -50,7 +52,8 @@ if __name__ == "__main__":
 
     if args.target == "H_B":
         samf = ""
-        rf = "Human_AR"
+        rf = "Human_AR/"
+        base_call = False
 
     D = Dataset(samfile=root + samf,
                 root_files=root + rf)
@@ -69,9 +72,10 @@ if __name__ == "__main__":
     if args.range != []:
         ran = range(1, 17)
     D.populate(maxf=maxf, filter_not_alligned=True,
-               filter_ch=ran, basecall=False, minion=False, arange=args.range)
-
+               filter_ch=ran, basecall=False, minion=False, arange=args.range,
+               base_call=base_call)
     # load from basecall
+
     def load_from_bc(strand):
         if samf != "":
             try:
