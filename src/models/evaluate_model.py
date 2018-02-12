@@ -394,5 +394,5 @@ if __name__ == '__main__':
 
             Evaluated_dataset.strands.append(s)
 
-    with open(args.root + args.name + ".pick", "wb"):
-        cPickle.write(Evaluated_dataset)
+    with open(args.root + args.name + ".pick", "wb") as f:
+        cPickle.dump(Evaluated_dataset, f)
