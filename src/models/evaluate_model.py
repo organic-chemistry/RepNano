@@ -306,8 +306,6 @@ if __name__ == '__main__':
         # except:
         #    print("Learning from scratch")
 
-    os.makedirs(args.root, exist_ok=True)
-
     original = []
     convert = []
 
@@ -408,5 +406,5 @@ if __name__ == '__main__':
 
             Evaluated_dataset.strands.append(s)
 
-    with open(args.root + os.path.split(args.name)[1] + ".pick", "wb") as f:
+    with open(root + os.path.split(args.name)[1] + ".pick", "wb") as f:
         cPickle.dump(Evaluated_dataset, f)
