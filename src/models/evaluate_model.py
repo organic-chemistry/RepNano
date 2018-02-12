@@ -335,6 +335,8 @@ if __name__ == '__main__':
             if strand.transfered is None:
                 data_x.append(None)
 
+            print(strand.transfered)
+
             if args.sclean:
                 data_x.append(scale_simple(strand.transfered))
             else:
