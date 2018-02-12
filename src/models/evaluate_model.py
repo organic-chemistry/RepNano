@@ -295,7 +295,7 @@ if __name__ == '__main__':
 
     if args.weights is not None:
 
-        predictor.load_weights(args.pre_trained_weight)
+        predictor.load_weights(args.weights)
         # except:
         #    print("Learning from scratch")
 
