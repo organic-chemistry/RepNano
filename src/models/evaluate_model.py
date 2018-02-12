@@ -247,6 +247,11 @@ if __name__ == '__main__':
     repo = Repo("./")
     argparse_dict["commit"] = str(repo.head.commit)
 
+    root, weight = os.path.split(args.weights)
+
+    root += "/evaluate_%i/" % weight.split("-")[-3]
+    root += os.path.split(args.name)[0]
+
     os.makedirs(args.root, exist_ok=True)
 
     with open(args.root + '/params.json', 'w') as fp:
@@ -402,5 +407,5 @@ if __name__ == '__main__':
 
             Evaluated_dataset.strands.append(s)
 
-    with open(args.root + args.name + ".pick", "wb") as f:
+    with open(args.root + os.path.split(args.name)[1] + ".pick", "wb") as f:
         cPickle.dump(Evaluated_dataset, f)
