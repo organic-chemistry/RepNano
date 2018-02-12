@@ -362,9 +362,11 @@ if __name__ == '__main__':
             # l = "I0013833_20170821_FAH14319_MN17490_sequencing_run_780_80823_read_344_ch_1_strand"
             # if not (l in s.filename):
             #    continue
-            transfered = s.transfered[:args.maxlen_input]
-            if transfered is None:
+            if s.transfered is None:
                 continue
+
+            transfered = s.transfered[:args.maxlen_input]
+
             # sig = np.array(scale_clean_two_pd(transfered), dtype=np.float32)
 
             # print(sig.shape)
