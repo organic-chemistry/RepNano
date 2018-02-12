@@ -55,6 +55,11 @@ if __name__ == "__main__":
         rf = "Human_AR/"
         base_call = False
 
+    if args.target == "H_T":
+        samf = ""
+        rf = "Human_HQ/"
+        base_call = False
+
     D = Dataset(samfile=root + samf,
                 root_files=root + rf)
     D.metadata = argparse_dict
