@@ -151,7 +151,11 @@ class Strand:
             return self.seq_from_minion
 
         if f == "no_basecall":
-            return self.segmentation(w=window_size)
+            sig = self.segmentation(w=window_size)
+            names = ["seq", "mean", "stdv", "length", "start"]
+
+            return pd.DataFrame({n: v for n, v in zip(
+                names, np.array(sig).T)}).convert_objects(convert_numeric=True)
 
         if f == "BaseCall":
             h5 = h5py.File(self.filename, "r")
