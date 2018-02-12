@@ -154,8 +154,7 @@ class Strand:
             sig = self.segmentation(w=window_size)
             names = ["seq", "mean", "stdv", "length", "start"]
 
-            return pd.DataFrame({n: v for n, v in zip(
-                names, np.array(sig).T)}).convert_objects(convert_numeric=True)
+            return pd.DataFrame({n: sig[n] for n in names}).convert_objects(convert_numeric=True)
 
         if f == "BaseCall":
             h5 = h5py.File(self.filename, "r")
