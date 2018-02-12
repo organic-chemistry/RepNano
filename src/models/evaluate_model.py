@@ -346,7 +346,7 @@ if __name__ == '__main__':
         data_x, load_dataset = load_datasets(dataset)
 
         Evaluated_dataset = Dataset("", "", metadata={"original_dataset": load_dataset.metadata,
-                                                      "weight_parameter": args.pre_trained_weight,
+                                                      "weight_parameter": args.weights,
                                                       "alloptions": argparse_dict})
         Evaluated_dataset.strands = []
 
