@@ -252,6 +252,8 @@ if __name__ == '__main__':
     root += "/evaluate_%s/" % weight.split("-")[-1][:-3]
     root += os.path.split(args.name)[0]
 
+    print(root)
+
     os.makedirs(args.root, exist_ok=True)
 
     with open(args.root + '/params.json', 'w') as fp:
