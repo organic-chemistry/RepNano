@@ -44,7 +44,7 @@ class Dataset:
                     return st
 
         if not base_call:
-            self.strands = [Strand("") for _ in lstrand]
+            self.strands = [Strand(fn) for fn in lstrand]
             return
 
         with open(self.samfile, "r") as f:
