@@ -87,6 +87,7 @@ if __name__ == "__main__":
             return [bc, minion]
         else:
             trans = strand.get_seq(f="no_basecall", window_size=args.window_size)
+            print(trans)
             return [trans, None]
     with Pool(n_cpu) as p:
         res = p.map(load_from_bc, D.strands)
