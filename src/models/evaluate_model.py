@@ -343,13 +343,14 @@ if __name__ == '__main__':
 
     for dataset in args.all_datasets:
 
-        Evaluated_dataset = Dataset("", "", metadata={"original_dataset": dataset.metadata,
+        data_x, load_dataset = load_datasets(dataset)
+
+        Evaluated_dataset = Dataset("", "", metadata={"original_dataset": load_dataset.metadata,
                                                       "weight_parameter": args.pre_trained_weight,
                                                       "alloptions": argparse_dict})
         Evaluated_dataset.strands = []
-        data_x, load_datasets = load_datasets(dataset)
 
-        for s, sig in zip(load_datasets.strands[:args.maxf], data_x):
+        for s, sig in zip(load_dataset.strands[:args.maxf], data_x):
             # s.segmentation(w=8,prefix="../../")
             # transfered = s.transfer(s.signal_bc,s.segments)
             # l = "I0013833_20170821_FAH14319_MN17490_sequencing_run_780_80823_read_344_ch_1_strand"
