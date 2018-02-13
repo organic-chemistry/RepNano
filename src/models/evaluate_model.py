@@ -253,7 +253,7 @@ if __name__ == '__main__':
     root += "/evaluate_%s/" % weight.split("-")[-1][:-3]
 
     root += args.target
-    from data import dataset
+    from ..data import dataset
 
     if args.all_datasets == []:
         if args.target == "T":
