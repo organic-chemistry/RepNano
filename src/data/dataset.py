@@ -219,7 +219,7 @@ class Strand:
         s2 = self.seq_from_basecall
         self.score(s1, s2, maxlen=maxlen)
 
-    def get_ref(self, sequence, correct=False, pos=False):
+    def get_ref(self, sequence, correct=False, pos=False, find_ref=True):
 
         h, name = tempfile.mkstemp(prefix="", dir="./")
         os.close(h)
@@ -242,7 +242,8 @@ class Strand:
         except subprocess.CalledProcessError as e:
             print(e.output)
             print(exex)
-        ref, succes, X1, P1 = get_seq("%s.sam" % name, ref=pre + REF, ret_pos=True, correct=correct)
+        ref, succes, X1, P1 = get_seq("%s.sam" % name, ref=pre + REF,
+                                      ret_pos=True, correct=correct, find_ref=find_ref)
         # print(X1, P1)
         os.remove("%s.sam" % name)
         os.remove("%s.fasta" % name)

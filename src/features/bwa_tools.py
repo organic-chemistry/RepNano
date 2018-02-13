@@ -50,7 +50,7 @@ def SeqInRef(Chrom, pos, bit, Lenght, ref):
 
 # read the sam file and write the input file for deepnano
 
-def get_seq(sam, ref, ret_pos=False, from_line=False, correct=False):
+def get_seq(sam, ref, ret_pos=False, from_line=False, correct=False, find_ref=True):
     ret = ["", 0, None, None]
     maxlen = 0
 
@@ -101,8 +101,12 @@ def get_seq(sam, ref, ret_pos=False, from_line=False, correct=False):
 
                     if Len < maxlen:
                         continue
-                    Seq = SeqInRef(Chrom, pos - offset_start, Bit,
-                                   LenghtOnRef(CIGAR) + offset_end, ref)
+
+                    if find_ref:
+                        Seq = SeqInRef(Chrom, pos - offset_start, Bit,
+                                       LenghtOnRef(CIGAR) + offset_end, ref)
+                    else:
+                        Seq = "NotLookedFor"
                     # print("Inside", Seq)
 
                     if ss[2] == '*' or "chr" not in ss[2]:

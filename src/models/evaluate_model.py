@@ -254,6 +254,7 @@ if __name__ == '__main__':
 
     root += args.target
     from ..data import dataset
+    find_ref = True
 
     if args.all_datasets == []:
         if args.target == "T":
@@ -266,12 +267,12 @@ if __name__ == '__main__':
             args.all_datasets = [
                 "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human_B/dataset.pick"]
             dataset.REF = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human/all_chra.fa"
-
+            find_ref = False
         if args.target == "H_T":
             args.all_datasets = [
                 "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human_T/dataset.pick"]
             dataset.REF = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human/all_chra.fa"
-
+            find_ref = False
     print(root)
 
     os.makedirs(root, exist_ok=True)
@@ -425,7 +426,7 @@ if __name__ == '__main__':
             else:
                 seq = "".join(s.ntwk_align["seq"]).replace("N", "").replace("B", "T")
 
-            s.ref_ntwk = s.get_ref(seq, pos=True, correct=True)
+            s.ref_ntwk = s.get_ref(seq, pos=True, correct=True, find_ref=find_ref)
             s.score_ntwk = s.score(seq, s.ref_ntwk[0], maxlen=args.maxlen)
             # print(Score)
             # Score["ntwk_bc"].append(s.score("".join(s.ntwk_align["seq"]).replace("N",""),s.seq_from_basecall))
