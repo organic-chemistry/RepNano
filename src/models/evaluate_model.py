@@ -263,6 +263,9 @@ if __name__ == '__main__':
         if args.target == "B":
             args.all_datasets = [
                 "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-B-dataset2-w5-second-half/dataset.pick"]
+        if args.target == "D":
+            args.all_datasets = [
+                "/data/bioinfo@borvo/users/jarbona/deepnano5bases/D-dataset-w5/dataset.pick"]
         if args.target == "H_B":
             args.all_datasets = [
                 "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human_B/dataset.pick"]
@@ -368,9 +371,9 @@ if __name__ == '__main__':
 
         return data_x, D
 
-    for dataset in args.all_datasets:
+    for idataset in args.all_datasets:
 
-        data_x, load_dataset = load_datasets(dataset)
+        data_x, load_dataset = load_datasets(idataset)
 
         Evaluated_dataset = Dataset("", "", metadata={"original_dataset": load_dataset.metadata,
                                                       "weight_parameter": args.weights,
