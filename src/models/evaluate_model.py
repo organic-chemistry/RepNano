@@ -253,6 +253,7 @@ if __name__ == '__main__':
     root += "/evaluate_%s/" % weight.split("-")[-1][:-3]
 
     root += args.target
+    from data import dataset
 
     if args.all_datasets == []:
         if args.target == "T":
@@ -264,10 +265,12 @@ if __name__ == '__main__':
         if args.target == "H_B":
             args.all_datasets = [
                 "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human_B/dataset.pick"]
+            dataset.REF = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/all_chra.fa"
 
         if args.target == "H_T":
             args.all_datasets = [
                 "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human_T/dataset.pick"]
+            dataset.REF = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/all_chra.fa"
 
     print(root)
 
