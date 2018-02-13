@@ -116,7 +116,7 @@ def get_seq(sam, ref, ret_pos=False, from_line=False, correct=False, find_ref=Tr
                             Chrom = int(ss[2][3:]) + 0
                         except:
                             Chrom = ss[2][3:]
-                        ret = [Seq + "", 1, Chrom + 0, pos + 0]
+                        ret = [Seq + "", 1, Chrom, pos + 0]
                         maxlen = max(len(Seq), maxlen)
 
                 else:
