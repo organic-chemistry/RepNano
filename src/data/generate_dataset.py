@@ -50,6 +50,10 @@ if __name__ == "__main__":
         samf = "BTF_AH_ONT_1_FAH14319_A-select.sam"
         rf = "AH-basecalled/"
 
+    if args.target == "B":
+        samf = ""
+        rf = "AD-basecalled"
+
     if args.target == "H_B":
         samf = ""
         rf = "Human_AR/"
