@@ -53,6 +53,7 @@ if __name__ == "__main__":
     if args.target == "D":
         samf = ""
         rf = "AD-basecalled"
+        base_call = False
 
     if args.target == "H_B":
         samf = ""
