@@ -186,6 +186,7 @@ if __name__ == "__main__":
             sub = "B"
             prop = from_ntwk.count("T") / (from_ntwk.count("T") + from_ntwk.count(sub) + 1e-7)
             ref = strand.get_ref(from_ntwk.replace(sub, "T"), correct=True)
+            print(ref)
             if ref == "":
                 return [None, None]
             # allign the ref on the transefered
