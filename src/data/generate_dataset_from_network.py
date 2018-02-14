@@ -95,18 +95,14 @@ if __name__ == "__main__":
     D.metadata = argparse_dict
     D.substitution = args.target
 
-    maxf = None
     maxlen = 20000
-    if args.test:
-        maxf = 12
-        maxlen = 1000
 
     ran = range(1, 11)
     if args.test_set:
         ran = range(11, 17)
     if args.range != []:
         ran = range(1, 17)
-    D.populate(maxf=maxf, filter_not_alligned=True,
+    D.populate(maxf=args.maxf, filter_not_alligned=True,
                filter_ch=ran, basecall=False, minion=False, arange=args.range,
                base_call=base_call)
 
