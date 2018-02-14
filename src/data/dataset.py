@@ -50,6 +50,7 @@ class Dataset:
         with open(self.samfile, "r") as f:
             fich = f.readlines()
             fich = list(set(fich))
+            fich.sort()
             tot = len(fich)
             for iline, line in enumerate(fich):
                 print(line)
