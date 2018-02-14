@@ -37,6 +37,7 @@ class Dataset:
                  filter_ch=None, realign=False, arange=[], base_call=False):
         self.strands = []
         lstrand = glob.glob(self.root_files + "/*")
+        lstrand.sort()
 
         def find_strand(strand):
             for st in lstrand:
@@ -51,9 +52,19 @@ class Dataset:
             fich = f.readlines()
             fich = list(set(fich))
             fich.sort()
+
+            filtered_fich = []
+            processed = []
+            for ifich in fich:
+                if ifich.startswith("@ch") and ifich.split()[0] not in processed:
+                    filtered_fich.append(ifich)
+                    processed.append(ifich.split()[0])
+            fich = filtered_fich
+            print("Total number of files", len(fich))
+
             tot = len(fich)
             for iline, line in enumerate(fich):
-                print(line)
+                # print(line)
 
                 if arange != []:
                     #print(arange, iline, tot, iline / tot > arange[0] and iline / tot < arange[1])
