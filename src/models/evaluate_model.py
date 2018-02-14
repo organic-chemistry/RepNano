@@ -237,6 +237,7 @@ if __name__ == '__main__':
     parser.add_argument('--maxlen', dest="maxlen", type=int, default=None)
     parser.add_argument('--maxlen_input', dest="maxlen_input", type=int, default=None)
     parser.add_argument('--target', dest='target', type=str, default=None)
+    parser.add_argument('--no-allign', dest='no_allign', action="store_true")
 
     args = parser.parse_args()
 
@@ -429,8 +430,9 @@ if __name__ == '__main__':
             else:
                 seq = "".join(s.ntwk_align["seq"]).replace("N", "").replace("B", "T")
 
-            s.ref_ntwk = s.get_ref(seq, pos=True, correct=True, find_ref=find_ref)
-            s.score_ntwk = s.score(seq, s.ref_ntwk[0], maxlen=args.maxlen)
+            if not args.no_allign:
+                s.ref_ntwk = s.get_ref(seq, pos=True, correct=True, find_ref=find_ref)
+                s.score_ntwk = s.score(seq, s.ref_ntwk[0], maxlen=args.maxlen)
             # print(Score)
             # Score["ntwk_bc"].append(s.score("".join(s.ntwk_align["seq"]).replace("N",""),s.seq_from_basecall))
             if hasattr(s, "seq_from_basecall"):
