@@ -157,8 +157,7 @@ if __name__ == "__main__":
     def load_from_bc(strand):
 
         trans = strand.get_seq(f="no_basecall", window_size=args.window_size)
-        output = strand.analyse_segmentation(predictor, scale_named2(trans))[0]
-        trans["seq"] = [s + "N" for s in output]
+
         return [trans, None]
 
     with Pool(n_cpu) as p:
@@ -176,6 +175,8 @@ if __name__ == "__main__":
                 pop.append(istrand)
         else:
             s.transfered = v[0]
+            output = s.analyse_segmentation(predictor, scale_named2(s.transfered))[0]
+            s.transfered["seq"] = [s + "N" for s in output]
 
     for istrand in pop[::-1]:
         D.strands.pop(istrand)
