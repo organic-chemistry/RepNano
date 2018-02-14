@@ -53,7 +53,7 @@ class Dataset:
             fich.sort()
             tot = len(fich)
             for iline, line in enumerate(fich):
-                # print(line)
+                print(line)
 
                 if arange != []:
                     #print(arange, iline, tot, iline / tot > arange[0] and iline / tot < arange[1])
