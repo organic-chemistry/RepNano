@@ -155,7 +155,7 @@ if __name__ == "__main__":
 
         trans = strand.get_seq(f="no_basecall", window_size=args.window_size)
         output = strand.analyse_segmentation(predictor, scale_named2(trans))[0]
-        trans["seq"][s + "N" for s in output]
+        trans["seq"] = [s + "N" for s in output]
         return [trans, None]
 
     with Pool(n_cpu) as p:
@@ -191,48 +191,48 @@ if __name__ == "__main__":
             from_ntwk = "".join(transfered["seq"]).replace("N", "")
             sub = "B"
             prop = from_ntwk.count("T") / (from_ntwk.count("T") + from_ntwk.count(sub) + 1e-7)
-            ref = from_ntwk.replace(sub, "T"), correct = True)
+            ref = strand.get_ref(from_ntwk.replace(sub, "T"), correct=True)
             if ref == "":
                 return [None, None]
             # allign the ref on the transefered
-            bc_strand="".join(transfered["seq"]).replace("N", "")
-            al=strand.score(bc_strand, ref, all_info = True)
+            bc_strand = "".join(transfered["seq"]).replace("N", "")
+            al = strand.score(bc_strand, ref, all_info=True)
             # strand.score_bc_ref = al[2] / len(bc_strand)
 
-            mapped_ref, correction=strand.give_map("".join(transfered["seq"]), al[:2])
+            mapped_ref, correction = strand.give_map("".join(transfered["seq"]), al[:2])
 
             def order(s1, s2):
 
                 if prop > 0.5:
-                    s1=s1.replace("T", sub)
-                    s2=s2.replace("T", sub)
+                    s1 = s1.replace("T", sub)
+                    s2 = s2.replace("T", sub)
                 if s1 != "N":
                     return s1 + s2
                 return s2 + s1
-            transfered["seq_ref"]=np.array([order(s, s1)
+            transfered["seq_ref"] = np.array([order(s, s1)
                                               for s, s1 in zip(mapped_ref[::2], mapped_ref[1::2])])
-            transfered["seq_ref_correction"]=np.array([order(s, s1)
+            transfered["seq_ref_correction"] = np.array([order(s, s1)
                                                          for s, s1 in zip(correction[::2], correction[1::2])])
-            strand.changed=True
+            strand.changed = True
 
         # strand.transfered_seq = transfered
 
             return transfered, al[2] / len(bc_strand), strand.score("".join(transfered["seq_ref"]).replace(
-                "N", ""), ref, all_info = False), len(ref)
+                "N", ""), ref, all_info=False), len(ref)
         except:
             return [None, None]
 
     if samf != "":
         with Pool(n_cpu) as p:
-            res=p.map(compute_attributes, D.strands)
+            res = p.map(compute_attributes, D.strands)
         for v, s in zip(res, D.strands):
             if v[0] is not None:
-                s.transfered=v[0]
-                s.bc_score=v[1]
-                s.confirm_score=v[2]
+                s.transfered = v[0]
+                s.bc_score = v[1]
+                s.confirm_score = v[2]
                 del(s.signal_bc)
             else:
-                s.transfered=None
+                s.transfered = None
     import _pickle as cPickle
     with open(args.name, "wb") as fich:
         cPickle.dump(D, fich)
