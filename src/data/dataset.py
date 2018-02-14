@@ -52,6 +52,7 @@ class Dataset:
             fich = list(set(fich))
             tot = len(fich)
             for iline, line in enumerate(fich):
+                print(line)
 
                 if arange != []:
                     #print(arange, iline, tot, iline / tot > arange[0] and iline / tot < arange[1])
