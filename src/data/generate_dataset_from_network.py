@@ -162,17 +162,10 @@ if __name__ == "__main__":
     # print(res)
     pop = []
     for istrand, (v, s) in enumerate(zip(res, D.strands)):
-        if samf != "":
-            if v[0][0] is not None:
-                s.signal_bc, s.seq_from_basecall, s.imin, s.raw, s.to_match, s.sampling_rate = v[0]
-                s.seq_from_minion = v[1]
-                s.to_match = ""
-            else:
-                pop.append(istrand)
-        else:
-            s.transfered = v[0]
-            output = s.analyse_segmentation(predictor, scale_named2(s.transfered))[0]
-            s.transfered["seq"] = [s + "N" for s in output]
+
+        s.transfered = v[0]
+        output = s.analyse_segmentation(predictor, scale_named2(s.transfered))[0]
+        s.transfered["seq"] = [s + "N" for s in output]
 
     for istrand in pop[::-1]:
         D.strands.pop(istrand)
