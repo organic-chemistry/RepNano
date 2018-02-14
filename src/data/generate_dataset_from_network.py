@@ -224,7 +224,6 @@ if __name__ == "__main__":
                 s.transfered = v[0]
                 s.bc_score = v[1]
                 s.confirm_score = v[2]
-                del(s.signal_bc)
             else:
                 s.transfered = None
     import _pickle as cPickle
