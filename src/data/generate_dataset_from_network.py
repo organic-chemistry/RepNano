@@ -110,6 +110,8 @@ if __name__ == "__main__":
                filter_ch=ran, basecall=False, minion=False, arange=args.range,
                base_call=base_call)
 
+    from ..models.model import build_models
+
     def load_model():
         if args.Nbases == 4:
             mapping = {"A": 0, "C": 1, "G": 2, "T": 3, "N": 4}  # Modif
@@ -123,7 +125,6 @@ if __name__ == "__main__":
 
         subseq_size = args.ctc_length
 
-        from .model import build_models
         ctc_length = subseq_size
         input_length = ctc_length
         if n_output_network == 2:
