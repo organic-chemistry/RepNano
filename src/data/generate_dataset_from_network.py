@@ -175,9 +175,8 @@ if __name__ == "__main__":
 
     def compute_attributes(strand):
         try:
-            strand.segmentation(w=args.window_size)
 
-            transfered = strand.transfer(strand.signal_bc, strand.segments)
+            transfered = strand.transfered
             # strand.transfered_bc = copy.deepcopy(transfered)
             if len("".join(transfered["seq"]).replace("N", "")) > maxlen:
                 transfered = transfered[:maxlen]
