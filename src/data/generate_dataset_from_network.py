@@ -164,8 +164,8 @@ if __name__ == "__main__":
     for istrand, (v, s) in enumerate(zip(res, D.strands)):
 
         s.transfered = v[0]
-        output = s.analyse_segmentation(predictor, scale_named2(s.transfered))
-        print(output.shape, len(s.transfered))
+        output = s.analyse_segmentation(predictor, scale_named2(s.transfered))[::, 0]
+        #print(output.shape, len(s.transfered))
         s.transfered["seq"] = [s + "N" for s in output]
 
     for istrand in pop[::-1]:
