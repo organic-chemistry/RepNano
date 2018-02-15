@@ -3,7 +3,7 @@ if __name__ == "__main__":
 
     import os
     import numpy as np
-    from subprocess import PIPE
+    # rom subprocess import PIPE
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--command-line', dest="command_line", type=str)

@@ -9,6 +9,10 @@ if __name__ == "__main__":
     from ..data.dataset import Dataset, NotAllign
     from ..features.helpers import scale_simple, scale_named, scale_named2
     import glob
+    import os
+    import sys
+    f = open(os.devnull, 'w')
+    sys.stdout = f
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--window-size', dest="window_size", type=int, choices=[4, 5, 8], default=5)
