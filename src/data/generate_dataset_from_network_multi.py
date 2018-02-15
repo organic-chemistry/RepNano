@@ -3,6 +3,7 @@ if __name__ == "__main__":
 
     import os
     import numpy as np
+    from subprocess import PIPE
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--command-line', dest="command_line", type=str)
@@ -23,4 +24,4 @@ if __name__ == "__main__":
         cmd = args.command_line + \
             "--range %.1f %.1f " % (start, end) + "--name %s-%.1f " % (args.name, start)
         print(cmd)
-        os.popen(cmd)
+        os.popen(cmd, stdout=PIPE)
