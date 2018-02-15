@@ -156,13 +156,11 @@ if __name__ == "__main__":
 
         return [trans, None]
 
-    with Pool(n_cpu) as p:
-        res = p.map(load_from_bc, D.strands)
-
     # print(res)
     pop = []
-    for istrand, (v, s) in enumerate(zip(res, D.strands)):
+    for istrand, s in enumerate(D.strands):
 
+        v = load_from_bc(s)
         s.transfered = v[0]
         output = s.analyse_segmentation(predictor, scale_named2(s.transfered))[::, 0]
         #print(output.shape, len(s.transfered))
@@ -217,9 +215,8 @@ if __name__ == "__main__":
             return [None, None]
 
     if samf != "":
-        with Pool(n_cpu) as p:
-            res = p.map(compute_attributes, D.strands)
-        for v, s in zip(res, D.strands):
+        for s in zip(D.strands):
+            v = compute_attributes(s)
             if v[0] is not None:
                 s.transfered = v[0]
                 s.bc_score = v[1]
