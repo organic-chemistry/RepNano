@@ -187,7 +187,7 @@ if __name__ == "__main__":
             if ref == "":
                 return [None, None]
             # allign the ref on the transefered
-            bc_strand = "".join(transfered["seq"]).replace("N", "")
+            bc_strand = from_ntwk.replace(sub, "T")
             al = strand.score(bc_strand, ref, all_info=True)
             # strand.score_bc_ref = al[2] / len(bc_strand)
 
@@ -195,7 +195,7 @@ if __name__ == "__main__":
 
             def order(s1, s2):
 
-                if prop > 0.5:
+                if prop < 0.5:
                     s1 = s1.replace("T", sub)
                     s2 = s2.replace("T", sub)
                 if s1 != "N":
