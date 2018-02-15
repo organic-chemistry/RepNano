@@ -22,6 +22,6 @@ if __name__ == "__main__":
                         (args.range[1] - args.range[0]) / args.n_cpu)[i + 1]
 
         cmd = args.command_line + \
-            "--range %.1f %.1f " % (start, end) + "--name %s-%.1f " % (args.name, start)
+            "--range %.3f %.3f " % (start, end) + "--name %s-%.3f " % (args.name, start)
         print(cmd)
         os.popen(cmd)
