@@ -161,7 +161,6 @@ if __name__ == "__main__":
         return [trans, None]
 
     # print(res)
-    pop = []
     for istrand, s in enumerate(D.strands):
 
         v = load_from_bc(s)
@@ -169,9 +168,6 @@ if __name__ == "__main__":
         output = s.analyse_segmentation(predictor, scale_named2(s.transfered))[::, 0]
         #print(output.shape, len(s.transfered))
         s.transfered["seq"] = [s + "N" for s in output]
-
-    for istrand in pop[::-1]:
-        D.strands.pop(istrand)
 
     data_x = []
 
@@ -219,7 +215,7 @@ if __name__ == "__main__":
             return [None, None]
 
     if samf != "":
-        for s in zip(D.strands):
+        for s in D.strands:
             v = compute_attributes(s)
             if v[0] is not None:
                 s.transfered = v[0]
