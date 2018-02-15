@@ -23,4 +23,4 @@ if __name__ == "__main__":
         cmd = args.command_line + \
             "--range %.1f %.1f " % (start, end) + "--name %s-%.1f " % (args.name, start)
         print(cmd)
-        # os.popen(cmd)
+        os.popen(cmd)
