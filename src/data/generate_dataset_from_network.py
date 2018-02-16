@@ -201,9 +201,9 @@ if __name__ == "__main__":
                 return s1 + s2
             return s2 + s1
 
-        new_ref = np.array([order(s, s1)
-                            for s, s1 in zip(mapped_ref[::2], mapped_ref[1::2])])
         try:
+            new_ref = np.array([order(s, s1)
+                                for s, s1 in zip(mapped_ref[::2], mapped_ref[1::2])])
             transfered["seq_ref"]
         except:
             print(len(new_ref), len(transfered["seq_ref"]), len(mapped_ref))
