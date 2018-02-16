@@ -99,10 +99,13 @@ if __name__ == "__main__":
         else:
             trans = strand.get_seq(f="no_basecall", window_size=args.window_size)
             return [trans, None]
+
+    print(len(D.strands))
     with Pool(n_cpu) as p:
         res = p.map(load_from_bc, D.strands)
 
     # print(res)
+
     pop = []
     for istrand, (v, s) in enumerate(zip(res, D.strands)):
         if samf != "":
