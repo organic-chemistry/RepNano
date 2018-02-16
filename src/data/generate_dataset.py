@@ -124,40 +124,40 @@ if __name__ == "__main__":
     data_x = []
 
     def compute_attributes(strand):
-        # try:
-        strand.segmentation(w=args.window_size, method=args.method)
+        try:
+            strand.segmentation(w=args.window_size, method=args.method)
 
-        transfered = strand.transfer(strand.signal_bc, strand.segments)
-        # strand.transfered_bc = copy.deepcopy(transfered)
-        if len("".join(transfered["seq"]).replace("N", "")) > maxlen:
-            transfered = transfered[:maxlen]
-        # get the ref from transefered:
-        ref = strand.get_ref("".join(transfered["seq"]).replace("N", ""), correct=True)
-        if ref == "":
+            transfered = strand.transfer(strand.signal_bc, strand.segments)
+            # strand.transfered_bc = copy.deepcopy(transfered)
+            if len("".join(transfered["seq"]).replace("N", "")) > maxlen:
+                transfered = transfered[:maxlen]
+            # get the ref from transefered:
+            ref = strand.get_ref("".join(transfered["seq"]).replace("N", ""), correct=True)
+            if ref == "":
+                return [None, None]
+            # allign the ref on the transefered
+            bc_strand = "".join(transfered["seq"]).replace("N", "")
+            al = strand.score(bc_strand, ref, all_info=True)
+            # strand.score_bc_ref = al[2] / len(bc_strand)
+
+            mapped_ref, correction = strand.give_map("".join(transfered["seq"]), al[:2])
+
+            def order(s1, s2):
+                if s1 != "N":
+                    return s1 + s2
+                return s2 + s1
+            transfered["seq_ref"] = np.array([order(s, s1)
+                                              for s, s1 in zip(mapped_ref[::2], mapped_ref[1::2])])
+            transfered["seq_ref_correction"] = np.array([order(s, s1)
+                                                         for s, s1 in zip(correction[::2], correction[1::2])])
+            strand.changed = True
+
+            # strand.transfered_seq = transfered
+
+            return transfered, al[2] / len(bc_strand), strand.score("".join(transfered["seq_ref"]).replace(
+                "N", ""), ref, all_info=False), len(ref)
+        except:
             return [None, None]
-        # allign the ref on the transefered
-        bc_strand = "".join(transfered["seq"]).replace("N", "")
-        al = strand.score(bc_strand, ref, all_info=True)
-        # strand.score_bc_ref = al[2] / len(bc_strand)
-
-        mapped_ref, correction = strand.give_map("".join(transfered["seq"]), al[:2])
-
-        def order(s1, s2):
-            if s1 != "N":
-                return s1 + s2
-            return s2 + s1
-        transfered["seq_ref"] = np.array([order(s, s1)
-                                          for s, s1 in zip(mapped_ref[::2], mapped_ref[1::2])])
-        transfered["seq_ref_correction"] = np.array([order(s, s1)
-                                                     for s, s1 in zip(correction[::2], correction[1::2])])
-        strand.changed = True
-
-        # strand.transfered_seq = transfered
-
-        return transfered, al[2] / len(bc_strand), strand.score("".join(transfered["seq_ref"]).replace(
-            "N", ""), ref, all_info=False), len(ref)
-        # except:
-        #    return [None, None]
 
     if samf != "":
         with Pool(n_cpu) as p:
