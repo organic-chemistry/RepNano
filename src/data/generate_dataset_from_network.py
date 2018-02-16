@@ -202,15 +202,15 @@ if __name__ == "__main__":
                     return s1 + s2
                 return s2 + s1
 
-                new_ref = np.array([order(s, s1)
-                                    for s, s1 in zip(mapped_ref[::2], mapped_ref[1::2])])
-                transfered["seq_ref"] = new_ref
+            new_ref = np.array([order(s, s1)
+                                for s, s1 in zip(mapped_ref[::2], mapped_ref[1::2])])
+            transfered["seq_ref"] = new_ref
 
             transfered["seq_ref_correction"] = np.array([order(s, s1)
                                                          for s, s1 in zip(correction[::2], correction[1::2])])
             strand.changed = True
             return transfered, al[2] / len(bc_strand), strand.score("".join(transfered["seq_ref"]).replace(
-                "N", ""), ref, all_info=False), len(ref)
+                "N", "").replace(sub, "T"), ref, all_info=False), len(ref)
         except:
             return [None, None]
 
