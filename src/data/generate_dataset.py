@@ -21,6 +21,7 @@ if __name__ == "__main__":
     parser.add_argument("--target", dest="target", type=str, default='T')
     parser.add_argument("--test-set", dest="test_set", action="store_true")
     parser.add_argument("--range", dest="range", nargs='+', default=[], type=float)
+    parser.add_argument("--method", dest="method", choices=["FW", "TV"])
 
     #parser.add_argument("--substitution", dest="substitution", default="T", type=str)
 
@@ -121,7 +122,7 @@ if __name__ == "__main__":
 
     def compute_attributes(strand):
         try:
-            strand.segmentation(w=args.window_size)
+            strand.segmentation(w=args.window_size, method=args.method)
 
             transfered = strand.transfer(strand.signal_bc, strand.segments)
             # strand.transfered_bc = copy.deepcopy(transfered)

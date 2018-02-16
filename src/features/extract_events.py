@@ -1,5 +1,8 @@
 import numpy as np
 from .helpers import scale, scale_clean
+from numba import jit
+import pandas as pd
+
 
 defs = {
     'r9.4': {
@@ -78,8 +81,6 @@ def find_stall_old(events, threshold):
             break
 
     return new_start
-
-import pandas as pd
 
 
 def find_stall(events, start_threshold, end_threshold, raw, sampling_rate, max_under_threshold=10):
@@ -250,6 +251,64 @@ def generate_events_old(ss1, ss2, peaks, sample_rate):
     events["length"] /= sample_rate
 
     return events
+
+
+# jit decorator tells Numba to compile this function.
+# The argument types will be inferred by Numba when function is called.
+
+
+@jit
+def find_best_partition(signal, gamma=0.1, maxlen=10, minlen=1):
+    signal = np.array(signal)
+    B = np.zeros(len(signal))
+    p = np.zeros(len(signal), dtype=np.int)
+
+    inf = 10000000000000000000
+    n = len(signal)
+
+    B[0] = -gamma
+
+    for r in range(1, n):
+        # print(r,B)
+        # print(r,p)
+        B[r] = inf
+        for l in range(max(1, r - maxlen), r + 1 - minlen + 1):
+            b = B[l - 1] + gamma + np.sum((signal[l:r + 1] - np.mean(signal[l:r + 1]))**2)
+            # print(B[r])
+            if b <= B[r]:
+                B[r] = b
+                p[r] = l - 1
+    return p
+
+
+@jit
+def return_start_length_mean_std(partition, signal):
+    start = []
+    length = []
+    mean = []
+    std = []
+    r = len(signal) - 1
+    l = partition[r]
+    while r > 0:
+        # print(l,r)
+        start.append(l + 1)
+        if l == 0:
+            start[-1] -= 1
+
+        length.append(r - l)
+        mean.append(np.mean(signal[start[-1]:start[-1] + length[-1]]))
+        std.append(np.sum((signal[start[-1]:start[-1] + length[-1]] - mean[-1])**2)**0.5)
+        r = l
+        l = partition[r]
+    return start[::-1], length[::-1], mean[::-1], std[::-1]
+
+
+def segment(signal, gamma=0.1, maxlen=10, minlen=1, sl=6024):
+    p = find_best_partition(np.array(signal, dtype=np.float32),
+                            gamma=gamma, maxlen=maxlen, minlen=minlen)
+    r = return_start_length_mean_std(p, signal)
+
+    return pd.DataFrame({"start": np.array(r[0]) / sl, "length": np.array(r[1]) / sl, "mean": r[2], "stdv": r[3]})
 
 
 def generate_events(ss1, ss2, peaks, sample_rate, raw):

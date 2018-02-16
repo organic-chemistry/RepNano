@@ -414,9 +414,13 @@ class Strand:
                 pylab.text((s + l / 2) * sl - 1.5, m + up, base,
                            color=color)  # 1.5 size of character
 
-    def segmentation(self, chem="rf", w=5, prefix=""):
+    def segmentation(self, chem="rf", w=5, prefix="", method="FW"):
         h5 = h5py.File(prefix + self.filename, "r")
-        self.segments = extract_events(h5, chem="rf", window_size=w, old=False)
+        if method == "FW":
+            self.segments = extract_events(h5, chem="rf", window_size=w, old=False)
+        elif method == "TV":
+            raw, sl = get_raw(h5)
+            self.segments = tv_segment(raw, gamma=130, maxlen=45, minlen=2, sl=sl)
         return self.segments
 
     def analyse_segmentation(self, ntwk, signal, no2=False):
