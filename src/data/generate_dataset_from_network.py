@@ -15,7 +15,8 @@ if __name__ == "__main__":
     # sys.stdout = f
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--window-size', dest="window_size", type=int, choices=[4, 5, 8], default=5)
+    parser.add_argument('--window-size', dest="window_size",
+                        type=int, choices=[2, 4, 5, 8], default=5)
     parser.add_argument('--Nbases', type=int, choices=[4, 5, 8], default=4)
 
     parser.add_argument('--root', type=str, default="data/training/")
