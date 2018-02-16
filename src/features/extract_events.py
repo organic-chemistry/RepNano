@@ -303,7 +303,7 @@ def return_start_length_mean_std(partition, signal):
     return start[::-1], length[::-1], mean[::-1], std[::-1]
 
 
-def segment(signal, gamma=0.1, maxlen=10, minlen=1, sl=6024):
+def tv_segment(signal, gamma=0.1, maxlen=10, minlen=1, sl=6024):
     p = find_best_partition(np.array(signal, dtype=np.float32),
                             gamma=gamma, maxlen=maxlen, minlen=minlen)
     r = return_start_length_mean_std(p, signal)

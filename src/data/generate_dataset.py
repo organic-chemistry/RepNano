@@ -74,7 +74,7 @@ if __name__ == "__main__":
     maxf = None
     maxlen = 20000
     if args.test:
-        maxf = 12
+        maxf = 2
         maxlen = 1000
 
     ran = range(1, 11)
