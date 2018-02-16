@@ -206,7 +206,7 @@ if __name__ == "__main__":
                                 for s, s1 in zip(mapped_ref[::2], mapped_ref[1::2])])
             transfered["seq_ref"] = new_ref
         except:
-            print(len(new_ref), len(transfered["seq_ref"]), len(mapped_ref))
+            print(len(new_ref), len(transfered["seq"]), len(mapped_ref))
             raise
         transfered["seq_ref_correction"] = np.array([order(s, s1)
                                                      for s, s1 in zip(correction[::2], correction[1::2])])
