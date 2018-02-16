@@ -2,10 +2,10 @@
 import glob
 try:
     from ..features.bwa_tools import get_seq
-    from ..features.extract_events import get_raw, extract_events
+    from ..features.extract_events import get_raw, extract_events, tv_segment
 except:
     from features.bwa_tools import get_seq
-    from features.extract_events import get_raw, extract_events
+    from features.extract_events import get_raw, extract_events, tv_segment
 import h5py
 import numpy as np
 from Bio import pairwise2
