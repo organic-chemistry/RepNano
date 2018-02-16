@@ -11,8 +11,8 @@ if __name__ == "__main__":
     import glob
     import os
     import sys
-    #f = open(os.devnull, 'w')
-    #sys.stdout = f
+    # f = open(os.devnull, 'w')
+    # sys.stdout = f
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--window-size', dest="window_size", type=int, choices=[4, 5, 8], default=5)
@@ -166,7 +166,7 @@ if __name__ == "__main__":
         v = load_from_bc(s)
         s.transfered = v[0]
         output = s.analyse_segmentation(predictor, scale_named2(s.transfered))[::, 0]
-        #print(output.shape, len(s.transfered))
+        # print(output.shape, len(s.transfered))
         s.transfered["seq"] = [s + "N" for s in output]
 
     data_x = []
@@ -190,7 +190,7 @@ if __name__ == "__main__":
         al = strand.score(bc_strand, ref, all_info=True)
         # strand.score_bc_ref = al[2] / len(bc_strand)
 
-        mapped_ref, correction = strand.give_map("".join(transfered["seq"]), al[:2])
+        mapped_ref, correction = strand.give_map(from_ntwk.replace(sub, "T"), al[:2])
 
         def order(s1, s2):
 
