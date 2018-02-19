@@ -318,9 +318,10 @@ class Strand:
 
     def get_seq_mean(self, motif, ref, short=True, void="N", caract="mean"):
 
-        seq = "".join(ref["seq"].replace(void, ""))
+        seq = "".join(ref["seq"]).replace(void, "")
+        # print("Look")
         if motif in seq:
-            num = [i for i, l in(enumerate(ref["seq"])) if l != void]
+            num = [i for i, l in(enumerate(ref["seq"])) if l != void + void]
             index = seq.index(motif)
             if short:
                 return motif, np.array(ref[caract][num[index:index + len(motif)]])
