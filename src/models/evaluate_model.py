@@ -238,6 +238,7 @@ if __name__ == '__main__':
     parser.add_argument('--maxlen_input', dest="maxlen_input", type=int, default=None)
     parser.add_argument('--target', dest='target', type=str, default=None)
     parser.add_argument('--no-allign', dest='no_allign', action="store_true")
+    parser.add_argument("--method", dest="method", choices=["FW", "TV"])
 
     args = parser.parse_args()
 
@@ -258,25 +259,46 @@ if __name__ == '__main__':
     find_ref = True
 
     if args.all_datasets == []:
-        if args.target == "T":
-            args.all_datasets = [
-                "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-T-dataset2-w8-second-half/dataset.pick"]
-        if args.target == "B":
-            args.all_datasets = [
-                "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-B-dataset2-w5-second-half/dataset.pick"]
-        if args.target == "D":
-            args.all_datasets = [
-                "/data/bioinfo@borvo/users/jarbona/deepnano5bases/D-dataset-w5/dataset.pick"]
-        if args.target == "H_B":
-            args.all_datasets = [
-                "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human_B/dataset.pick"]
-            dataset.REF = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human/all_chra.fa"
-            find_ref = False
-        if args.target == "H_T":
-            args.all_datasets = [
-                "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human_T/dataset.pick"]
-            dataset.REF = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human/all_chra.fa"
-            find_ref = False
+        if args.method == "FW":
+            if args.target == "T":
+                args.all_datasets = [
+                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-T-dataset2-w8-second-half/dataset.pick"]
+            if args.target == "B":
+                args.all_datasets = [
+                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-B-dataset2-w5-second-half/dataset.pick"]
+            if args.target == "D":
+                args.all_datasets = [
+                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/D-dataset-w5/dataset.pick"]
+            if args.target == "H_B":
+                args.all_datasets = [
+                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human_B/dataset.pick"]
+                dataset.REF = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human/all_chra.fa"
+                find_ref = False
+            if args.target == "H_T":
+                args.all_datasets = [
+                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human_T/dataset.pick"]
+                dataset.REF = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human/all_chra.fa"
+                find_ref = False
+        else:
+            if args.target == "T":
+                args.all_datasets = [
+                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-second-half-T-TV/dataset.pick"]
+            if args.target == "B":
+                args.all_datasets = [
+                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-second-half-B-TV/dataset.pick"]
+            if args.target == "D":
+                args.all_datasets = [
+                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/D-dataset-w5/dataset.pick"]
+            if args.target == "H_B":
+                args.all_datasets = [
+                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human_B/dataset.pick"]
+                dataset.REF = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human/all_chra.fa"
+                find_ref = False
+            if args.target == "H_T":
+                args.all_datasets = [
+                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human_T/dataset.pick"]
+                dataset.REF = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human/all_chra.fa"
+                find_ref = False
     print(root)
 
     os.makedirs(root, exist_ok=True)
