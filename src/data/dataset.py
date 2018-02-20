@@ -421,7 +421,9 @@ class Strand:
             self.segments = extract_events(h5, chem="rf", window_size=w, old=False)
         elif method == "TV":
             raw, sl = get_raw(h5)
-            self.segments = tv_segment(raw, gamma=130, maxlen=45, minlen=2, sl=sl)
+            #self.segments = tv_segment(raw, gamma=130, maxlen=45, minlen=2, sl=sl)
+            self.segments = tv_segment(raw, gamma=45, maxlen=70, minlen=2, sl=sl)
+
         return self.segments
 
     def analyse_segmentation(self, ntwk, signal, no2=False):
