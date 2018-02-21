@@ -422,7 +422,15 @@ class Strand:
         elif method == "TV":
             raw, sl = get_raw(h5)
             #self.segments = tv_segment(raw, gamma=130, maxlen=45, minlen=2, sl=sl)
+            self.segments = tv_segment(raw, gamma=70, maxlen=70, minlen=2, sl=sl)
+        elif method == "TV45":
+            raw, sl = get_raw(h5)
+            #self.segments = tv_segment(raw, gamma=130, maxlen=45, minlen=2, sl=sl)
             self.segments = tv_segment(raw, gamma=45, maxlen=70, minlen=2, sl=sl)
+        elif method == "TV25":
+            raw, sl = get_raw(h5)
+            #self.segments = tv_segment(raw, gamma=130, maxlen=45, minlen=2, sl=sl)
+            self.segments = tv_segment(raw, gamma=25, maxlen=70, minlen=2, sl=sl)
 
         return self.segments
 
