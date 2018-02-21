@@ -319,6 +319,26 @@ if __name__ == '__main__':
                     "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human_T/dataset.pick"]
                 dataset.REF = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human/all_chra.fa"
                 find_ref = False
+        elif args.method == "TV25":
+            if args.target == "T":
+                args.all_datasets = [
+                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-second-half-T-TV-25/dataset.pick"]
+            if args.target == "B":
+                args.all_datasets = [
+                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-second-half-B-TV-25/dataset.pick"]
+            if args.target == "D":
+                args.all_datasets = [
+                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/D-dataset-w5/dataset.pick"]
+            if args.target == "H_B":
+                args.all_datasets = [
+                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human_B/dataset.pick"]
+                dataset.REF = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human/all_chra.fa"
+                find_ref = False
+            if args.target == "H_T":
+                args.all_datasets = [
+                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human_T/dataset.pick"]
+                dataset.REF = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human/all_chra.fa"
+                find_ref = False
     print(root)
 
     os.makedirs(root, exist_ok=True)
