@@ -238,7 +238,8 @@ if __name__ == '__main__':
     parser.add_argument('--maxlen_input', dest="maxlen_input", type=int, default=None)
     parser.add_argument('--target', dest='target', type=str, default=None)
     parser.add_argument('--no-allign', dest='no_allign', action="store_true")
-    parser.add_argument("--method", dest="method", choices=["FW", "TV", "TV45"], default="FW")
+    parser.add_argument("--method", dest="method",
+                        choices=["FW", "TV", "TV45", "TV25"], default="FW")
 
     args = parser.parse_args()
 
