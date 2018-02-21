@@ -340,6 +340,7 @@ if __name__ == '__main__':
                 dataset.REF = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human/all_chra.fa"
                 find_ref = False
     print(root)
+    print(args.all_datasets)
 
     os.makedirs(root, exist_ok=True)
 
