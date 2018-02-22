@@ -227,7 +227,7 @@ class Strand:
 
             self.seq_from_basecall = s2
             # print(self.signal_bc)
-
+            self.D = D
             return self.signal_bc, self.seq_from_basecall, self.imin, self.raw, self.to_match, self.sampling_rate
 
     def score_ref(self, maxlen=1000):
