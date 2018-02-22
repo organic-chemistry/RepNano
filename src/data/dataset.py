@@ -493,12 +493,12 @@ class Strand:
                     # where = np.argmin( np.abs(stl_center-r_center[ib]))
                     where = np.argmax(s)
                     if stl_base[where] != "NN":
-                        print("one")
+                        # print("one")
                         #print(stl_base[where], b)
                         stl_base[where] += b
                         stl_base[where] = stl_base[where].replace("N", "")
                         # First try to transfer at previouss:
-                        print(stl_base[where - 1], stl_base[where], stl_base[where + 1])
+                        #print(stl_base[where - 1], stl_base[where], stl_base[where + 1])
                         if len(stl_base[where]) > 2 and where > 0:
                             if "NN" in stl_base[where - 1]:
 
@@ -520,7 +520,7 @@ class Strand:
                         stl_base[where] = stl_base[where][:2]
                         stl_base[where] = stl_base[where] + \
                             "N" * (2 - len(stl_base[where]))
-                        print(stl_base[where - 1], stl_base[where], stl_base[where + 1])
+                        #print(stl_base[where - 1], stl_base[where], stl_base[where + 1])
 
                         #print("After", stl_base[where])
                     else:
