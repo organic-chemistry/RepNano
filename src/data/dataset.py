@@ -425,6 +425,16 @@ class Strand:
                 pylab.text((s + l / 2) * sl - 1.5, m + up, base,
                            color=color)  # 1.5 size of character
 
+    def plot_sequence_nanoraw(self, sign, window=[None, None], color="k", up=5, sl=None):
+        if sl is None:
+            sl = self.sampling_rate
+        for i, (s, l, m, base) in enumerate(zip(sign["start"], sign["length"], sign["norm_mean"], sign["base"])):
+
+            if (window[0] is None or (window[0] is not None and s * sl > window[0])) and \
+                    (window[1] is None or (window[1] is not None and s * sl < window[1])):
+                pylab.text((s + l / 2) * sl - 1.5, m + up, base,
+                           color=color)  # 1.5 size of character
+
     def segmentation(self, chem="rf", w=5, prefix="", method="FW"):
         h5 = h5py.File(prefix + self.filename, "r")
         if method == "FW":
