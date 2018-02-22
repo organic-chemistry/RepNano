@@ -518,6 +518,8 @@ class Strand:
                                 "N" * (2 - len(stl_base[where][2:]))
 
                         stl_base[where] = stl_base[where][:2]
+                        stl_base[where] = stl_base[where] + \
+                            "N" * (2 - len(stl_base[where]))
                         print(stl_base[where - 1], stl_base[where], stl_base[where + 1])
 
                         #print("After", stl_base[where])
