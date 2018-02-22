@@ -218,6 +218,8 @@ class Strand:
                 names, np.array(self.signal_bc).T[1:])}
             D["seq"] = np.array(self.signal_bc).T[0]
 
+            self.csignal = self.signal_bc.copy()
+
             self.signal_bc = pd.DataFrame(D)
 
             self.allign_basecall_raw()
