@@ -213,9 +213,12 @@ class Strand:
                 else:
                     left = None
 
-            names = ["seq", "mean", "stdv", "length", "start"]
-            self.signal_bc = pd.DataFrame({n: v for n, v in zip(
-                names, np.array(self.signal_bc).T)})
+            names = ["mean", "stdv", "length", "start"]
+            D = {n: np.array(v, dtype=np.float64) for n, v in zip(
+                names, np.array(self.signal_bc).T[1:])}
+            D["seq"] = np.array(self.signal_bc).T[0]
+
+            self.signal_bc = pd.DataFrame(D)
 
             self.allign_basecall_raw()
             # print(self.signal_bc)
