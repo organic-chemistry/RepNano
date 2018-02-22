@@ -381,9 +381,13 @@ if __name__ == '__main__':
                     return "T"
 
                 if args.correct_ref:
-                    data_y.append([mapping[transform(b[0])] for b in strand.transfered["seq_ref"]])
+                    data_y.append([[mapping[transform(b[0])],
+                                    mapping[transform(b2[0])],
+                                    mapping[transform(b[1])],
+                                    mapping[transform(b2[1])]]
+                                   for b, b2 in zip(strand.transfered["seq_ref"],
+                                                    strand.transfered["seq_ref_correction"])])
 
-                    data_y2.append([mapping[transform(b[1])] for b in strand.transfered["seq_ref"]])
                 else:
                     data_y.append([mapping[transform(b)] for b in strand.transfered["seq"]])
 
@@ -593,11 +597,11 @@ if __name__ == '__main__':
                                 r: r + subseq_size] if base != mapping["N"]]
                         if args.correct_ref:
                             y = []
-                            for b1, b2 in zip(d_y[s2][r: r + subseq_size], d_y2[s2][r: r + subseq_size]):
-                                if b1 != mapping["N"]:
-                                    y.append(b1)
-                                if args.supcorre and b2 != mapping["N"]:
-                                    y.append(b2)
+                            for b1 in d_y[s2][r: r + subseq_size]:
+                                for bb in b1:
+                                    if b1 != mapping["N"]:
+                                        y.append(bb)
+
                         if y == [] or len(y) > subseq_size:
                             continue
 

@@ -329,7 +329,7 @@ if __name__ == '__main__':
                     "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-second-half-B-TV-25/dataset.pick"]
             if args.target == "D":
                 args.all_datasets = [
-                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/D-dataset-w5/dataset.pick"]
+                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-D-TV-25/dataset.pick"]
             if args.target == "H_B":
                 args.all_datasets = [
                     "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human_B/dataset.pick"]
