@@ -75,6 +75,7 @@ class Dataset:
                 # print("p")
                 if maxf is not None and len(self.strands) >= maxf:
                     break
+                print(len(self.strand), maxf)
                 sp = line.split()
                 if len(sp) > 1 and sp[0].startswith("@ch"):
                     # print(sp[:4])
