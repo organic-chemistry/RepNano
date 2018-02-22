@@ -415,8 +415,9 @@ class Strand:
 
         return np.array(X), np.array(Y)
 
-    def plot_sequence(self, sign, window=[None, None], color="k", up=5):
-        sl = self.sampling_rate
+    def plot_sequence(self, sign, window=[None, None], color="k", up=5, sl=None):
+        if sl is None:
+            sl = self.sampling_rate
         for i, (s, l, m, base) in enumerate(zip(sign["start"], sign["length"], sign["mean"], sign["seq"])):
 
             if (window[0] is None or (window[0] is not None and s * sl > window[0])) and \
