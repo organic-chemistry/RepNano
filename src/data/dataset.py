@@ -213,10 +213,14 @@ class Strand:
                 else:
                     left = None
 
-            names = ["mean", "stdv", "length", "start"]
-            D = {n: np.array(v, dtype=np.float32) for n, v in zip(
-                names, np.array(self.signal_bc).T[1:])}
-            D["seq"] = np.array(self.signal_bc).T[0]
+            names = ["seq,""mean", "stdv", "length", "start"]
+            D = {na: [] for na in names}
+            for s in self.signal_bc:
+                for i, na in enumerate(names):
+                    D[na].append(s[i])
+
+            for name in names[1:]:
+                D[name] = np.array(D[name])
 
             self.csignal = self.signal_bc.copy()
 
