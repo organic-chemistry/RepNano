@@ -132,7 +132,7 @@ if __name__ == "__main__":
             if len("".join(transfered["seq"]).replace("N", "")) > maxlen:
                 transfered = transfered[:maxlen]
             # get the ref from transefered:
-            ref = strand.get_ref("".join(transfered["seq"]).replace("N", ""), correct=True)
+            ref = strand.get_ref("".join(transfered["seq"]).replace("N", ""), correct=False)
             if ref == "":
                 return [None, None]
             # allign the ref on the transefered
