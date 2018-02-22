@@ -507,7 +507,7 @@ class Strand:
                             elif "N" in stl_base[where - 1]:
                                 stl_base[where - 1] += stl_base[where][:1]
                                 stl_base[where - 1] = stl_base[where - 1].replace("N", "")
-
+                                print(stl_base[where - 1])
                                 stl_base[where] = stl_base[where][1:]
 
                         if len(stl_base[where]) > 2 and where < len(stl_base):
