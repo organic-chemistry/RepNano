@@ -400,7 +400,7 @@ class Strand:
 
         pylab.plot(*self.segmentation_to_plot(self.signal_bc, shift=self.imin))
 
-    def segmentation_to_plot(self, sign, shift=None, sl=6024):
+    def segmentation_to_plot(self, sign, shift=None, sl=6024, nanoraw=False):
         X = []
         Y = []
         s0 = 0
@@ -409,26 +409,25 @@ class Strand:
         else:
             shift = 0
         print("shift", shift)
-        for i, (s, l, m) in enumerate(zip(sign["start"], sign["length"], sign["mean"])):
+        f2 = "mean"
+        if nanoraw:
+            f2 = "norm_mean"
+        for i, (s, l, m) in enumerate(zip(sign["start"], sign["length"], sign[f2])):
             X += [(s - s0) * sl + shift, (s - s0 + l) * sl + shift]
             Y += [m, m]
 
         return np.array(X), np.array(Y)
 
-    def plot_sequence(self, sign, window=[None, None], color="k", up=5, sl=None):
+    def plot_sequence(self, sign, window=[None, None], color="k", up=5, sl=None, nanoraw=False):
         if sl is None:
             sl = self.sampling_rate
-        for i, (s, l, m, base) in enumerate(zip(sign["start"], sign["length"], sign["mean"], sign["seq"])):
 
-            if (window[0] is None or (window[0] is not None and s * sl > window[0])) and \
-                    (window[1] is None or (window[1] is not None and s * sl < window[1])):
-                pylab.text((s + l / 2) * sl - 1.5, m + up, base,
-                           color=color)  # 1.5 size of character
-
-    def plot_sequence_nanoraw(self, sign, window=[None, None], color="k", up=5, sl=None):
-        if sl is None:
-            sl = self.sampling_rate
-        for i, (s, l, m, base) in enumerate(zip(sign["start"], sign["length"], sign["norm_mean"], sign["base"])):
+        f2 = "mean"
+        f3 = "seq"
+        if nanoraw:
+            f2 = "norm_mean"
+            f3 = "base"
+        for i, (s, l, m, base) in enumerate(zip(sign["start"], sign["length"], sign[f2], sign[f3])):
 
             if (window[0] is None or (window[0] is not None and s * sl > window[0])) and \
                     (window[1] is None or (window[1] is not None and s * sl < window[1])):
