@@ -429,8 +429,8 @@ class Strand:
             f3 = "base"
         for i, (s, l, m, base) in enumerate(zip(sign["start"], sign["length"], sign[f2], sign[f3])):
 
-            if (window[0] is None or (window[0] is not None and s * sl > window[0])) and \
-                    (window[1] is None or (window[1] is not None and s * sl < window[1])):
+            if (window[0] is None or (window[0] is not None and (s + shift) * sl  > window[0])) and \
+                    (window[1] is None or (window[1] is not None and (s + shift) * sl < window[1])):
                 pylab.text((s + l / 2 + shift) * sl - 1.5, m + up, base,
                            color=color)  # 1.5 size of character
 
