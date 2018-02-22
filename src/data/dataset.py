@@ -213,7 +213,7 @@ class Strand:
                 else:
                     left = None
 
-            names = ["seq,""mean", "stdv", "length", "start"]
+            names = ["seq", "mean", "stdv", "length", "start"]
             D = {na: [] for na in names}
             for s in self.signal_bc:
                 for i, na in enumerate(names):
