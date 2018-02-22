@@ -599,7 +599,7 @@ if __name__ == '__main__':
                             y = []
                             for b1 in d_y[s2][r: r + subseq_size]:
                                 for bb in b1:
-                                    if b1 != mapping["N"]:
+                                    if bb != mapping["N"]:
                                         y.append(bb)
 
                         if y == [] or len(y) > subseq_size:
