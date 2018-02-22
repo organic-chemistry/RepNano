@@ -498,15 +498,23 @@ class Strand:
                         stl_base[where] += b
                         stl_base[where] = stl_base[where].replace("N", "")
                         # First try to transfer at previouss:
-                        # if len(stl_base[where]) > 2 and where > 0 and "N" in stl_base[where] :
-                        #
-                        #    stl_base[where + 1] = stl_base[where][2:] + \
-                        #        "N" * (2 - len(stl_base[where][2:]))
+                        if len(stl_base[where]) > 2 and where > 0:
+                            if "NN" in stl_base[where - 1]:
+
+                                #
+                                stl_base[where - 1] = stl_base[where][:2]
+                                stl_base[where] = stl_base[where][2:]
+                            elif "N" in stl_base[where - 1]:
+                                stl_base[where - 1] += stl_base[where][:1]
+                                stl_base[where - 1] = stl_base[where - 1].replace("N", "")
+
+                                stl_base[where] = stl_base[where][1:]
 
                         if len(stl_base[where]) > 2 and where < len(stl_base):
 
                             stl_base[where + 1] = stl_base[where][2:] + \
                                 "N" * (2 - len(stl_base[where][2:]))
+
                         stl_base[where] = stl_base[where][:2]
                         #print("After", stl_base[where])
                     else:
