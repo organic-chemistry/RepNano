@@ -495,12 +495,12 @@ if __name__ == '__main__':
                 seq = "".join(s.ntwk_align["seq"]).replace("N", "").replace("B", "T")
 
             if not args.no_allign:
-                s.ref_ntwk = s.get_ref(seq, pos=True, correct=True, find_ref=find_ref)
+                s.ref_ntwk = s.get_ref(seq, pos=True, correct=False, find_ref=find_ref)
                 s.score_ntwk = s.score(seq, s.ref_ntwk[0], maxlen=args.maxlen)
             # print(Score)
             # Score["ntwk_bc"].append(s.score("".join(s.ntwk_align["seq"]).replace("N",""),s.seq_from_basecall))
             if hasattr(s, "seq_from_basecall"):
-                s.ref_bc = s.get_ref(s.seq_from_basecall, pos=True, correct=True)
+                s.ref_bc = s.get_ref(s.seq_from_basecall, pos=True, correct=False)
 
                 s.score_mininion = s.score(s.seq_from_basecall, s.ref_bc[0], maxlen=args.maxlen)
 
