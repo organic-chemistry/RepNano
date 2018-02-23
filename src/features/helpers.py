@@ -115,7 +115,7 @@ def scale_clean3(X, normalise_window=True, window=500):
 
     ret[:, 2] = (ret[::, 3] - p75) / p75
 
-    return ret[:, : 2]
+    return ret[:, : 3]
 
 
 """
