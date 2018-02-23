@@ -242,6 +242,8 @@ if __name__ == '__main__':
     parser.add_argument('--supcorre', dest="supcorre", action='store_true')
     parser.add_argument('--waiting-time', dest="waiting_time", type=int, default=500)
     parser.add_argument('--norm2', dest="norm2", action="store_true")
+    parser.add_argument('--norm3', dest="norm3", action="store_true")
+
     parser.add_argument('--raw', dest="raw", action="store_true")
     parser.add_argument('--substitution', dest="substitution", action="store_true")
     parser.add_argument('--maxf', dest="maxf", type=int, default=None)
@@ -297,6 +299,8 @@ if __name__ == '__main__':
         n_feat = 1
     if args.norm2:
         n_feat = 2
+    if args.norm3:
+        n_feat = 3
 
     _, ntwk = build_models(args.size, nbase=args.Nbases - 4,
                            ctc_length=ctc_length,
@@ -334,7 +338,7 @@ if __name__ == '__main__':
     import sys
     sys.path.append("src/")
 
-    from ..features.helpers import scale_simple, scale_named, scale_named2
+    from ..features.helpers import scale_simple, scale_named, scale_named2, scale_named3
     root = "data/raw/20170908-R9.5/"
 
     def load_datasets(argdatasets):
@@ -346,6 +350,8 @@ if __name__ == '__main__':
         fnorm = scale_named
         if args.norm2:
             fnorm = scale_named2
+        if args.norm3:
+            fnorm = scale_named3
 
         data_x = []
         data_y = []
