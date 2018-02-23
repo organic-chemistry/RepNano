@@ -76,6 +76,12 @@ if __name__ == "__main__":
     if args.target == "T":
         samf = "BTF_AG_ONT_1_FAH14273_A-select.sam"
         rf = "AG-basecalled/"
+
+    if args.target == "TR":
+        samf = ""
+        rf = "../../../../../data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/AG_0-10/"
+        base_call = False
+
     if args.target == "B":
         samf = "BTF_AH_ONT_1_FAH14319_A-select.sam"
         rf = "AH-basecalled/"
