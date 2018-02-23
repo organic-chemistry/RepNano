@@ -157,14 +157,14 @@ class Strand:
         self.t_from_Minion = t_from_Minion
         self.sam_line_minion = sam_line_minion
 
-    def get_seq(self, f, correct=False, window_size=5):
+    def get_seq(self, f, correct=False, window_size=5, method="FW"):
         if f == "Minion":
             seq, sucess = get_seq(self.sam_line_minion, ref=REF, from_line=True, correct=correct)
             self.seq_from_minion = seq
             return self.seq_from_minion
 
         if f == "no_basecall":
-            sig = self.segmentation(w=window_size)
+            sig = self.segmentation(w=window_size, method=method)
             names = ["mean", "stdv", "length", "start"]
 
             return pd.DataFrame({n: sig[n] for n in names}).convert_objects(convert_numeric=True)
@@ -450,6 +450,10 @@ class Strand:
             raw, sl = get_raw(h5)
             #self.segments = tv_segment(raw, gamma=130, maxlen=45, minlen=2, sl=sl)
             self.segments = tv_segment(raw, gamma=25, maxlen=70, minlen=2, sl=sl)
+        elif method == "TV5":
+            raw, sl = get_raw(h5)
+            #self.segments = tv_segment(raw, gamma=130, maxlen=45, minlen=2, sl=sl)
+            self.segments = tv_segment(raw, gamma=5, maxlen=30, minlen=2, sl=sl)
 
         return self.segments
 

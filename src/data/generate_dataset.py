@@ -21,7 +21,7 @@ if __name__ == "__main__":
     parser.add_argument("--target", dest="target", type=str, default='T')
     parser.add_argument("--test-set", dest="test_set", action="store_true")
     parser.add_argument("--range", dest="range", nargs='+', default=[], type=float)
-    parser.add_argument("--method", dest="method", choices=["FW", "TV", "TV45", "TV25"])
+    parser.add_argument("--method", dest="method", choices=["FW", "TV", "TV45", "TV25", "TV5"])
 
     #parser.add_argument("--substitution", dest="substitution", default="T", type=str)
 
@@ -97,14 +97,14 @@ if __name__ == "__main__":
             minion = strand.get_seq(f="Minion", correct=True)
             return [bc, minion]
         else:
-            trans = strand.get_seq(f="no_basecall", window_size=args.window_size)
+            trans = strand.get_seq(
+                f="no_basecall", window_size=args.window_size, method=args.method)
+
             return [trans, None]
 
     print(len(D.strands))
     with Pool(n_cpu) as p:
         res = p.map(load_from_bc, D.strands)
-
-    # print(res)
 
     pop = []
     for istrand, (v, s) in enumerate(zip(res, D.strands)):
