@@ -349,15 +349,15 @@ if __name__ == '__main__':
                     "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-second-half-B-TV-5-cfalse/dataset.pick"]
             if args.target == "D":
                 args.all_datasets = [
-                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-D-TV-25/dataset.pick"]
+                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-D-TV-5/dataset.pick"]
             if args.target == "H_B":
                 args.all_datasets = [
-                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-H_B-TV-25/dataset.pick"]
+                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-H_B-TV-5/dataset.pick"]
                 dataset.REF = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human/all_chra.fa"
                 find_ref = False
             if args.target == "H_T":
                 args.all_datasets = [
-                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-H_T-TV-25/dataset.pick"]
+                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-H_T-TV-5/dataset.pick"]
                 dataset.REF = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human/all_chra.fa"
                 find_ref = False
     print(root)
