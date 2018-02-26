@@ -11,8 +11,8 @@ if __name__ == "__main__":
     import glob
     import os
     import sys
-    # f = open(os.devnull, 'w')
-    # sys.stdout = f
+    f = open(os.devnull, 'w')
+    sys.stdout = f
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--window-size', dest="window_size",
