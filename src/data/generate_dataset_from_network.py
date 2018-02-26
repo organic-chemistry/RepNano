@@ -11,8 +11,8 @@ if __name__ == "__main__":
     import glob
     import os
     import sys
-    #f = open(os.devnull, 'w')
-    #sys.stdout = f
+    f = open(os.devnull, 'w')
+    sys.stdout = f
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--window-size', dest="window_size",
@@ -80,7 +80,7 @@ if __name__ == "__main__":
 
     if args.target == "TR":
         samf = ""
-        rf = "../../../../../data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/AG_0-10/"
+        rf = "../../../../../../../data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/AG_0-10"
         base_call = False
 
     if args.target == "B":
