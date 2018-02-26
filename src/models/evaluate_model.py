@@ -340,7 +340,7 @@ if __name__ == '__main__':
                     "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-H_T-TV-25/dataset.pick"]
                 dataset.REF = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human/all_chra.fa"
                 find_ref = False
-        elif args.method == "T5":
+        elif args.method == "TV5":
             if args.target == "T":
                 args.all_datasets = [
                     "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-second-half-T-TV-5-cfalse/dataset.pick"]
