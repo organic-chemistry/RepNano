@@ -51,6 +51,7 @@ if __name__ == "__main__":
     parser.add_argument('--norm2', dest="norm2", action="store_true")
 
     parser.add_argument('--maxf', dest="maxf", type=int, default=None)
+    parser.add_argument("--method", dest="method", choices=["FW", "TV", "TV45", "TV25", "TV5"])
 
     # parser.add_argument("--substitution", dest="substitution", default="T", type=str)
 
@@ -163,7 +164,7 @@ if __name__ == "__main__":
 
     def load_from_bc(strand):
 
-        trans = strand.get_seq(f="no_basecall", window_size=args.window_size)
+        trans = strand.get_seq(f="no_basecall", window_size=args.window_size, method=args.method)
 
         return [trans, None]
 
