@@ -117,6 +117,7 @@ if __name__ == "__main__":
     D.populate(maxf=args.maxf, filter_not_alligned=True,
                filter_ch=ran, basecall=False, minion=False, arange=args.range,
                base_call=base_call)
+    print("Popul")
 
     from ..models.model import build_models
 
