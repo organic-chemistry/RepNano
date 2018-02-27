@@ -196,7 +196,7 @@ if __name__ == "__main__":
             from_ntwk = "".join(transfered["seq"]).replace("N", "")
             sub = "B"
             prop = from_ntwk.count("T") / (from_ntwk.count("T") + from_ntwk.count(sub) + 1e-7)
-            ref = strand.get_ref(from_ntwk.replace(sub, "T"), correct=True)
+            ref = strand.get_ref(from_ntwk.replace(sub, "T"), correct=False)
             # print(ref)
             if ref == "":
                 return [None, None]
