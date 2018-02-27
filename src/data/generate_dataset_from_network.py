@@ -175,7 +175,7 @@ if __name__ == "__main__":
         print(istrand)
         t = time.time()
         v = load_from_bc(s)
-        print("TV", time.time() - t)
+        print("TV", time.time() - t, len(v))
         t = time.time()
         s.transfered = v[0]
         output = s.analyse_segmentation(predictor, scale_named2(s.transfered))[::, 0]
