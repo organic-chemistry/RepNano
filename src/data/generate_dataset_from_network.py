@@ -234,18 +234,17 @@ if __name__ == "__main__":
     # except:
     #     return [None, None]
 
-    if samf != "":
-        for s in D.strands:
+    for s in D.strands:
 
-            t = time.time()
-            v = compute_attributes(s)
-            print("Cattr", time.time() - t)
-            if v[0] is not None:
-                s.transfered = v[0]
-                s.bc_score = v[1]
-                s.confirm_score = v[2]
-            else:
-                s.transfered = None
+        t = time.time()
+        v = compute_attributes(s)
+        print("Cattr", time.time() - t)
+        if v[0] is not None:
+            s.transfered = v[0]
+            s.bc_score = v[1]
+            s.confirm_score = v[2]
+        else:
+            s.transfered = None
     import _pickle as cPickle
     with open(args.name, "wb") as fich:
         cPickle.dump(D, fich)
