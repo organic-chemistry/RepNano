@@ -11,8 +11,8 @@ if __name__ == "__main__":
     import glob
     import os
     import sys
-    #f = open(os.devnull, 'w')
-    #sys.stdout = f
+    f = open(os.devnull, 'w')
+    sys.stdout = f
     import time
 
     parser = argparse.ArgumentParser()
@@ -175,7 +175,7 @@ if __name__ == "__main__":
         print(istrand)
         t = time.time()
         v = load_from_bc(s)
-        print("TV", time.time() - t, len(v))
+        print("TV", time.time() - t, len(v[0]))
         t = time.time()
         s.transfered = v[0]
         output = s.analyse_segmentation(predictor, scale_named2(s.transfered))[::, 0]
