@@ -11,8 +11,9 @@ if __name__ == "__main__":
     import glob
     import os
     import sys
-    f = open(os.devnull, 'w')
-    sys.stdout = f
+    #f = open(os.devnull, 'w')
+    #sys.stdout = f
+    import time
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--window-size', dest="window_size",
@@ -171,10 +172,15 @@ if __name__ == "__main__":
 
     # print(res)
     for istrand, s in enumerate(D.strands):
-
+        print(istrand)
+        t = time.time()
         v = load_from_bc(s)
+        print("TV", time.time() - t)
+        t = time.time()
         s.transfered = v[0]
         output = s.analyse_segmentation(predictor, scale_named2(s.transfered))[::, 0]
+        print("predict", time.time() - t)
+
         # print(output.shape, len(s.transfered))
         s.transfered["seq"] = [s + "N" for s in output]
 
@@ -230,7 +236,10 @@ if __name__ == "__main__":
 
     if samf != "":
         for s in D.strands:
+
+            t = time.time()
             v = compute_attributes(s)
+            print("Cattr", time.time() - t)
             if v[0] is not None:
                 s.transfered = v[0]
                 s.bc_score = v[1]

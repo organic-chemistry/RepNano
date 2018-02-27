@@ -4,7 +4,7 @@ if __name__ == "__main__":
     import os
     import numpy as np
     # rom subprocess import PIPE
-
+    # OMP_NUM_THREADS=1 THEANO_FLAGS=mode=FAST_COMPILE
     parser = argparse.ArgumentParser()
     parser.add_argument('--command-line', dest="command_line", type=str)
     parser.add_argument("--n-cpu", dest="n_cpu", type=int, default=None)
