@@ -49,7 +49,7 @@ class Dataset:
             if arange == []:
                 self.strands = [Strand(fn) for fn in lstrand]
             else:
-                tot = len(lstrand):
+                tot = len(lstrand)
                 self.strands = []
                 for ifn, fn in enumerate(lstrands):
                     if ifn / tot > arange[0] and ifn / tot < arange[1]:
