@@ -369,10 +369,6 @@ if __name__ == '__main__':
         json.dump(argparse_dict, fp, indent=True)
     # print(args.filter)
 
-    if keras.backend.backend() != 'tensorflow':
-        print("Must use tensorflow to train")
-        exit()
-
     if args.Nbases == 4:
         mapping = {"A": 0, "C": 1, "G": 2, "T": 3, "N": 4}  # Modif
     elif args.Nbases == 5:
