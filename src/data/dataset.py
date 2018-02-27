@@ -51,7 +51,7 @@ class Dataset:
             else:
                 tot = len(lstrand)
                 self.strands = []
-                for ifn, fn in enumerate(lstrands):
+                for ifn, fn in enumerate(lstrand):
                     if ifn / tot > arange[0] and ifn / tot < arange[1]:
                         self.strands.append(Strand(fn))
             return
