@@ -263,10 +263,10 @@ if __name__ == '__main__':
         if args.method == "FW":
             if args.target == "T":
                 args.all_datasets = [
-                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-T-dataset2-w8-second-half/dataset.pick"]
+                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-second-half-T-FW-cfalse/dataset.pick"]
             if args.target == "B":
                 args.all_datasets = [
-                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-B-dataset2-w5-second-half/dataset.pick"]
+                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-second-half-B-FW-cfalse/dataset.pick"]
             if args.target == "D":
                 args.all_datasets = [
                     "/data/bioinfo@borvo/users/jarbona/deepnano5bases/D-dataset-w5/dataset.pick"]
