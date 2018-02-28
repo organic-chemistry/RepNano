@@ -436,7 +436,7 @@ if __name__ == '__main__':
         if args.norm2:
             fnorm = scale_named2
 
-        if args.norm2:
+        if args.norm3:
             fnorm = scale_named3
 
         data_x = []
