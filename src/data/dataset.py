@@ -29,7 +29,7 @@ class Dataset:
     def __init__(self, samfile, root_files, metadata=""):
         self.root_files = root_files
         self.samfile = samfile
-        self.metadata = ""
+        self.metadata = metadata
         self.substitution = "T"
 
     def populate(self, maxf=None, minion=True, basecall=True,
