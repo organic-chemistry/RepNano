@@ -376,6 +376,10 @@ if __name__ == '__main__':
                                   length in zip(strand.transfered["start"], strand.transfered["length"])]
 
                 def transform(b):
+
+                    if args.Nbases == 4 and b not in ["N", "A", "T", "C", "G"]:
+                        return "T"
+
                     if b != "T":
                         return b
 
