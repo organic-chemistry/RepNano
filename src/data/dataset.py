@@ -465,9 +465,13 @@ class Strand:
 
         return self.segments
 
-    def analyse_segmentation(self, ntwk, signal, no2=False):
+    def analyse_segmentation(self, ntwk, signal, no2=False, already_pre=None):
 
-        pre = ntwk.predict(signal[np.newaxis, ::, ::])
+        if already_pre is None:
+
+            pre = ntwk.predict(signal[np.newaxis, ::, ::])
+        else:
+            pre = already_pre
         if no2:
             #print(pre[0].shape, signal.shape)
             o1, o2 = pre
