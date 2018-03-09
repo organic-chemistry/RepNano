@@ -108,7 +108,7 @@ if __name__ == "__main__":
     D.metadata = argparse_dict
     D.substitution = args.target
 
-    maxlen = 20000
+    maxlen = 100000
 
     ran = range(1, 11)
     if args.test_set:
@@ -213,6 +213,9 @@ if __name__ == "__main__":
                 if prop < 0.5:
                     s1 = s1.replace("T", sub)
                     s2 = s2.replace("T", sub)
+                else:
+                    s1 = s1.replace(sub, "T")
+                    s2 = s2.replace(sub, "T")
                 if s1 != "N":
                     return s1 + s2
                 return s2 + s1
