@@ -442,7 +442,7 @@ class Strand:
 
                 if not empty:
                     if base == "N" or base == "NN":
-                        pass
+                        continue
                 pylab.text((s + l / 2 + shift) * sl - 1.5, m + up, base,
                            color=color)  # 1.5 size of character
 
