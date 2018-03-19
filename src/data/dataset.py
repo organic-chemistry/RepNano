@@ -426,7 +426,7 @@ class Strand:
 
         return np.array(X), np.array(Y)
 
-    def plot_sequence(self, sign, window=[None, None], color="k", up=5, sl=None, nanoraw=False, shift=0):
+    def plot_sequence(self, sign, window=[None, None], color="k", up=5, sl=None, nanoraw=False, shift=0, empty=True):
         if sl is None:
             sl = self.sampling_rate
 
@@ -439,6 +439,10 @@ class Strand:
 
             if (window[0] is None or (window[0] is not None and (s + shift) * sl  > window[0])) and \
                     (window[1] is None or (window[1] is not None and (s + shift) * sl < window[1])):
+
+                if not empty:
+                    if base == "N" or base == "NN":
+                        pass
                 pylab.text((s + l / 2 + shift) * sl - 1.5, m + up, base,
                            color=color)  # 1.5 size of character
 

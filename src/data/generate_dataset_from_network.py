@@ -108,7 +108,7 @@ if __name__ == "__main__":
     D.metadata = argparse_dict
     D.substitution = args.target
 
-    maxlen = 50000
+    maxlen = 20000
 
     ran = range(1, 11)
     if args.test_set:
@@ -168,7 +168,7 @@ if __name__ == "__main__":
 
         trans = strand.get_seq(f="no_basecall", window_size=args.window_size, method=args.method)
 
-        return [trans, None]
+        return [trans[:int(4 * maxlen)], None]
 
     # print(res)
     for istrand, s in enumerate(D.strands):
