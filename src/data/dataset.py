@@ -416,7 +416,7 @@ class Strand:
             s0 = sign["start"][0]
         else:
             shift = 0
-        print("shift", shift)
+        #print("shift", shift)
         f2 = "mean"
         if nanoraw:
             f2 = "norm_mean"
