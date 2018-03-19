@@ -435,6 +435,7 @@ class Strand:
         if nanoraw:
             f2 = "norm_mean"
             f3 = "base"
+        seq = ""
         for i, (s, l, m, base) in enumerate(zip(sign["start"], sign["length"], sign[f2], sign[f3])):
 
             if (window[0] is None or (window[0] is not None and (s + shift) * sl  > window[0])) and \
@@ -446,6 +447,8 @@ class Strand:
                     base = base.replace("N", "")
                 pylab.text((s + l / 2 + shift) * sl - 1.5, m + up, base,
                            color=color)  # 1.5 size of character
+                seq += base
+        return seq
 
     def segmentation(self, chem="rf", w=5, prefix="", method="FW"):
         h5 = h5py.File(prefix + self.filename, "r")
