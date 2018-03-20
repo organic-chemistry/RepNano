@@ -304,10 +304,10 @@ if __name__ == '__main__':
         elif args.method == "TVb":
             if args.target == "T":
                 args.all_datasets = [
-                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-second-half-T-TVb/dataset.pick"]
+                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-second-half-T-TVb-cfalse/dataset.pick"]
             if args.target == "B":
                 args.all_datasets = [
-                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-second-half-B-TVb/dataset.pick"]
+                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-second-half-B-TVb-cfalse/dataset.pick"]
             if args.target == "D":
                 args.all_datasets = [
                     "/data/bioinfo@borvo/users/jarbona/deepnano5bases/D-dataset-w5/dataset.pick"]
