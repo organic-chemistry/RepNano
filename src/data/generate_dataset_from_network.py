@@ -199,6 +199,7 @@ if __name__ == "__main__":
         ref = strand.get_ref(from_ntwk.replace(sub, "T"), correct=False)
         # print(ref)
         if ref == "":
+            print("Not alligned")
             return [None, None]
         # allign the ref on the transefered
         bc_strand = from_ntwk.replace(sub, "T")
