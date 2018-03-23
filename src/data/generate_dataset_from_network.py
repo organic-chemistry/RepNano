@@ -187,50 +187,51 @@ if __name__ == "__main__":
     data_x = []
 
     def compute_attributes(strand):
-        try:
-            transfered = strand.transfered
-            # strand.transfered_bc = copy.deepcopy(transfered)
-            if len("".join(transfered["seq"]).replace("N", "")) > maxlen:
-                transfered = transfered[:maxlen]
-            # get the ref from transefered:
-            from_ntwk = "".join(transfered["seq"]).replace("N", "")
-            sub = "B"
-            prop = from_ntwk.count("T") / (from_ntwk.count("T") + from_ntwk.count(sub) + 1e-7)
-            ref = strand.get_ref(from_ntwk.replace(sub, "T"), correct=False)
-            # print(ref)
-            if ref == "":
-                return [None, None]
-            # allign the ref on the transefered
-            bc_strand = from_ntwk.replace(sub, "T")
-            al = strand.score(bc_strand, ref, all_info=True)
-            # strand.score_bc_ref = al[2] / len(bc_strand)
-
-            mapped_ref, correction = strand.give_map(
-                "".join(transfered["seq"]).replace(sub, "T"), al[:2])
-
-            def order(s1, s2):
-
-                if prop < 0.5:
-                    s1 = s1.replace("T", sub)
-                    s2 = s2.replace("T", sub)
-                else:
-                    s1 = s1.replace(sub, "T")
-                    s2 = s2.replace(sub, "T")
-                if s1 != "N":
-                    return s1 + s2
-                return s2 + s1
-
-            new_ref = np.array([order(s, s1)
-                                for s, s1 in zip(mapped_ref[::2], mapped_ref[1::2])])
-            transfered["seq_ref"] = new_ref
-
-            transfered["seq_ref_correction"] = np.array([order(s, s1)
-                                                         for s, s1 in zip(correction[::2], correction[1::2])])
-            strand.changed = True
-            return transfered, al[2] / len(bc_strand), strand.score("".join(transfered["seq_ref"]).replace(
-                "N", "").replace(sub, "T"), ref, all_info=False), len(ref)
-        except:
+        # try:
+        transfered = strand.transfered
+        # strand.transfered_bc = copy.deepcopy(transfered)
+        if len("".join(transfered["seq"]).replace("N", "")) > maxlen:
+            transfered = transfered[:maxlen]
+        # get the ref from transefered:
+        from_ntwk = "".join(transfered["seq"]).replace("N", "")
+        sub = "B"
+        prop = from_ntwk.count("T") / (from_ntwk.count("T") + from_ntwk.count(sub) + 1e-7)
+        ref = strand.get_ref(from_ntwk.replace(sub, "T"), correct=False)
+        # print(ref)
+        if ref == "":
             return [None, None]
+        # allign the ref on the transefered
+        bc_strand = from_ntwk.replace(sub, "T")
+        al = strand.score(bc_strand, ref, all_info=True)
+        # strand.score_bc_ref = al[2] / len(bc_strand)
+
+        mapped_ref, correction = strand.give_map(
+            "".join(transfered["seq"]).replace(sub, "T"), al[:2])
+
+        def order(s1, s2):
+
+            if prop < 0.5:
+                s1 = s1.replace("T", sub)
+                s2 = s2.replace("T", sub)
+            else:
+                s1 = s1.replace(sub, "T")
+                s2 = s2.replace(sub, "T")
+            if s1 != "N":
+                return s1 + s2
+            return s2 + s1
+
+        new_ref = np.array([order(s, s1)
+                            for s, s1 in zip(mapped_ref[::2], mapped_ref[1::2])])
+        transfered["seq_ref"] = new_ref
+
+        transfered["seq_ref_correction"] = np.array([order(s, s1)
+                                                     for s, s1 in zip(correction[::2], correction[1::2])])
+        strand.changed = True
+        return transfered, al[2] / len(bc_strand), strand.score("".join(transfered["seq_ref"]).replace(
+            "N", "").replace(sub, "T"), ref, all_info=False), len(ref)
+        # except:
+
+        #    return [None, None]
 
     # strand.transfered_seq = transfered
 
