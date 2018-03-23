@@ -228,6 +228,7 @@ if __name__ == "__main__":
         transfered["seq_ref_correction"] = np.array([order(s, s1)
                                                      for s, s1 in zip(correction[::2], correction[1::2])])
         strand.changed = True
+        print("ALL")
         return transfered, al[2] / len(bc_strand), strand.score("".join(transfered["seq_ref"]).replace(
             "N", "").replace(sub, "T"), ref, all_info=False), len(ref)
         # except:
