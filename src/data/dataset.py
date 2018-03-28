@@ -516,7 +516,7 @@ class Strand:
 
             return np.concatenate((output, signal), axis=-1)
 
-    def transfer(self, root_signal, signal_to_label, center_of_mass=False, seqt="seq"):
+    def transfer(self, root_signal, signal_to_label, center_of_mass=False, seqt="seq", allinfos=False):
         # Compute center:
 
         r_center = root_signal["start"] + root_signal["length"] / 2
@@ -576,13 +576,22 @@ class Strand:
                         stl_base[where] = b
 
         new_signal = []
-        for s, m, std, l, start in zip(stl_base, signal_to_label["mean"], signal_to_label["stdv"],
-                                       signal_to_label["length"], signal_to_label["start"]):
-            new_signal.append([s, m, std, l, start])
+        if not allinfos:
+            for s, m, std, l, start in zip(stl_base, signal_to_label["mean"], signal_to_label["stdv"],
+                                           signal_to_label["length"], signal_to_label["start"]):
+                new_signal.append([s, m, std, l, start])
 
-        names = [seqt, "mean", "stdv", "length", "start"]
-        return pd.DataFrame({n: v for n, v in zip(
-            names, np.array(new_signal).T)}).convert_objects(convert_numeric=True)
+            names = [seqt, "mean", "stdv", "length", "start"]
+            return pd.DataFrame({n: v for n, v in zip(
+                names, np.array(new_signal).T)}).convert_objects(convert_numeric=True)
+        else:
+            for s, m, std, l, start, alls in zip(stl_base, signal_to_label["mean"], signal_to_label["stdv"],
+                                                 signal_to_label["length"], signal_to_label["start"], signal_to_label["all"]):
+                new_signal.append([s, m, std, l, start, alls])
+
+            names = [seqt, "mean", "stdv", "length", "start", "all"]
+            return pd.DataFrame({n: v for n, v in zip(
+                names, np.array(new_signal).T)}).convert_objects(convert_numeric=True)
 
 """
 ref = "../../data/processed/results/ctc_20170908-R9.5/BTF_AG_ONT_1_FAH14273_A-select_pass_test_T.sam"

@@ -134,7 +134,7 @@ if __name__ == "__main__":
             strand.segmentation(w=args.window_size, method=args.method,
                                 allinfos=args.allinfos, maxlen=args.maxlen, minlen=args.minlen)
 
-            transfered = strand.transfer(strand.signal_bc, strand.segments)
+            transfered = strand.transfer(strand.signal_bc, strand.segments, allinfos=args.allinfos)
             # strand.transfered_bc = copy.deepcopy(transfered)
             if len("".join(transfered["seq"]).replace("N", "")) > maxlen:
                 transfered = transfered[:maxlen]
