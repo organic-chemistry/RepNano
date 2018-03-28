@@ -243,7 +243,8 @@ if __name__ == '__main__':
     parser.add_argument('--waiting-time', dest="waiting_time", type=int, default=500)
     parser.add_argument('--norm2', dest="norm2", action="store_true")
     parser.add_argument('--norm3', dest="norm3", action="store_true")
-
+    parser.add_argument('--allinfos', dest="allinfos", action="store_true")
+    parser.add_argument('--maxleninf', dest="maxleninf", type=int, default=35)
     parser.add_argument('--raw', dest="raw", action="store_true")
     parser.add_argument('--substitution', dest="substitution", action="store_true")
     parser.add_argument('--maxf', dest="maxf", type=int, default=None)
@@ -302,6 +303,9 @@ if __name__ == '__main__':
     if args.norm3:
         n_feat = 3
 
+    if args.allinfos:
+        n_feat = args.maxleninf
+
     _, ntwk = build_models(args.size, nbase=args.Nbases - 4,
                            ctc_length=ctc_length,
                            input_length=input_length, n_output=n_output_network,
@@ -352,6 +356,9 @@ if __name__ == '__main__':
             fnorm = scale_named2
         if args.norm3:
             fnorm = scale_named3
+
+        if args.norm4:
+            fnorm = lambda x scale_named4(x, maxlen=args.maxleninf)
 
         data_x = []
         data_y = []
