@@ -358,7 +358,7 @@ if __name__ == '__main__':
             fnorm = scale_named3
 
         if args.allinfos:
-            fnorm = lambda x: scale_named4(x, maxlen=args.maxleninf)
+            fnorm = lambda x: scale_named4(x, maxleninf=args.maxleninf)
 
         data_x = []
         data_y = []
