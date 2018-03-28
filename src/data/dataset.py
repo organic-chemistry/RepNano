@@ -450,30 +450,32 @@ class Strand:
                 seq += base
         return seq
 
-    def segmentation(self, chem="rf", w=5, prefix="", method="FW", minlen=2, maxlen=70, gamma=70):
+    def segmentation(self, chem="rf", w=5, prefix="", method="FW", minlen=2, maxlen=70, gamma=70, allinfos=False):
         h5 = h5py.File(prefix + self.filename, "r")
         if method == "FW":
             self.segments = extract_events(h5, chem="rf", window_size=w, old=False)
         elif method == "TV":
             raw, sl = get_raw(h5)
             #self.segments = tv_segment(raw, gamma=130, maxlen=45, minlen=2, sl=sl)
-            self.segments = tv_segment(raw, gamma=gamma, maxlen=maxlen, minlen=minlen, sl=sl)
+            self.segments = tv_segment(raw, gamma=gamma, maxlen=maxlen,
+                                       minlen=minlen, sl=sl, allinfos=allinfos)
         elif method == "TVb":
             raw, sl = get_raw(h5)
             #self.segments = tv_segment(raw, gamma=130, maxlen=45, minlen=2, sl=sl)
-            self.segments = tv_segment(raw, gamma=gamma, maxlen=100, minlen=1, sl=sl)
+            self.segments = tv_segment(raw, gamma=gamma, maxlen=100,
+                                       minlen=1, sl=sl, allinfos=allinfos)
         elif method == "TV45":
             raw, sl = get_raw(h5)
             #self.segments = tv_segment(raw, gamma=130, maxlen=45, minlen=2, sl=sl)
-            self.segments = tv_segment(raw, gamma=45, maxlen=70, minlen=2, sl=sl)
+            self.segments = tv_segment(raw, gamma=45, maxlen=70, minlen=2, sl=sl, allinfos=allinfos)
         elif method == "TV25":
             raw, sl = get_raw(h5)
             #self.segments = tv_segment(raw, gamma=130, maxlen=45, minlen=2, sl=sl)
-            self.segments = tv_segment(raw, gamma=25, maxlen=70, minlen=2, sl=sl)
+            self.segments = tv_segment(raw, gamma=25, maxlen=70, minlen=2, sl=sl, allinfos=allinfos)
         elif method == "TV5":
             raw, sl = get_raw(h5)
             #self.segments = tv_segment(raw, gamma=130, maxlen=45, minlen=2, sl=sl)
-            self.segments = tv_segment(raw, gamma=5, maxlen=30, minlen=2, sl=sl)
+            self.segments = tv_segment(raw, gamma=5, maxlen=30, minlen=2, sl=sl, allinfos=allinfos)
 
         return self.segments
 

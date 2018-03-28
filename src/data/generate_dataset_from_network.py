@@ -11,8 +11,8 @@ if __name__ == "__main__":
     import glob
     import os
     import sys
-    #f = open(os.devnull, 'w')
-    #sys.stdout = f
+    f = open(os.devnull, 'w')
+    sys.stdout = f
     import time
 
     parser = argparse.ArgumentParser()

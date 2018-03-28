@@ -282,13 +282,14 @@ def find_best_partition(signal, gamma=0.1, maxlen=10, minlen=1):
 
 
 @jit
-def return_start_length_mean_std(partition, signal):
+def return_start_length_mean_std(partition, signal, allinfos=False):
     start = []
     length = []
     mean = []
     std = []
     r = len(signal) - 1
     l = partition[r]
+    allinfo = []
     while r > 0:
         # print(l,r)
         start.append(l + 1)
@@ -298,17 +299,24 @@ def return_start_length_mean_std(partition, signal):
         length.append(r - l)
         mean.append(np.mean(signal[start[-1]:start[-1] + length[-1]]))
         std.append(np.sum((signal[start[-1]:start[-1] + length[-1]] - mean[-1])**2)**0.5)
+        allinfo.append(signal[start[-1]:start[-1] + length[-1]])
         r = l
         l = partition[r]
-    return start[::-1], length[::-1], mean[::-1], std[::-1]
+    if allinfos:
+        return start[::-1], length[::-1], mean[::-1], std[::-1], allinfo[::-1]
+    else:
+        return start[::-1], length[::-1], mean[::-1], std[::-1], allinfo[::-1]
 
 
-def tv_segment(signal, gamma=0.1, maxlen=10, minlen=1, sl=6024):
+def tv_segment(signal, gamma=0.1, maxlen=10, minlen=1, sl=6024, allinfos=False):
     p = find_best_partition(np.array(signal, dtype=np.float32),
                             gamma=gamma, maxlen=maxlen, minlen=minlen)
-    r = return_start_length_mean_std(p, signal)
+    r = return_start_length_mean_std(p, signal, allinfos)
 
-    return pd.DataFrame({"start": np.array(r[0]) / sl, "length": np.array(r[1]) / sl, "mean": r[2], "stdv": r[3]})
+    if not allinfos:
+        return pd.DataFrame({"start": np.array(r[0]) / sl, "length": np.array(r[1]) / sl, "mean": r[2], "stdv": r[3]})
+    else:
+        return pd.DataFrame({"start": np.array(r[0]) / sl, "length": np.array(r[1]) / sl, "mean": r[2], "stdv": r[3], "all": r[4]})
 
 
 def generate_events(ss1, ss2, peaks, sample_rate, raw):
