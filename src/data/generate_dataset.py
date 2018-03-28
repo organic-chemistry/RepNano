@@ -14,7 +14,12 @@ if __name__ == "__main__":
     parser.add_argument('--window-size', dest="window_size", type=int, choices=[4, 5, 8], default=5)
     parser.add_argument('--root', type=str, default="data/training/")
     parser.add_argument('--test', dest='test', action='store_true')
+    parser.add_argument('--allinfos', dest='allinfos', action='store_true')
+
     parser.add_argument('--size', type=int, default=20)
+    parser.add_argument('--maxlen', type=int, default=35)
+    parser.add_argument('--minlen', type=int, default=1)
+
     parser.add_argument("--metadata", type=str, default=None)
     parser.add_argument("--n-cpu", dest="n_cpu", type=int, default=None)
     parser.add_argument("--name", dest="name", type=str, default='dataset.pick')
@@ -126,7 +131,8 @@ if __name__ == "__main__":
 
     def compute_attributes(strand):
         try:
-            strand.segmentation(w=args.window_size, method=args.method)
+            strand.segmentation(w=args.window_size, method=args.method,
+                                allinfos=args.allinfos, maxlen=args.maxlen, minlen=args.minlen)
 
             transfered = strand.transfer(strand.signal_bc, strand.segments)
             # strand.transfered_bc = copy.deepcopy(transfered)
