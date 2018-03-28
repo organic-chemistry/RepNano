@@ -64,8 +64,10 @@ def scale_named3(X, normalise_window=True):
 
 def scale_named4(X, normalise_window=True, maxleninf=35):
     X = np.zeros((len(X), maxleninf))
-    for iis, s in enumerate(X["all"]):
+    iis = 0
+    for s in X["all"]:
         X[iis][:len(s)] = s
+        iis += 1
     X -= np.median(X)
     return X
 
