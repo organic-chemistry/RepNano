@@ -63,13 +63,14 @@ def scale_named3(X, normalise_window=True):
 
 
 def scale_named4(X, normalise_window=True, maxleninf=35):
-    X = np.zeros((len(X), maxleninf))
+    Xd = np.zeros((len(X), maxleninf))
     iis = 0
+
     for s in X["all"]:
-        X[iis][:len(s)] = s
+        Xd[iis][:len(s)] = s
         iis += 1
-    X -= np.median(X)
-    return X
+    Xd -= np.median(Xd)
+    return Xd
 
 
 def scale_clean(X, normalise_window=True):
