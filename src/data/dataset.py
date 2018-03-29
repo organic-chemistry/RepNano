@@ -459,7 +459,7 @@ class Strand:
             #self.segments = tv_segment(raw, gamma=130, maxlen=45, minlen=2, sl=sl)
             self.segments = tv_segment(raw, gamma=gamma, maxlen=maxlen,
                                        minlen=minlen, sl=sl, allinfos=allinfos)
-            #print(self.segments.columns)
+            # print(self.segments.columns)
         elif method == "TVb":
             raw, sl = get_raw(h5)
             #self.segments = tv_segment(raw, gamma=130, maxlen=45, minlen=2, sl=sl)
@@ -590,9 +590,9 @@ class Strand:
                                                  signal_to_label["length"], signal_to_label["start"], signal_to_label["all"]):
                 new_signal.append([s, m, std, l, start, alls])
 
-            names = [seqt, "mean", "stdv", "length", "start", "all"]
-            return pd.DataFrame({n: v for n, v in zip(
-                names, np.array(new_signal).T)}).convert_objects(convert_numeric=True)
+            names = ["mean", "stdv", "length", "start", "all"]
+            return pd.DataFrame({seqt: np.array(new_signal).T[0]} + {n: np.array(v) for n, v in zip(
+                names, np.array(new_signal).T[1:])})
 
 """
 ref = "../../data/processed/results/ctc_20170908-R9.5/BTF_AG_ONT_1_FAH14273_A-select_pass_test_T.sam"
