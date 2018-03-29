@@ -418,7 +418,7 @@ if __name__ == '__main__':
         tdata_x, tdata_y, tdata_y2 = data_x, data_y, data_y2
 
     print("done", len(data_x), len(tdata_x))
-    exit()
+    # exit()
     sys.stdout.flush()
     # rint(data_x, data_x[0].shape)
     # print(len(refs[0]),len(data_x[0]),len(data_y[0]))

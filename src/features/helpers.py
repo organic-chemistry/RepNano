@@ -65,7 +65,7 @@ def scale_named3(X, normalise_window=True):
 def scale_named4(X, normalise_window=True, maxleninf=35):
     Xd = np.zeros((len(X), maxleninf))
     iis = 0
-    print(X.columns)
+    # print(X.columns)
     for s in X["all"]:
         Xd[iis][:len(s)] = s
         iis += 1
