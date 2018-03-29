@@ -305,14 +305,14 @@ def return_start_length_mean_std(partition, signal, allinfos=False):
     if allinfos:
         return start[::-1], length[::-1], mean[::-1], std[::-1], allinfo[::-1]
     else:
-        return start[::-1], length[::-1], mean[::-1], std[::-1], allinfo[::-1]
+        return start[::-1], length[::-1], mean[::-1], std[::-1]
 
 
 def tv_segment(signal, gamma=0.1, maxlen=10, minlen=1, sl=6024, allinfos=False):
     p = find_best_partition(np.array(signal, dtype=np.float32),
                             gamma=gamma, maxlen=maxlen, minlen=minlen)
     r = return_start_length_mean_std(p, signal, allinfos)
-
+    print(allinfos)
     if not allinfos:
         return pd.DataFrame({"start": np.array(r[0]) / sl, "length": np.array(r[1]) / sl, "mean": r[2], "stdv": r[3]})
     else:
