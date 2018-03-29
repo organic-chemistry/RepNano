@@ -586,13 +586,17 @@ class Strand:
             return pd.DataFrame({n: v for n, v in zip(
                 names, np.array(new_signal).T)}).convert_objects(convert_numeric=True)
         else:
+            Alls = []
             for s, m, std, l, start, alls in zip(stl_base, signal_to_label["mean"], signal_to_label["stdv"],
                                                  signal_to_label["length"], signal_to_label["start"], signal_to_label["all"]):
-                new_signal.append([s, m, std, l, start, alls])
+                new_signal.append([s, m, std, l, start])
+                Alls.append(alls)
 
-            names = ["mean", "stdv", "length", "start", "all"]
-            return pd.DataFrame({seqt: np.array(new_signal).T[0]} + {n: np.array(v) for n, v in zip(
-                names, np.array(new_signal).T[1:])})
+            names = [seqt, "mean", "stdv", "length", "start"]
+            df = pd.DataFrame({n: v for n, v in zip(
+                names, np.array(new_signal).T)}).convert_objects(convert_numeric=True)
+            df["all"] = Alls
+            return df
 
 """
 ref = "../../data/processed/results/ctc_20170908-R9.5/BTF_AG_ONT_1_FAH14273_A-select_pass_test_T.sam"
