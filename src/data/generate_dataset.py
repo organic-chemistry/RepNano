@@ -135,6 +135,7 @@ if __name__ == "__main__":
                                 allinfos=args.allinfos, maxlen=args.maxlen, minlen=args.minlen)
             print(strand.segments.columns)
             transfered = strand.transfer(strand.signal_bc, strand.segments, allinfos=args.allinfos)
+            print(transfered.columns)
             # strand.transfered_bc = copy.deepcopy(transfered)
             if len("".join(transfered["seq"]).replace("N", "")) > maxlen:
                 transfered = transfered[:maxlen]
