@@ -166,7 +166,7 @@ if __name__ == "__main__":
             "N", ""), ref, all_info=False), len(ref)
         # except:
         #    return [None, None]
-
+    alligned = 0
     if samf != "":
         with Pool(n_cpu) as p:
             res = p.map(compute_attributes, D.strands)
@@ -176,8 +176,10 @@ if __name__ == "__main__":
                 s.bc_score = v[1]
                 s.confirm_score = v[2]
                 del(s.signal_bc)
+                alligned += 1
             else:
                 s.transfered = None
+    print("Nmol alligned", alligned)
     import _pickle as cPickle
     with open(args.name, "wb") as fich:
         cPickle.dump(D, fich)
