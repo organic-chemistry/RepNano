@@ -316,7 +316,10 @@ def tv_segment(signal, gamma=0.1, maxlen=10, minlen=1, sl=6024, allinfos=False):
         return pd.DataFrame({"start": np.array(r[0]) / sl, "length": np.array(r[1]) / sl, "mean": r[2], "stdv": r[3]})
     else:
         print("la")
-        return pd.DataFrame({"start": np.array(r[0]) / sl, "length": np.array(r[1]) / sl, "mean": r[2], "stdv": r[3], "all": r[4]})
+        d = pd.DataFrame({"start": np.array(
+            r[0]) / sl, "length": np.array(r[1]) / sl, "mean": r[2], "stdv": r[3], "all": r[4]})
+        print(d.columns)
+        return d
 
 
 def generate_events(ss1, ss2, peaks, sample_rate, raw):
