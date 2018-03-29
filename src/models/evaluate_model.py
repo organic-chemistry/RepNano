@@ -233,6 +233,8 @@ if __name__ == '__main__':
     parser.add_argument('--norm2', dest="norm2", action="store_true")
     parser.add_argument('--norm3', dest="norm3", action="store_true")
 
+    parser.add_argument('--allinfos', dest="allinfos", action="store_true")
+    parser.add_argument('--maxleninf', dest="maxleninf", type=int, default=36)
     parser.add_argument('--substitution', dest="substitution", action="store_true")
     parser.add_argument('--maxf', dest="maxf", type=int, default=None)
     parser.add_argument('--maxlen', dest="maxlen", type=int, default=None)
@@ -261,7 +263,16 @@ if __name__ == '__main__':
     find_ref = True
 
     if args.all_datasets == []:
-        if args.method == "FW":
+
+        if args.allinfos:
+            if args.target == "T":
+                args.all_datasets = [
+                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-second-half-T-TV-alls/dataset.pick"]
+            if args.target == "B":
+                args.all_datasets = [
+                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-second-half-B-TV-alls/dataset.pick"]
+
+        elif args.method == "FW":
             if args.target == "T":
                 args.all_datasets = [
                     "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-second-half-T-FW-cfalse/dataset.pick"]
@@ -422,6 +433,9 @@ if __name__ == '__main__':
         n_feat = 2
     if args.norm3:
         n_feat = 3
+
+    if args.allinfos:
+        n_feat = args.maxleninf
 
     predictor, _ = build_models(args.size, nbase=args.Nbases - 4,
                                 ctc_length=ctc_length,

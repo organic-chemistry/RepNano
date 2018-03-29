@@ -244,7 +244,7 @@ if __name__ == '__main__':
     parser.add_argument('--norm2', dest="norm2", action="store_true")
     parser.add_argument('--norm3', dest="norm3", action="store_true")
     parser.add_argument('--allinfos', dest="allinfos", action="store_true")
-    parser.add_argument('--maxleninf', dest="maxleninf", type=int, default=35)
+    parser.add_argument('--maxleninf', dest="maxleninf", type=int, default=36)
     parser.add_argument('--raw', dest="raw", action="store_true")
     parser.add_argument('--substitution', dest="substitution", action="store_true")
     parser.add_argument('--maxf', dest="maxf", type=int, default=None)
