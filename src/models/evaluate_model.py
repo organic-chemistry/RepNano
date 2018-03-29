@@ -459,7 +459,7 @@ if __name__ == '__main__':
     from ..data.dataset import Dataset
     sys.path.append("src/")
 
-    from ..features.helpers import scale_simple, scale_named, scale_named2, scale_named3
+    from ..features.helpers import scale_simple, scale_named, scale_named2, scale_named3, scale_named4
 
     def load_datasets(argdatasets):
 
@@ -472,6 +472,9 @@ if __name__ == '__main__':
 
         if args.norm3:
             fnorm = scale_named3
+
+        if args.allinfos:
+            fnorm = lambda x: scale_named4(x, maxleninf=args.maxleninf)
 
         data_x = []
 
