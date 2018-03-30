@@ -7,7 +7,7 @@ if __name__ == "__main__":
     import numpy as np
 
     from ..data.dataset import Dataset, NotAllign
-    from ..features.helpers import scale_simple, scale_named, scale_named2
+    from ..features.helpers import scale_simple, scale_named, scale_named2, scale_named4
     import glob
     import os
     import sys
@@ -53,6 +53,8 @@ if __name__ == "__main__":
 
     parser.add_argument('--maxf', dest="maxf", type=int, default=None)
     parser.add_argument("--method", dest="method", choices=["FW", "TV", "TV45", "TV25", "TV5"])
+    parser.add_argument('--allinfos', dest='allinfos', action='store_true')
+    parser.add_argument('--maxleninf', dest="maxleninf", type=int, default=36)
 
     # parser.add_argument("--substitution", dest="substitution", default="T", type=str)
 
@@ -149,6 +151,9 @@ if __name__ == "__main__":
         if args.norm2:
             n_feat = 2
 
+        if args.all_info:
+            n_feat = args.maxleninf
+
         predictor, _ = build_models(args.size, nbase=args.Nbases - 4,
                                     ctc_length=ctc_length,
                                     input_length=None, n_output=n_output_network,
@@ -170,6 +175,11 @@ if __name__ == "__main__":
 
         return [trans[:int(4 * maxlen)], None]
 
+    if args.allinfos:
+        fnorm = lambda x: scale_named4(x, maxleninf=args.maxleninf)
+    else:
+        fnorm = scale_named2
+
     # print(res)
     for istrand, s in enumerate(D.strands):
         print(istrand)
@@ -178,7 +188,7 @@ if __name__ == "__main__":
         print("TV", time.time() - t, len(v[0]))
         t = time.time()
         s.transfered = v[0]
-        output = s.analyse_segmentation(predictor, scale_named2(s.transfered))[::, 0]
+        output = s.analyse_segmentation(predictor, fnorm(s.transfered))[::, 0]
         print("predict", time.time() - t)
 
         # print(output.shape, len(s.transfered))
