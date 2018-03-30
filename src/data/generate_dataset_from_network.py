@@ -151,7 +151,7 @@ if __name__ == "__main__":
         if args.norm2:
             n_feat = 2
 
-        if args.all_info:
+        if args.allinfos:
             n_feat = args.maxleninf
 
         predictor, _ = build_models(args.size, nbase=args.Nbases - 4,
