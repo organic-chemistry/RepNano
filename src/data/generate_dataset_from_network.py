@@ -172,7 +172,7 @@ if __name__ == "__main__":
     def load_from_bc(strand):
 
         trans = strand.get_seq(f="no_basecall", window_size=args.window_size,
-                               method=args.method, allinfos=args.allinfos, maxlen=args.maxleninf, minlen=1)
+                               method=args.method, allinfos=args.allinfos, maxlen=args.maxleninf - 1, minlen=1)
 
         return [trans[:int(4 * maxlen)], None]
 
