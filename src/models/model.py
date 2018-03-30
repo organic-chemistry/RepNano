@@ -208,7 +208,7 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
 
                     return tuple(shape[:-1])
                 ot = []
-                for n in extra_output:
+                for n in range(extra_output):
                     ot.append(Lambda(average, output_shape=average_output_shape,
                                      name="o%i" % n)(ext[n]))
 
