@@ -174,7 +174,7 @@ class Strand:
         if f == "no_basecall":
             sig = self.segmentation(w=window_size, method=method,
                                     allinfos=allinfos, maxlen=maxlen, minlen=minlen)
-            names = ["mean", "stdv", "length", "start"]
+            names = ["mean", "stdv", "length", "start", "all"]
 
             return pd.DataFrame({n: sig[n] for n in names}).convert_objects(convert_numeric=True)
 
