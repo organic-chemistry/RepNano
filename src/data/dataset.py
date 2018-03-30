@@ -165,14 +165,15 @@ class Strand:
         self.t_from_Minion = t_from_Minion
         self.sam_line_minion = sam_line_minion
 
-    def get_seq(self, f, correct=False, window_size=5, method="FW"):
+    def get_seq(self, f, correct=False, window_size=5, method="FW", allinfos=False, maxlen=70, minlen=1):
         if f == "Minion":
             seq, sucess = get_seq(self.sam_line_minion, ref=REF, from_line=True, correct=correct)
             self.seq_from_minion = seq
             return self.seq_from_minion
 
         if f == "no_basecall":
-            sig = self.segmentation(w=window_size, method=method)
+            sig = self.segmentation(w=window_size, method=method,
+                                    allinfos=allinfos, maxlen=maxlen, minlen=minlen)
             names = ["mean", "stdv", "length", "start"]
 
             return pd.DataFrame({n: sig[n] for n in names}).convert_objects(convert_numeric=True)
