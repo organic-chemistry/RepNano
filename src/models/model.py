@@ -208,17 +208,17 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
 
                     return tuple(shape[:-1])
                 ot = []
-                #inp = []
+                # inp = []
                 for n in range(extra_output):
                     ot.append(Lambda(average, output_shape=average_output_shape,
                                      name="o%i" % n)(ext[n]))
 
-                    #inp.append(Input(name='input_prop%i' % n, shape=[1], dtype='float32'))
+                    # inp.append(Input(name='input_prop%i' % n, shape=[1], dtype='float32'))
 
                 model2 = Model(inputs=[inputs, labels, input_length,
                                        label_length], outputs=[loss_out] + ot)
 
-                model2.compile(loss={'ctc': lambda y_true, y_pred: y_pred} + {"o%i": lambda p_true,
-                                                                              p_pred: K.mean_squared_error(p_true, p_pred) for i in range(extra_output)}, optimizer="adadelta")
+                model2.compile(loss=[lambda y_true, y_pred: y_pred] + [lambda p_true,
+                                                                       p_pred: K.mean_squared_error(p_true, p_pred) for i in range(extra_output)], optimizer="adadelta")
 
     return model, model2
