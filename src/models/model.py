@@ -211,7 +211,7 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                 for n in extra_output:
                     ot.append(Lambda(average, output_shape=average_output_shape, name="o%i" % n)(ext[n])
 
-                    inp.append(Input(name='input_prop%i' % n, shape=[1], dtype='float32')
+                    inp.append(Input(name='input_prop%i' % n, shape=[1], dtype='float32'))
 
 
                 model2=Model(inputs=[inputs, labels, input_length,
