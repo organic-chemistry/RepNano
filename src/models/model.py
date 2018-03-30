@@ -12,12 +12,13 @@ try:
     from .attention import AttentionDecoder
 except:
     print("Loading theano no attention")
-#from .attentionBis import Attention
+# from .attentionBis import Attention
 
 
 def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                  uniform=True, input_length=None, n_output=1,
-                 n_feat=4, recurrent_dropout=0, lr=0.01, res=False, attention=False, simple=False):
+                 n_feat=4, recurrent_dropout=0, lr=0.01, res=False, attention=False, simple=False,
+                 extra_output=0):
     if keras.backend.backend() == 'tensorflow':
         import tensorflow as tf
 
@@ -70,7 +71,7 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
     l1 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable, recurrent_dropout=recurrent_dropout),
                        merge_mode=merge_mode)(inputs)
     # if res:
-    #l1 = Add()([l1, inputs])
+    # l1 = Add()([l1, inputs])
     l2 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable, recurrent_dropout=recurrent_dropout),
                        merge_mode=merge_mode)(l1)
     if res:
@@ -95,6 +96,12 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
 
         else:
             out_layer1 = TimeDistributed(Dense(Nbases, activation="softmax"), name="out_layer1")(l3)
+
+        if extra_output != 0:
+            ext = []
+            for n in range(extra_output):
+                ext.append(TimeDistributed(
+                    Dense(Nbases, activation="softmax"), name="extra%i" % n)(l3))
 
     else:
         old = False
@@ -152,9 +159,14 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
         print("ici")
         model = Model(inputs=inputs, outputs=[out_layer1, out_layer2])
     else:
-        model = Model(inputs=inputs, outputs=out_layer1)
+        if extra_output == 0:
+            model = Model(inputs=inputs, outputs=out_layer1)
 
-    #ada = Adadelta(lr=lr, rho=0.95, epsilon=1e-08, decay=0.0)
+        else:
+            model = Model(inputs=inputs, outputs=[out_layer1] + ext)
+:
+
+    # ada = Adadelta(lr=lr, rho=0.95, epsilon=1e-08, decay=0.0)
     if not uniform:
         model.compile(optimizer='adadelta', loss='categorical_crossentropy',
                       sample_weight_mode='temporal')
@@ -179,10 +191,34 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
             loss_out = Lambda(ctc_lambda_func, output_shape=(1,), name='ctc')(
                 [out_layer1, labels, input_length, label_length])
 
-            model2 = Model(inputs=[inputs, labels, input_length, label_length], outputs=loss_out)
-
             sgd = SGD(lr=lr, decay=1e-6, momentum=0.9, nesterov=True, clipnorm=5)
             # rms = RMSprop(lr=0.0005, rho=0.9, epsilon=1e-08, decay=0.0, clipvalue=0.05)
-            model2.compile(loss={'ctc': lambda y_true, y_pred: y_pred}, optimizer="adadelta")
+            if extra_output == 0:
+                model2 = Model(inputs=[inputs, labels, input_length,
+                                       label_length], outputs=loss_out)
+                model2.compile(loss={'ctc': lambda y_true, y_pred: y_pred}, optimizer="adadelta")
+
+            else:
+                def average(x):
+                    x = K.mean(x, axis=-1)  # , keepdims=True)
+                    return x
+
+                def average_output_shape(input_shape):
+                    shape = list(input_shape)
+                    # assert len(shape) == 3  # only valid for 2D tensors
+
+                    return tuple(shape[:-1])
+                ot = []
+                for n in extra_output:
+                    ot.append(Lambda(average, output_shape=average_output_shape, name="o%i" % n)(ext[n])
+
+                    inp.append(Input(name='input_prop%i' % n, shape=[1], dtype='float32')
+
+
+                model2=Model(inputs=[inputs, labels, input_length,
+                                       label_length] + inp, outputs=[loss_out] + ot)
+
+                model2.compile(loss={'ctc': lambda y_true, y_pred: y_pred} + {"o%i": lambda p_true,
+                               p_pred: K.mean_squared_error(p_true, p_pred) for i in range(extra_output)}, optimizer="adadelta")
 
     return model, model2
