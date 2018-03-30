@@ -792,15 +792,39 @@ if __name__ == '__main__':
                 maxin = args.batch_size * (int(len(X_new) // args.batch_size))
                 val = 30
                 batch_size = args.batch_size
- # To record lr
-            r = ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size] * len(Length))[:maxin], Length[:maxin]],
-                         Label[:maxin], nb_epoch=1, batch_size=batch_size,
-                         validation_data=([tX_new,
-                                           tLabel,
-                                           np.array([subseq_size] *
-                                                    len(tLength)),
-                                           tLength],
-                                          tLabel))
+
+            if args.extra_output:
+                def clean(x):
+                    x[x >= 3] = 3
+                    return x
+
+                def proportion(x, c):
+                    return np.sum(x == c, axis=-1) / (np.sum(x == c, axis=-1) + np.sum(x == 3, axis=-1) + 1e-7)
+
+                if args.extra_output == 1:
+                    p1 = proportion(Label, mapping["B"])
+                    Label = clean(Label)
+                    tp1 = proportion(tLabel, mapping["B"])
+                    tLabel = clean(tLabel)
+
+                    r = ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size] * len(Length))[:maxin], Length[:maxin]],
+                                 [Label[:maxin], p1[:maxin]], nb_epoch=1, batch_size=batch_size,
+                                 validation_data=([tX_new,
+                                                   tLabel,
+                                                   np.array([subseq_size] *
+                                                            len(tLength)),
+                                                   tLength],
+                                                  [tLabel, tp1]))
+
+            else:
+                r = ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size] * len(Length))[:maxin], Length[:maxin]],
+                             Label[:maxin], nb_epoch=1, batch_size=batch_size,
+                             validation_data=([tX_new,
+                                               tLabel,
+                                               np.array([subseq_size] *
+                                                        len(tLength)),
+                                               tLength],
+                                              tLabel))
             if epoch % 10 == 0:
                 ntwk.save_weights(os.path.join(
                     args.root, 'my_model_weights-%i.h5' % epoch))
