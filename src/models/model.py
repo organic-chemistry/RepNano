@@ -164,7 +164,6 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
 
         else:
             model = Model(inputs=inputs, outputs=[out_layer1] + ext)
-:
 
     # ada = Adadelta(lr=lr, rho=0.95, epsilon=1e-08, decay=0.0)
     if not uniform:
