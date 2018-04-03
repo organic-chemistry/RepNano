@@ -248,6 +248,7 @@ if __name__ == '__main__':
     parser.add_argument('--raw', dest="raw", action="store_true")
     parser.add_argument('--substitution', dest="substitution", action="store_true")
     parser.add_argument('--maxf', dest="maxf", type=int, default=None)
+    parser.add_argument('--extra_output', dest='extra_output', type=int, default=0)
 
     args = parser.parse_args()
 
