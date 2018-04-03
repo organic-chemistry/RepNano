@@ -269,6 +269,7 @@ if __name__ == '__main__':
                 args.all_datasets = [
                     "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-second-half-T-TV-alls/dataset.pick"]
             if args.target == "B":
+                print("La")
                 args.all_datasets = [
                     "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-second-half-B-TV-alls/dataset.pick"]
 
