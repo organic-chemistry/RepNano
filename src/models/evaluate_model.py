@@ -436,7 +436,7 @@ if __name__ == '__main__':
         n_feat = 3
 
     if args.allinfos:
-        n_feat = args.maxleninf - 1
+        n_feat = args.maxleninf
 
     predictor, _ = build_models(args.size, nbase=args.Nbases - 4,
                                 ctc_length=ctc_length,
