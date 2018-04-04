@@ -219,6 +219,6 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                                        label_length], outputs=[loss_out] + ot)
 
                 model2.compile(loss=[lambda y_true, y_pred: y_pred] + [lambda p_true,
-                                                                       p_pred: tf.losses.mean_squared_error(p_true, p_pred) for i in range(extra_output)], optimizer="adadelta")
+                                                                       p_pred:100 * tf.losses.mean_squared_error(p_true, p_pred) for i in range(extra_output)], optimizer="adadelta")
 
     return model, model2
