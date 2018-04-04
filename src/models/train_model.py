@@ -249,6 +249,7 @@ if __name__ == '__main__':
     parser.add_argument('--substitution', dest="substitution", action="store_true")
     parser.add_argument('--maxf', dest="maxf", type=int, default=None)
     parser.add_argument('--extra-output', dest='extra_output', type=int, default=0)
+    parser.add_argument('--probas', nargs='+', dest="probas", default=[], type=str)
 
     args = parser.parse_args()
 
@@ -367,6 +368,7 @@ if __name__ == '__main__':
         data_x = []
         data_y = []
         data_y2 = []
+        probas = []
 
         for D, named in zip(Datasets, argdatasets):
             keep = 0
@@ -413,16 +415,23 @@ if __name__ == '__main__':
 
                 else:
                     data_y.append([mapping[transform(b)] for b in strand.transfered["seq"]])
+
+                probas.append([])
+                for sub in args.probas:
+                    if hasattr(strand, "%sprop" % sub):
+                        probas[-1].append(getattr(strand, "%sprop" % sub))
+                    else:
+                        probas[-1].append(0)
                 keep += 1
             print(named, len(D.strands[:args.maxf]), keep)
         del Datasets
-        return data_x, data_y, data_y2
+        return data_x, data_y, data_y2, np.array(probas)
 
-    data_x, data_y, data_y2 = load_datasets(args.all_datasets)
+    data_x, data_y, data_y2, probas = load_datasets(args.all_datasets)
     if args.all_test_datasets != []:
-        tdata_x, tdata_y, tdata_y2 = load_datasets(args.all_test_datasets)
+        tdata_x, tdata_y, tdata_y2, tprobas = load_datasets(args.all_test_datasets)
     else:
-        tdata_x, tdata_y, tdata_y2 = data_x, data_y, data_y2
+        tdata_x, tdata_y, tdata_y2, tprobas = data_x, data_y, data_y2, probas
 
     print("done", len(data_x), len(tdata_x))
     # exit()
@@ -571,7 +580,7 @@ if __name__ == '__main__':
         tc2 = 0
         tc3 = 0
 
-        def get_transformed_sets(d_x, d_y, d_y2, s_arr, p_arr, mini=200, maxi=None):
+        def get_transformed_sets(d_x, d_y, d_y2, d_prob, s_arr, p_arr, mini=200, maxi=None):
 
             print(len(d_x), len(d_y))
 
@@ -580,6 +589,7 @@ if __name__ == '__main__':
             Y2_new = []
             Label = []
             Length = []
+            Probas = []
             stats = defaultdict(int)
             megas = ""
             infostat = {}
@@ -633,6 +643,8 @@ if __name__ == '__main__':
                         X_new.append(x)
                         Label.append(y + [0] * (subseq_size * args.n_output_network - len(y)))
                         Length.append(len(y))
+                        Probas.append(d_prob[s2])
+
                     # x[:,0] += np.random.binomial(n=1, p=0.1, size=x.shape[0]) *
                     # np.random.normal(scale=0.01, size=x.shape[0])
 
@@ -730,12 +742,12 @@ if __name__ == '__main__':
             Label = np.array(Label)
             Length = np.array(Length)
 
-            return X_new, Y_new, Y2_new, Label, Length, stats
+            return X_new, Y_new, Y2_new, Label, Length, stats, Probas
 
-        X_new, Y_new, Y2_new, Label, Length, stats = get_transformed_sets(
-            data_x, data_y, data_y2, s_arr, p_arr, mini=200)
-        tX_new, tY_new, tY2_new, tLabel, tLength, stats = get_transformed_sets(
-            tdata_x, tdata_y, tdata_y2,  ts_arr, tp_arr, maxi=40)
+        X_new, Y_new, Y2_new, Label, Length, stats, sp1 = get_transformed_sets(
+            data_x, data_y, data_y2, probas, s_arr, p_arr, mini=200)
+        tX_new, tY_new, tY2_new, tLabel, tLength, stats, stp1 = get_transformed_sets(
+            tdata_x, tdata_y, tdata_y2, tprobas, ts_arr, tp_arr, maxi=40)
 
         if not args.ctc:
             sum1 = 0
@@ -801,29 +813,27 @@ if __name__ == '__main__':
                 batch_size = args.batch_size
 
             if args.extra_output:
-                def clean(x):
-                    x[x >= 3] = 3
-                    return x
 
                 def proportion(x, c):
                     return np.sum(x == c, axis=-1) / (np.sum(x == c, axis=-1) + np.sum(x == 3, axis=-1) + 1e-7)
 
+                def countT(x):
+                    return np.sum(x == c, axis=-1)
+
                 if args.extra_output == 1:
-                    p1 = proportion(Label, mapping["B"])
-                    Label = clean(Label)
-                    tp1 = proportion(tLabel, mapping["B"])
-                    tLabel = clean(tLabel)
+                    p1 = countT(Label)[::, np.newaxis] * sp1
+                    tp1 = countT(tLabel)[::, np.newaxis] * stp1
 
                     print(p1)
 
                     r = ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size] * len(Length))[:maxin], Length[:maxin]],
-                                 [Label[:maxin], p1[:maxin]], nb_epoch=1, batch_size=batch_size,
+                                 [Label[:maxin]] + [pi[:maxin] for pi in p1.T], nb_epoch=1, batch_size=batch_size,
                                  validation_data=([tX_new,
                                                    tLabel,
                                                    np.array([subseq_size] *
                                                             len(tLength)),
                                                    tLength],
-                                                  [tLabel, tp1]))
+                                                  [tLabel] + [pi[:maxin] for pi in tp1.T]))
 
             else:
                 r = ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size] * len(Length))[:maxin], Length[:maxin]],

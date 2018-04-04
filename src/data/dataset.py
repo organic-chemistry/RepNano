@@ -164,6 +164,9 @@ class Strand:
         self.X_from_Minion = X_from_Minion
         self.t_from_Minion = t_from_Minion
         self.sam_line_minion = sam_line_minion
+        self.Bprop = 0
+        self.Eprop = 0
+        self.Iprop = 0
 
     def get_seq(self, f, correct=False, window_size=5, method="FW", allinfos=False, maxlen=70, minlen=1):
         if f == "Minion":
