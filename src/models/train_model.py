@@ -369,6 +369,8 @@ if __name__ == '__main__':
         data_y2 = []
 
         for D, named in zip(Datasets, argdatasets):
+            keep = 0
+
             for strand in D.strands[:args.maxf]:
 
                 if strand.transfered is None:
@@ -411,7 +413,8 @@ if __name__ == '__main__':
 
                 else:
                     data_y.append([mapping[transform(b)] for b in strand.transfered["seq"]])
-
+                keep += 1
+            print(named, len(D.strands[:args.maxf]), keep)
         del Datasets
         return data_x, data_y, data_y2
 
