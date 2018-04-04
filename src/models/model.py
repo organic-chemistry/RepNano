@@ -101,7 +101,7 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
             ext = []
             for n in range(extra_output):
                 ext.append(TimeDistributed(
-                    Dense(Nbases, activation="softmax"), name="extra%i" % n)(l3))
+                    Dense(1, activation="softmax"), name="extra%i" % n)(l3))
 
     else:
         old = False
@@ -199,14 +199,14 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
 
             else:
                 def average(x):
-                    x = K.mean(x, axis=-1)  # , keepdims=True)
+                    x = K.mean(x, axis=-2)  # , keepdims=True)
                     return x
 
                 def average_output_shape(input_shape):
                     shape = list(input_shape)
                     # assert len(shape) == 3  # only valid for 2D tensors
 
-                    return tuple(shape[:-1])
+                    return tuple(shape[:-2] + [1])
                 ot = []
                 # inp = []
                 for n in range(extra_output):
