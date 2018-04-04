@@ -101,7 +101,7 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
             ext = []
             for n in range(extra_output):
                 ext.append(TimeDistributed(
-                    Dense(1, activation="softmax"), name="extra%i" % n)(l3))
+                    Dense(1, activation="sigmoid"), name="extra%i" % n)(l3))
 
     else:
         old = False
