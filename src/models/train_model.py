@@ -811,6 +811,8 @@ if __name__ == '__main__':
                     tp1 = proportion(tLabel, mapping["B"])
                     tLabel = clean(tLabel)
 
+                    print(p1)
+
                     r = ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size] * len(Length))[:maxin], Length[:maxin]],
                                  [Label[:maxin], p1[:maxin]], nb_epoch=1, batch_size=batch_size,
                                  validation_data=([tX_new,
