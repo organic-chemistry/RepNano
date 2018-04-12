@@ -492,9 +492,10 @@ class Strand:
         else:
             pre = already_pre
         if len(pre) > 1:
-            pre = pre[0]
+            pre = pre[0][0]
             b = np.argmax(pre, axis=-1)
             n = 6
+            print(b)
             # if len(pre)
 
         else:
