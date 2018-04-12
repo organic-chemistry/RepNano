@@ -11,6 +11,7 @@ if __name__ == "__main__":
     parser.add_argument("--range", dest="range", nargs='+', default=[], type=float)
     parser.add_argument("--name", dest="name", type=str, default='dataset.pick')
     parser.add_argument("--target", dest="target", type=str, default='dataset.pick')
+    parser.add_argument("--weight", dest="weights", type=str, default='')
 
     args = parser.parse_args()
 
@@ -22,7 +23,7 @@ if __name__ == "__main__":
         end = np.arange(args.range[0], args.range[1] + 1e-4,
                         (args.range[1] - args.range[0]) / args.n_cpu)[i + 1]
 
-        cmd = "qsub -v TARGET=%s,START=%.3f,END=%.3f,NAME=%s script_generate.sh" % (
-            args.target, start, end, args.name)
+        cmd = "qsub -v TARGET=%s,START=%.3f,END=%.3f,NAME=%s,WEIGHT=%s script_generate.sh" % (
+            args.target, start, end, args.name, args.weight)
         print(cmd)
         os.popen(cmd)
