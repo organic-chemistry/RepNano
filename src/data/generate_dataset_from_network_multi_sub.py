@@ -12,7 +12,7 @@ if __name__ == "__main__":
     parser.add_argument("--name", dest="name", type=str, default='dataset.pick')
     parser.add_argument("--target", dest="target", type=str, default='dataset.pick')
     parser.add_argument("--weight", dest="weights", type=str, default='')
-    parser.add_argument("--test", dest="test", type=bool, action="store_true")
+    parser.add_argument("--test", dest="test", action="store_true")
 
     args = parser.parse_args()
 
