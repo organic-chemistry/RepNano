@@ -8,7 +8,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--command-line', dest="command_line", type=str)
     parser.add_argument("--n-cpu", dest="n_cpu", type=int, default=None)
-    parser.add_argument("--range", dest="range", nargs='+', default=[], type=float)
+    parser.add_argument("--range", dest="range", nargs='+', default=[0, 1], type=float)
     parser.add_argument("--name", dest="name", type=str, default='dataset.pick')
     parser.add_argument("--target", dest="target", type=str, default='dataset.pick')
     parser.add_argument("--weight", dest="weights", type=str, default='')
