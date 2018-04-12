@@ -8,7 +8,7 @@ if __name__ == "__main__":
 
     from ..data.dataset import Dataset, NotAllign
     from ..features.helpers import scale_simple, scale_named, scale_named2, scale_named4
-    from ..features.extract_event import tv_segment
+    from ..features.extract_events import tv_segment
     import glob
     import os
     import sys
