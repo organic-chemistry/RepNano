@@ -8,6 +8,7 @@ if __name__ == "__main__":
 
     from ..data.dataset import Dataset, NotAllign
     from ..features.helpers import scale_simple, scale_named, scale_named2, scale_named4
+    from ..features.extract_event import tv_segment
     import glob
     import os
     import sys
@@ -200,9 +201,21 @@ if __name__ == "__main__":
     def compute_attributes(strand):
         # try:
         transfered = strand.transfered
+
         # strand.transfered_bc = copy.deepcopy(transfered)
         if len("".join(transfered["seq"]).replace("N", "")) > maxlen:
             transfered = transfered[:maxlen]
+
+        re_segment = True
+        if re_segment:
+            flat = []
+            for peaces in transfered["all"]:
+                flat.extend(peaces)
+
+            segments = tv_segment(flat, gamma=40, maxlen=35,
+                                  minlen=1, sl=6024, allinfos=True)
+            transfered = strand.transfer(transfered, segments, allinfos=args.allinfos)
+
         # get the ref from transefered:
         from_ntwk = "".join(transfered["seq"]).replace("N", "")
         sub = "B"
@@ -260,6 +273,10 @@ if __name__ == "__main__":
             s.transfered = v[0]
             s.bc_score = v[1]
             s.confirm_score = v[2]
+            s.transfered["all"] = [np.array(a, dtype=np.float16) for a in s.transfered["all"]]
+            s.transfered["mean"] = np.array(s.transfered["mean"], dtype=np.float16)
+            s.transfered["stdv"] = np.array(s.transfered["stdv"], dtype=np.float16)
+            s.segments = None
         else:
             s.transfered = None
     import _pickle as cPickle

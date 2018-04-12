@@ -175,6 +175,8 @@ if __name__ == "__main__":
                 s.transfered = v[0]
                 s.bc_score = v[1]
                 s.confirm_score = v[2]
+                if hasattr(s, "segments"):
+                    s.segments = None
                 del(s.signal_bc)
                 alligned += 1
             else:

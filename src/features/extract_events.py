@@ -259,6 +259,7 @@ def generate_events_old(ss1, ss2, peaks, sample_rate):
 
 @jit
 def find_best_partition(signal, gamma=0.1, maxlen=10, minlen=1):
+    maxlen -= 1
     signal = np.array(signal)
     B = np.zeros(len(signal))
     p = np.zeros(len(signal), dtype=np.int)
