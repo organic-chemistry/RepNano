@@ -78,6 +78,7 @@ if __name__ == "__main__":
 
     root = "data/raw/20170908-R9.5/"
     base_call = True
+    rf = None
     if args.target == "T":
         samf = "BTF_AG_ONT_1_FAH14273_A-select.sam"
         rf = "AG-basecalled/"
@@ -104,6 +105,11 @@ if __name__ == "__main__":
     if args.target == "H_T":
         samf = ""
         rf = "Human_HQ/"
+        base_call = False
+
+    if rf is None:
+        samf = ""
+        rf = args.target
         base_call = False
 
     D = Dataset(samfile=root + samf,
