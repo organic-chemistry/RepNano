@@ -441,7 +441,7 @@ if __name__ == '__main__':
     predictor, _ = build_models(args.size, nbase=args.Nbases - 4,
                                 ctc_length=ctc_length,
                                 input_length=None, n_output=n_output_network,
-                                lr=1, res=args.res, attention=args.attention, n_feat=n_feat, simple=args.simple)
+                                lr=1, res=args.res, attention=args.attention, n_feat=n_feat, simple=args.simple, extra_output=args.extra_output)
 
     if args.weights is not None:
 

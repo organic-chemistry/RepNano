@@ -491,13 +491,12 @@ class Strand:
             pre = ntwk.predict(signal[np.newaxis, ::, ::])
         else:
             pre = already_pre
-        if no2:
-            #print(pre[0].shape, signal.shape)
-            o1, o2 = pre
-            o1m = (np.argmax(o1[0], -1))
-            o2m = (np.argmax(o2[0], -1))
-            #b = np.vstack((o1m, o2m)).reshape((-1,), order='F')
-            n = o1[0].shape[-1]
+        if len(pre) > 1:
+            pre = pre[0]
+            b = np.argmax(pre, axis=-1)
+            n = 6
+            # if len(pre)
+
         else:
             pre = pre[0]
             b = np.argmax(pre, axis=-1)
