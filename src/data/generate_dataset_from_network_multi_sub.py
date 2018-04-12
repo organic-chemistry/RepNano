@@ -12,6 +12,7 @@ if __name__ == "__main__":
     parser.add_argument("--name", dest="name", type=str, default='dataset.pick')
     parser.add_argument("--target", dest="target", type=str, default='dataset.pick')
     parser.add_argument("--weight", dest="weights", type=str, default='')
+    parser.add_argument("--test", dest="test", type=bool, action="store_true")
 
     args = parser.parse_args()
 
@@ -26,4 +27,5 @@ if __name__ == "__main__":
         cmd = "qsub -v TARGET=%s,START=%.3f,END=%.3f,NAME=%s,WEIGHT=%s script_generate.sh" % (
             args.target, start, end, args.name, args.weight)
         print(cmd)
-        os.popen(cmd)
+        if not args.test:
+            os.popen(cmd)
