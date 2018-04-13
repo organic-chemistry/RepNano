@@ -55,7 +55,7 @@ if __name__ == "__main__":
     parser.add_argument("--method", dest="method", choices=["FW", "TV", "TV45", "TV25", "TV5"])
     parser.add_argument('--allinfos', dest='allinfos', action='store_true')
     parser.add_argument('--maxleninf', dest="maxleninf", type=int, default=36)
-    parser.add_argument('--debug', dest='allinfos', action='store_true')
+    parser.add_argument('--debug', dest='debug', action='store_true')
 
     # parser.add_argument("--substitution", dest="substitution", default="T", type=str)
 
