@@ -308,6 +308,10 @@ if __name__ == '__main__':
     if args.allinfos:
         n_feat = args.maxleninf
 
+    if len(args.probas) != args.extra_output:
+        print("Pproba must match extra output")
+        raise
+
     _, ntwk = build_models(args.size, nbase=args.Nbases - 4,
                            ctc_length=ctc_length,
                            input_length=input_length, n_output=n_output_network,
@@ -821,10 +825,8 @@ if __name__ == '__main__':
                     return np.sum(x == mapping["T"], axis=-1)
 
                 if args.extra_output == 1:
-                    p1 = (countT(Label)[::, np.newaxis] * sp1 +
-                          (subseq_size - countT(Label)[::, np.newaxis])) / subseq_size
-                    tp1 = (countT(tLabel)[::, np.newaxis] * stp1 +
-                           (subseq_size - countT(tLabel)[::, np.newaxis])) / subseq_size
+                    p1 = countT(Label)[::, np.newaxis] * sp1 / subseq_size
+                    tp1 = countT(tLabel)[::, np.newaxis] * stp1 / subseq_size
 
                     print(countT(Label))
                     print(sp1)
