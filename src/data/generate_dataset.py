@@ -104,7 +104,7 @@ if __name__ == "__main__":
             return [bc, minion]
         else:
             trans = strand.get_seq(
-                f="no_basecall", window_size=args.window_size, method=args.method)
+                f="no_basecall", window_size=args.window_size, method=args.method, allinfos=True)
 
             return [trans, None]
 
