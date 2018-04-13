@@ -825,8 +825,8 @@ if __name__ == '__main__':
                     return np.sum(x == mapping["T"], axis=-1)
 
                 if args.extra_output == 1:
-                    p1 = countT(Label)[::, np.newaxis] * sp1 / subseq_size
-                    tp1 = countT(tLabel)[::, np.newaxis] * stp1 / subseq_size
+                    p1 = countT(Label)[::, np.newaxis] * sp1 / 1.0 / subseq_size
+                    tp1 = countT(tLabel)[::, np.newaxis] * stp1 / 1.0 / subseq_size
 
                     print(countT(Label))
                     print(sp1)
