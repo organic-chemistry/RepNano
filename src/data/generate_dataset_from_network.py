@@ -12,8 +12,7 @@ if __name__ == "__main__":
     import glob
     import os
     import sys
-    f = open(os.devnull, 'w')
-    sys.stdout = f
+
     import time
 
     parser = argparse.ArgumentParser()
@@ -56,6 +55,7 @@ if __name__ == "__main__":
     parser.add_argument("--method", dest="method", choices=["FW", "TV", "TV45", "TV25", "TV5"])
     parser.add_argument('--allinfos', dest='allinfos', action='store_true')
     parser.add_argument('--maxleninf', dest="maxleninf", type=int, default=36)
+    parser.add_argument('--debug', dest='allinfos', action='store_true')
 
     # parser.add_argument("--substitution", dest="substitution", default="T", type=str)
 
@@ -67,6 +67,10 @@ if __name__ == "__main__":
 
     os.makedirs(args.root, exist_ok=True)
     os.makedirs(os.path.split(args.name)[0], exist_ok=True)
+
+    if not args.debug:
+        f = open(os.devnull, 'w')
+        sys.stdout = f
 
     with open(os.path.split(args.name)[0] + '/params.json', 'w') as fp:
         json.dump(argparse_dict, fp, indent=True)
