@@ -56,6 +56,7 @@ if __name__ == "__main__":
     parser.add_argument('--allinfos', dest='allinfos', action='store_true')
     parser.add_argument('--maxleninf', dest="maxleninf", type=int, default=36)
     parser.add_argument('--debug', dest='debug', action='store_true')
+    parser.add_argument('--maxlen', dest="maxlen", type=int, default=10000)
 
     # parser.add_argument("--substitution", dest="substitution", default="T", type=str)
 
@@ -121,7 +122,7 @@ if __name__ == "__main__":
     D.metadata = argparse_dict
     D.substitution = args.target
 
-    maxlen = 10000
+    maxlen = args.maxlen
 
     ran = range(1, 11)
     if args.test_set:
