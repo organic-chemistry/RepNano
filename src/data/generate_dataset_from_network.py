@@ -290,8 +290,11 @@ if __name__ == "__main__":
         else:
             s.transfered = None
     import _pickle as cPickle
+    print("Writing on ", args.name)
+
     with open(args.name, "wb") as fich:
         cPickle.dump(D, fich)
+    print("End writing")
     """
     for strand in D.strands:
 
