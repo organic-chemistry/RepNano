@@ -121,7 +121,7 @@ if __name__ == "__main__":
     D.metadata = argparse_dict
     D.substitution = args.target
 
-    maxlen = 20000
+    maxlen = 10000
 
     ran = range(1, 11)
     if args.test_set:
