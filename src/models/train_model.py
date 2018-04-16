@@ -287,7 +287,7 @@ if __name__ == '__main__':
 
     subseq_size = args.ctc_length
 
-    from .model import build_models
+    from .model import build_models, load_weights_from_hdf5_group_what_you_can
     ctc_length = subseq_size
     input_length = ctc_length
     if n_output_network == 2:
@@ -326,12 +326,15 @@ if __name__ == '__main__':
 
     if args.pre_trained_weight is not None:
 
-        # try:
+        try:
             # try:
-        ntwk.load_weights(args.pre_trained_weight)
-        # except:
-        # print("Only predictor loaded (normal if no ctc)")
-        predictor.load_weights(args.pre_trained_weight)
+            ntwk.load_weights(args.pre_trained_weight)
+            # except:
+            # print("Only predictor loaded (normal if no ctc)")
+            predictor.load_weights(args.pre_trained_weight)
+        except:
+            load_weights_from_hdf5_group_what_you_can(args.pre_trained_weight, ntwk.layers)
+            load_weights_from_hdf5_group_what_you_can(args.pre_trained_weight, predictor.layers)
         # except:
         #    print("Learning from scratch")
 
