@@ -491,13 +491,15 @@ class Strand:
             pre = ntwk.predict(signal[np.newaxis, ::, ::])
         else:
             pre = already_pre
-        if len(pre) > 1:
+        if len(pre) == 2:
             #pre = pre[0][0]
             b = np.argmax(pre[0][0], axis=-1)
             TouB = np.argmax(pre[0][0], axis=-1) == 3
+            empty = np.argmax(pre[0][0], axis=-1) == pre[0][0].shape[-1]
             IsB = pre[1][0][::, 0] > 0.5
             b[TouB & IsB] = 4
-            n = pre[0][0].shape[-1]
+            b[empty] = 5
+            n = 6
             # print(b)
             # if len(pre)
 
