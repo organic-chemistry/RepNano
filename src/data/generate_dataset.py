@@ -28,6 +28,7 @@ if __name__ == "__main__":
     parser.add_argument("--range", dest="range", nargs='+', default=[], type=float)
     parser.add_argument("--method", dest="method",
                         choices=["FW", "TV", "TV45", "TV25", "TV5", "TVb"])
+    parser.add_argument('--correct', dest='correct', action='store_true')
 
     #parser.add_argument("--substitution", dest="substitution", default="T", type=str)
 
@@ -140,7 +141,7 @@ if __name__ == "__main__":
         if len("".join(transfered["seq"]).replace("N", "")) > maxlen:
             transfered = transfered[:maxlen]
         # get the ref from transefered:
-        ref = strand.get_ref("".join(transfered["seq"]).replace("N", ""), correct=False)
+        ref = strand.get_ref("".join(transfered["seq"]).replace("N", ""), correct=args.correct)
         if ref == "":
             return [None, None]
         # allign the ref on the transefered
