@@ -57,6 +57,7 @@ if __name__ == "__main__":
     parser.add_argument('--maxleninf', dest="maxleninf", type=int, default=36)
     parser.add_argument('--debug', dest='debug', action='store_true')
     parser.add_argument('--maxlen', dest="maxlen", type=int, default=10000)
+    parser.add_argument('--correct', dest='correct', action='store_true')
 
     # parser.add_argument("--substitution", dest="substitution", default="T", type=str)
 
@@ -231,7 +232,7 @@ if __name__ == "__main__":
         from_ntwk = "".join(transfered["seq"]).replace("N", "")
         sub = "B"
         prop = from_ntwk.count("T") / (from_ntwk.count("T") + from_ntwk.count(sub) + 1e-7)
-        ref = strand.get_ref(from_ntwk.replace(sub, "T"), correct=False)
+        ref = strand.get_ref(from_ntwk.replace(sub, "T"), correct=args.correct)
         # print(ref)
         if ref == "":
             print("Not alligned")
