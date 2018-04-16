@@ -822,7 +822,7 @@ if __name__ == '__main__':
                     return np.sum(x == c, axis=-1) / (np.sum(x == c, axis=-1) + np.sum(x == 3, axis=-1) + 1e-7)
 
                 def countT(x):
-                    return np.sum(x == mapping["T"], axis=-1) + np.sum(x == mapping["B"], axis=-1)
+                    return np.sum(x == mapping["T"], axis=-1)
 
                 if args.extra_output == 1:
                     p1 = countT(Label)[::, np.newaxis] * sp1 / 1.0 / subseq_size
