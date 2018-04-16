@@ -105,7 +105,8 @@ if __name__ == "__main__":
             return [bc, minion]
         else:
             trans = strand.get_seq(
-                f="no_basecall", window_size=args.window_size, method=args.method, allinfos=True)
+                f="no_basecall", window_size=args.window_size,
+                method=args.method, allinfos=True, maxlen=args.maxlen, minlen=args.minlen)
 
             return [trans, None]
 
@@ -134,6 +135,7 @@ if __name__ == "__main__":
         # try:
         strand.segmentation(w=args.window_size, method=args.method,
                             allinfos=args.allinfos, maxlen=args.maxlen, minlen=args.minlen)
+
         # print(strand.segments.columns)
         transfered = strand.transfer(strand.signal_bc, strand.segments, allinfos=args.allinfos)
         # print(transfered.columns)
