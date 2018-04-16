@@ -822,7 +822,7 @@ if __name__ == '__main__':
                     return np.sum(x == c, axis=-1) / (np.sum(x == c, axis=-1) + np.sum(x == 3, axis=-1) + 1e-7)
 
                 def countT(x):
-                    return np.sum(x == mapping["T"], axis=-1)
+                    return np.sum(x == mapping["T"], axis=-1) + np.sum(x == mapping["B"], axis=-1)
 
                 if args.extra_output == 1:
                     p1 = countT(Label)[::, np.newaxis] * sp1 / 1.0 / subseq_size
@@ -855,6 +855,11 @@ if __name__ == '__main__':
                     args.root, 'my_model_weights-%i.h5' % epoch))
 
         csv_keys = ["epoch", "loss", "val_loss"]
+        if args.extra_output > 1:
+            csv_keys.extend(["val_ctc_loss", "ctc_loss"])
+
+            for i in range(args.extra_output):
+                csv_keys.extend(["o%i_loss" % i, "val_o%i_loss" % i])
 
         lr = Schedul.set_new_lr(r.history["loss"][0])
 
