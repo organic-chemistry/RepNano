@@ -497,7 +497,7 @@ class Strand:
             TouB = np.argmax(pre[0][0], axis=-1) == 3
             IsB = pre[1][0][::, 0] > 0.5
             b[TouB & IsB] = 4
-            n = 6
+            n = pre[0][0].shape[-1]
             # print(b)
             # if len(pre)
 
