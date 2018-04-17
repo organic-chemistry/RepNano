@@ -500,8 +500,22 @@ class Strand:
             b[TouB & IsB] = 4
             b[empty] = 5
             n = 6
-            # print(b)
-            # if len(pre)
+
+        elif len(pre) == 4:
+            #pre = pre[0][0]
+            b = np.argmax(pre[0][0], axis=-1)
+            TouB = np.argmax(pre[0][0], axis=-1) == 3
+            empty = np.argmax(pre[0][0], axis=-1) == pre[0][0].shape[-1] - 1
+
+            Base = np.concatenate([np.zeros_like(pre[1][0][::, ]) + 0.500001,
+                                   pre[1][0][::, ], pre[2][0][::, ], pre[3][0][::, ]], axis=-1)
+
+            KBase = np.argmax(Base, axis=1) + 3
+
+            b[TouB] = KBase[TouB]
+
+            b[empty] = 7
+            n = 8
 
         else:
             pre = pre[0]
@@ -513,6 +527,8 @@ class Strand:
             alph = "ACGTN"
         if n == 5 + 1:
             alph = "ACGTBN"
+        if n == 7 + 1:
+            alph = "ACGTBEIN"
         if n == 8 + 1:
             alph = "ACGTBLEIN"
 
