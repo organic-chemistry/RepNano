@@ -494,15 +494,13 @@ class Strand:
         if len(pre) == 2:
             #pre = pre[0][0]
             b = np.argmax(pre[0][0], axis=-1)
-            """
+
             TouB = np.argmax(pre[0][0], axis=-1) == 3
             empty = np.argmax(pre[0][0], axis=-1) == pre[0][0].shape[-1] - 1
             IsB = pre[1][0][::, 0] > 0.5
             b[TouB & IsB] = 4
             b[empty] = 5
             n = 6
-            """
-            n = 5
 
         elif len(pre) == 4:
             #pre = pre[0][0]
