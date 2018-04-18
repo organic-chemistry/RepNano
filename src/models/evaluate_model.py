@@ -242,7 +242,7 @@ if __name__ == '__main__':
     parser.add_argument('--target', dest='target', type=str, default=None)
     parser.add_argument('--no-allign', dest='no_allign', action="store_true")
     parser.add_argument("--method", dest="method",
-                        choices=["FW", "TV", "TV45", "TV25", "TV5", "TVb"], default="FW")
+                        choices=["FW", "TV", "TV45", "TV25", "TV5", "TVb", "TV40"], default="FW")
     parser.add_argument('--extra-output', dest='extra_output', type=int, default=0)
 
     args = parser.parse_args()
@@ -266,17 +266,21 @@ if __name__ == '__main__':
     if args.all_datasets == []:
 
         if args.allinfos:
-            if args.target == "T":
-                args.all_datasets = [
-                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-second-half-T-TV-alls/dataset.pick"]
-            if args.target == "B":
-                print("La")
-                args.all_datasets = [
-                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-second-half-B-TV-alls/dataset.pick"]
-            if args.target == "D":
-                args.all_datasets = [
-                    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-D-TV-alls/dataset.pick"]
-
+            if args.method == "TV":
+                if args.target == "T":
+                    args.all_datasets = [
+                        "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-second-half-T-TV-alls/dataset.pick"]
+                if args.target == "B":
+                    print("La")
+                    args.all_datasets = [
+                        "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-second-half-B-TV-alls/dataset.pick"]
+                if args.target == "D":
+                    args.all_datasets = [
+                        "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-D-TV-alls/dataset.pick"]
+            if args.method == "T40V":
+                if args.target == "T":
+                    args.all_datasets = [
+                        "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-T-TV-allsg_40/dataset.pick"]
         elif args.method == "FW":
             if args.target == "T":
                 args.all_datasets = [
