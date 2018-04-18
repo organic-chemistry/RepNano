@@ -58,6 +58,7 @@ if __name__ == "__main__":
     parser.add_argument('--debug', dest='debug', action='store_true')
     parser.add_argument('--maxlen', dest="maxlen", type=int, default=10000)
     parser.add_argument('--correct', dest='correct', action='store_true')
+    parser.add_argument('--re-segment', dest='re_segment', action='store_true')
 
     # parser.add_argument("--substitution", dest="substitution", default="T", type=str)
 
@@ -185,7 +186,7 @@ if __name__ == "__main__":
     def load_from_bc(strand):
 
         trans = strand.get_seq(f="no_basecall", window_size=args.window_size,
-                               method=args.method, allinfos=args.allinfos, maxlen=args.maxleninf - 1, minlen=1)
+                               method=args.method, allinfos=args.allinfos, maxlen=args.maxleninf, minlen=1)
 
         return [trans[:int(4 * maxlen)], None]
 
@@ -218,8 +219,7 @@ if __name__ == "__main__":
         if len("".join(transfered["seq"]).replace("N", "")) > maxlen:
             transfered = transfered[:maxlen]
 
-        re_segment = True
-        if re_segment:
+        if args.re_segment:
             flat = []
             for peaces in transfered["all"]:
                 flat.extend(peaces)
