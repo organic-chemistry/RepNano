@@ -29,6 +29,7 @@ if __name__ == "__main__":
     parser.add_argument("--method", dest="method",
                         choices=["FW", "TV", "TV45", "TV25", "TV5", "TVb"])
     parser.add_argument('--correct', dest='correct', action='store_true')
+    parser.add_argument('--gamma', type=float, default=40)
 
     #parser.add_argument("--substitution", dest="substitution", default="T", type=str)
 
@@ -134,7 +135,7 @@ if __name__ == "__main__":
     def compute_attributes(strand):
         # try:
         strand.segmentation(w=args.window_size, method=args.method,
-                            allinfos=args.allinfos, maxlen=args.maxlen, minlen=args.minlen)
+                            allinfos=args.allinfos, maxlen=args.maxlen, minlen=args.minlen, gamma=args.gamma)
 
         # print(strand.segments.columns)
         transfered = strand.transfer(strand.signal_bc, strand.segments, allinfos=args.allinfos)
