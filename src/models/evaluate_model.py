@@ -277,7 +277,7 @@ if __name__ == '__main__':
                 if args.target == "D":
                     args.all_datasets = [
                         "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-D-TV-alls/dataset.pick"]
-            if args.method == "T40V":
+            if args.method == "TV40":
                 if args.target == "T":
                     args.all_datasets = [
                         "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-T-TV-allsg_40/dataset.pick"]
