@@ -74,6 +74,17 @@ def scale_named4(X, normalise_window=True, maxleninf=35):
     return Xd
 
 
+def scale_named4s(X, normalise_window=True, maxleninf=35):
+    Xd = np.zeros((len(X), maxleninf))
+    iis = 0
+    # print(X.columns)
+    for s in X["all"]:
+        Xd[iis][:len(s)] = s
+        iis += 1
+    Xd -= np.median(Xd)
+    return Xd
+
+
 def scale_clean(X, normalise_window=True):
 
     ret = np.array(X)

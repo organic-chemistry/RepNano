@@ -7,7 +7,7 @@ if __name__ == "__main__":
     import numpy as np
 
     from ..data.dataset import Dataset, NotAllign
-    from ..features.helpers import scale_simple, scale_named, scale_named2, scale_named4
+    from ..features.helpers import scale_simple, scale_named, scale_named2, scale_named4, scale_named4s
     from ..features.extract_events import tv_segment
     import glob
     import os
@@ -60,6 +60,7 @@ if __name__ == "__main__":
     parser.add_argument('--correct', dest='correct', action='store_true')
     parser.add_argument('--re-segment', dest='re_segment', action='store_true')
     parser.add_argument('--gamma', dest="gamma", type=float, default=40)
+    parser.add_argument('--not-normed', dest="normed", action="store_false")
 
     # parser.add_argument("--substitution", dest="substitution", default="T", type=str)
 
@@ -193,7 +194,11 @@ if __name__ == "__main__":
         return [trans[:int(4 * maxlen)], None]
 
     if args.allinfos:
-        fnorm = lambda x: scale_named4(x, maxleninf=args.maxleninf)
+        if args.normed:
+            fnorm = lambda x: scale_named4(x, maxleninf=args.maxleninf)
+        else:
+            fnorm = lambda x: scale_named4s(x, maxleninf=args.maxleninf)
+
     else:
         fnorm = scale_named2
 
