@@ -59,6 +59,7 @@ if __name__ == "__main__":
     parser.add_argument('--maxlen', dest="maxlen", type=int, default=10000)
     parser.add_argument('--correct', dest='correct', action='store_true')
     parser.add_argument('--re-segment', dest='re_segment', action='store_true')
+    parser.add_argument('--gamma', dest="gamma", type=float, default=40)
 
     # parser.add_argument("--substitution", dest="substitution", default="T", type=str)
 
@@ -186,7 +187,8 @@ if __name__ == "__main__":
     def load_from_bc(strand):
 
         trans = strand.get_seq(f="no_basecall", window_size=args.window_size,
-                               method=args.method, allinfos=args.allinfos, maxlen=args.maxleninf, minlen=1)
+                               method=args.method, allinfos=args.allinfos,
+                               maxlen=args.maxleninf, minlen=1, gamma=args.gamma)
 
         return [trans[:int(4 * maxlen)], None]
 
@@ -225,7 +227,7 @@ if __name__ == "__main__":
                 flat.extend(peaces)
 
             segments = tv_segment(flat, gamma=40, maxlen=35,
-                                  minlen=1, sl=6024, allinfos=True)
+                                  minlen=1, sl=strand.sl, allinfos=True)
             transfered = strand.transfer(transfered, segments, allinfos=args.allinfos)
 
         # get the ref from transefered:
