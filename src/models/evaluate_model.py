@@ -401,6 +401,10 @@ if __name__ == '__main__':
                     "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-H_T-TV-5/dataset.pick"]
                 dataset.REF = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human/all_chra.fa"
                 find_ref = False
+
+    if args.all_datasets == []:
+        find_ref = False
+        args.all_datasets = [args.target]
     print(root)
     print(args.all_datasets)
 
