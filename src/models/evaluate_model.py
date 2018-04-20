@@ -402,7 +402,7 @@ if __name__ == '__main__':
     if args.all_datasets == []:
         find_ref = True
         args.all_datasets = [args.target]
-        args.target = "/%s/" % args.target.split("/")[-2]
+        args.target = "/%s" % args.target.split("/")[-2]
 
     root += "/evaluate_%s/" % weight.split("-")[-1][:-3]
 
