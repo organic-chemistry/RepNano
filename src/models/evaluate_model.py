@@ -400,7 +400,7 @@ if __name__ == '__main__':
                 find_ref = False
 
     if args.all_datasets == []:
-        find_ref = False
+        find_ref = True
         args.all_datasets = [args.target]
         args.target = "/%s/" % args.target.split("/")[-2]
 
