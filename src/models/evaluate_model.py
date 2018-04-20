@@ -257,9 +257,6 @@ if __name__ == '__main__':
 
     root, weight = os.path.split(args.weights)
 
-    root += "/evaluate_%s/" % weight.split("-")[-1][:-3]
-
-    root += args.target
     from ..data import dataset
     find_ref = True
 
@@ -405,7 +402,12 @@ if __name__ == '__main__':
     if args.all_datasets == []:
         find_ref = False
         args.all_datasets = [args.target]
-        args.target = args.target.split("/")[-2]
+        args.target = "/%s/" % args.target.split("/")[-2]
+
+    root += "/evaluate_%s/" % weight.split("-")[-1][:-3]
+
+    root += args.target
+
     print(root)
     print(args.all_datasets)
 
