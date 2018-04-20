@@ -405,6 +405,7 @@ if __name__ == '__main__':
     if args.all_datasets == []:
         find_ref = False
         args.all_datasets = [args.target]
+        args.target = args.target.split("/")[-2]
     print(root)
     print(args.all_datasets)
 
