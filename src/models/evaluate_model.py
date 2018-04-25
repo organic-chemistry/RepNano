@@ -531,8 +531,10 @@ if __name__ == '__main__':
             # l = "I0013833_20170821_FAH14319_MN17490_sequencing_run_780_80823_read_344_ch_1_strand"
             # if not (l in s.filename):
             #    continue
-
-            transfered = s.transfered[:args.maxlen_input]
+            if s.transfered is not None:
+                transfered = s.transfered[:args.maxlen_input]
+            else:
+                transfered = s.segments[:args.maxlen_input]
 
             # sig = np.array(scale_clean_two_pd(transfered), dtype=np.float32)
 
