@@ -502,7 +502,7 @@ if __name__ == '__main__':
         for strand in D.strands[:args.maxf]:
 
             if strand.transfered is None:
-                data_x.append(None)
+                data_x.append(fnorm(s.segments))
                 continue
 
             if args.sclean:
@@ -531,8 +531,6 @@ if __name__ == '__main__':
             # l = "I0013833_20170821_FAH14319_MN17490_sequencing_run_780_80823_read_344_ch_1_strand"
             # if not (l in s.filename):
             #    continue
-            if s.transfered is None:
-                continue
 
             transfered = s.transfered[:args.maxlen_input]
 
@@ -545,8 +543,8 @@ if __name__ == '__main__':
             new = copy.deepcopy(transfered)
             # print(ns.shape)
             new["seq"] = ns[::, 0]
-
-            if n_output_network == 2:
+            """
+            if n_output_network == 2 and s.transfered is not None:
 
                 new["seq1"] = ns[::, 1]
 
@@ -554,6 +552,8 @@ if __name__ == '__main__':
                 print(len("".join(transfered["seq"]).replace("N", "")), len("".join(new["seq"]).replace("N", "")),
                       len("".join(new["seq1"]).replace("N", "")), len(new))
             else:
+            """
+            if s.transfered is not None:
                 print(np.sum(new["seq"] == "B"),)
                 if "seq" in transfered.columns:
                     print(len("".join(transfered["seq"]).replace("N", "")), len("".join(new["seq"]).replace("N", "")),
@@ -561,6 +561,8 @@ if __name__ == '__main__':
                 else:
                     print(len("".join(new["seq"]).replace("N", "")),
                           len(new))
+            else:
+                print(len("".join(new["seq"]).replace("N", "")), len(s.new))
 
             s.ntwk_align = new
 
