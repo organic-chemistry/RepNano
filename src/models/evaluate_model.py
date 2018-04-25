@@ -492,7 +492,7 @@ if __name__ == '__main__':
             fnorm = scale_named3
 
         if args.allinfos:
-            if args.not_normed:
+            if not args.normed:
                 fnorm = lambda x: scale_named4s(x, maxleninf=args.maxleninf)
             else:
                 fnorm = lambda x: scale_named4(x, maxleninf=args.maxleninf)
