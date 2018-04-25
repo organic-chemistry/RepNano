@@ -244,6 +244,7 @@ if __name__ == '__main__':
     parser.add_argument("--method", dest="method",
                         choices=["FW", "TV", "TV45", "TV25", "TV5", "TVb", "TV40"], default="FW")
     parser.add_argument('--extra-output', dest='extra_output', type=int, default=0)
+    parser.add_argument('--not-normed', dest="normed", action="store_false")
 
     args = parser.parse_args()
 
@@ -476,7 +477,7 @@ if __name__ == '__main__':
     from ..data.dataset import Dataset
     sys.path.append("src/")
 
-    from ..features.helpers import scale_simple, scale_named, scale_named2, scale_named3, scale_named4
+    from ..features.helpers import scale_simple, scale_named, scale_named2, scale_named3, scale_named4, scale_named4s
 
     def load_datasets(argdatasets):
 
@@ -491,7 +492,10 @@ if __name__ == '__main__':
             fnorm = scale_named3
 
         if args.allinfos:
-            fnorm = lambda x: scale_named4(x, maxleninf=args.maxleninf)
+            if args.not_normed:
+                fnorm = lambda x: scale_named4s(x, maxleninf=args.maxleninf)
+            else:
+                fnorm = lambda x: scale_named4(x, maxleninf=args.maxleninf)
 
         data_x = []
 
