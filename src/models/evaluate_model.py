@@ -564,7 +564,7 @@ if __name__ == '__main__':
                     print(len("".join(new["seq"]).replace("N", "")),
                           len(new))
             else:
-                print(len("".join(new["seq"]).replace("N", "")), len(s.new))
+                print(len("".join(new["seq"]).replace("N", "")), len(new))
 
             s.ntwk_align = new
 
