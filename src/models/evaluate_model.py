@@ -502,7 +502,7 @@ if __name__ == '__main__':
         for strand in D.strands[:args.maxf]:
 
             if strand.transfered is None:
-                data_x.append(fnorm(s.segments))
+                data_x.append(fnorm(strand.segments))
                 continue
 
             if args.sclean:
