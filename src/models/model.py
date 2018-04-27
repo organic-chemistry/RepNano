@@ -279,6 +279,8 @@ def load_weights_from_hdf5_group_what_you_can(filepath, layers):
     weight_value_tuples = []
     for k, name in enumerate(layer_names):
         g = f[name]
+        if "o0" in name:
+            continue
         weight_names = [n.decode('utf8') for n in g.attrs['weight_names']]
         weight_values = [g[weight_name] for weight_name in weight_names]
         layer = filtered_layers[k]
