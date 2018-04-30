@@ -231,7 +231,7 @@ if __name__ == "__main__":
             for peaces in transfered["all"]:
                 flat.extend(peaces)
 
-            segments = tv_segment(flat, gamma=40, maxlen=35,
+            segments = tv_segment(flat, gamma=20, maxlen=35,
                                   minlen=1, sl=strand.sl, allinfos=True)
             transfered = strand.transfer(transfered, segments, allinfos=args.allinfos)
 
