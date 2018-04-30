@@ -144,7 +144,7 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                                merge_mode=merge_mode)(l2)
 
             out_layer1 = TimeDistributed(
-                Dense(Nbases, activation="softmax"), name="out_layer1")(l3)
+                Dense(Nbases, activation="softmax", trainable=trainable), name="out_layer1", trainable=trainable)(l3)
             out_layer2 = TimeDistributed(
                 Dense(Nbases, activation="softmax"), name="out_layer2")(Concatenate()([l3, out_layer1]))
 
