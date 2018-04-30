@@ -288,7 +288,7 @@ class Strand:
         else:
             return ref, X1, P1
 
-    def score(self, s1, s2, maxlen=None, all_info=False):
+    def score(self, s1, s2, maxlen=None, all_info=False, c1=-0.5, c2=-0.5):
 
         if s1 == "":
             return None
@@ -299,7 +299,7 @@ class Strand:
             s1 = s1[:maxlen]
             s2 = s2[:maxlen]
 
-        al = pairwise2.align.globalxs(s1, s2, -0.5, -0.5, one_alignment_only=True)[0]
+        al = pairwise2.align.globalxs(s1, s2, c1, c2, one_alignment_only=True)[0]
 
         if all_info:
             return al
