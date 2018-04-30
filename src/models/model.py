@@ -164,7 +164,7 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
 
     if out_layer2 is not None:
         print("ici")
-        model = Model(inputs=inputs, outputs=[out_layer1, out_layer2])
+        model = Model(inputs=inputs, outputs=[out_layer1, out_layer2, ext])
     else:
         if extra_output == 0:
             model = Model(inputs=inputs, outputs=out_layer1)
