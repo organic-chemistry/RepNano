@@ -493,6 +493,13 @@ class Strand:
             pre = ntwk.predict(signal[np.newaxis, ::, ::])
         else:
             pre = already_pre
+
+        if no2:
+            alph = "ACGTN"
+            output1 = np.array(list(map(lambda x: str(alph)[x], o1m)))[::, np.newaxis]
+            output2 = np.array(list(map(lambda x: str(alph)[x], o2m)))[::, np.newaxis]
+
+            return np.concatenate((output1, output2, signal), axis=-1)
         if len(pre) == 2:
             #pre = pre[0][0]
             b = np.argmax(pre[0][0], axis=-1)
