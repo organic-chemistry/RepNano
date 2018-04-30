@@ -602,6 +602,8 @@ class Strand:
                             stl_base[where + 1] = stl_base[where][2:] + \
                                 "N" * (2 - len(stl_base[where][2:]))
 
+                            stl_base[where] = stl_base[where][:2]
+
                         if len(stl_base[where]) > 2:
                             print("Loss", stl_base[where])
                         stl_base[where] = stl_base[where][:2]
