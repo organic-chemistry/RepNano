@@ -234,7 +234,7 @@ import h5py
 from keras.engine.topology import preprocess_weights_for_loading
 
 
-def load_weights_from_hdf5_group_what_you_can(filepath, layers):
+def load_weights_from_hdf5_group_what_you_can(filepath, layers, extra=False):
 
     f = h5py.File(filepath, mode='r')
 
@@ -285,7 +285,7 @@ def load_weights_from_hdf5_group_what_you_can(filepath, layers):
     weight_value_tuples = []
     for k, name in enumerate(layer_names):
         g = f[name]
-        if "extra0" in name:
+        if not extra and "extra0" in name:
             continue
         print(name)
         weight_names = [n.decode('utf8') for n in g.attrs['weight_names']]
