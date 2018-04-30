@@ -588,14 +588,14 @@ class Strand:
                                 stl_base[where - 1] = stl_base[where - 1].replace("N", "")
                                 #print(stl_base[where - 1])
                                 stl_base[where] = stl_base[where][1:]
-
+                        """
                         elif len(stl_base[where]) == 2 and where > 0:
                             if "NN" in stl_base[where - 1]:
 
                                 #
                                 stl_base[where - 1] = stl_base[where][:2]
                                 stl_base[where] = stl_base[where][2:]
-                                # print(stl_base[where])
+                                # print(stl_base[where])"""
 
                         if len(stl_base[where]) > 2 and where < len(stl_base):
 
