@@ -502,8 +502,8 @@ class Strand:
             om1 = np.argmax(om1[0], axis=-1)
             om2 = np.argmax(om2[0], axis=-1)
 
-            output1 = np.array(list(map(lambda x: str(alph)[x], o1m)))[::, np.newaxis]
-            output2 = np.array(list(map(lambda x: str(alph)[x], o2m)))[::, np.newaxis]
+            output1 = np.array(list(map(lambda x: str(alph)[x], om1)))[::, np.newaxis]
+            output2 = np.array(list(map(lambda x: str(alph)[x], om2)))[::, np.newaxis]
 
             return np.concatenate((output1, output2, signal), axis=-1)
         if len(pre) == 2:
