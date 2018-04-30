@@ -545,6 +545,9 @@ if __name__ == '__main__':
             new = copy.deepcopy(transfered)
             # print(ns.shape)
             new["seq"] = ns[::, 0]
+            if n_output_network == 2:
+
+                new["seq1"] = ns[::, 1]
             """
             if n_output_network == 2 and s.transfered is not None:
 
