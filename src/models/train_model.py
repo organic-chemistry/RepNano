@@ -247,6 +247,8 @@ if __name__ == '__main__':
     parser.add_argument('--maxleninf', dest="maxleninf", type=int, default=36)
     parser.add_argument('--raw', dest="raw", action="store_true")
     parser.add_argument('--substitution', dest="substitution", action="store_true")
+    parser.add_argument('--not-trainable', dest="trainable", action="store_false")
+
     parser.add_argument('--maxf', dest="maxf", type=int, default=None)
     parser.add_argument('--extra-output', dest='extra_output', type=int, default=0)
     parser.add_argument('--probas', nargs='+', dest="probas", default=[], type=str)
@@ -314,6 +316,7 @@ if __name__ == '__main__':
         raise
 
     _, ntwk = build_models(args.size, nbase=args.Nbases - 4,
+                           trainable=args.trainable,
                            ctc_length=ctc_length,
                            input_length=input_length, n_output=n_output_network,
                            lr=args.lr, res=args.res,
@@ -321,6 +324,7 @@ if __name__ == '__main__':
                            n_feat=n_feat, simple=args.simple, extra_output=args.extra_output)
     predictor, _ = build_models(args.size, nbase=args.Nbases - 4,
                                 ctc_length=ctc_length,
+                                trainable=args.trainable,
                                 input_length=None, n_output=n_output_network,
                                 lr=args.lr, res=args.res, attention=args.attention,
                                 n_feat=n_feat, simple=args.simple, extra_output=args.extra_output)
