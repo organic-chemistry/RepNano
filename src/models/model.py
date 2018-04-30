@@ -146,7 +146,7 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
             out_layer1 = TimeDistributed(
                 Dense(Nbases, activation="softmax"), name="out_layer1")(l3)
             out_layer2 = TimeDistributed(
-                Dense(Nbases, activation="softmax"))(l3)  # Concatenate()([l3, out_layer1]))
+                Dense(Nbases, activation="softmax"))(Concatenate()([l3, out_layer1]))
 
             if input_length is not None:
 
@@ -285,7 +285,7 @@ def load_weights_from_hdf5_group_what_you_can(filepath, layers):
     weight_value_tuples = []
     for k, name in enumerate(layer_names):
         g = f[name]
-        if "o0" in name:
+        if "extra0" in name:
             continue
         print(name)
         weight_names = [n.decode('utf8') for n in g.attrs['weight_names']]
