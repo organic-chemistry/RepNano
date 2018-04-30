@@ -496,8 +496,7 @@ class Strand:
 
         if no2:
             alph = "ACGTN"
-            print(len(pre),)
-            print(len(pre[0]))
+
             om1, om2, _ = pre
             om1 = np.argmax(om1[0], axis=-1)
             om2 = np.argmax(om2[0], axis=-1)
