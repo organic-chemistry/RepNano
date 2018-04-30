@@ -272,7 +272,7 @@ def load_weights_from_hdf5_group_what_you_can(filepath, layers, extra=False):
             filtered_layer_names.append(name)
     layer_names = filtered_layer_names
     print(layer_names)
-    print(filtered_layers)
+    print([l.name for l in filtered_layers])
     """
     if len(layer_names) != len(filtered_layers):
         raise ValueError('You are trying to load a weight file '
