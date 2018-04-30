@@ -577,7 +577,7 @@ class Strand:
                         stl_base[where] = stl_base[where].replace("N", "")
                         # First try to transfer at previouss:
                         #print(stl_base[where - 1], stl_base[where], stl_base[where + 1])
-                        if len(stl_base[where]) > 2 and where > 0:
+                        if len(stl_base[where]) >= 2 and where > 0:
                             if "NN" in stl_base[where - 1]:
 
                                 #
