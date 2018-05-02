@@ -586,6 +586,7 @@ if __name__ == '__main__':
                 s.ref_ntwk = s.get_ref(seq, pos=True, correct=True, find_ref=find_ref)
                 print(s.ref_ntwk)
                 s.score_ntwk = s.score(seq, s.ref_ntwk[0], maxlen=args.maxlen)
+                print(s.score_ntwk)
             # print(Score)
             # Score["ntwk_bc"].append(s.score("".join(s.ntwk_align["seq"]).replace("N",""),s.seq_from_basecall))
             if hasattr(s, "seq_from_basecall"):
