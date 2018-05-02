@@ -148,7 +148,7 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
 
             if input_length is not None:
 
-                l3b = Concatenate()([out_layer2, out_layer1])
+                l3b = Concatenate()([out_layer1, out_layer2])
                 # 2 * size because l3 is concat
                 out_layer1 = Reshape((input_length * 2, Nbases))(l3b)
                 out_layer2 = None

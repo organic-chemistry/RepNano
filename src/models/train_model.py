@@ -843,7 +843,7 @@ if __name__ == '__main__':
                     print(sp1)
                     print(p1)
 
-                    r = ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size] * len(Length))[:maxin], Length[:maxin]],
+                    r = ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size * args.n_output_network] * len(Length))[:maxin], Length[:maxin]],
                                  [Label[:maxin]] + [pi[:maxin] for pi in p1.T], nb_epoch=1, batch_size=batch_size,
                                  validation_data=([tX_new,
                                                    tLabel,
@@ -853,7 +853,7 @@ if __name__ == '__main__':
                                                   [tLabel] + [pi[:maxin] for pi in tp1.T]))
 
             else:
-                r = ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size] * len(Length))[:maxin], Length[:maxin]],
+                r = ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size * args.n_output_network] * len(Length))[:maxin], Length[:maxin]],
                              Label[:maxin], nb_epoch=1, batch_size=batch_size,
                              validation_data=([tX_new,
                                                tLabel,
