@@ -847,7 +847,7 @@ if __name__ == '__main__':
                                  [Label[:maxin]] + [pi[:maxin] for pi in p1.T], nb_epoch=1, batch_size=batch_size,
                                  validation_data=([tX_new,
                                                    tLabel,
-                                                   np.array([subseq_size] *
+                                                   np.array([subseq_size * args.n_output_network] *
                                                             len(tLength)),
                                                    tLength],
                                                   [tLabel] + [pi[:maxin] for pi in tp1.T]))
@@ -857,7 +857,7 @@ if __name__ == '__main__':
                              Label[:maxin], nb_epoch=1, batch_size=batch_size,
                              validation_data=([tX_new,
                                                tLabel,
-                                               np.array([subseq_size] *
+                                               np.array([subseq_size * args.n_output_network] *
                                                         len(tLength)),
                                                tLength],
                                               tLabel))
