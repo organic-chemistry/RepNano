@@ -809,7 +809,7 @@ if __name__ == '__main__':
                                          len(tLength)).shape, tLength.shape, tLabel.shape)
             print(Label.shape, np.array([subseq_size] *
                                         len(Length)).shape, Length.shape, Label.shape)
-            print(Length)
+            # print(Length)
             print(X_new.dtype, Y_new.dtype, Label.dtype, Length.dtype)
 
             # To balance class weight
