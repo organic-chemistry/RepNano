@@ -574,8 +574,9 @@ if __name__ == '__main__':
             if n_output_network == 2:
                 seq = ""
                 for b1, b2 in zip(s.ntwk_align["seq"], s.ntwk_align["seq1"]):
+
+                    #seq += b1
                     seq += b2
-                    seq += b1
                 print(np.sum(s.ntwk_align["seq"] != "N"), np.sum(s.ntwk_align["seq1"] != "N"))
                 seq = "".join(seq).replace("N", "").replace("B", "T")
             else:
