@@ -577,6 +577,7 @@ if __name__ == '__main__':
 
                     #seq += b1
                     seq += b1
+                    seq += b2
                 print(np.sum(s.ntwk_align["seq"] != "N"), np.sum(s.ntwk_align["seq1"] != "N"))
                 seq = "".join(seq).replace("N", "").replace("B", "T")
             else:
