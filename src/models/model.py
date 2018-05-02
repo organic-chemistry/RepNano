@@ -77,26 +77,26 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
     if res:
         l2 = Add()([l2, l1])
 
-    if n_output == 1:
-        l3 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable, recurrent_dropout=recurrent_dropout),
-                           merge_mode=merge_mode)(l2)
+    l3 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable, recurrent_dropout=recurrent_dropout),
+                       merge_mode=merge_mode)(l2)
 
-        if res:
-            l3 = Add()([l3, l2])
+    if res:
+        l3 = Add()([l3, l2])
 
-        if attention:
-            if input_length is not None:
-                inp = 2 * size
-                if res:
-                    inp = size
-                out_layer1 = AttentionDecoder(
-                    size, Nbases, name="out_layer1", input_shape=(input_length, inp))(l3)
-            else:
-                out_layer1 = AttentionDecoder(size, Nbases, name="out_layer1", to_apply=True)(l3)
-
+    if attention:
+        if input_length is not None:
+            inp = 2 * size
+            if res:
+                inp = size
+            out_layer1 = AttentionDecoder(
+                size, Nbases, name="out_layer1", input_shape=(input_length, inp))(l3)
         else:
-            out_layer1 = TimeDistributed(Dense(Nbases, activation="softmax"), name="out_layer1")(l3)
+            out_layer1 = AttentionDecoder(size, Nbases, name="out_layer1", to_apply=True)(l3)
 
+    else:
+        out_layer1 = TimeDistributed(Dense(Nbases, activation="softmax"), name="out_layer1")(l3)
+
+    if n_output == 1:
         if extra_output != 0:
             ext = []
             for n in range(extra_output):
@@ -140,8 +140,6 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                 out_layer1 = TD(l3d)
                 out_layer2 = TD(l3u)
         else:
-            l3 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable, recurrent_dropout=recurrent_dropout),
-                               merge_mode=merge_mode)(l2)
 
             out_layer1 = TimeDistributed(
                 Dense(Nbases, activation="softmax", trainable=trainable), name="out_layer1", trainable=trainable)(l3)
