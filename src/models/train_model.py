@@ -621,7 +621,9 @@ if __name__ == '__main__':
                     s2 = np.random.choice(s_arr, p=p_arr)
                     # print(s2)
                     # print(data_x[s2].shape[0])
-                    r = np.random.randint(0, d_x[s2].shape[0] - subseq_size)
+                    r = np.random.randint(0, d_x[s2].shape[0] - i=0
+                                          plot(np.argmax(pre[0][i], axis=-1))
+                                          print(np.argmax(pre[0][i], axis=-1)))
                     x = d_x[s2][r:r + subseq_size]
 
                     if not args.ctc:
@@ -808,7 +810,8 @@ if __name__ == '__main__':
             print(tLabel.shape, np.array([subseq_size] *
                                          len(tLength)).shape, tLength.shape, tLabel.shape)
             print(Label.shape, np.array([subseq_size] *
-                                        len(Length)).shape, Length.shape, Label.shape)
+                                        len(Length)).shape, Length.shape)
+            print(Length)
 
             print(X_new.dtype, Y_new.dtype, Label.dtype, Length.dtype)
 
