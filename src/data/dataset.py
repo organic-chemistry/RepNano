@@ -495,42 +495,55 @@ class Strand:
             pre = already_pre
 
         if no2:
-            alph = "ACGTN"
 
-            om1, om2, _ = pre
+            om1, om2, *other = pre
             om1 = np.argmax(om1[0], axis=-1)
             om2 = np.argmax(om2[0], axis=-1)
 
-            output1 = np.array(list(map(lambda x: str(alph)[x], om1)))[::, np.newaxis]
-            output2 = np.array(list(map(lambda x: str(alph)[x], om2)))[::, np.newaxis]
+            #output1 = np.array(list(map(lambda x: str(alph)[x], om1)))[::, np.newaxis]
+            #output2 = np.array(list(map(lambda x: str(alph)[x], om2)))[::, np.newaxis]
+            outputs = [om1, om2]
+            # return np.concatenate((output1, output2, signal), axis=-1)
 
-            return np.concatenate((output1, output2, signal), axis=-1)
-        if len(pre) == 2:
-            #pre = pre[0][0]
-            b = np.argmax(pre[0][0], axis=-1)
+        else:
+            om1,  *other = pre
+            om1 = np.argmax(om1[0], axis=-1)
+            outputs = [om1]
 
-            TouB = np.argmax(pre[0][0], axis=-1) == 3
-            empty = np.argmax(pre[0][0], axis=-1) == pre[0][0].shape[-1] - 1
-            IsB = pre[1][0][::, 0] > 0.5
-            b[TouB & IsB] = 4
-            b[empty] = 5
-            n = 6
+        if other == []:
 
-        elif len(pre) == 4:
-            #pre = pre[0][0]
-            b = np.argmax(pre[0][0], axis=-1)
-            TouB = np.argmax(pre[0][0], axis=-1) == 3
-            empty = np.argmax(pre[0][0], axis=-1) == pre[0][0].shape[-1] - 1
+            n = outputs[0].shape[-1]
 
-            Base = np.concatenate([np.zeros_like(pre[1][0][::, ]) + 0.500001,
-                                   pre[1][0][::, ], pre[2][0][::, ], pre[3][0][::, ]], axis=-1)
+        else:
 
-            KBase = np.argmax(Base, axis=1) + 3
+            if len(other) == 1:
+                tmp_outputs = []
+                for b in outputs:
 
-            b[TouB] = KBase[TouB]
+                    TouB = b == 3
+                    empty = b == pre[0][0].shape[-1] - 1
+                    IsB = other[0][0][::, 0] > 0.5
+                    b[TouB & IsB] = 4
+                    b[empty] = 5
+                    n = 6
+                    tmp_outputs.append(copy.deepcopy(b))
 
-            b[empty] = 7
-            n = 8
+            elif len(other) == 3:
+                print("Warning, not implemented")
+                #pre = pre[0][0]
+                b = np.argmax(pre[0][0], axis=-1)
+                TouB = np.argmax(pre[0][0], axis=-1) == 3
+                empty = np.argmax(pre[0][0], axis=-1) == pre[0][0].shape[-1] - 1
+
+                Base = np.concatenate([np.zeros_like(pre[1][0][::, ]) + 0.500001,
+                                       pre[1][0][::, ], pre[2][0][::, ], pre[3][0][::, ]], axis=-1)
+
+                KBase = np.argmax(Base, axis=1) + 3
+
+                b[TouB] = KBase[TouB]
+
+                b[empty] = 7
+                n = 8
 
         else:
             pre = pre[0]
@@ -538,14 +551,6 @@ class Strand:
             n = pre.shape[-1]
 
         # print(n)
-        if n == 4 + 1:
-            alph = "ACGTN"
-        if n == 5 + 1:
-            alph = "ACGTBN"
-        if n == 7 + 1:
-            alph = "ACGTBEIN"
-        if n == 8 + 1:
-            alph = "ACGTBLEIN"
 
         if no2:
             output1 = np.array(list(map(lambda x: str(alph)[x], o1m)))[::, np.newaxis]
