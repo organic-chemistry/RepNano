@@ -217,7 +217,7 @@ if __name__ == "__main__":
         output = outputs[::, 0]
         if len(outputs) > 2:
             output2 = outputs[::, 1]
-            s.transfered["seq"] = [s + "N" for s, s2 in zip(output, output1)]
+            s.transfered["seq"] = [s + s2 for s, s2 in zip(output, output2)]
         else:
             s.transfered["seq"] = [s + "N" for s in output]
 
