@@ -61,6 +61,7 @@ if __name__ == "__main__":
     parser.add_argument('--re-segment', dest='re_segment', action='store_true')
     parser.add_argument('--gamma', dest="gamma", type=float, default=40)
     parser.add_argument('--not-normed', dest="normed", action="store_false")
+    parser.add_argument('--extra-output', dest='extra_output', type=int, default=0)
 
     # parser.add_argument("--substitution", dest="substitution", default="T", type=str)
 
@@ -173,7 +174,8 @@ if __name__ == "__main__":
         predictor, _ = build_models(args.size, nbase=args.Nbases - 4,
                                     ctc_length=ctc_length,
                                     input_length=None, n_output=n_output_network,
-                                    lr=1, res=args.res, attention=args.attention, n_feat=n_feat, simple=args.simple)
+                                    lr=1, res=args.res, attention=args.attention,
+                                    n_feat=n_feat, simple=args.simple, extra_output=args.extra_output)
 
         if args.weights is not None:
 
@@ -210,11 +212,17 @@ if __name__ == "__main__":
         print("TV", time.time() - t, len(v[0]))
         t = time.time()
         s.transfered = v[0]
-        output = s.analyse_segmentation(predictor, fnorm(s.transfered))[::, 0]
+        outputs = s.analyse_segmentation(predictor, fnorm(s.transfered), no2=n_output_network == 2)
+        output = outputs[::, 0]
+        if len(outputs) > 2:
+            output2 = outputs[::, 1]
+            s.transfered["seq"] = [s + "N" for s, s2 in zip(output, output1)]
+        else:
+            s.transfered["seq"] = [s + "N" for s in output]
+
         print("predict", time.time() - t)
 
         # print(output.shape, len(s.transfered))
-        s.transfered["seq"] = [s + "N" for s in output]
 
     data_x = []
 
