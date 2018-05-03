@@ -561,9 +561,9 @@ class Strand:
 
             print(outputs[0].shape, outputs[1].shape, signal.shape)
 
-            return np.concatenate((outputs[0], outputs[1], signal), axis=-1)
+            return np.concatenate((outputs[0][::, np.newaxis], outputs[1][::, np.newaxis], signal), axis=-1)
         else:
-            return np.concatenate((outputs[0], signal), axis=-1)
+            return np.concatenate((outputs[0][::, np.newaxis], signal), axis=-1)
 
     def transfer(self, root_signal, signal_to_label, center_of_mass=False, seqt="seq", allinfos=False):
         # Compute center:
