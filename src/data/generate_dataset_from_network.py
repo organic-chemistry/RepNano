@@ -212,7 +212,8 @@ if __name__ == "__main__":
         print("TV", time.time() - t, len(v[0]))
         t = time.time()
         s.transfered = v[0]
-        outputs = s.analyse_segmentation(predictor, fnorm(s.transfered), no2=n_output_network == 2)
+        outputs = s.analyse_segmentation(predictor, fnorm(
+            s.transfered), no2=args.n_output_network == 2)
         output = outputs[::, 0]
         if len(outputs) > 2:
             output2 = outputs[::, 1]
