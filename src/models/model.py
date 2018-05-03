@@ -224,7 +224,7 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                                        label_length], outputs=[loss_out] + ot)
 
                 model2.compile(loss=[lambda y_true, y_pred: y_pred] +
-                               ["mean_squared_error" for i in range(extra_output)], optimizer="adadelta")
+                               ["mean_squared_logarithmic_error" for i in range(extra_output)], optimizer="adadelta")
 
     return model, model2
 
