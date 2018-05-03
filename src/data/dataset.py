@@ -500,8 +500,6 @@ class Strand:
             om1 = np.argmax(om1[0], axis=-1)
             om2 = np.argmax(om2[0], axis=-1)
 
-            #output1 = np.array(list(map(lambda x: str(alph)[x], om1)))[::, np.newaxis]
-            #output2 = np.array(list(map(lambda x: str(alph)[x], om2)))[::, np.newaxis]
             outputs = [om1, om2]
             # return np.concatenate((output1, output2, signal), axis=-1)
 
@@ -527,6 +525,7 @@ class Strand:
                     b[empty] = 5
                     n = 6
                     tmp_outputs.append(copy.deepcopy(b))
+                outputs = tmp_outputs
 
             elif len(other) == 3:
                 print("Warning, not implemented")
@@ -545,22 +544,22 @@ class Strand:
                 b[empty] = 7
                 n = 8
 
+        if n == 4 + 1:
+            alph = "ACGTN"
+        if n == 5 + 1:
+            alph = "ACGTBN"
+        if n == 7 + 1:
+            alph = "ACGTBEIN"
+        if n == 8 + 1:
+            alph = "ACGTBLEIN"
+
+            outputs = [np.array(list(map(lambda x: str(alph)[x], o)))
+                       [::, np.newaxis] for o in outputs]
+
+        if len(outputs) == 2:
+            return np.concatenate((outputs[0], outputs[1], signal), axis=-1)
         else:
-            pre = pre[0]
-            b = np.argmax(pre, axis=-1)
-            n = pre.shape[-1]
-
-        # print(n)
-
-        if no2:
-            output1 = np.array(list(map(lambda x: str(alph)[x], o1m)))[::, np.newaxis]
-            output2 = np.array(list(map(lambda x: str(alph)[x], o2m)))[::, np.newaxis]
-
-            return np.concatenate((output1, output2, signal), axis=-1)
-        else:
-            output = np.array(list(map(lambda x: str(alph)[x], b)))[::, np.newaxis]
-
-            return np.concatenate((output, signal), axis=-1)
+            return np.concatenate((outputs[0], signal), axis=-1)
 
     def transfer(self, root_signal, signal_to_label, center_of_mass=False, seqt="seq", allinfos=False):
         # Compute center:
