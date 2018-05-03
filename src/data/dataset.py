@@ -559,7 +559,7 @@ class Strand:
 
         if len(outputs) == 2:
 
-            print(outputs[0].shape, outputs[1].shape, signal.shape)
+            #print(outputs[0].shape, outputs[1].shape, signal.shape)
 
             return np.concatenate((outputs[0], outputs[1], signal), axis=-1)
         else:
