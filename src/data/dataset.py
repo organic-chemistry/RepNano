@@ -14,6 +14,7 @@ import subprocess
 import pandas as pd
 import tempfile
 import os
+import copy
 
 
 class NotAllign(Exception):
