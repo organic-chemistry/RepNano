@@ -68,12 +68,14 @@ def scale_named4(X, normalise_window=True, maxleninf=35):
     # print(X.columns)
     tot = []
     for s in X["all"]:
-        Xd[iis][:len(s)] = s
         tot.extend(s)
-        iis += 1
 
-    Xd -= np.median(tot)
-    Xd /= np.std(tot)
+    tot = np.array(tot)
+    med = np.median(tot)
+    std = np.std(tot - med)
+    for s in X["all"]:
+        Xd[iis][:len(s)] = (s - med) / std
+
     return Xd
 
 
