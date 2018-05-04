@@ -70,7 +70,6 @@ def scale_named4(X, normalise_window=True, maxleninf=35):
         Xd[iis][:len(s)] = s
         iis += 1
 
-    print("med", np.median(Xd))
     Xd -= np.median(Xd)
     Xd /= np.std(Xd)
     return Xd
@@ -83,6 +82,9 @@ def scale_named4s(X, normalise_window=True, maxleninf=35):
     for s in X["all"]:
         Xd[iis][:len(s)] = s
         iis += 1
+
+    print("med", np.median(Xd))
+
     Xd -= np.median(Xd)
     return Xd
 
