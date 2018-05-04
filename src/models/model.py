@@ -233,7 +233,7 @@ import h5py
 from keras.engine.topology import preprocess_weights_for_loading
 
 
-def load_weights_from_hdf5_group_what_you_can(filepath, layers, extra=False):
+def load_weights_from_hdf5_group_what_you_can(filepath, layers, extra=True):
 
     f = h5py.File(filepath, mode='r')
 

@@ -245,6 +245,7 @@ if __name__ == '__main__':
                         choices=["FW", "TV", "TV45", "TV25", "TV5", "TVb", "TV40"], default="FW")
     parser.add_argument('--extra-output', dest='extra_output', type=int, default=0)
     parser.add_argument('--not-normed', dest="normed", action="store_false")
+    parser.add_argument('--info', action="store_true")
 
     args = parser.parse_args()
 
@@ -601,3 +602,6 @@ if __name__ == '__main__':
     print(root + "/" + args.target + "-dataset" + ".pick")
     with open(root + "/" + args.target + "-dataset" + ".pick", "wb") as f:
         cPickle.dump(Evaluated_dataset, f)
+
+    if args.info:
+        print("Sampling rate")
