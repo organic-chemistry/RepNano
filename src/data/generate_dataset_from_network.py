@@ -307,8 +307,8 @@ if __name__ == "__main__":
             s.transfered["mean"] = np.array(s.transfered["mean"], dtype=np.float16)
             s.transfered["stdv"] = np.array(s.transfered["stdv"], dtype=np.float16)
             s.segments = None
-            Density_network.append(len("".join([s.transfered["seq"]])) / len(s.transfered))
-            Density_alligned.append(len("".join([s.transfered["seq_ref"]])) / len(s.transfered))
+            Density_network.append(len("".join(s.transfered["seq"])) / len(s.transfered))
+            Density_alligned.append(len("".join(s.transfered["seq_ref"])) / len(s.transfered))
 
         else:
             s.transfered = None
