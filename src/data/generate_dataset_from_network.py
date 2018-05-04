@@ -62,6 +62,7 @@ if __name__ == "__main__":
     parser.add_argument('--gamma', dest="gamma", type=float, default=40)
     parser.add_argument('--not-normed', dest="normed", action="store_false")
     parser.add_argument('--extra-output', dest='extra_output', type=int, default=0)
+    parser.add_argument('--info', action="store_true")
 
     # parser.add_argument("--substitution", dest="substitution", default="T", type=str)
 
@@ -291,7 +292,8 @@ if __name__ == "__main__":
 
     # except:
     #     return [None, None]
-
+    Density_network = []
+    Density_alligned = []
     for s in D.strands:
 
         t = time.time()
@@ -305,6 +307,9 @@ if __name__ == "__main__":
             s.transfered["mean"] = np.array(s.transfered["mean"], dtype=np.float16)
             s.transfered["stdv"] = np.array(s.transfered["stdv"], dtype=np.float16)
             s.segments = None
+            Density_network.append(len("".join([s.transfered["seq"]])) / len(s.transfered))
+            Density_alligned.append(len("".join([s.transfered["seq_ref"]])) / len(s.transfered))
+
         else:
             s.transfered = None
     import _pickle as cPickle
@@ -313,6 +318,15 @@ if __name__ == "__main__":
     with open(args.name, "wb") as fich:
         cPickle.dump(D, fich)
     print("End writing")
+
+    if args.info:
+        print("########################")
+        print("Infos:")
+        print("Sampling rate", s.sl)
+        print("Density of segments (network)", np.mean(Density_network))
+        print(Density_network)
+        print("Density of segments (alligned)", np.mean(Density_alligned))
+        print(Density_alligned)
     """
     for strand in D.strands:
 
