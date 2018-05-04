@@ -253,7 +253,7 @@ if __name__ == "__main__":
         # print(ref)
         if ref == "":
             print("Not alligned")
-            return [None, None]
+            return [None, len(from_ntwk)]
         # allign the ref on the transefered
         bc_strand = from_ntwk.replace(sub, "T")
         al = strand.score(bc_strand, ref, all_info=True)
@@ -314,6 +314,7 @@ if __name__ == "__main__":
 
         else:
             s.transfered = None
+            Density_network.append(v[1] / len(s.transfered))
     import _pickle as cPickle
     print("Writing on ", args.name)
 
