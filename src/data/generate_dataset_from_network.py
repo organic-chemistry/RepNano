@@ -12,7 +12,7 @@ if __name__ == "__main__":
     import glob
     import os
     import sys
-
+    from keras import backend as K
     import time
 
     parser = argparse.ArgumentParser()
@@ -330,6 +330,9 @@ if __name__ == "__main__":
         print(Density_network)
         print("Density of segments (alligned)", np.mean(Density_alligned))
         print(Density_alligned)
+
+    K.clear_session()
+
     """
     for strand in D.strands:
 
