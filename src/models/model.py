@@ -204,7 +204,7 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
 
             else:
                 def average(x):
-                    x = K.sum(x**50, axis=-2)  # , keepdims=True)
+                    x = K.sum(1 / (1 + K.exp(-50 * (x - 0.5))), axis=-2)  # , keepdims=True)
                     return x
 
                 def average_output_shape(input_shape):
