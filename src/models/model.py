@@ -223,11 +223,11 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                 model2 = Model(inputs=[inputs, labels, input_length,
                                        label_length], outputs=[loss_out] + ot)
                 if poisson:
-                    loss = "poisson"
+                    losst = "poisson"
                 else:
-                    loss = "mean_squared_error"
+                    losst = "mean_squared_error"
                 model2.compile(loss=[lambda y_true, y_pred: y_pred] +
-                               ["mean_squared_error" for i in range(extra_output)], optimizer="adadelta")
+                               [losst for i in range(extra_output)], optimizer="adadelta")
 
     return model, model2
 
