@@ -253,6 +253,7 @@ if __name__ == '__main__':
     parser.add_argument('--extra-output', dest='extra_output', type=int, default=0)
     parser.add_argument('--probas', nargs='+', dest="probas", default=[], type=str)
     parser.add_argument('--not-normed', dest="normed", action="store_false")
+    parser.add_argument('--poisson', dest="poisson", action="store_true")
 
     args = parser.parse_args()
 
@@ -321,13 +322,13 @@ if __name__ == '__main__':
                            input_length=input_length, n_output=n_output_network,
                            lr=args.lr, res=args.res,
                            attention=args.attention,
-                           n_feat=n_feat, simple=args.simple, extra_output=args.extra_output)
+                           n_feat=n_feat, simple=args.simple, extra_output=args.extra_output, poisson=args.poisson)
     predictor, _ = build_models(args.size, nbase=args.Nbases - 4,
                                 ctc_length=ctc_length,
                                 trainable=args.trainable,
                                 input_length=None, n_output=n_output_network,
                                 lr=args.lr, res=args.res, attention=args.attention,
-                                n_feat=n_feat, simple=args.simple, extra_output=args.extra_output)
+                                n_feat=n_feat, simple=args.simple, extra_output=args.extra_output, poisson=args.poisson)
 
     if args.pre_trained_weight is not None:
 
