@@ -588,6 +588,9 @@ if __name__ == '__main__':
             if not args.no_allign:
                 s.ref_ntwk = s.get_ref(seq, pos=True, correct=True, find_ref=find_ref)
                 print(s.ref_ntwk)
+                print(seq)
+                print(len(s.ref_ntwk), len(seq))
+
                 s.score_ntwk = s.score(seq, s.ref_ntwk[0], maxlen=args.maxlen)
                 print(s.score_ntwk)
             # print(Score)
