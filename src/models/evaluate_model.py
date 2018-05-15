@@ -560,8 +560,9 @@ if __name__ == '__main__':
                       len("".join(new["seq1"]).replace("N", "")), len(new))
             else:
             """
+            print(np.sum(new["seq"] == "B"),)
+
             if s.transfered is not None:
-                print(np.sum(new["seq"] == "B"),)
                 if "seq" in transfered.columns:
                     print(len("".join(transfered["seq"]).replace("N", "")), len("".join(new["seq"]).replace("N", "")),
                           len(new))
@@ -588,9 +589,9 @@ if __name__ == '__main__':
 
             if not args.no_allign:
                 s.ref_ntwk = s.get_ref(seq, pos=True, correct=True, find_ref=find_ref)
-                print(s.ref_ntwk)
+                # print(s.ref_ntwk)
                 print(seq)
-                print(len(s.ref_ntwk), len(seq))
+                print("len ref, len seq", len(s.ref_ntwk), len(seq))
 
                 s.score_ntwk = s.score(seq, s.ref_ntwk[0], maxlen=args.maxlen)
                 print(s.score_ntwk)
