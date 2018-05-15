@@ -73,7 +73,7 @@ def scale_named4(X, normalise_window=True, maxleninf=35):
     #tot = np.array(tot)
     med = np.median(tot)
     std = np.percentile(np.array(tot) - med, 75) - np.percentile(np.array(tot) - med, 25)
-
+    print("Median", med, std)
     for s in X["all"]:
         Xd[iis][:len(s)] = (s - med) / std
         Xd[iis][Xd[iis] > 2] = 2
