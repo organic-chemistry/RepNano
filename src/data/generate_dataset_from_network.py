@@ -222,6 +222,7 @@ if __name__ == "__main__":
         else:
             s.transfered["seq"] = [s + "N" for s in output]
 
+        print("ADD to segments")
         s.segments["seq"] = s.transfered["seq"]
 
         print("predict", time.time() - t)
