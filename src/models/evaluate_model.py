@@ -581,8 +581,9 @@ if __name__ == '__main__':
                     seq += b1
                     seq += b2
                 print(np.sum(s.ntwk_align["seq"] != "N"), np.sum(s.ntwk_align["seq1"] != "N"))
-
-            seq = "".join(s.ntwk_align["seq"]).replace("N", "").replace(
+            else:
+                seq = s.ntwk_align["seq"]
+            seq = "".join(seq).replace("N", "").replace(
                 "B", "T").replace("E", "T").replace("I", "T")
 
             if not args.no_allign:
