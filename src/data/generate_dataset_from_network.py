@@ -332,8 +332,9 @@ if __name__ == "__main__":
         print(Density_network)
         print("Density of segments (alligned)", np.mean(Density_alligned))
         print(Density_alligned)
+    if K.backend.backend() == 'tensorflow':
 
-    K.clear_session()
+        K.clear_session()
 
     """
     for strand in D.strands:
