@@ -79,7 +79,7 @@ def scale_named4(X, normalise_window=True, maxleninf=35):
     for s in X["all"]:
         Xd[iis][:len(s)] = (s - med) / std
         ncut += sum(Xd[iis] > 2)
-        ncut += sum(Xd[iis] < 2)
+        ncut += sum(Xd[iis] < -2)
         Xd[iis][Xd[iis] > 2] = 2
         Xd[iis][Xd[iis] < -2] = -2
         iis += 1
