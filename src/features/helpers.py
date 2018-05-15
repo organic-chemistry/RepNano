@@ -62,7 +62,7 @@ def scale_named3(X, normalise_window=True):
     return scale_clean3(np.array([X["mean"], X["mean"]**2, X["stdv"], X["length"]]).T)
 
 
-def scale_named4(X, normalise_window=True, maxleninf=35, maxi=2):
+def scale_named4(X, normalise_window=True, maxleninf=35, maxi=5):
     Xd = np.zeros((len(X), maxleninf))
     iis = 0
     # print(X.columns)
