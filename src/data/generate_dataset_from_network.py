@@ -333,7 +333,7 @@ if __name__ == "__main__":
         print(Density_network)
         print("Density of segments (alligned)", np.mean(Density_alligned))
         print(Density_alligned)
-    if K.backend.backend() == 'tensorflow':
+    if K.backend() == 'tensorflow':
 
         K.clear_session()
 
