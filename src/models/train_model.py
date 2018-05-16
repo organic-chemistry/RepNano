@@ -195,6 +195,262 @@ def get_al(se0, ref, tmpfile="./tmp.sam", check=False):
     # and match to the ref
     return start, end, seq[istart:iend], match[istart:iend], success
 
+from ..data.dataset import Dataset
+from .. import data
+from ..data import dataset
+import sys
+sys.path.append("src/")
+
+from ..features.helpers import scale_simple, scale_named, scale_named2, scale_named3, scale_named4, scale_named4s
+root = "data/raw/20170908-R9.5/"
+
+
+def load_datasets(argdatasets):
+    Datasets = []
+    for d in argdatasets:
+        with open(d, "rb") as fich:
+            Datasets.append(cPickle.load(fich))
+
+    fnorm = scale_named
+    if args.norm2:
+        fnorm = scale_named2
+    if args.norm3:
+        fnorm = scale_named3
+
+    if args.allinfos:
+        if args.normed:
+            fnorm = lambda x: scale_named4(x, maxleninf=args.maxleninf)
+        else:
+            fnorm = lambda x: scale_named4s(x, maxleninf=args.maxleninf)
+
+    data_x = []
+    data_y = []
+    data_y2 = []
+    probas = []
+
+    for D, named in zip(Datasets, argdatasets):
+        keep = 0
+
+        for strand in D.strands[:args.maxf]:
+
+            if strand.transfered is None:
+                continue
+
+            if not(strand.bc_score > args.all_quality):
+                continue
+
+            if args.sclean:
+                data_x.append(scale_simple(strand.transfered))
+            else:
+                data_x.append(fnorm(strand.transfered))
+            if args.raw:
+                sl = s.sampling_rate
+                data_x[-1] = [s.raw[int(start * sl):int((start + length) * sl)] for start,
+                              length in zip(strand.transfered["start"], strand.transfered["length"])]
+
+            def transform(b):
+
+                if args.Nbases == 4 and b not in ["N", "A", "T", "C", "G"]:
+                    return "T"
+
+                if b != "T":
+                    return b
+
+                if not args.substitution:
+                    return "T"
+                if hasattr(D, "substitution") and D.substitution != "T":
+                    return D.substitution
+
+                return "T"
+
+            if args.correct_ref:
+                data_y.append([[mapping[transform(b[0])],
+                                mapping[transform(b2[0])],
+                                mapping[transform(b[1])],
+                                mapping[transform(b2[1])]]
+                               for b, b2 in zip(strand.transfered["seq_ref"],
+                                                strand.transfered["seq_ref_correction"])])
+
+            else:
+                data_y.append([mapping[transform(b)] for b in strand.transfered["seq"]])
+
+            probas.append([])
+            for sub in args.probas:
+                if hasattr(strand, "%sprop" % sub):
+                    probas[-1].append(getattr(strand, "%sprop" % sub))
+                else:
+                    probas[-1].append(0)
+            keep += 1
+        print(named, len(D.strands[:args.maxf]), keep)
+    del Datasets
+    return data_x, data_y, data_y2, np.array(probas)
+
+
+def get_transformed_sets(d_x, d_y, d_y2, d_prob, s_arr, p_arr, mini=200, maxi=None):
+
+    print(len(d_x), len(d_y))
+
+    X_new = []
+    Y_new = []
+    Y2_new = []
+    Label = []
+    Length = []
+    Probas = []
+    stats = defaultdict(int)
+    megas = ""
+    infostat = {}
+    stop = False
+    while len(X_new) < mini:
+        print(len(X_new))
+        if stop:
+            break
+        for s in range(len(d_x)):
+            if maxi is not None:
+                if len(X_new) >= maxi:
+                    stop = True
+                    break
+            s2 = np.random.choice(s_arr, p=p_arr)
+            # print(s2)
+            # print(data_x[s2].shape[0])
+            r = np.random.randint(0, d_x[s2].shape[0] - subseq_size)
+            x = d_x[s2][r:r + subseq_size]
+
+            if not args.ctc:
+
+                def domap(base):
+                    ret = [0 for b in range(args.Nbases + 1)]
+                    ret[base] = 1
+                    return ret
+
+                y = [domap(base) for base in d_y[s2][r: r + subseq_size]]
+                y2 = [domap(base) for base in d_y2[s2][r: r + subseq_size]]
+
+                X_new.append(x)
+                Y_new.append(y)
+                Y2_new.append(y2)
+
+                for xx in d_y[s2][r:r + subseq_size]:
+                    stats[xx] += 1
+
+            if args.ctc:
+                if not args.correct_ref:
+                    y = [base for base in d_y[s2][
+                        r: r + subseq_size] if base != mapping["N"]]
+                if args.correct_ref:
+                    y = []
+                    for b1 in d_y[s2][r: r + subseq_size]:
+                        for bb in b1:
+                            if bb != mapping["N"]:
+                                y.append(bb)
+
+                if y == [] or len(y) > subseq_size:
+                    continue
+
+                X_new.append(x)
+                Label.append(y + [0] * (subseq_size * args.n_output_network - len(y)))
+                Length.append(len(y))
+                Probas.append(d_prob[s2])
+
+            # x[:,0] += np.random.binomial(n=1, p=0.1, size=x.shape[0]) *
+            # np.random.normal(scale=0.01, size=x.shape[0])
+
+            # oversampleb
+            # if "B" not in refs[s2] and np.random.randint(args.oversampleb) != 0:
+        #        continue
+
+            if args.ctc and False:
+                def domap(base):
+                    ret = [0 for b in range(n_classes)]
+                    ret[base] = 1
+                    return ret
+
+                length = subseq_size
+                start = r
+                Index = d_index[s2]
+                alignment = data_alignment[s2]
+                f = 1
+                if n_input == 1 and n_output == 2:
+                    f = 2
+
+                start_index_on_seqs = find_closest(start * f, Index)
+                end_index_on_seqs = find_closest(start * f + length * f, Index)
+                # from IPython import embed
+                # embed()
+                # print(start, start_index_on_seqs, end_index_on_seqs,
+                #      len(alignment[0]), len(alignment[1]))
+                seg, ss1, ss2, success = get_segment(
+                    alignment, start_index_on_seqs, end_index_on_seqs)
+
+                # print(ss2, ss1, seg, [l in refs[s2] for l in ["B", "L", "E", "I"]])
+
+                if not success:
+                    continue
+                maxi = f * subseq_size
+                l = min(max(len(seg), 1), maxi - 1)
+                delta = abs(len(ss2.replace("-", "")) - len(ss2)) + \
+                    abs(len(ss1.replace("-", "")) - len(ss1))
+
+                if delta > args.deltaseq or \
+                        len(ss2.replace("-", "")) < args.forcelength * subseq_size or len(ss1.replace("-", "")) < args.forcelength * subseq_size:
+                    # print(ss2, ss1, delta, len(ss2.replace("-", "")))
+                    # print("Skip")
+                    continue
+                print("Keep", delta, ss2, ss1, len(data_x), [
+                    l in refs[s2] for l in ["B", "L", "E", "I"]])
+                Length.append(l)
+
+                test = False
+                if test:
+                    # print(len(data_x[s2]))
+                    o1 = predictor.predict(np.array(x)[np.newaxis, ::, ::])
+                    o1 = o1[0]
+                    om = np.argmax(o1, axis=-1)
+
+                    alph = "ACGTTN"
+                    seq_tmp = "".join(map(lambda x: alph[x], om))
+                    print(seq_tmp.replace("N", ""))
+
+                # print(len(s))
+                if len(seg) > maxi - 1:
+                    seg = seg[:maxi - 1]
+
+                if "B" in refs[s2]:
+                    megas += seg.replace("T", "B")
+                else:
+                    megas += seg
+
+                for l in ["T", "B", "L", "E", "I"]:
+                    if l in seg:
+                        infostat[l] = infostat.get(l, 0) + seg.count(l)
+
+                seg = seg + "A" * (maxi - len(seg))
+
+                if not args.all_T:
+                    for l in ["B", "L", "E", "I"]:
+                        if l in refs[s2]:
+                            if not args.hybrid:
+                                seg = seg.replace("T", l)
+                            break
+
+                # print(ss1, ss2, seg)
+
+                # print(len(s))
+                # print(s)
+                # print([base for base in s])
+                Label.append([mapping[base] for base in seg])
+
+                X_new.append(x)
+                # print(x)
+
+    X_new = np.array(X_new)
+    Y_new = np.array(Y_new)
+    Y2_new = np.array(Y2_new)
+    Label = np.array(Label)
+    Length = np.array(Length)
+
+    return X_new, Y_new, Y2_new, Label, Length, stats, Probas
+
+
 if __name__ == '__main__':
 
     import argparse
@@ -354,95 +610,6 @@ if __name__ == '__main__':
     refs = []
     names = []
 
-    from ..data.dataset import Dataset
-    from .. import data
-    from ..data import dataset
-    import sys
-    sys.path.append("src/")
-
-    from ..features.helpers import scale_simple, scale_named, scale_named2, scale_named3, scale_named4, scale_named4s
-    root = "data/raw/20170908-R9.5/"
-
-    def load_datasets(argdatasets):
-        Datasets = []
-        for d in argdatasets:
-            with open(d, "rb") as fich:
-                Datasets.append(cPickle.load(fich))
-
-        fnorm = scale_named
-        if args.norm2:
-            fnorm = scale_named2
-        if args.norm3:
-            fnorm = scale_named3
-
-        if args.allinfos:
-            if args.normed:
-                fnorm = lambda x: scale_named4(x, maxleninf=args.maxleninf)
-            else:
-                fnorm = lambda x: scale_named4s(x, maxleninf=args.maxleninf)
-
-        data_x = []
-        data_y = []
-        data_y2 = []
-        probas = []
-
-        for D, named in zip(Datasets, argdatasets):
-            keep = 0
-
-            for strand in D.strands[:args.maxf]:
-
-                if strand.transfered is None:
-                    continue
-
-                if not(strand.bc_score > args.all_quality):
-                    continue
-
-                if args.sclean:
-                    data_x.append(scale_simple(strand.transfered))
-                else:
-                    data_x.append(fnorm(strand.transfered))
-                if args.raw:
-                    sl = s.sampling_rate
-                    data_x[-1] = [s.raw[int(start * sl):int((start + length) * sl)] for start,
-                                  length in zip(strand.transfered["start"], strand.transfered["length"])]
-
-                def transform(b):
-
-                    if args.Nbases == 4 and b not in ["N", "A", "T", "C", "G"]:
-                        return "T"
-
-                    if b != "T":
-                        return b
-
-                    if not args.substitution:
-                        return "T"
-                    if hasattr(D, "substitution") and D.substitution != "T":
-                        return D.substitution
-
-                    return "T"
-
-                if args.correct_ref:
-                    data_y.append([[mapping[transform(b[0])],
-                                    mapping[transform(b2[0])],
-                                    mapping[transform(b[1])],
-                                    mapping[transform(b2[1])]]
-                                   for b, b2 in zip(strand.transfered["seq_ref"],
-                                                    strand.transfered["seq_ref_correction"])])
-
-                else:
-                    data_y.append([mapping[transform(b)] for b in strand.transfered["seq"]])
-
-                probas.append([])
-                for sub in args.probas:
-                    if hasattr(strand, "%sprop" % sub):
-                        probas[-1].append(getattr(strand, "%sprop" % sub))
-                    else:
-                        probas[-1].append(0)
-                keep += 1
-            print(named, len(D.strands[:args.maxf]), keep)
-        del Datasets
-        return data_x, data_y, data_y2, np.array(probas)
-
     data_x, data_y, data_y2, probas = load_datasets(args.all_datasets)
     if args.all_test_datasets != []:
         tdata_x, tdata_y, tdata_y2, tprobas = load_datasets(args.all_test_datasets)
@@ -595,170 +762,6 @@ if __name__ == '__main__':
         tc = 0
         tc2 = 0
         tc3 = 0
-
-        def get_transformed_sets(d_x, d_y, d_y2, d_prob, s_arr, p_arr, mini=200, maxi=None):
-
-            print(len(d_x), len(d_y))
-
-            X_new = []
-            Y_new = []
-            Y2_new = []
-            Label = []
-            Length = []
-            Probas = []
-            stats = defaultdict(int)
-            megas = ""
-            infostat = {}
-            stop = False
-            while len(X_new) < mini:
-                print(len(X_new))
-                if stop:
-                    break
-                for s in range(len(d_x)):
-                    if maxi is not None:
-                        if len(X_new) >= maxi:
-                            stop = True
-                            break
-                    s2 = np.random.choice(s_arr, p=p_arr)
-                    # print(s2)
-                    # print(data_x[s2].shape[0])
-                    r = np.random.randint(0, d_x[s2].shape[0] - subseq_size)
-                    x = d_x[s2][r:r + subseq_size]
-
-                    if not args.ctc:
-
-                        def domap(base):
-                            ret = [0 for b in range(args.Nbases + 1)]
-                            ret[base] = 1
-                            return ret
-
-                        y = [domap(base) for base in d_y[s2][r: r + subseq_size]]
-                        y2 = [domap(base) for base in d_y2[s2][r: r + subseq_size]]
-
-                        X_new.append(x)
-                        Y_new.append(y)
-                        Y2_new.append(y2)
-
-                        for xx in d_y[s2][r:r + subseq_size]:
-                            stats[xx] += 1
-
-                    if args.ctc:
-                        if not args.correct_ref:
-                            y = [base for base in d_y[s2][
-                                r: r + subseq_size] if base != mapping["N"]]
-                        if args.correct_ref:
-                            y = []
-                            for b1 in d_y[s2][r: r + subseq_size]:
-                                for bb in b1:
-                                    if bb != mapping["N"]:
-                                        y.append(bb)
-
-                        if y == [] or len(y) > subseq_size:
-                            continue
-
-                        X_new.append(x)
-                        Label.append(y + [0] * (subseq_size * args.n_output_network - len(y)))
-                        Length.append(len(y))
-                        Probas.append(d_prob[s2])
-
-                    # x[:,0] += np.random.binomial(n=1, p=0.1, size=x.shape[0]) *
-                    # np.random.normal(scale=0.01, size=x.shape[0])
-
-                    # oversampleb
-                    # if "B" not in refs[s2] and np.random.randint(args.oversampleb) != 0:
-                #        continue
-
-                    if args.ctc and False:
-                        def domap(base):
-                            ret = [0 for b in range(n_classes)]
-                            ret[base] = 1
-                            return ret
-
-                        length = subseq_size
-                        start = r
-                        Index = d_index[s2]
-                        alignment = data_alignment[s2]
-                        f = 1
-                        if n_input == 1 and n_output == 2:
-                            f = 2
-
-                        start_index_on_seqs = find_closest(start * f, Index)
-                        end_index_on_seqs = find_closest(start * f + length * f, Index)
-                        # from IPython import embed
-                        # embed()
-                        # print(start, start_index_on_seqs, end_index_on_seqs,
-                        #      len(alignment[0]), len(alignment[1]))
-                        seg, ss1, ss2, success = get_segment(
-                            alignment, start_index_on_seqs, end_index_on_seqs)
-
-                        # print(ss2, ss1, seg, [l in refs[s2] for l in ["B", "L", "E", "I"]])
-
-                        if not success:
-                            continue
-                        maxi = f * subseq_size
-                        l = min(max(len(seg), 1), maxi - 1)
-                        delta = abs(len(ss2.replace("-", "")) - len(ss2)) + \
-                            abs(len(ss1.replace("-", "")) - len(ss1))
-
-                        if delta > args.deltaseq or \
-                                len(ss2.replace("-", "")) < args.forcelength * subseq_size or len(ss1.replace("-", "")) < args.forcelength * subseq_size:
-                            # print(ss2, ss1, delta, len(ss2.replace("-", "")))
-                            # print("Skip")
-                            continue
-                        print("Keep", delta, ss2, ss1, len(data_x), [
-                            l in refs[s2] for l in ["B", "L", "E", "I"]])
-                        Length.append(l)
-
-                        test = False
-                        if test:
-                            # print(len(data_x[s2]))
-                            o1 = predictor.predict(np.array(x)[np.newaxis, ::, ::])
-                            o1 = o1[0]
-                            om = np.argmax(o1, axis=-1)
-
-                            alph = "ACGTTN"
-                            seq_tmp = "".join(map(lambda x: alph[x], om))
-                            print(seq_tmp.replace("N", ""))
-
-                        # print(len(s))
-                        if len(seg) > maxi - 1:
-                            seg = seg[:maxi - 1]
-
-                        if "B" in refs[s2]:
-                            megas += seg.replace("T", "B")
-                        else:
-                            megas += seg
-
-                        for l in ["T", "B", "L", "E", "I"]:
-                            if l in seg:
-                                infostat[l] = infostat.get(l, 0) + seg.count(l)
-
-                        seg = seg + "A" * (maxi - len(seg))
-
-                        if not args.all_T:
-                            for l in ["B", "L", "E", "I"]:
-                                if l in refs[s2]:
-                                    if not args.hybrid:
-                                        seg = seg.replace("T", l)
-                                    break
-
-                        # print(ss1, ss2, seg)
-
-                        # print(len(s))
-                        # print(s)
-                        # print([base for base in s])
-                        Label.append([mapping[base] for base in seg])
-
-                        X_new.append(x)
-                        # print(x)
-
-            X_new = np.array(X_new)
-            Y_new = np.array(Y_new)
-            Y2_new = np.array(Y2_new)
-            Label = np.array(Label)
-            Length = np.array(Length)
-
-            return X_new, Y_new, Y2_new, Label, Length, stats, Probas
 
         X_new, Y_new, Y2_new, Label, Length, stats, sp1 = get_transformed_sets(
             data_x, data_y, data_y2, probas, s_arr, p_arr, mini=200)
