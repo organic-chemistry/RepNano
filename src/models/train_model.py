@@ -205,7 +205,9 @@ from ..features.helpers import scale_simple, scale_named, scale_named2, scale_na
 root = "data/raw/20170908-R9.5/"
 
 
-def load_datasets(argdatasets, norm2, norm3, maxleninf, maxf, allinfos, normed, all_quality, raw, Nbases, substitution, correct_ref, probas, sclean):
+def load_datasets(argdatasets, norm2, norm3, maxleninf,
+                  maxf, allinfos, normed, all_quality,
+                  raw, Nbases, substitution, correct_ref, probas, sclean, mapping):
     Datasets = []
     for d in argdatasets:
         with open(d, "rb") as fich:
@@ -615,7 +617,7 @@ if __name__ == '__main__':
                                                     maxf=args.maxf, allinfos=args.allinfos,
                                                     normed=args.normed, all_quality=args.all_quality,
                                                     raw=args.raw, Nbases=args.Nbases, substitution=args.substitution,
-                                                    correct_ref=args.correct_ref, probas=args.probas, sclean=args.sclean)
+                                                    correct_ref=args.correct_ref, probas=args.probas, sclean=args.sclean, mapping=mapping)
     if args.all_test_datasets != []:
         tdata_x, tdata_y, tdata_y2, tprobas = load_datasets(args.all_test_datasets)
     else:
