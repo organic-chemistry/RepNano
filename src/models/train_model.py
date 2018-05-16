@@ -205,23 +205,23 @@ from ..features.helpers import scale_simple, scale_named, scale_named2, scale_na
 root = "data/raw/20170908-R9.5/"
 
 
-def load_datasets(argdatasets):
+def load_datasets(argdatasets, norm2, norm3, maxleninf, maxf, allinfos, normed, all_quality, raw, Nbases, substitution, correct_ref, probas):
     Datasets = []
     for d in argdatasets:
         with open(d, "rb") as fich:
             Datasets.append(cPickle.load(fich))
 
     fnorm = scale_named
-    if args.norm2:
+    if norm2:
         fnorm = scale_named2
-    if args.norm3:
+    if norm3:
         fnorm = scale_named3
 
-    if args.allinfos:
-        if args.normed:
-            fnorm = lambda x: scale_named4(x, maxleninf=args.maxleninf)
+    if allinfos:
+        if normed:
+            fnorm = lambda x: scale_named4(x, maxleninf=maxleninf)
         else:
-            fnorm = lambda x: scale_named4s(x, maxleninf=args.maxleninf)
+            fnorm = lambda x: scale_named4s(x, maxleninf=maxleninf)
 
     data_x = []
     data_y = []
@@ -231,39 +231,39 @@ def load_datasets(argdatasets):
     for D, named in zip(Datasets, argdatasets):
         keep = 0
 
-        for strand in D.strands[:args.maxf]:
+        for strand in D.strands[:maxf]:
 
             if strand.transfered is None:
                 continue
 
-            if not(strand.bc_score > args.all_quality):
+            if not(strand.bc_score > all_quality):
                 continue
 
             if args.sclean:
                 data_x.append(scale_simple(strand.transfered))
             else:
                 data_x.append(fnorm(strand.transfered))
-            if args.raw:
+            if raw:
                 sl = s.sampling_rate
                 data_x[-1] = [s.raw[int(start * sl):int((start + length) * sl)] for start,
                               length in zip(strand.transfered["start"], strand.transfered["length"])]
 
             def transform(b):
 
-                if args.Nbases == 4 and b not in ["N", "A", "T", "C", "G"]:
+                if Nbases == 4 and b not in ["N", "A", "T", "C", "G"]:
                     return "T"
 
                 if b != "T":
                     return b
 
-                if not args.substitution:
+                if not substitution:
                     return "T"
                 if hasattr(D, "substitution") and D.substitution != "T":
                     return D.substitution
 
                 return "T"
 
-            if args.correct_ref:
+            if correct_ref:
                 data_y.append([[mapping[transform(b[0])],
                                 mapping[transform(b2[0])],
                                 mapping[transform(b[1])],
@@ -275,13 +275,13 @@ def load_datasets(argdatasets):
                 data_y.append([mapping[transform(b)] for b in strand.transfered["seq"]])
 
             probas.append([])
-            for sub in args.probas:
+            for sub in probas:
                 if hasattr(strand, "%sprop" % sub):
                     probas[-1].append(getattr(strand, "%sprop" % sub))
                 else:
                     probas[-1].append(0)
             keep += 1
-        print(named, len(D.strands[:args.maxf]), keep)
+        print(named, len(D.strands[:maxf]), keep)
     del Datasets
     return data_x, data_y, data_y2, np.array(probas)
 
@@ -610,7 +610,12 @@ if __name__ == '__main__':
     refs = []
     names = []
 
-    data_x, data_y, data_y2, probas = load_datasets(args.all_datasets)
+    data_x, data_y, data_y2, probas = load_datasets(args.all_datasets,
+                                                    norm2=args.norm2, norm3=args.norm3, maxleninf=args.maxleninf,
+                                                    maxf=args.maxf, allinfos=args.allinfos,
+                                                    normed=args.normed, all_quality=args.all_quality,
+                                                    raw=args.raw, Nbases=args.Nbases, substitution=args.substitution,
+                                                    correct_ref=args.correct_ref, probas=args.probas)
     if args.all_test_datasets != []:
         tdata_x, tdata_y, tdata_y2, tprobas = load_datasets(args.all_test_datasets)
     else:
