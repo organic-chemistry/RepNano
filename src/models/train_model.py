@@ -288,7 +288,8 @@ def load_datasets(argdatasets, norm2, norm3, maxleninf,
     return data_x, data_y, data_y2, np.array(probas)
 
 
-def get_transformed_sets(d_x, d_y, d_y2, d_prob, s_arr, p_arr, mini=200, maxi=None):
+def get_transformed_sets(d_x, d_y, d_y2, d_prob, s_arr, p_arr, mini=200, maxi=None, subseq_size,
+                         ctc, Nbases, correct_ref, n_output_network):
 
     print(len(d_x), len(d_y))
 
@@ -317,10 +318,10 @@ def get_transformed_sets(d_x, d_y, d_y2, d_prob, s_arr, p_arr, mini=200, maxi=No
             r = np.random.randint(0, d_x[s2].shape[0] - subseq_size)
             x = d_x[s2][r:r + subseq_size]
 
-            if not args.ctc:
+            if not ctc:
 
                 def domap(base):
-                    ret = [0 for b in range(args.Nbases + 1)]
+                    ret = [0 for b in range(Nbases + 1)]
                     ret[base] = 1
                     return ret
 
@@ -334,11 +335,11 @@ def get_transformed_sets(d_x, d_y, d_y2, d_prob, s_arr, p_arr, mini=200, maxi=No
                 for xx in d_y[s2][r:r + subseq_size]:
                     stats[xx] += 1
 
-            if args.ctc:
-                if not args.correct_ref:
+            if ctc:
+                if not correct_ref:
                     y = [base for base in d_y[s2][
                         r: r + subseq_size] if base != mapping["N"]]
-                if args.correct_ref:
+                if correct_ref:
                     y = []
                     for b1 in d_y[s2][r: r + subseq_size]:
                         for bb in b1:
@@ -349,7 +350,7 @@ def get_transformed_sets(d_x, d_y, d_y2, d_prob, s_arr, p_arr, mini=200, maxi=No
                     continue
 
                 X_new.append(x)
-                Label.append(y + [0] * (subseq_size * args.n_output_network - len(y)))
+                Label.append(y + [0] * (subseq_size * n_output_network - len(y)))
                 Length.append(len(y))
                 Probas.append(d_prob[s2])
 
@@ -360,7 +361,7 @@ def get_transformed_sets(d_x, d_y, d_y2, d_prob, s_arr, p_arr, mini=200, maxi=No
             # if "B" not in refs[s2] and np.random.randint(args.oversampleb) != 0:
         #        continue
 
-            if args.ctc and False:
+            if ctc and False:
                 def domap(base):
                     ret = [0 for b in range(n_classes)]
                     ret[base] = 1
@@ -771,9 +772,11 @@ if __name__ == '__main__':
         tc3 = 0
 
         X_new, Y_new, Y2_new, Label, Length, stats, sp1 = get_transformed_sets(
-            data_x, data_y, data_y2, probas, s_arr, p_arr, mini=200)
+            data_x, data_y, data_y2, probas, s_arr, p_arr, mini=200, subseq_size=subseq_size,
+            ctc=args.ctc, Nbases=args.Nbases, correct_ref=args.correct_ref, n_output_network=args.n_output_network)
         tX_new, tY_new, tY2_new, tLabel, tLength, stats, stp1 = get_transformed_sets(
-            tdata_x, tdata_y, tdata_y2, tprobas, ts_arr, tp_arr, maxi=40)
+            tdata_x, tdata_y, tdata_y2, tprobas, ts_arr, tp_arr, maxi=40, subseq_size=subseq_size,
+            ctc=args.ctc, Nbases=args.Nbases, correct_ref=args.correct_ref, n_output_network=args.n_output_network)
 
         if not args.ctc:
             sum1 = 0
