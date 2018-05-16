@@ -82,7 +82,7 @@ def scale_named4(X, normalise_window=True, maxleninf=35, maxi=5):
     z = Xd == 0
     Xd = (Xd - med) / std
     Xd[z] = 0
-    ncut = np.sum(Xd > maxi) + np.sum(Xd < maxi)
+    ncut = np.sum(Xd > maxi) + np.sum(Xd < -maxi)
     Xd[Xd > maxi] = maxi
     Xd[Xd < -maxi] = -maxi
     # - med) / std
