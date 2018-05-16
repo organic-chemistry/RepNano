@@ -289,7 +289,7 @@ def load_datasets(argdatasets, norm2, norm3, maxleninf,
 
 
 def get_transformed_sets(d_x, d_y, d_y2, d_prob, s_arr, p_arr, mini, subseq_size,
-                         ctc, Nbases, correct_ref, n_output_network):
+                         ctc, Nbases, correct_ref, n_output_network, mapping):
 
     print(len(d_x), len(d_y))
     maxi = None
@@ -773,10 +773,10 @@ if __name__ == '__main__':
 
         X_new, Y_new, Y2_new, Label, Length, stats, sp1 = get_transformed_sets(
             data_x, data_y, data_y2, probas, s_arr, p_arr, mini=200, subseq_size=subseq_size,
-            ctc=args.ctc, Nbases=args.Nbases, correct_ref=args.correct_ref, n_output_network=args.n_output_network)
+            ctc=args.ctc, Nbases=args.Nbases, correct_ref=args.correct_ref, n_output_network=args.n_output_network, mapping=mapping)
         tX_new, tY_new, tY2_new, tLabel, tLength, stats, stp1 = get_transformed_sets(
             tdata_x, tdata_y, tdata_y2, tprobas, ts_arr, tp_arr, maxi=40, subseq_size=subseq_size,
-            ctc=args.ctc, Nbases=args.Nbases, correct_ref=args.correct_ref, n_output_network=args.n_output_network)
+            ctc=args.ctc, Nbases=args.Nbases, correct_ref=args.correct_ref, n_output_network=args.n_output_network, mapping=mapping)
 
         if not args.ctc:
             sum1 = 0
