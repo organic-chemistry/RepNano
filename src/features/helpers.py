@@ -77,13 +77,21 @@ def scale_named4(X, normalise_window=True, maxleninf=35, maxi=5):
     ncut = 0
 
     for s in X["all"]:
-        Xd[iis][:len(s)] = (s - med) / std
-        ncut += sum(Xd[iis] > maxi)
-        ncut += sum(Xd[iis] < -maxi)
-        Xd[iis][Xd[iis] > maxi] = maxi
-        Xd[iis][Xd[iis] < -maxi] = -maxi
+        Xd[iis][:len(s)] = s
         iis += 1
-    print("Median", med, std, ncut, len(tot))
+    z = Xd == 0
+    Xd = (Xd - med) / std
+    Xd[z] = 0
+    Xd[Xd > maxi] = maxi
+    Xd[Xd < -maxi] = -maxi
+    # - med) / std
+    #ncut += sum(Xd[iis] > maxi)
+    #ncut += sum(Xd[iis] < -maxi)
+    #Xd[iis][Xd[iis] > maxi] = maxi
+    #Xd[iis][Xd[iis] < -maxi] = -maxi
+    #
+
+    #print("Median", med, std, ncut, len(tot))
     return Xd
 
 

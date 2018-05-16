@@ -289,10 +289,9 @@ def load_datasets(argdatasets, norm2, norm3, maxleninf,
 
 
 def get_transformed_sets(d_x, d_y, d_y2, d_prob, s_arr, p_arr, mini, subseq_size,
-                         ctc, Nbases, correct_ref, n_output_network, mapping):
+                         ctc, Nbases, correct_ref, n_output_network, mapping, maxi=None):
 
     print(len(d_x), len(d_y))
-    maxi = None
     X_new = []
     Y_new = []
     Y2_new = []
