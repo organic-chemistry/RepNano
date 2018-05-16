@@ -228,7 +228,7 @@ def load_datasets(argdatasets, norm2, norm3, maxleninf,
     data_x = []
     data_y = []
     data_y2 = []
-    probas = []
+    Probas = []
 
     for D, named in zip(Datasets, argdatasets):
         keep = 0
@@ -276,16 +276,16 @@ def load_datasets(argdatasets, norm2, norm3, maxleninf,
             else:
                 data_y.append([mapping[transform(b)] for b in strand.transfered["seq"]])
 
-            probas.append([])
+            Probas.append([])
             for sub in probas:
                 if hasattr(strand, "%sprop" % sub):
-                    probas[-1].append(getattr(strand, "%sprop" % sub))
+                    Probas[-1].append(getattr(strand, "%sprop" % sub))
                 else:
-                    probas[-1].append(0)
+                    Probas[-1].append(0)
             keep += 1
         print(named, len(D.strands[:maxf]), keep)
     del Datasets
-    return data_x, data_y, data_y2, np.array(probas)
+    return data_x, data_y, data_y2, np.array(Probas)
 
 
 def get_transformed_sets(d_x, d_y, d_y2, d_prob, s_arr, p_arr, subseq_size,
