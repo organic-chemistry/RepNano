@@ -205,7 +205,7 @@ from ..features.helpers import scale_simple, scale_named, scale_named2, scale_na
 root = "data/raw/20170908-R9.5/"
 
 
-def load_datasets(argdatasets, norm2, norm3, maxleninf, maxf, allinfos, normed, all_quality, raw, Nbases, substitution, correct_ref, probas):
+def load_datasets(argdatasets, norm2, norm3, maxleninf, maxf, allinfos, normed, all_quality, raw, Nbases, substitution, correct_ref, probas, sclean):
     Datasets = []
     for d in argdatasets:
         with open(d, "rb") as fich:
@@ -239,7 +239,7 @@ def load_datasets(argdatasets, norm2, norm3, maxleninf, maxf, allinfos, normed, 
             if not(strand.bc_score > all_quality):
                 continue
 
-            if args.sclean:
+            if sclean:
                 data_x.append(scale_simple(strand.transfered))
             else:
                 data_x.append(fnorm(strand.transfered))
@@ -615,7 +615,7 @@ if __name__ == '__main__':
                                                     maxf=args.maxf, allinfos=args.allinfos,
                                                     normed=args.normed, all_quality=args.all_quality,
                                                     raw=args.raw, Nbases=args.Nbases, substitution=args.substitution,
-                                                    correct_ref=args.correct_ref, probas=args.probas)
+                                                    correct_ref=args.correct_ref, probas=args.probas, sclean=args.sclean)
     if args.all_test_datasets != []:
         tdata_x, tdata_y, tdata_y2, tprobas = load_datasets(args.all_test_datasets)
     else:
