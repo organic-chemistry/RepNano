@@ -515,7 +515,7 @@ if __name__ == '__main__':
     parser.add_argument('--probas', nargs='+', dest="probas", default=[], type=str)
     parser.add_argument('--not-normed', dest="normed", action="store_false")
     parser.add_argument('--poisson', dest="poisson", action="store_true")
-    parser.add_argument('--maxi', dest='maxi', type=str, default=None)
+    parser.add_argument('--maxi', dest='maxi', type=int, default=None)
 
     args = parser.parse_args()
 
