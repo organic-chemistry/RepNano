@@ -515,6 +515,7 @@ if __name__ == '__main__':
     parser.add_argument('--probas', nargs='+', dest="probas", default=[], type=str)
     parser.add_argument('--not-normed', dest="normed", action="store_false")
     parser.add_argument('--poisson', dest="poisson", action="store_true")
+    parser.add_argument('--maxi', dest='maxi', type=str, default=None)
 
     args = parser.parse_args()
 
@@ -782,7 +783,7 @@ if __name__ == '__main__':
 
         X_new, Y_new, Y2_new, Label, Length, stats, sp1 = get_transformed_sets(
             data_x, data_y, data_y2, probas, s_arr, p_arr, mini=200, subseq_size=subseq_size,
-            ctc=args.ctc, Nbases=args.Nbases, correct_ref=args.correct_ref, n_output_network=args.n_output_network, mapping=mapping)
+            ctc=args.ctc, Nbases=args.Nbases, correct_ref=args.correct_ref, n_output_network=args.n_output_network, mapping=mapping, maxi=args.maxi)
         tX_new, tY_new, tY2_new, tLabel, tLength, stats, stp1 = get_transformed_sets(
             tdata_x, tdata_y, tdata_y2, tprobas, ts_arr, tp_arr, maxi=40, subseq_size=subseq_size,
             ctc=args.ctc, Nbases=args.Nbases, correct_ref=args.correct_ref, n_output_network=args.n_output_network, mapping=mapping)
