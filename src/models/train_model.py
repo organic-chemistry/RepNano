@@ -207,7 +207,7 @@ root = "data/raw/20170908-R9.5/"
 
 def load_datasets(argdatasets, norm2, norm3, maxleninf,
                   maxf, allinfos, normed, all_quality,
-                  raw, Nbases, substitution, correct_ref, probas, sclean, mapping):
+                  raw, Nbases, substitution, correct_ref, probas, sclean, mapping, minimal_length):
     Datasets = []
     for d in argdatasets:
         with open(d, "rb") as fich:
@@ -239,6 +239,9 @@ def load_datasets(argdatasets, norm2, norm3, maxleninf,
                 continue
 
             if not(strand.bc_score > all_quality):
+                continue
+
+            if len(strand.transfered) < minimal_length:
                 continue
 
             if sclean:
@@ -617,14 +620,16 @@ if __name__ == '__main__':
                                                     maxf=args.maxf, allinfos=args.allinfos,
                                                     normed=args.normed, all_quality=args.all_quality,
                                                     raw=args.raw, Nbases=args.Nbases, substitution=args.substitution,
-                                                    correct_ref=args.correct_ref, probas=args.probas, sclean=args.sclean, mapping=mapping)
+                                                    correct_ref=args.correct_ref, probas=args.probas, sclean=args.sclean,
+                                                    mapping=mapping, minimal_length=subseq_size + 1)
     if args.all_test_datasets != []:
         tdata_x, tdata_y, tdata_y2, tprobas = load_datasets(args.all_test_datasets,
                                                             norm2=args.norm2, norm3=args.norm3, maxleninf=args.maxleninf,
                                                             maxf=args.maxf, allinfos=args.allinfos,
                                                             normed=args.normed, all_quality=args.all_quality,
                                                             raw=args.raw, Nbases=args.Nbases, substitution=args.substitution,
-                                                            correct_ref=args.correct_ref, probas=args.probas, sclean=args.sclean, mapping=mapping)
+                                                            correct_ref=args.correct_ref, probas=args.probas, sclean=args.sclean, mapping=mapping,
+                                                            minimal_length=subseq_size + 1)
     else:
         tdata_x, tdata_y, tdata_y2, tprobas = data_x, data_y, data_y2, probas
 
