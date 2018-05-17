@@ -619,7 +619,12 @@ if __name__ == '__main__':
                                                     raw=args.raw, Nbases=args.Nbases, substitution=args.substitution,
                                                     correct_ref=args.correct_ref, probas=args.probas, sclean=args.sclean, mapping=mapping)
     if args.all_test_datasets != []:
-        tdata_x, tdata_y, tdata_y2, tprobas = load_datasets(args.all_test_datasets)
+        tdata_x, tdata_y, tdata_y2, tprobas = load_datasets(args.all_test_datasets,
+                                                            norm2=args.norm2, norm3=args.norm3, maxleninf=args.maxleninf,
+                                                            maxf=args.maxf, allinfos=args.allinfos,
+                                                            normed=args.normed, all_quality=args.all_quality,
+                                                            raw=args.raw, Nbases=args.Nbases, substitution=args.substitution,
+                                                            correct_ref=args.correct_ref, probas=args.probas, sclean=args.sclean, mapping=mapping)
     else:
         tdata_x, tdata_y, tdata_y2, tprobas = data_x, data_y, data_y2, probas
 
