@@ -5,7 +5,7 @@ from keras.models import Model
 from keras.layers.wrappers import Bidirectional, TimeDistributed
 from keras import backend as K
 from keras.layers.core import Lambda, Reshape
-from keras.layers import Concatenate
+from keras.layers import Concatenate, BatchNormalization
 from keras.optimizers import SGD, Adadelta
 import keras
 try:
@@ -18,7 +18,7 @@ except:
 def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                  uniform=True, input_length=None, n_output=1,
                  n_feat=4, recurrent_dropout=0, lr=0.01, res=False, attention=False, simple=False,
-                 extra_output=0, poisson=False):
+                 extra_output=0, poisson=False, batchnorm=False):
     if keras.backend.backend() == 'tensorflow':
         import tensorflow as tf
 
@@ -71,17 +71,24 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
     l1 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable, recurrent_dropout=recurrent_dropout),
                        merge_mode=merge_mode)(inputs)
     # if res:
+    if batchnorm:
+        l1 = BatchNormalization()(l1)
     # l1 = Add()([l1, inputs])
     l2 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable, recurrent_dropout=recurrent_dropout),
                        merge_mode=merge_mode)(l1)
     if res:
         l2 = Add()([l2, l1])
 
+    if batchnorm:
+        l2 = BatchNormalization()(l2)
+
     l3 = Bidirectional(LSTM(size, return_sequences=True, trainable=trainable, recurrent_dropout=recurrent_dropout),
                        merge_mode=merge_mode)(l2)
 
     if res:
         l3 = Add()([l3, l2])
+    if batchnorm:
+        l3 = BatchNormalization()(l3)
 
     if attention:
         if input_length is not None:
