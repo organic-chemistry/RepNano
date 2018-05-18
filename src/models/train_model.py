@@ -588,7 +588,7 @@ if __name__ == '__main__':
                            attention=args.attention,
                            n_feat=n_feat, simple=args.simple,
                            extra_output=args.extra_output, poisson=args.poisson, batchnorm=args.batchnorm,
-                           recurrent_dropout=args.recurrent_dropout)
+                           recurrent_dropout=args.dropout)
     predictor, _ = build_models(args.size, nbase=args.Nbases - 4,
                                 ctc_length=ctc_length,
                                 trainable=args.trainable,
@@ -596,7 +596,7 @@ if __name__ == '__main__':
                                 lr=args.lr, res=args.res, attention=args.attention,
                                 n_feat=n_feat, simple=args.simple, extra_output=args.extra_output,
                                 poisson=args.poisson, batchnorm=args.batchnorm,
-                                recurrent_dropout=args.recurrent_dropout)
+                                recurrent_dropout=args.dropout)
 
     if args.pre_trained_weight is not None:
 
