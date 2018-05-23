@@ -246,6 +246,8 @@ if __name__ == '__main__':
     parser.add_argument('--extra-output', dest='extra_output', type=int, default=0)
     parser.add_argument('--not-normed', dest="normed", action="store_false")
     parser.add_argument('--info', action="store_true")
+    parser.add_argument('--batchnorm', dest='batchnorm', action="store_true")
+    parser.add_argument('--dropout', dest='dropout', default=0, type=float)
 
     args = parser.parse_args()
 
@@ -459,7 +461,9 @@ if __name__ == '__main__':
                                 ctc_length=ctc_length,
                                 input_length=None, n_output=n_output_network,
                                 lr=1, res=args.res, attention=args.attention,
-                                n_feat=n_feat, simple=args.simple, extra_output=args.extra_output)
+                                n_feat=n_feat, simple=args.simple, extra_output=args.extra_output,
+                                batchnorm=args.batchnorm,
+                                recurrent_dropout=args.dropout)
 
     if args.weights is not None:
 
@@ -595,6 +599,7 @@ if __name__ == '__main__':
 
                 s.score_ntwk = s.score(seq, s.ref_ntwk[0], maxlen=args.maxlen)
                 print(s.score_ntwk)
+
             # print(Score)
             # Score["ntwk_bc"].append(s.score("".join(s.ntwk_align["seq"]).replace("N",""),s.seq_from_basecall))
             if hasattr(s, "seq_from_basecall"):
