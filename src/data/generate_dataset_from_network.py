@@ -298,6 +298,7 @@ if __name__ == "__main__":
     #     return [None, None]
     Density_network = []
     Density_alligned = []
+    Length = []
     for s in D.strands:
 
         t = time.time()
@@ -315,10 +316,13 @@ if __name__ == "__main__":
                 len("".join(s.transfered["seq"]).replace("N", "")) / len(s.transfered))
             Density_alligned.append(
                 len("".join(s.transfered["seq_ref"]).replace("N", "")) / len(s.transfered))
+            Length.append(np.mean([len(t) for i in s.transfered["all"]]))
 
         else:
             s.transfered = None
             Density_network.append(v[1])
+            Length.append(np.mean([len(t) for i in s.segments["all"]]))
+
     import _pickle as cPickle
     print("Writing on ", args.name)
 
@@ -334,6 +338,7 @@ if __name__ == "__main__":
         print(Density_network)
         print("Density of segments (alligned)", np.mean(Density_alligned))
         print(Density_alligned)
+        print("lengths of segment")
     if K.backend() == 'tensorflow':
 
         K.clear_session()
