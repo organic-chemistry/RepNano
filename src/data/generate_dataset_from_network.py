@@ -316,12 +316,12 @@ if __name__ == "__main__":
                 len("".join(s.transfered["seq"]).replace("N", "")) / len(s.transfered))
             Density_alligned.append(
                 len("".join(s.transfered["seq_ref"]).replace("N", "")) / len(s.transfered))
-            Length.append(np.mean([len(t) for i in s.transfered["all"]]))
+            Length.append(np.mean([len(t) for t in s.transfered["all"]]))
 
         else:
             s.transfered = None
             Density_network.append(v[1])
-            Length.append(np.mean([len(t) for i in s.segments["all"]]))
+            Length.append(np.mean([len(t) for t in s.segments["all"]]))
 
     import _pickle as cPickle
     print("Writing on ", args.name)
