@@ -64,6 +64,8 @@ if __name__ == "__main__":
     parser.add_argument('--extra-output', dest='extra_output', type=int, default=0)
     parser.add_argument('--info', action="store_true")
     parser.add_argument('--flatten', action="store_true")
+    parser.add_argument('--batchnorm', dest='batchnorm', action="store_true")
+    parser.add_argument('--dropout', dest='dropout', default=0, type=float)
 
     # parser.add_argument("--substitution", dest="substitution", default="T", type=str)
 
@@ -177,7 +179,8 @@ if __name__ == "__main__":
                                     ctc_length=ctc_length,
                                     input_length=None, n_output=n_output_network,
                                     lr=1, res=args.res, attention=args.attention,
-                                    n_feat=n_feat, simple=args.simple, extra_output=args.extra_output)
+                                    n_feat=n_feat, simple=args.simple, extra_output=args.extra_output, batchnorm=args.batchnorm,
+                                    recurrent_dropout=args.dropout)
 
         if args.weights is not None:
 
