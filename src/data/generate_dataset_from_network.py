@@ -338,7 +338,7 @@ if __name__ == "__main__":
         print(Density_network)
         print("Density of segments (alligned)", np.mean(Density_alligned))
         print(Density_alligned)
-        print("lengths of segment", np.mean(Length)))
+        print("lengths of segment", np.mean(Length))
         print(Length)
     if K.backend() == 'tensorflow':
 
