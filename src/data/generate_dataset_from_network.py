@@ -63,6 +63,7 @@ if __name__ == "__main__":
     parser.add_argument('--not-normed', dest="normed", action="store_false")
     parser.add_argument('--extra-output', dest='extra_output', type=int, default=0)
     parser.add_argument('--info', action="store_true")
+    parser.add_argument('--flatten', action="store_true")
 
     # parser.add_argument("--substitution", dest="substitution", default="T", type=str)
 
@@ -192,7 +193,7 @@ if __name__ == "__main__":
 
         trans = strand.get_seq(f="no_basecall", window_size=args.window_size,
                                method=args.method, allinfos=args.allinfos,
-                               maxlen=args.maxleninf, minlen=1, gamma=args.gamma)
+                               maxlen=args.maxleninf, minlen=1, gamma=args.gamma, flatten=args.flatten)
 
         return [trans[:int(4 * maxlen)], None]
 
