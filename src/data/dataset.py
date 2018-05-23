@@ -456,7 +456,7 @@ class Strand:
                 seq += base
         return seq
 
-    def segmentation(self, chem="rf", w=5, prefix="", method="FW", minlen=2, maxlen=70, gamma=70, allinfos=False):
+    def segmentation(self, chem="rf", w=5, prefix="", method="FW", minlen=2, maxlen=70, gamma=70, allinfos=False, flatten=False):
         h5 = h5py.File(prefix + self.filename, "r")
         if method == "FW":
             self.segments = extract_events(h5, chem="rf", window_size=w, old=False)
