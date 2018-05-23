@@ -308,16 +308,16 @@ def return_start_length_mean_std(partition, signal, allinfos=False):
     else:
         return start[::-1], length[::-1], mean[::-1], std[::-1]
 
-import time
+#import time
 
 
 def tv_segment(signal, gamma=0.1, maxlen=10, minlen=1, sl=6024, allinfos=False, flatten=False):
     if flatten:
-        t0 = time.time()
+        #t0 = time.time()
         signal = np.array(signal) - pd.Series(signal).rolling(200,
                                                               min_periods=1, center=True).median()
         signal = np.array(signal)
-        print("flatten", time.time() - t0)
+        #print("flatten", time.time() - t0)
     p = find_best_partition(np.array(signal, dtype=np.float32),
                             gamma=gamma, maxlen=maxlen, minlen=minlen)
     r = return_start_length_mean_std(p, signal, allinfos)
