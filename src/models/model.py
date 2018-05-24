@@ -226,8 +226,7 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                 ot = []
                 # inp = []
                 for n in range(extra_output):
-                    extd = Concatenate()([ext[n], ext[n]])
-                    # 2 * size because l3 is concat
+                    extd = Concatenate()([ext[n], ext[n]], axis=-1)
                     extd1 = Reshape((input_length * 2, 1))(extd)
                     ot.append(Lambda(average, output_shape=average_output_shape,
                                      name="o%i" % n)([extd1, out_layer1]))
