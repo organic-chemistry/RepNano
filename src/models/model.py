@@ -210,22 +210,27 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                 model2.compile(loss={'ctc': lambda y_true, y_pred: y_pred}, optimizer="adadelta")
 
             else:
-                def average(x):
-                    x = K.sum(1 / (1 + K.exp(-50 * (x - 0.5))), axis=-2)  # , keepdims=True)
+                def average(v):
+                    p, b = v
+                    p = 1 / (1 + K.exp(-50 * (p - 0.5)))
+                    bp = 1 / (1 + K.exp(-50 * (b[::, 3] - 0.5)))
+                    x = K.sum(p * bp, axis=-2)  # , keepdims=True)
                     return x
 
                 def average_output_shape(input_shape):
-                    shape = list(input_shape)
+                    shape = list(input_shape[0])
                     # assert len(shape) == 3  # only valid for 2D tensors
 
                     return tuple(shape[:-2] + [1])
+
                 ot = []
                 # inp = []
                 for n in range(extra_output):
+                    extd = Concatenate()([ext[n], ext[n]])
+                    # 2 * size because l3 is concat
+                    extd = Reshape((input_length * 2, 1))(extd)
                     ot.append(Lambda(average, output_shape=average_output_shape,
-                                     name="o%i" % n)(ext[n]))
-
-                    # inp.append(Input(name='input_prop%i' % n, shape=[1], dtype='float32'))
+                                     name="o%i" % n)([extd, out_layer1]))
 
                 model2 = Model(inputs=[inputs, labels, input_length,
                                        label_length], outputs=[loss_out] + ot)
