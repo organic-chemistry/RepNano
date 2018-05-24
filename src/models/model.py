@@ -213,8 +213,14 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                 def average(v):
                     p, b = v
                     p = 1 / (1 + K.exp(-50 * (p - 0.5)))
-                    bp = 1 / (1 + K.exp(-50 * (b[::, 3] - 0.5)))
-                    x = K.sum(p * bp, axis=-2)  # , keepdims=True)
+                    if n_output == 1:
+                        bp1 = 1 / (1 + K.exp(-50 * (b[::, ::2, 3] - 0.5)))
+                        bp2 = 1 / (1 + K.exp(-50 * (b[::, 1::2, 3] - 0.5)))
+
+                        x = K.sum(p * (bp1 + bp2), axis=-2)  # , keepdims=True)
+                    else:
+                        bp = 1 / (1 + K.exp(-50 * (b[::, ::, 3] - 0.5)))
+                        x = K.sum(p * bp, axis=-2)  # ,
                     return x
 
                 def average_output_shape(input_shape):
@@ -230,10 +236,8 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                     #l3b = Concatenate()([out_layer1, out_layer2])
                     #out_layer1 = Reshape((input_length * 2, Nbases))(l3b)
 
-                    extd = Concatenate(axis=-1)([ext[n], out_layer1[::, ::2, ::]])
-                    extd1 = Reshape((input_length * 2, 1))(extd)
                     ot.append(Lambda(average, output_shape=average_output_shape,
-                                     name="o%i" % n)([extd1, out_layer1]))
+                                     name="o%i" % n)([ext[n], out_layer1]))
 
                 model2 = Model(inputs=[inputs, labels, input_length,
                                        label_length], outputs=[loss_out] + ot)
