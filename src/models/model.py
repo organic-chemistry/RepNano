@@ -213,13 +213,13 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                 def average(v):
                     p, b = v
                     p = 1 / (1 + K.exp(-50 * (p - 0.5)))
-                    if n_output == 1:
-                        bp1 = 1 / (1 + K.exp(-50 * (b[::, ::2, 3] - 0.5)))
-                        bp2 = 1 / (1 + K.exp(-50 * (b[::, 1::2, 3] - 0.5)))
+                    if n_output == 2:
+                        bp1 = 1 / (1 + K.exp(-50 * (b[::, ::2, 3:4] - 0.5)))
+                        bp2 = 1 / (1 + K.exp(-50 * (b[::, 1::2, 3:4] - 0.5)))
 
                         x = K.sum(p * (bp1 + bp2), axis=-2)  # , keepdims=True)
                     else:
-                        bp = 1 / (1 + K.exp(-50 * (b[::, ::, 3] - 0.5)))
+                        bp = 1 / (1 + K.exp(-50 * (b[::, ::, 3:4] - 0.5)))
                         x = K.sum(p * bp, axis=-2)  # ,
                     return x
 
