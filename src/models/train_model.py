@@ -384,7 +384,7 @@ def get_transformed_sets(d_x, d_y, d_y2, d_prob, s_arr, p_arr, subseq_size,
                     continue
 
                 if np.random.rand() < pupdown:
-                    X_new.append(sample(x, up=np.random.choice([False, True]))
+                    X_new.append(sample(x.copy(), up=np.random.choice([False, True])))
                 else:
                     X_new.append(x)
                 Label.append(y + [0] * (subseq_size * n_output_network - len(y)))
@@ -400,34 +400,34 @@ def get_transformed_sets(d_x, d_y, d_y2, d_prob, s_arr, p_arr, subseq_size,
 
             if ctc and False:
                 def domap(base):
-                    ret=[0 for b in range(n_classes)]
-                    ret[base]=1
+                    ret = [0 for b in range(n_classes)]
+                    ret[base] = 1
                     return ret
 
-                length=subseq_size
-                start=r
-                Index=d_index[s2]
-                alignment=data_alignment[s2]
-                f=1
+                length = subseq_size
+                start = r
+                Index = d_index[s2]
+                alignment = data_alignment[s2]
+                f = 1
                 if n_input == 1 and n_output == 2:
-                    f=2
+                    f = 2
 
-                start_index_on_seqs=find_closest(start * f, Index)
-                end_index_on_seqs=find_closest(start * f + length * f, Index)
+                start_index_on_seqs = find_closest(start * f, Index)
+                end_index_on_seqs = find_closest(start * f + length * f, Index)
                 # from IPython import embed
                 # embed()
                 # print(start, start_index_on_seqs, end_index_on_seqs,
                 #      len(alignment[0]), len(alignment[1]))
-                seg, ss1, ss2, success=get_segment(
+                seg, ss1, ss2, success = get_segment(
                     alignment, start_index_on_seqs, end_index_on_seqs)
 
                 # print(ss2, ss1, seg, [l in refs[s2] for l in ["B", "L", "E", "I"]])
 
                 if not success:
                     continue
-                maxi=f * subseq_size
-                l=min(max(len(seg), 1), maxi - 1)
-                delta=abs(len(ss2.replace("-", "")) - len(ss2)) + \
+                maxi = f * subseq_size
+                l = min(max(len(seg), 1), maxi - 1)
+                delta = abs(len(ss2.replace("-", "")) - len(ss2)) + \
                     abs(len(ss1.replace("-", "")) - len(ss1))
 
                 if delta > args.deltaseq or \
@@ -439,20 +439,20 @@ def get_transformed_sets(d_x, d_y, d_y2, d_prob, s_arr, p_arr, subseq_size,
                     l in refs[s2] for l in ["B", "L", "E", "I"]])
                 Length.append(l)
 
-                test=False
+                test = False
                 if test:
                     # print(len(data_x[s2]))
-                    o1=predictor.predict(np.array(x)[np.newaxis, ::, ::])
-                    o1=o1[0]
-                    om=np.argmax(o1, axis=-1)
+                    o1 = predictor.predict(np.array(x)[np.newaxis, ::, ::])
+                    o1 = o1[0]
+                    om = np.argmax(o1, axis=-1)
 
-                    alph="ACGTTN"
-                    seq_tmp="".join(map(lambda x: alph[x], om))
+                    alph = "ACGTTN"
+                    seq_tmp = "".join(map(lambda x: alph[x], om))
                     print(seq_tmp.replace("N", ""))
 
                 # print(len(s))
                 if len(seg) > maxi - 1:
-                    seg=seg[:maxi - 1]
+                    seg = seg[:maxi - 1]
 
                 if "B" in refs[s2]:
                     megas += seg.replace("T", "B")
@@ -461,15 +461,15 @@ def get_transformed_sets(d_x, d_y, d_y2, d_prob, s_arr, p_arr, subseq_size,
 
                 for l in ["T", "B", "L", "E", "I"]:
                     if l in seg:
-                        infostat[l]=infostat.get(l, 0) + seg.count(l)
+                        infostat[l] = infostat.get(l, 0) + seg.count(l)
 
-                seg=seg + "A" * (maxi - len(seg))
+                seg = seg + "A" * (maxi - len(seg))
 
                 if not args.all_T:
                     for l in ["B", "L", "E", "I"]:
                         if l in refs[s2]:
                             if not args.hybrid:
-                                seg=seg.replace("T", l)
+                                seg = seg.replace("T", l)
                             break
 
                 # print(ss1, ss2, seg)
@@ -482,11 +482,11 @@ def get_transformed_sets(d_x, d_y, d_y2, d_prob, s_arr, p_arr, subseq_size,
                 X_new.append(x)
                 # print(x)
 
-    X_new=np.array(X_new)
-    Y_new=np.array(Y_new)
-    Y2_new=np.array(Y2_new)
-    Label=np.array(Label)
-    Length=np.array(Length)
+    X_new = np.array(X_new)
+    Y_new = np.array(Y_new)
+    Y2_new = np.array(Y2_new)
+    Label = np.array(Label)
+    Length = np.array(Length)
 
     return X_new, Y_new, Y2_new, Label, Length, stats, Probas
 
@@ -498,7 +498,7 @@ if __name__ == '__main__':
     from git import Repo
     import tensorflow as tf
 
-    parser=argparse.ArgumentParser()
+    parser = argparse.ArgumentParser()
     parser.add_argument('--Nbases', type=int, choices=[4, 5, 8], default=4)
     parser.add_argument('--root', type=str, default="data/training/")
     parser.add_argument('--test', dest='test', action='store_true')
@@ -554,15 +554,15 @@ if __name__ == '__main__':
     parser.add_argument('--batchnorm', dest='batchnorm', action="store_true")
     parser.add_argument('--dropout', dest='dropout', default=0, type=float)
 
-    args=parser.parse_args()
+    args = parser.parse_args()
 
-    argparse_dict=vars(args)
+    argparse_dict = vars(args)
 
     # sess = tf.Session(config=tf.ConfigProto(
 #        intra_op_parallelism_threads=args.num_threads))
 
-    repo=Repo("./")
-    argparse_dict["commit"]=str(repo.head.commit)
+    repo = Repo("./")
+    argparse_dict["commit"] = str(repo.head.commit)
 
     os.makedirs(args.root, exist_ok=True)
 
@@ -570,52 +570,52 @@ if __name__ == '__main__':
         json.dump(argparse_dict, fp, indent=True)
     # print(args.filter)
 
-    log_total_length=os.path.join(args.root, "total_length.log")
+    log_total_length = os.path.join(args.root, "total_length.log")
     if keras.backend.backend() != 'tensorflow':
         print("Must use tensorflow to train")
         exit()
 
     if args.Nbases == 4:
-        mapping={"A": 0, "C": 1, "G": 2, "T": 3, "N": 4}  # Modif
+        mapping = {"A": 0, "C": 1, "G": 2, "T": 3, "N": 4}  # Modif
     elif args.Nbases == 5:
-        mapping={"A": 0, "C": 1, "G": 2, "T": 3, "B": 4, "N": 5}  # Modif
+        mapping = {"A": 0, "C": 1, "G": 2, "T": 3, "B": 4, "N": 5}  # Modif
     elif args.Nbases == 8:
-        mapping={"A": 0, "C": 1, "G": 2, "T": 3, "B": 4, "L": 5, "E": 6, "I": 7, "N": 8}  # Modif
+        mapping = {"A": 0, "C": 1, "G": 2, "T": 3, "B": 4, "L": 5, "E": 6, "I": 7, "N": 8}  # Modif
 
-    n_classes=len(mapping.keys())
+    n_classes = len(mapping.keys())
 
-    n_output_network=args.n_output_network
-    n_output=args.n_output
-    n_input=args.n_input
+    n_output_network = args.n_output_network
+    n_output = args.n_output
+    n_input = args.n_input
 
-    subseq_size=args.ctc_length
+    subseq_size = args.ctc_length
 
     from .model import build_models, load_weights_from_hdf5_group_what_you_can
-    ctc_length=subseq_size
-    input_length=ctc_length
+    ctc_length = subseq_size
+    input_length = ctc_length
     if n_output_network == 2:
-        input_length=subseq_size
-        ctc_length=2 * subseq_size
+        input_length = subseq_size
+        ctc_length = 2 * subseq_size
 
-    n_feat=4
+    n_feat = 4
     # if args.clean:
 #        n_feat = 3
 
     if args.sclean:
-        n_feat=1
+        n_feat = 1
     if args.norm2:
-        n_feat=2
+        n_feat = 2
     if args.norm3:
-        n_feat=3
+        n_feat = 3
 
     if args.allinfos:
-        n_feat=args.maxleninf
+        n_feat = args.maxleninf
 
     if len(args.probas) != args.extra_output:
         print("Pproba must match extra output")
         raise
 
-    _, ntwk=build_models(args.size, nbase=args.Nbases - 4,
+    _, ntwk = build_models(args.size, nbase=args.Nbases - 4,
                            trainable=args.trainable,
                            ctc_length=ctc_length,
                            input_length=input_length, n_output=n_output_network,
@@ -624,7 +624,7 @@ if __name__ == '__main__':
                            n_feat=n_feat, simple=args.simple,
                            extra_output=args.extra_output, poisson=args.poisson, batchnorm=args.batchnorm,
                            recurrent_dropout=args.dropout)
-    predictor, _=build_models(args.size, nbase=args.Nbases - 4,
+    predictor, _ = build_models(args.size, nbase=args.Nbases - 4,
                                 ctc_length=ctc_length,
                                 trainable=args.trainable,
                                 input_length=None, n_output=n_output_network,
@@ -649,15 +649,15 @@ if __name__ == '__main__':
 
     os.makedirs(args.root, exist_ok=True)
 
-    original=[]
-    convert=[]
+    original = []
+    convert = []
 
-    data_index=[]
-    data_alignment=[]
-    refs=[]
-    names=[]
+    data_index = []
+    data_alignment = []
+    refs = []
+    names = []
 
-    data_x, data_y, data_y2, probas=load_datasets(args.all_datasets,
+    data_x, data_y, data_y2, probas = load_datasets(args.all_datasets,
                                                     norm2=args.norm2, norm3=args.norm3, maxleninf=args.maxleninf,
                                                     maxf=args.maxf, allinfos=args.allinfos,
                                                     normed=args.normed, all_quality=args.all_quality,
@@ -665,7 +665,7 @@ if __name__ == '__main__':
                                                     correct_ref=args.correct_ref, probas=args.probas, sclean=args.sclean,
                                                     mapping=mapping, minimal_length=subseq_size + 1)
     if args.all_test_datasets != []:
-        tdata_x, tdata_y, tdata_y2, tprobas=load_datasets(args.all_test_datasets,
+        tdata_x, tdata_y, tdata_y2, tprobas = load_datasets(args.all_test_datasets,
                                                             norm2=args.norm2, norm3=args.norm3, maxleninf=args.maxleninf,
                                                             maxf=args.maxf, allinfos=args.allinfos,
                                                             normed=args.normed, all_quality=args.all_quality,
@@ -673,7 +673,7 @@ if __name__ == '__main__':
                                                             correct_ref=args.correct_ref, probas=args.probas, sclean=args.sclean, mapping=mapping,
                                                             minimal_length=subseq_size + 1)
     else:
-        tdata_x, tdata_y, tdata_y2, tprobas=data_x, data_y, data_y2, probas
+        tdata_x, tdata_y, tdata_y2, tprobas = data_x, data_y, data_y2, probas
 
     print("done", len(data_x), len(tdata_x))
     # exit()
@@ -682,35 +682,35 @@ if __name__ == '__main__':
     # print(len(refs[0]),len(data_x[0]),len(data_y[0]))
     # exit()
 
-    s_arr=[]
-    p_arr=[]
+    s_arr = []
+    p_arr = []
     for s in range(len(data_x)):
         s_arr += [s]
         p_arr += [len(data_x[s]) - subseq_size]
 
-    sum_p=sum(p_arr)
+    sum_p = sum(p_arr)
     for i in range(len(p_arr)):
-        p_arr[i]=1. * p_arr[i] / sum_p
+        p_arr[i] = 1. * p_arr[i] / sum_p
 
-    ts_arr=[]
-    tp_arr=[]
+    ts_arr = []
+    tp_arr = []
     for s in range(len(tdata_x)):
         ts_arr += [s]
         tp_arr += [len(tdata_x[s]) - subseq_size]
 
-    tsum_p=sum(tp_arr)
+    tsum_p = sum(tp_arr)
     for i in range(len(tp_arr)):
-        tp_arr[i]=1. * tp_arr[i] / tsum_p
+        tp_arr[i] = 1. * tp_arr[i] / tsum_p
 
-    batch_size=1
-    n_batches=len(data_x) / batch_size
+    batch_size = 1
+    n_batches = len(data_x) / batch_size
     # print(len(data_x), batch_size, n_batches, datetime.datetime.now())
 
-    boring=False
+    boring = False
 
 
 # ntwk.load_weights("./my_model_weights.h5")
-    Schedul=lrd(waiting_time=args.waiting_time, start_lr=args.lr, min_lr=0.0001, factor=2)
+    Schedul = lrd(waiting_time=args.waiting_time, start_lr=args.lr, min_lr=0.0001, factor=2)
     for epoch in range(20000):
 
         # Test to see if realignment is interesting:
@@ -725,54 +725,54 @@ if __name__ == '__main__':
             # predictor.load_weights("data/training/my_model_weights-1990.h5")
 
             print("Realign")
-            New_seq=[]
-            change=0
-            old_length=0
-            new_length=0
-            total_length=0
-            current_length=0
-            switch=0
+            New_seq = []
+            change = 0
+            old_length = 0
+            new_length = 0
+            total_length = 0
+            current_length = 0
+            switch = 0
             for s in range(len(data_x)):
 
-                new_seq=np.argmax(predictor.predict(np.array([data_x[s]]))[0], axis=-1)
+                new_seq = np.argmax(predictor.predict(np.array([data_x[s]]))[0], axis=-1)
                 # print(args.Nbases)
                 if args.Nbases == 8:
-                    alph="ACGTBLEIN"   # use T to Align
+                    alph = "ACGTBLEIN"   # use T to Align
                 if args.Nbases == 5:
-                    alph="ACGTBN"   # use T to Align
+                    alph = "ACGTBN"   # use T to Align
                 if args.Nbases == 4:
-                    alph="ACGTN"
+                    alph = "ACGTN"
                 New_seq.append("".join(list(map(lambda x: alph[x], new_seq))))
 
-                nc={}
+                nc = {}
 
                 for l in ["B", "L", "E", "I", "T"]:
-                    nc[l]=New_seq[-1].count(l)
+                    nc[l] = New_seq[-1].count(l)
 
                 for l in ["B", "L", "E", "I"]:
-                    New_seq[-1]=New_seq[-1].replace(l, "T")
+                    New_seq[-1] = New_seq[-1].replace(l, "T")
 
             # Here maybe realign with bwa
             # for s in range(len(data_x)):
-                type_sub="T"
-                subts=False
-                ref="" + refs[s]
+                type_sub = "T"
+                subts = False
+                ref = "" + refs[s]
 
                 for l in ["B", "L", "E", "I"]:
                     if l in refs[s]:
-                        type_sub=l
-                        subts=True
+                        type_sub = l
+                        subts = True
                         break
                 if subts:
-                    ref=ref.replace(type_sub, "T")
+                    ref = ref.replace(type_sub, "T")
 
-                re_align=True
+                re_align = True
 
                 if re_align:
-                    old_align=data_alignment[s]
+                    old_align = data_alignment[s]
                     # new_align = pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))[0][:2]
                     try:
-                        new_align=pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))
+                        new_align = pairwise2.align.globalxx(ref, New_seq[s].replace("N", ""))
                     except MemoryError:
                         print("Out of memory")
                         continue
@@ -780,7 +780,7 @@ if __name__ == '__main__':
                         new_length += len(old_align[0])
                         print()
                         continue
-                    new_align=new_align[0][:2]
+                    new_align = new_align[0][:2]
                     print("Old", len(old_align[0]), "New", len(new_align[0]), subts, len(
                         ref), (len(ref) - len(New_seq[s].replace("N", ""))) / len(ref), nc[type_sub] / (nc["T"] + 1))
 
@@ -790,9 +790,9 @@ if __name__ == '__main__':
                     if len(new_align[0]) < len(old_align[0]) and (len(ref) - len(New_seq[s].replace("N", ""))) / len(ref) < 0.05:
                         print("Keep!")
                         change += 1
-                        data_alignment[s]=new_align
+                        data_alignment[s] = new_align
 
-                        data_index[s]=np.arange(len(New_seq[s]))[
+                        data_index[s] = np.arange(len(New_seq[s]))[
                             np.array([ss for ss in New_seq[s]]) != "N"]
                         new_length += len(new_align[0])
 
@@ -803,7 +803,7 @@ if __name__ == '__main__':
                 if subts and nc[type_sub] / (nc["T"] + nc[type_sub]) < 0.1:
                     if args.force_clean and type_sub != "B":
                         continue
-                    refs[s]=refs[s].replace(type_sub, "T")
+                    refs[s] = refs[s].replace(type_sub, "T")
                     switch += 1
                     print("Swich")
             print("Change", change, len(data_x))
@@ -816,49 +816,49 @@ if __name__ == '__main__':
                              (epoch, old_length, new_length, total_length, current_length, change, switch))
 
             # Keep new alignment
-        taken_gc=[]
-        out_gc=[]
-        tc=0
-        tc2=0
-        tc3=0
+        taken_gc = []
+        out_gc = []
+        tc = 0
+        tc2 = 0
+        tc3 = 0
 
-        X_new, Y_new, Y2_new, Label, Length, stats, sp1=get_transformed_sets(
+        X_new, Y_new, Y2_new, Label, Length, stats, sp1 = get_transformed_sets(
             data_x, data_y, data_y2, probas, s_arr, p_arr, mini=200, subseq_size=subseq_size,
             ctc=args.ctc, Nbases=args.Nbases, correct_ref=args.correct_ref, n_output_network=args.n_output_network, mapping=mapping, maxi=args.maxi)
-        tX_new, tY_new, tY2_new, tLabel, tLength, stats, stp1=get_transformed_sets(
+        tX_new, tY_new, tY2_new, tLabel, tLength, stats, stp1 = get_transformed_sets(
             tdata_x, tdata_y, tdata_y2, tprobas, ts_arr, tp_arr, maxi=40, subseq_size=subseq_size,
             ctc=args.ctc, Nbases=args.Nbases, correct_ref=args.correct_ref, n_output_network=args.n_output_network, mapping=mapping)
 
         if not args.ctc:
-            sum1=0
+            sum1 = 0
             for k in stats.keys():
                 sum1 += stats[k]
 
             if epoch == 0:
-                weight=[0 for k in stats.keys()]
+                weight = [0 for k in stats.keys()]
 
                 for k in stats.keys():
-                    weight[k]=stats[k] / 1.0 / sum1
-                    weight[k]=1 / weight[k]
-                weight=np.array(weight)
-                weight=weight * len(stats.keys()) / np.sum(weight)
+                    weight[k] = stats[k] / 1.0 / sum1
+                    weight[k] = 1 / weight[k]
+                weight = np.array(weight)
+                weight = weight * len(stats.keys()) / np.sum(weight)
             # weight[4] *= 100
 
-            w2=[]
+            w2 = []
 
             for y in Y2_new:
                 w2.append([])
                 for arr in y:
                     w2[-1].append(weight[np.argmax(arr)])
 
-            w2=np.array(w2)
+            w2 = np.array(w2)
 
         if not args.ctc:
             if args.n_output_network == 1:
-                r=predictor.fit(X_new, Y_new, nb_epoch=1,
+                r = predictor.fit(X_new, Y_new, nb_epoch=1,
                                   batch_size=args.batch_size, validation_split=0.05)
             else:
-                r=predictor.fit(X_new, [Y_new, Y2_new], nb_epoch=1,
+                r = predictor.fit(X_new, [Y_new, Y2_new], nb_epoch=1,
                                   batch_size=args.batch_size, validation_split=0.05)
             # ntwk.fit(X_new, Y_new, nb_epoch=1, batch_size=10, validation_split=0.05,
             #          sample_weight={"out_layer2": w2}, )
@@ -884,13 +884,13 @@ if __name__ == '__main__':
             #    [length] * len(Length)).shape, Length.shape)
 
             if args.test:
-                maxin=8
-                val=2
-                batch_size=8
+                maxin = 8
+                val = 2
+                batch_size = 8
             else:
-                maxin=args.batch_size * (int(len(X_new) // args.batch_size))
-                val=30
-                batch_size=args.batch_size
+                maxin = args.batch_size * (int(len(X_new) // args.batch_size))
+                val = 30
+                batch_size = args.batch_size
 
             if args.extra_output:
 
@@ -901,14 +901,14 @@ if __name__ == '__main__':
                     return np.sum(x == mapping["T"], axis=-1)
 
                 if args.extra_output >= 1:
-                    p1=countT(Label)[::, np.newaxis] * sp1  # / 1.0 / subseq_size
-                    tp1=countT(tLabel)[::, np.newaxis] * stp1  # / 1.0 / subseq_size
+                    p1 = countT(Label)[::, np.newaxis] * sp1  # / 1.0 / subseq_size
+                    tp1 = countT(tLabel)[::, np.newaxis] * stp1  # / 1.0 / subseq_size
 
                     print(countT(Label))
                     print(sp1)
                     print(p1)
 
-                    r=ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size * args.n_output_network] * len(Length))[:maxin], Length[:maxin]],
+                    r = ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size * args.n_output_network] * len(Length))[:maxin], Length[:maxin]],
                                  [Label[:maxin]] + [pi[:maxin] for pi in p1.T], nb_epoch=1, batch_size=batch_size,
                                  validation_data=([tX_new,
                                                    tLabel,
@@ -918,7 +918,7 @@ if __name__ == '__main__':
                                                   [tLabel] + [pi[:maxin] for pi in tp1.T]))
 
             else:
-                r=ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size * args.n_output_network] * len(Length))[:maxin], Length[:maxin]],
+                r = ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size * args.n_output_network] * len(Length))[:maxin], Length[:maxin]],
                              Label[:maxin], nb_epoch=1, batch_size=batch_size,
                              validation_data=([tX_new,
                                                tLabel,
@@ -930,14 +930,14 @@ if __name__ == '__main__':
                 ntwk.save_weights(os.path.join(
                     args.root, 'my_model_weights-%i.h5' % epoch))
 
-        csv_keys=["epoch", "loss", "val_loss"]
+        csv_keys = ["epoch", "loss", "val_loss"]
         if args.extra_output >= 1:
             csv_keys.extend(["val_ctc_loss", "ctc_loss"])
 
             for i in range(args.extra_output):
                 csv_keys.extend(["o%i_loss" % i, "val_o%i_loss" % i])
 
-        lr=Schedul.set_new_lr(r.history["loss"][0])
+        lr = Schedul.set_new_lr(r.history["loss"][0])
 
         K.set_value(ntwk.optimizer.lr, lr)
         K.set_value(predictor.optimizer.lr, lr)
@@ -946,7 +946,7 @@ if __name__ == '__main__':
 
         if epoch == 0:
             with open(os.path.join(args.root, "training.log"), "w") as csv_file:
-                writer=csv.writer(csv_file)
+                writer = csv.writer(csv_file)
                 # from IPython import embed
                 # embed()
                 # print(r)
@@ -954,7 +954,7 @@ if __name__ == '__main__':
                 writer.writerow([epoch] + [r.history[k][-1] for k in csv_keys[1:]] + [lr])
         else:
             with open(os.path.join(args.root, "training.log"), "a") as csv_file:
-                writer=csv.writer(csv_file)
+                writer = csv.writer(csv_file)
                 # writer.writerow(k + ["lr"])
                 writer.writerow([epoch] + [r.history[k][-1] for k in csv_keys[1:]] + [lr])
         if Schedul.stop:
