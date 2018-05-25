@@ -564,7 +564,8 @@ if __name__ == '__main__':
                       len("".join(new["seq1"]).replace("N", "")), len(new))
             else:
             """
-            print(np.sum(new["seq"] == "B"),np.sum(new["seq"] == "B")/(1+np.sum(new["seq"] == "T")+np.sum(new["seq"] == "B")))
+            print(np.sum(new["seq"] == "B"), np.sum(new["seq"] == "B") /
+                  (1 + np.sum(new["seq"] == "T") + np.sum(new["seq"] == "B")))
 
             if s.transfered is not None:
                 if "seq" in transfered.columns:
