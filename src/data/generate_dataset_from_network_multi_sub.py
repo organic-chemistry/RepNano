@@ -24,7 +24,7 @@ if __name__ == "__main__":
         end = np.arange(args.range[0], args.range[1] + 1e-4,
                         (args.range[1] - args.range[0]) / args.n_cpu)[i + 1]
 
-        cmd = "qsub -v target=%s,start=%.3f,end=%.3f,name=%s,weight=%s script_generate.sh" % (
+        cmd = "qsub -binding linear:1 -v target=%s,start=%.3f,end=%.3f,name=%s,w=%s script_generate.sh" % (
             args.target, start, end, args.name, args.weight)
         print(cmd)
         if not args.test:
