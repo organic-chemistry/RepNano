@@ -288,7 +288,7 @@ def load_datasets(argdatasets, norm2, norm3, maxleninf,
             keep += 1
         print(named, len(D.strands[:maxf]), keep)
     del Datasets
-    return data_x, data_y, data_y2, np.array(Probas)
+    return data_x, data_y, data_y2, np.array(Probas, dtype=np.float)
 
 
 def sample(sig, maxleninf=36, up=True, append=False):
@@ -386,10 +386,10 @@ def get_transformed_sets(d_x, d_y, d_y2, d_prob, s_arr, p_arr, subseq_size,
                 if np.random.rand() < pupdown:
                     X_new.append(sample(x.copy(), up=np.random.choice([False, True])))
                 else:
-                    X_new.append(x)
-                Label.append(y + [0] * (subseq_size * n_output_network - len(y)))
+                    X_new.append(x.copy())
+                Label.append([] + y + [0] * (subseq_size * n_output_network - len(y)))
                 Length.append(len(y))
-                Probas.append(d_prob[s2])
+                Probas.append(d_prob[s2].copy())
 
             # x[:,0] += np.random.binomial(n=1, p=0.1, size=x.shape[0]) *
             # np.random.normal(scale=0.01, size=x.shape[0])
