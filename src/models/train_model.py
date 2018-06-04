@@ -324,7 +324,7 @@ def sample(sig, maxleninf=36, up=True, append=False):
 
 
 def get_transformed_sets(d_x, d_y, d_y2, d_prob, s_arr, p_arr, subseq_size,
-                         ctc, Nbases, correct_ref, n_output_network, mapping, maxi=None, mini=40, pupdown=0.05):
+                         ctc, Nbases, correct_ref, n_output_network, mapping, maxi=None, mini=40, pupdown=0.05, pmix=0.1):
 
     print(len(d_x), len(d_y))
     X_new = []
@@ -482,7 +482,7 @@ def get_transformed_sets(d_x, d_y, d_y2, d_prob, s_arr, p_arr, subseq_size,
                 X_new.append(x)
                 # print(x)
 
-    for n in range(int(0.1 * len(X_new))):
+    for n in range(int(pmix * len(X_new))):
 
         i1 = np.random.randint(len(X_new))
         i2 = np.random.randint(len(X_new))
@@ -565,6 +565,7 @@ if __name__ == '__main__':
     parser.add_argument('--maxi', dest='maxi', type=int, default=None)
     parser.add_argument('--batchnorm', dest='batchnorm', action="store_true")
     parser.add_argument('--dropout', dest='dropout', default=0, type=float)
+    parser.add_argument('--pmix', dest="pmix", type=float, default=0.1)
 
     args = parser.parse_args()
 
@@ -836,10 +837,12 @@ if __name__ == '__main__':
 
         X_new, Y_new, Y2_new, Label, Length, stats, sp1 = get_transformed_sets(
             data_x, data_y, data_y2, probas, s_arr, p_arr, mini=200, subseq_size=subseq_size,
-            ctc=args.ctc, Nbases=args.Nbases, correct_ref=args.correct_ref, n_output_network=args.n_output_network, mapping=mapping, maxi=args.maxi)
+            ctc=args.ctc, Nbases=args.Nbases, correct_ref=args.correct_ref, n_output_network=args.n_output_network,
+            mapping=mapping, maxi=args.maxi, pmix=args.pmix)
         tX_new, tY_new, tY2_new, tLabel, tLength, stats, stp1 = get_transformed_sets(
             tdata_x, tdata_y, tdata_y2, tprobas, ts_arr, tp_arr, maxi=40, subseq_size=subseq_size,
-            ctc=args.ctc, Nbases=args.Nbases, correct_ref=args.correct_ref, n_output_network=args.n_output_network, mapping=mapping)
+            ctc=args.ctc, Nbases=args.Nbases, correct_ref=args.correct_ref,
+            n_output_network=args.n_output_network, mapping=mapping, pmix=args.pmix)
 
         if not args.ctc:
             sum1 = 0
