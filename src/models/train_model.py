@@ -482,7 +482,7 @@ def get_transformed_sets(d_x, d_y, d_y2, d_prob, s_arr, p_arr, subseq_size,
                 X_new.append(x)
                 # print(x)
 
-    for n in range(200):
+    for n in range(int(0.1 * len(X_new))):
 
         i1 = np.random.randint(len(X_new))
         i2 = np.random.randint(len(X_new))
