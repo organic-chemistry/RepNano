@@ -115,7 +115,7 @@ if __name__ == "__main__":
     if args.target == "H_B":
         samf = ""
         rf = "Human-HR2/72"
-        base_call = True
+        base_call = False
         human = True
 
     if args.target == "H_T":
