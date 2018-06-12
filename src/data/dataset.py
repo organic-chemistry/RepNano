@@ -23,6 +23,7 @@ class NotAllign(Exception):
         self.message = "Delta = % i" % delta
 
 REF = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
+REFH = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/external/chromFa/all_chra.fa"
 
 
 class Dataset:
@@ -255,7 +256,7 @@ class Strand:
         s2 = self.seq_from_basecall
         self.score(s1, s2, maxlen=maxlen)
 
-    def get_ref(self, sequence, correct=False, pos=False, find_ref=True):
+    def get_ref(self, sequence, correct=False, pos=False, find_ref=True, human=False):
 
         h, name = tempfile.mkstemp(prefix="", dir="./")
         os.close(h)
@@ -265,20 +266,24 @@ class Strand:
             output_file.writelines(sequence.replace("B", "T") + "\n")
 
         # try to add some prefix to the ref:
-        if not os.path.exists(REF):
-            if os.path.exists("../../" + REF):
+
+        ref = REF
+        if human:
+            ref = REFH
+        if not os.path.exists(ref):
+            if os.path.exists("../../" + ref):
                 pre = "../../"
             else:
-                print(REF, "not found")
+                print(ref, "not found")
         else:
             pre = ""
-        exex = "bwa mem -x ont2d  %s  %s.fasta > %s.sam" % (pre + REF, name, name)
+        exex = "bwa mem -x ont2d  %s  %s.fasta > %s.sam" % (pre + ref, name, name)
         try:
             subprocess.check_output(exex, shell=True, stderr=subprocess.STDOUT, close_fds=True)
         except subprocess.CalledProcessError as e:
             print(e.output)
             print(exex)
-        ref, succes, X1, P1 = get_seq("%s.sam" % name, ref=pre + REF,
+        ref, succes, X1, P1 = get_seq("%s.sam" % name, ref=pre + ref,
                                       ret_pos=True, correct=correct, find_ref=find_ref)
         # print(X1, P1)
         os.remove("%s.sam" % name)

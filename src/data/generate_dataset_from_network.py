@@ -93,6 +93,7 @@ if __name__ == "__main__":
     root = "data/raw/20170908-R9.5/"
     base_call = True
     rf = None
+    human = False
     if args.target == "T":
         samf = "BTF_AG_ONT_1_FAH14273_A-select.sam"
         rf = "AG-basecalled/"
@@ -113,8 +114,9 @@ if __name__ == "__main__":
 
     if args.target == "H_B":
         samf = ""
-        rf = "Human_AR/"
-        base_call = False
+        rf = "Human-HR2/72"
+        base_call = True
+        human = True
 
     if args.target == "H_T":
         samf = ""
@@ -256,7 +258,7 @@ if __name__ == "__main__":
         from_ntwk = "".join(transfered["seq"]).replace("N", "")
         sub = "B"
         prop = from_ntwk.count("T") / (from_ntwk.count("T") + from_ntwk.count(sub) + 1e-7)
-        ref = strand.get_ref(from_ntwk.replace(sub, "T"), correct=args.correct)
+        ref = strand.get_ref(from_ntwk.replace(sub, "T"), correct=args.correct, human=human)
         # print(ref)
         if ref == "":
             print("Not alligned")
