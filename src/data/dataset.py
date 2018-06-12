@@ -23,7 +23,7 @@ class NotAllign(Exception):
         self.message = "Delta = % i" % delta
 
 REF = "data/external/ref/S288C_reference_sequence_R64-2-1_20150113.fa"
-REFH = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/external/chromFa/all_chra.fa"
+REFH = "data/external/chromFa/all_chra.fa"
 
 
 class Dataset:
@@ -273,6 +273,9 @@ class Strand:
         if not os.path.exists(ref):
             if os.path.exists("../../" + ref):
                 pre = "../../"
+
+            elif os.path.exists("/data/bioinfo@borvo/users/jarbona/deepnano5bases/" + ref):
+                pre = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/"
             else:
                 print(ref, "not found")
         else:
