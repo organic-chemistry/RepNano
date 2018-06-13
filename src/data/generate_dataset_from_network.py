@@ -298,6 +298,8 @@ if __name__ == "__main__":
         score = strand.score("".join(transfered["seq_ref"]).replace(
             "N", "").replace(sub, "T"), ref, all_info=False)
         print("ALL", score)
+        print("".join(transfered["seq_ref"]).replace(
+            "N", "").replace(sub, "T"))
         return transfered, al[2] / len(bc_strand), score, len(ref)
         # except:
 
