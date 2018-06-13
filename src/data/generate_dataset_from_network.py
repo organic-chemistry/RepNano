@@ -139,6 +139,7 @@ if __name__ == "__main__":
     if args.human is not None:
         if args.human == 1:
             human = True
+            print("Human")
     ran = range(1, 11)
     if args.test_set:
         ran = range(11, 17)
