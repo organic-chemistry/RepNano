@@ -46,7 +46,7 @@ class Dataset:
                 if strand in st:
                     return st
 
-        if not base_call:
+        if not base_call or self.samfile == "":
 
             if arange == []:
                 self.strands = [Strand(fn) for fn in lstrand]
