@@ -29,6 +29,9 @@ if __name__ == "__main__":
     parser.add_argument("--method", dest="method",
                         choices=["FW", "TV", "TV45", "TV25", "TV5", "TVb"])
     parser.add_argument('--correct', dest='correct', action='store_true')
+    parser.add_argument('--no-align', dest='realign', action='store_false')
+    parser.add_argument('--human', dest='human', action='store_true')
+
     parser.add_argument('--gamma', type=float, default=40)
 
     #parser.add_argument("--substitution", dest="substitution", default="T", type=str)
@@ -96,14 +99,17 @@ if __name__ == "__main__":
     # load from basecall
 
     def load_from_bc(strand):
-        if samf != "":
+        if base_call:
             try:
                 bc = strand.get_seq(f="BaseCall")
             except NotAllign:
                 bc = [None]
 
-            minion = strand.get_seq(f="Minion", correct=True)
-            return [bc, minion]
+            if samf != "":
+                minion = strand.get_seq(f="Minion", correct=True)
+                return [bc, minion]
+            else:
+                return [bc, None]
         else:
             trans = strand.get_seq(
                 f="no_basecall", window_size=args.window_size,
@@ -117,7 +123,7 @@ if __name__ == "__main__":
 
     pop = []
     for istrand, (v, s) in enumerate(zip(res, D.strands)):
-        if samf != "":
+        if base_call:
             if v[0][0] is not None:
                 s.signal_bc, s.seq_from_basecall, s.imin, s.raw, s.to_match, s.sampling_rate = v[0]
                 s.seq_from_minion = v[1]
@@ -144,34 +150,46 @@ if __name__ == "__main__":
         if len("".join(transfered["seq"]).replace("N", "")) > maxlen:
             transfered = transfered[:maxlen]
         # get the ref from transefered:
-        ref = strand.get_ref("".join(transfered["seq"]).replace("N", ""), correct=args.correct)
-        if ref == "":
-            return [None, None]
-        # allign the ref on the transefered
-        bc_strand = "".join(transfered["seq"]).replace("N", "")
-        al = strand.score(bc_strand, ref, all_info=True)
-        # strand.score_bc_ref = al[2] / len(bc_strand)
 
-        mapped_ref, correction = strand.give_map("".join(transfered["seq"]), al[:2])
+        if args.realign:
+            ref = strand.get_ref("".join(transfered["seq"]).replace(
+                "N", ""), correct=args.correct, human=args.human)
 
-        def order(s1, s2):
-            if s1 != "N":
-                return s1 + s2
-            return s2 + s1
-        transfered["seq_ref"] = np.array([order(s, s1)
-                                          for s, s1 in zip(mapped_ref[::2], mapped_ref[1::2])])
-        transfered["seq_ref_correction"] = np.array([order(s, s1)
-                                                     for s, s1 in zip(correction[::2], correction[1::2])])
-        strand.changed = True
+            if ref == "":
+                return [None, None]
+            # allign the ref on the transefered
+            bc_strand = "".join(transfered["seq"]).replace("N", "")
+            al = strand.score(bc_strand, ref, all_info=True)
+            # strand.score_bc_ref = al[2] / len(bc_strand)
+
+            mapped_ref, correction = strand.give_map("".join(transfered["seq"]), al[:2])
+
+            def order(s1, s2):
+                if s1 != "N":
+                    return s1 + s2
+                return s2 + s1
+            transfered["seq_ref"] = np.array([order(s, s1)
+                                              for s, s1 in zip(mapped_ref[::2], mapped_ref[1::2])])
+            transfered["seq_ref_correction"] = np.array([order(s, s1)
+                                                         for s, s1 in zip(correction[::2], correction[1::2])])
+            strand.changed = True
+            bc_score = al[2] / len(bc_strand)
+            confirm_score = strand.score("".join(transfered["seq_ref"]).replace(
+                "N", ""), ref, all_info=False)
+
+        else:
+            transfered["seq_ref"] = transfered["seq"]
+            print(transfered[:4])
+            bc_score = 0
+            confirm_score = 0
 
         # strand.transfered_seq = transfered
 
-        return transfered, al[2] / len(bc_strand), strand.score("".join(transfered["seq_ref"]).replace(
-            "N", ""), ref, all_info=False), len(ref)
+        return transfered, bc_score, confirm_score, ""
         # except:
         #    return [None, None]
     alligned = 0
-    if samf != "":
+    if base_call:
         with Pool(n_cpu) as p:
             res = p.map(compute_attributes, D.strands)
         for v, s in zip(res, D.strands):
