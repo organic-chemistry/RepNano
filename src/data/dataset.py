@@ -41,7 +41,7 @@ class Dataset:
         lstrand = glob.glob(self.root_files + "/*")
         lstrand.sort()
 
-        print("Number of strands found", len(lstrand))
+        print("Number of strands found %i in %s " % (len(lstrand), self.root_files))
 
         def find_strand(strand):
             for st in lstrand:
