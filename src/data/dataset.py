@@ -36,7 +36,7 @@ class Dataset:
 
     def populate(self, maxf=None, minion=True, basecall=True,
                  filter_not_alligned=False,
-                 filter_ch=None, realign=False, arange=[], base_call=False):
+                 filter_ch=None, realign=False, arange=[], base_call=False, samf=""):
         self.strands = []
         lstrand = glob.glob(self.root_files + "/*")
         lstrand.sort()
@@ -46,7 +46,7 @@ class Dataset:
                 if strand in st:
                     return st
 
-        if not base_call or self.samfile == "":
+        if not base_call or samf == "":
 
             if arange == []:
                 self.strands = [Strand(fn) for fn in lstrand]
