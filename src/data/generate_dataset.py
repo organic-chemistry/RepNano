@@ -151,7 +151,7 @@ if __name__ == "__main__":
     def compute_attributes(strand):
         # try:
         strand.segmentation(w=args.window_size, method=args.method,
-                            allinfos=args.allinfos, maxlen=args.maxlen, minlen=args.minlen, gamma=args.gamma)
+                            allinfos=args.allinfos, maxlen=args.maxlen, minlen=args.minlen, gamma=args.gamma, totallen=args.maxlen / 2 * maxlen)
 
         # print(strand.segments.columns)
         transfered = strand.transfer(strand.signal_bc, strand.segments, allinfos=args.allinfos)
