@@ -17,7 +17,7 @@ if __name__ == "__main__":
     parser.add_argument('--allinfos', dest='allinfos', action='store_true')
 
     parser.add_argument('--size', type=int, default=20)
-    parser.add_argument('--maxlen', type=int, default=35)
+    parser.add_argument('--maxlen', type=int, default=36)
     parser.add_argument('--minlen', type=int, default=1)
 
     parser.add_argument("--metadata", type=str, default=None)
@@ -189,7 +189,7 @@ if __name__ == "__main__":
 
         else:
             transfered["seq_ref"] = transfered["seq"]
-            transfered["seq_ref_correction"] = ["" for _ in transfered_seq]
+            transfered["seq_ref_correction"] = ["NN" for _ in transfered["seq"]]
 
             print(transfered[:4])
             bc_score = 0
