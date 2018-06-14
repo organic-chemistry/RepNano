@@ -152,7 +152,7 @@ if __name__ == "__main__":
         # try:
         strand.segmentation(w=args.window_size, method=args.method,
                             allinfos=args.allinfos, maxlen=args.maxlen, minlen=args.minlen,
-                            gamma=args.gamma, totallen=args.maxlen / 6 * maxlen)
+                            gamma=args.gamma, totallen=None)
 
         # print(strand.segments.columns)
         transfered = strand.transfer(strand.signal_bc, strand.segments, allinfos=args.allinfos)
