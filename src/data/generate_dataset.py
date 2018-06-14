@@ -112,7 +112,7 @@ if __name__ == "__main__":
         if base_call:
             try:
                 bc = strand.get_seq(f="BaseCall")
-            except NotAllign, KeyError:
+            except (NotAllign, KeyError) as e:
                 bc = [None]
 
             if samf != "":
