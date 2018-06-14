@@ -157,6 +157,7 @@ if __name__ == "__main__":
         transfered = strand.transfer(strand.signal_bc, strand.segments, allinfos=args.allinfos)
         # print(transfered.columns)
         # strand.transfered_bc = copy.deepcopy(transfered)
+        init_len = len(transfered)
         if len("".join(transfered["seq"]).replace("N", "")) > maxlen:
             transfered = transfered[:maxlen]
         # get the ref from transefered:
@@ -191,7 +192,7 @@ if __name__ == "__main__":
             transfered["seq_ref"] = transfered["seq"]
             transfered["seq_ref_correction"] = ["NN" for _ in transfered["seq"]]
 
-            print(transfered[:4])
+            print(init_len, len(transfered))
             bc_score = 0
             confirm_score = 0
 
