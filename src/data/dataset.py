@@ -473,7 +473,7 @@ class Strand:
         elif method == "TV":
             raw, sl = get_raw(h5)
             #self.segments = tv_segment(raw, gamma=130, maxlen=45, minlen=2, sl=sl)
-            self.segments = tv_segment(raw[:totallen], gamma=gamma, maxlen=maxlen,
+            self.segments = tv_segment(raw[:int(totallen)], gamma=gamma, maxlen=maxlen,
                                        minlen=minlen, sl=sl, allinfos=allinfos, flatten=flatten)
             self.sl = sl
             # print(self.segments.columns)
