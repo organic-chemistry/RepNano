@@ -78,12 +78,12 @@ if __name__ == "__main__":
         base_call = False
 
     if args.target == "H_B_B":
-        root = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw"
+        root = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/"
         samf = ""
         rf = "Albacore-human/HR/workspace/"
 
     if args.target == "H_T_B":
-        root = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw"
+        root = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/"
         samf = ""
         rf = "Albacore-human/HQ/workspace/"
 
@@ -105,7 +105,7 @@ if __name__ == "__main__":
         ran = range(1, 17)
     D.populate(maxf=maxf, filter_not_alligned=True,
                filter_ch=ran, basecall=False, minion=False, arange=args.range,
-               base_call=base_call)
+               base_call=base_call, samf=samf)
     # load from basecall
 
     def load_from_bc(strand):
