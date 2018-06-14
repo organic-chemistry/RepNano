@@ -189,6 +189,8 @@ if __name__ == "__main__":
 
         else:
             transfered["seq_ref"] = transfered["seq"]
+            transfered["seq_ref_correction"] = ["" for _ in transfered_seq]
+
             print(transfered[:4])
             bc_score = 0
             confirm_score = 0
@@ -211,6 +213,7 @@ if __name__ == "__main__":
                     s.segments = None
                 del(s.signal_bc)
                 alligned += 1
+                print(v[1], v[2])
             else:
                 s.transfered = None
     print("Nmol alligned", alligned)
