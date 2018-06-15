@@ -21,6 +21,7 @@ def SeqInRef(Chrom, pos, bit, Lenght, ref):
     # try opening individual chromosome
     refd = os.path.split(ref)[0]
     nref = ref
+    print("Look for ", refd + "/chr%s.fa" % str(Chrom))
     if os.path.exists(refd + "/chr%s.fa" % str(Chrom)):
         nref = refd + "/chr%s.fa" % str(Chrom)
 
