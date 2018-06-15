@@ -260,6 +260,8 @@ class Strand:
 
     def get_ref(self, sequence, correct=False, pos=False, find_ref=True, human=False):
 
+        import time
+        t0 = time.time()
         h, name = tempfile.mkstemp(prefix="", dir="./")
         os.close(h)
         with open(name + ".fasta", "w") as output_file:
@@ -288,9 +290,14 @@ class Strand:
         except subprocess.CalledProcessError as e:
             print(e.output)
             print(exex)
+
+        print(time.time() - t0)
+
+        t0 = time.time()
         ref, succes, X1, P1 = get_seq("%s.sam" % name, ref=pre + ref,
                                       ret_pos=True, correct=correct, find_ref=find_ref)
         # print(X1, P1)
+        print(time.time() - t0)
         os.remove("%s.sam" % name)
         os.remove("%s.fasta" % name)
         os.remove(name)
