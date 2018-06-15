@@ -3,6 +3,7 @@
 import re
 import io
 import cigar
+import os
 
 
 def LenghtOnRef(CIGAR):
@@ -17,7 +18,13 @@ def LenghtOnRef(CIGAR):
 
 
 def SeqInRef(Chrom, pos, bit, Lenght, ref):
-    f = open(ref, 'r')
+    # try opening individual chromosome
+    refd = os.path.split(ref)[0]
+    nref = ref
+    if os.path.exists(refd + "/chr%s.fa" % str(Chrom)):
+        nref = refd + "/chr%s.fa" % str(Chrom)
+
+    f = open(nref, 'r')
     s = f.readline()
     Ref = ''
     while s != '':
