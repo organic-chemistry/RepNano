@@ -23,7 +23,7 @@ def SeqInRef(Chrom, pos, bit, Lenght, ref):
     nref = ref
     print("Look for ", refd + "/%s.fa" % str(Chrom))
     if os.path.exists(refd + "/%s.fa" % str(Chrom)):
-        nref = refd + "/chr%s.fa" % str(Chrom)
+        nref = refd + "/%s.fa" % str(Chrom)
 
     f = open(nref, 'r')
     s = f.readline()
