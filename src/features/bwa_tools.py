@@ -46,7 +46,7 @@ def SeqInRef(Chrom, pos, bit, Lenght, ref):
             s = f.readline()
     if bit == '16' or bit == '2064':
         revcompl = lambda x: ''.join(
-            [{'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}[B] for B in x][::-1])
+            [{'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A', "N": ""}[B] for B in x][::-1])
         # Ref = revcompl(Ref)
     f.close()
     SeqInRef = ''.join(Ref[pos:pos + Lenght]).upper()
