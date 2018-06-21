@@ -508,8 +508,12 @@ if __name__ == '__main__':
         for strand in D.strands[:args.maxf]:
 
             if strand.transfered is None:
-                data_x.append(fnorm(strand.segments))
-                continue
+                if not hasattr(strand, "segments"):
+                    print("useless strand??")
+                    continue
+                else:
+                    data_x.append(fnorm(strand.segments))
+                    continue
 
             if args.sclean:
                 data_x.append(scale_simple(strand.transfered))
