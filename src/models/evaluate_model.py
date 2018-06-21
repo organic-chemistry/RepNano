@@ -569,8 +569,6 @@ if __name__ == '__main__':
                       len("".join(new["seq1"]).replace("N", "")), len(new))
             else:
             """
-            print(np.sum(new["seq"] == "B"), np.sum(new["seq"] == "B") /
-                  (1 + np.sum(new["seq"] == "T") + np.sum(new["seq"] == "B")))
 
             if s.transfered is not None:
                 if "seq" in transfered.columns:
@@ -594,6 +592,10 @@ if __name__ == '__main__':
                 print(np.sum(s.ntwk_align["seq"] != "N"), np.sum(s.ntwk_align["seq1"] != "N"))
             else:
                 seq = s.ntwk_align["seq"]
+            lseq = np.array([l for l in seq])
+            print("Nb", np.sum(lseq == "B"), "percent", np.sum(lseq == "B") /
+                  (1 + np.sum(lseq == "T") + np.sum(lseq == "B")))
+
             seq = "".join(seq).replace("N", "").replace(
                 "B", "T").replace("E", "T").replace("I", "T")
 
@@ -605,7 +607,7 @@ if __name__ == '__main__':
                 print("len ref, len seq", len(s.ref_ntwk), len(seq))
 
                 s.score_ntwk = s.score(seq, s.ref_ntwk[0], maxlen=args.maxlen)
-                print(s.score_ntwk)
+                print("score al", s.score_ntwk)
 
             # print(Score)
             # Score["ntwk_bc"].append(s.score("".join(s.ntwk_align["seq"]).replace("N",""),s.seq_from_basecall))
