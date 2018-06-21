@@ -248,6 +248,7 @@ if __name__ == '__main__':
     parser.add_argument('--info', action="store_true")
     parser.add_argument('--batchnorm', dest='batchnorm', action="store_true")
     parser.add_argument('--dropout', dest='dropout', default=0, type=float)
+    parser.add_argument('--human', dest='human', action="store_true")
 
     args = parser.parse_args()
 
@@ -593,7 +594,8 @@ if __name__ == '__main__':
                 "B", "T").replace("E", "T").replace("I", "T")
 
             if not args.no_allign:
-                s.ref_ntwk = s.get_ref(seq, pos=True, correct=True, find_ref=find_ref)
+                s.ref_ntwk = s.get_ref(seq, pos=True, correct=True,
+                                       find_ref=find_ref, human=args.human)
                 # print(s.ref_ntwk)
                 print(seq)
                 print("len ref, len seq", len(s.ref_ntwk), len(seq))
