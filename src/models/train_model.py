@@ -932,7 +932,7 @@ if __name__ == '__main__':
                                                    np.array([subseq_size * args.n_output_network] *
                                                             len(tLength)),
                                                    tLength],
-                                                  [tLabel] + [pi[:maxin] for pi in tp1.T] + + [pi[:maxin] for pi in T_tp1.T]))
+                                                  [tLabel] + [pi[:maxin] for pi in tp1.T] + [pi[:maxin] for pi in T_tp1.T]))
 
             else:
                 r = ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size * args.n_output_network] * len(Length))[:maxin], Length[:maxin]],
