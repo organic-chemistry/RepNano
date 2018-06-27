@@ -210,9 +210,15 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                 model2.compile(loss={'ctc': lambda y_true, y_pred: y_pred}, optimizer="adadelta")
 
             else:
-                def average(v):
+                def averageT(v):
+                    return average(v, B=False)
+
+                def average(v, B=True):
                     p, b = v
+
                     p = 1 / (1 + K.exp(-50 * (p - 0.5)))
+                    if not B:
+                        p = (1 - p)
                     if n_output == 2:
                         bp1 = 1 / (1 + K.exp(-50 * (b[::, ::2, 3:4] - 0.5)))
                         bp2 = 1 / (1 + K.exp(-50 * (b[::, 1::2, 3:4] - 0.5)))
@@ -237,6 +243,8 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                     #out_layer1 = Reshape((input_length * 2, Nbases))(l3b)
 
                     ot.append(Lambda(average, output_shape=average_output_shape,
+                                     name="o%i" % n)([ext[n], out_layer1]))
+                    ot.append(Lambda(averageT, output_shape=average_output_shape,
                                      name="o%i" % n)([ext[n], out_layer1]))
 
                 model2 = Model(inputs=[inputs, labels, input_length,

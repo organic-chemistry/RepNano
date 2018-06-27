@@ -917,20 +917,22 @@ if __name__ == '__main__':
 
                 if args.extra_output >= 1:
                     p1 = countT(Label)[::, np.newaxis] * sp1  # / 1.0 / subseq_size
-                    tp1 = countT(tLabel)[::, np.newaxis] * stp1  # / 1.0 / subseq_size
 
+                    T_p1 = countT(Label)[::, np.newaxis] * (1 - sp1)
+                    tp1 = countT(tLabel)[::, np.newaxis] * stp1  # / 1.0 / subseq_size
+                    T_tp1 = countT(tLabel)[::, np.newaxis] * (1 - stp1)
                     print(countT(Label))
                     print(sp1)
                     print(p1)
 
                     r = ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size * args.n_output_network] * len(Length))[:maxin], Length[:maxin]],
-                                 [Label[:maxin]] + [pi[:maxin] for pi in p1.T], nb_epoch=1, batch_size=batch_size,
+                                 [Label[:maxin]] + [pi[:maxin] for pi in p1.T] + [pi[:maxin] for pi in T_p1.T], nb_epoch=1, batch_size=batch_size,
                                  validation_data=([tX_new,
                                                    tLabel,
                                                    np.array([subseq_size * args.n_output_network] *
                                                             len(tLength)),
                                                    tLength],
-                                                  [tLabel] + [pi[:maxin] for pi in tp1.T]))
+                                                  [tLabel] + [pi[:maxin] for pi in tp1.T] + + [pi[:maxin] for pi in T_tp1.T]))
 
             else:
                 r = ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size * args.n_output_network] * len(Length))[:maxin], Length[:maxin]],
