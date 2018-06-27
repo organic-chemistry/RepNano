@@ -918,9 +918,9 @@ if __name__ == '__main__':
                 if args.extra_output >= 1:
                     p1 = countT(Label)[::, np.newaxis] * sp1  # / 1.0 / subseq_size
 
-                    T_p1 = countT(Label)[::, np.newaxis] * (1 - sp1)
+                    T_p1 = countT(Label)[::, np.newaxis] * (1 - np.array(sp1))
                     tp1 = countT(tLabel)[::, np.newaxis] * stp1  # / 1.0 / subseq_size
-                    T_tp1 = countT(tLabel)[::, np.newaxis] * (1 - stp1)
+                    T_tp1 = countT(tLabel)[::, np.newaxis] * (1 - np.array(stp1))
                     print(countT(Label))
                     print(sp1)
                     print(p1)
