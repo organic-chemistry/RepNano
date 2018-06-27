@@ -245,7 +245,7 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                     ot.append(Lambda(average, output_shape=average_output_shape,
                                      name="o%i" % n)([ext[n], out_layer1]))
                     ot.append(Lambda(averageT, output_shape=average_output_shape,
-                                     name="o%i" % n)([ext[n], out_layer1]))
+                                     name="To%i" % n)([ext[n], out_layer1]))
 
                 model2 = Model(inputs=[inputs, labels, input_length,
                                        label_length], outputs=[loss_out] + ot)
