@@ -265,13 +265,13 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                     return tf.sqrt(reduce_var(x, axis=axis, keepdims=keepdims))
 
                 def soft_argmax(v):
-                    std = reduce_std(v, axis=-1, keepdims=True)
+                    std = reduce_std(v, axis=2, keepdims=True)
                     xp = v - ((0.95 - 0.4) * std / 0.4 + 0.4)  # tf.reduce_mean(x,axis=-1)
                     n = 5
                     beta = 100
                     betap = std * (4 * beta - n * beta) / 0.4 + n * beta
 
-                    return tf.exp(betap * xp) / tf.reduce_sum(tf.exp(betap * xp))
+                    return tf.exp(betap * xp) / tf.reduce_sum(tf.exp(betap * xp), axis=2, keep_dims=True)
 
                 def average(v, B=True):
                     p, b = v
