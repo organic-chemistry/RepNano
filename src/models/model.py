@@ -281,6 +281,7 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                         p = (1 - p)
                     if n_output == 2:
                         bsoft = soft_argmax(b[::, ::, ::])
+                        bsoft = tf.Print(bsoft, [bsoft])
                         bp1 = bsoft[::, ::2, 3:4]
                         bp2 = bsoft[::, 1::2, 3:4]
 
