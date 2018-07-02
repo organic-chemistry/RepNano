@@ -210,10 +210,11 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                 model2.compile(loss={'ctc': lambda y_true, y_pred: y_pred}, optimizer="adadelta")
 
             else:
-                def averageT(v):
+
+                def old_averageT(v):
                     return average(v, B=False)
 
-                def average(v, B=True):
+                def old_average(v, B=True):
                     p, b = v
 
                     p = 1 / (1 + K.exp(-50 * (p - 0.5)))
@@ -228,6 +229,69 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                         bp = 1 / (1 + K.exp(-50 * (b[::, ::, 3:4] - 0.5)))
                         x = K.sum(p * bp, axis=-2)  # ,
                     return x
+
+                def reduce_var(x, axis=None, keepdims=False):
+                    """Variance of a tensor, alongside the specified axis.
+
+                    # Arguments
+                        x: A tensor or variable.
+                        axis: An integer, the axis to compute the variance.
+                        keepdims: A boolean, whether to keep the dimensions or not.
+                            If `keepdims` is `False`, the rank of the tensor is reduced
+                            by 1. If `keepdims` is `True`,
+                            the reduced dimension is retained with length 1.
+
+                    # Returns
+                        A tensor with the variance of elements of `x`.
+                    """
+                    m = tf.reduce_mean(x, axis=axis, keep_dims=True)
+                    devs_squared = tf.square(x - m)
+                    return tf.reduce_mean(devs_squared, axis=axis, keep_dims=keepdims)
+
+                def reduce_std(x, axis=None, keepdims=False):
+                    """Standard deviation of a tensor, alongside the specified axis.
+
+                    # Arguments
+                        x: A tensor or variable.
+                        axis: An integer, the axis to compute the standard deviation.
+                        keepdims: A boolean, whether to keep the dimensions or not.
+                            If `keepdims` is `False`, the rank of the tensor is reduced
+                            by 1. If `keepdims` is `True`,
+                            the reduced dimension is retained with length 1.
+
+                    # Returns
+                        A tensor with the standard deviation of elements of `x`.
+                    """
+                    return tf.sqrt(reduce_var(x, axis=axis, keepdims=keepdims))
+
+                def soft_argmax(v):
+                    std = reduce_std(v, axis=-1)
+                    xp = v - ((0.95 - 0.4) * std / 0.4 + 0.4)  # tf.reduce_mean(x,axis=-1)
+                    n = 5
+                    beta = 100
+                    betap = std * (4 * beta - n * beta) / 0.4 + n * beta
+
+                    return tf.exp(betap * xp) / tf.reduce_sum(tf.exp(betap * xp))
+
+                def average(v, B=True):
+                    p, b = v
+
+                    p = 1 / (1 + K.exp(-50 * (p - 0.5)))
+                    if not B:
+                        p = (1 - p)
+                    if n_output == 2:
+                        bsoft = soft_argmax(b[::, ::, ::])
+                        bp1 = bsoft[::, ::2, 3:4]
+                        bp2 = bsoft[::, 1::2, 3:4]
+
+                        x = K.sum(p * (bp1 + bp2), axis=-2)  # , keepdims=True)
+                    else:
+                        bp = soft_argmax(b[::, ::, ::])[::, ::, 3:4]
+                        x = K.sum(p * bp, axis=-2)  # ,
+                    return x
+
+                def averageT(v):
+                    return average(v, B=False)
 
                 def average_output_shape(input_shape):
                     shape = list(input_shape[0])
