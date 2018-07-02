@@ -282,10 +282,10 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                     if n_output == 2:
                         print("la")
                         bsoft = soft_argmax(b[::, ::, ::])
-                        bsoft = tf.Print(bsoft, [bsoft], "here I am")
-                        bsoft = bsoft * 1
-                        bp1 = bsoft[::, ::2, 3:4]
-                        bp2 = bsoft[::, 1::2, 3:4]
+                        bsoft_p = tf.Print(bsoft, [bsoft], "here I am")
+                        bsoft_p = bsoft_p * 1
+                        bp1 = bsoft_p[::, ::2, 3:4]
+                        bp2 = bsoft_p[::, 1::2, 3:4]
 
                         x = K.sum(p * (bp1 + bp2), axis=-2)  # , keepdims=True)
                     else:
