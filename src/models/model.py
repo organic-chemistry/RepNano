@@ -269,7 +269,7 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                     xp = v - ((0.95 - 0.4) * std / 0.4 + 0.4)  # tf.reduce_mean(x,axis=-1)
                     n = 5
                     beta = 100
-                    betap = std * (4 * beta - n * beta) / 0.4 + n * beta
+                    betap = std * (4 * beta - n * beta) / 0.4 + 3 * beta
 
                     return tf.exp(betap * xp) / tf.reduce_sum(tf.exp(betap * xp), axis=2, keep_dims=True)
 
@@ -280,10 +280,10 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                     if not B:
                         p = (1 - p)
                     if n_output == 2:
-                        print("la")
+                        # print("la")
                         bsoft = soft_argmax(b[::, ::, ::])
-                        bsoft_p = tf.Print(bsoft, [bsoft], "here I am")
-                        bsoft_p = bsoft_p * 1
+                        bsoft_p = bsoft  # tf.Print(bsoft, [bsoft], "here I am")
+                        #bsoft_p = bsoft_p * 1
                         bp1 = bsoft_p[::, ::2, 3:4]
                         bp2 = bsoft_p[::, 1::2, 3:4]
 
