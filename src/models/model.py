@@ -280,6 +280,7 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                     if not B:
                         p = (1 - p)
                     if n_output == 2:
+                        print("la")
                         bsoft = soft_argmax(b[::, ::, ::])
                         bsoft = tf.Print(bsoft, [bsoft], "here I am")
                         bsoft = bsoft * 1
