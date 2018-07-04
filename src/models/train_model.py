@@ -974,7 +974,7 @@ if __name__ == '__main__':
                 with open(os.path.join(args.root, "test.log"), "a") as csv_file:
                     print(tindexes, args.all_test_datasets)
                     for ind in tindexes:
-                        tot = 100
+                        tot = 150
                         print("index", ind, len(tdata_x))
                         tX_new, tY_new, tY2_new, tLabel, tLength, stats, stp1 = get_transformed_sets(
                             tdata_x[ind:ind + tot], tdata_y[ind:ind + tot], tdata_y2[ind:ind +
