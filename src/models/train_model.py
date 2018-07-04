@@ -229,9 +229,11 @@ def load_datasets(argdatasets, norm2, norm3, maxleninf,
     data_y = []
     data_y2 = []
     Probas = []
+    indexes = []
 
     for D, named in zip(Datasets, argdatasets):
         keep = 0
+        indexes.append(len(data_x))
 
         for strand in D.strands[:maxf]:
 
@@ -288,7 +290,7 @@ def load_datasets(argdatasets, norm2, norm3, maxleninf,
             keep += 1
         print(named, len(D.strands[:maxf]), keep)
     del Datasets
-    return data_x, data_y, data_y2, np.array(Probas, dtype=np.float)
+    return data_x, data_y, data_y2, np.array(Probas, dtype=np.float), indexes
 
 
 def sample(sig, maxleninf=36, up=True, append=False):
@@ -670,23 +672,23 @@ if __name__ == '__main__':
     refs = []
     names = []
 
-    data_x, data_y, data_y2, probas = load_datasets(args.all_datasets,
-                                                    norm2=args.norm2, norm3=args.norm3, maxleninf=args.maxleninf,
-                                                    maxf=args.maxf, allinfos=args.allinfos,
-                                                    normed=args.normed, all_quality=args.all_quality,
-                                                    raw=args.raw, Nbases=args.Nbases, substitution=args.substitution,
-                                                    correct_ref=args.correct_ref, probas=args.probas, sclean=args.sclean,
-                                                    mapping=mapping, minimal_length=subseq_size + 1)
+    data_x, data_y, data_y2, probas, indexes = load_datasets(args.all_datasets,
+                                                             norm2=args.norm2, norm3=args.norm3, maxleninf=args.maxleninf,
+                                                             maxf=args.maxf, allinfos=args.allinfos,
+                                                             normed=args.normed, all_quality=args.all_quality,
+                                                             raw=args.raw, Nbases=args.Nbases, substitution=args.substitution,
+                                                             correct_ref=args.correct_ref, probas=args.probas, sclean=args.sclean,
+                                                             mapping=mapping, minimal_length=subseq_size + 1)
     if args.all_test_datasets != []:
-        tdata_x, tdata_y, tdata_y2, tprobas = load_datasets(args.all_test_datasets,
-                                                            norm2=args.norm2, norm3=args.norm3, maxleninf=args.maxleninf,
-                                                            maxf=args.maxf, allinfos=args.allinfos,
-                                                            normed=args.normed, all_quality=args.all_quality,
-                                                            raw=args.raw, Nbases=args.Nbases, substitution=args.substitution,
-                                                            correct_ref=args.correct_ref, probas=args.probas, sclean=args.sclean, mapping=mapping,
-                                                            minimal_length=subseq_size + 1)
+        tdata_x, tdata_y, tdata_y2, tprobas, tindexes = load_datasets(args.all_test_datasets,
+                                                                      norm2=args.norm2, norm3=args.norm3, maxleninf=args.maxleninf,
+                                                                      maxf=args.maxf, allinfos=args.allinfos,
+                                                                      normed=args.normed, all_quality=args.all_quality,
+                                                                      raw=args.raw, Nbases=args.Nbases, substitution=args.substitution,
+                                                                      correct_ref=args.correct_ref, probas=args.probas, sclean=args.sclean, mapping=mapping,
+                                                                      minimal_length=subseq_size + 1)
     else:
-        tdata_x, tdata_y, tdata_y2, tprobas = data_x, data_y, data_y2, probas
+        tdata_x, tdata_y, tdata_y2, tprobas, tindexes = data_x, data_y, data_y2, probas, indexes
 
     print("done", len(data_x), len(tdata_x))
     # exit()
@@ -946,6 +948,69 @@ if __name__ == '__main__':
             if epoch % 10 == 0:
                 ntwk.save_weights(os.path.join(
                     args.root, 'my_model_weights-%i.h5' % epoch))
+
+                if epoch == 0:
+                    row = []
+                    with open(os.path.join(args.root, "test.log"), "w") as csv_file:
+                        for d in args.all_test_datasets:
+                            na = os.path.split(d)[0].split("/")[-1]
+                            row.append(na + "_real")
+                            row.append(na + "_predicted_mean")
+                            row.append(na + "_predicted_std")
+                            row.append(na + "_predicted_T")
+                            row.append(na + "_predicted_B")
+                            row.append(na + "_tot_loss")
+                            row.append(na + "_ctc_loss")
+                            row.append(na + "_loss_o0")
+                            row.append(na + "_loss_o02")
+
+                        writer = csv.writer(csv_file)
+                        # from IPython import embed
+                        # embed()
+                        # print(r)
+                        writer.writerow(row)
+                row = []
+                with open(os.path.join(args.root, "test.log"), "a") as csv_file:
+                    print(tindexes, args.all_test_datasets)
+                    for ind in tindexes:
+                        tot = 100
+                        print("index", ind, len(tdata_x))
+                        tX_new, tY_new, tY2_new, tLabel, tLength, stats, stp1 = get_transformed_sets(
+                            tdata_x[ind:ind + tot], tdata_y[ind:ind + tot], tdata_y2[ind:ind +
+                                                                                     tot], tprobas[ind:ind + tot], np.array(ts_arr[ind:ind + tot]) - ind,
+                            np.array(tp_arr[ind:ind + tot]) / np.sum(tp_arr[ind:ind + tot]), maxi=100, subseq_size=subseq_size,
+                            ctc=args.ctc, Nbases=args.Nbases, correct_ref=args.correct_ref,
+                            n_output_network=args.n_output_network, mapping=mapping, pmix=args.pmix)
+
+                        rt = predictor.predict(tX_new)[0]
+
+                        print(rt.shape)
+                        T = np.sum(rt.argmax(-1) == 3)
+                        B = np.sum(rt.argmax(-1) == 4)
+                        row.append(np.mean(stp1))
+                        m = np.mean(B / (B + T + 1e-7))
+                        row.append(m)
+                        T = np.sum(rt.argmax(-1) == 3, axis=-1)
+                        B = np.sum(rt.argmax(-1) == 4, axis=-1)
+                        row.append(np.std(B / (B + T + 1e-7) - m))
+
+                        row.append(np.mean(T))
+                        row.append(np.mean(B))
+
+                        tp1 = countT(tLabel)[::, np.newaxis] * stp1  # / 1.0 / subseq_size
+
+                        Ttp1 = countT(tLabel)[::, np.newaxis] - tp1
+
+                        r2t = ntwk.evaluate([tX_new, tLabel, np.array([subseq_size * args.n_output_network] *
+                                                                      len(tLength)),
+                                             tLength],
+                                            [tLabel] + [pi[:maxin] for pi in tp1.T] + [pi[:maxin] for pi in Ttp1.T])
+                        row.extend(r2t)
+
+                    row = [float("%.2f" % rrr) for rrr in row]
+                    writer = csv.writer(csv_file)
+
+                    writer.writerow(row)
 
         csv_keys = ["epoch", "loss", "val_loss"]
         if args.extra_output >= 1:

@@ -153,19 +153,30 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
             out_layer2 = TimeDistributed(
                 Dense(Nbases, activation="softmax"), name="out_layer2", trainable=trainable)(Concatenate()([l3, out_layer1]))
 
+            if extra_output != 0:
+                ext = []
+                print("Extrao")
+                for n in range(extra_output):
+                    t1 = TimeDistributed(
+                        Dense(1, activation="sigmoid"), name="extra%i" % n)(l3)
+                    ext.append(t1)
+
+                    t2 = TimeDistributed(
+                        Dense(1, activation="sigmoid"), name="extra%i_2" % n)(Concatenate()([l3, out_layer1]))
+
+                    ext.append(t2)
+
             if input_length is not None:
 
                 l3b = Concatenate()([out_layer1, out_layer2])
                 # 2 * size because l3 is concat
                 out_layer1 = Reshape((input_length * 2, Nbases))(l3b)
                 out_layer2 = None
-
-            if extra_output != 0:
-                ext = []
-                print("Extrao")
-                for n in range(extra_output):
-                    ext.append(TimeDistributed(
-                        Dense(1, activation="sigmoid"), name="extra%i" % n)(l3))
+                extb = []
+                for l1, l2 in zip(ext[::2], ext[1::2]):
+                    extb.append(Concatenate()([l1, l2]))
+                    extb[-1] = Reshape((input_length * 2, 1))(extb[-1])
+                ext = extb
 
     if out_layer2 is not None:
         print("ici")
@@ -279,18 +290,9 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                     p = 1 / (1 + K.exp(-50 * (p - 0.5)))
                     if not B:
                         p = (1 - p)
-                    if n_output == 2:
-                        # print("la")
-                        bsoft = soft_argmax(b[::, ::, ::])
-                        bsoft_p = bsoft  # tf.Print(bsoft, [bsoft], "here I am")
-                        #bsoft_p = bsoft_p * 1
-                        bp1 = bsoft_p[::, ::2, 3:4]
-                        bp2 = bsoft_p[::, 1::2, 3:4]
 
-                        x = K.sum(p * (bp1 + bp2), axis=-2)  # , keepdims=True)
-                    else:
-                        bp = soft_argmax(b[::, ::, ::])[::, ::, 3:4]
-                        x = K.sum(p * bp, axis=-2)  # ,
+                    bp = soft_argmax(b[::, ::, ::])[::, ::, 3:4]
+                    x = K.sum(p * bp, axis=-2)  # ,
                     return x
 
                 def averageT(v):
