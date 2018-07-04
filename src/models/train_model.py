@@ -689,6 +689,7 @@ if __name__ == '__main__':
                                                                       minimal_length=subseq_size + 1)
     else:
         tdata_x, tdata_y, tdata_y2, tprobas, tindexes = data_x, data_y, data_y2, probas, indexes
+        args.all_test_datasets = args.all_datasets
 
     print("done", len(data_x), len(tdata_x))
     # exit()
@@ -1018,6 +1019,7 @@ if __name__ == '__main__':
 
             for i in range(args.extra_output):
                 csv_keys.extend(["o%i_loss" % i, "val_o%i_loss" % i])
+                csv_keys.extend(["To%i_loss" % i, "val_To%i_loss" % i])
 
         lr = Schedul.set_new_lr(r.history["loss"][0])
 
