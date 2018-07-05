@@ -630,15 +630,15 @@ if __name__ == '__main__':
         print("Pproba must match extra output")
         raise
 
-    _, ntwk = build_models(args.size, nbase=args.Nbases - 4,
-                           trainable=args.trainable,
-                           ctc_length=ctc_length,
-                           input_length=input_length, n_output=n_output_network,
-                           lr=args.lr, res=args.res,
-                           attention=args.attention,
-                           n_feat=n_feat, simple=args.simple,
-                           extra_output=args.extra_output, poisson=args.poisson, batchnorm=args.batchnorm,
-                           recurrent_dropout=args.dropout)
+    predictor2, ntwk = build_models(args.size, nbase=args.Nbases - 4,
+                                    trainable=args.trainable,
+                                    ctc_length=ctc_length,
+                                    input_length=input_length, n_output=n_output_network,
+                                    lr=args.lr, res=args.res,
+                                    attention=args.attention,
+                                    n_feat=n_feat, simple=args.simple,
+                                    extra_output=args.extra_output, poisson=args.poisson, batchnorm=args.batchnorm,
+                                    recurrent_dropout=args.dropout)
     predictor, _ = build_models(args.size, nbase=args.Nbases - 4,
                                 ctc_length=ctc_length,
                                 trainable=args.trainable,
@@ -983,18 +983,23 @@ if __name__ == '__main__':
                             ctc=args.ctc, Nbases=args.Nbases, correct_ref=args.correct_ref,
                             n_output_network=args.n_output_network, mapping=mapping, pmix=args.pmix)
 
-                        predictor.load_weights(os.path.join(
+                        predictor2.load_weights(os.path.join(
                             args.root, 'my_model_weights-%i.h5' % epoch))
-                        rt = predictor.predict(tX_new)
+                        rt = predictor2.predict(tX_new)
 
-                        print(rt.shape)
-                        T = np.sum(rt.argmax(-1) == 3)
-                        B = np.sum(rt.argmax(-1) == 4)
+                        ToB = (rt[0].argmax(axis=-1) == 3)
+                        ToB.shape
+                        ToB[0]
+                        rt[1].shape
+                        T = rt[1] < 0.5
+                        T = T[::, ::, 0]
+                        T = T * ToB
+                        B = (~T) * ToB
+                        T = np.sum(T, axis=-1)
+                        B = np.sum(B, axis=-1)
                         row.append(np.mean(stp1))
                         m = np.mean(B / (B + T + 1e-7))
                         row.append(m)
-                        T = np.sum(rt.argmax(-1) == 3, axis=-1)
-                        B = np.sum(rt.argmax(-1) == 4, axis=-1)
                         row.append(np.std(B / (B + T + 1e-7) - m))
 
                         row.append(np.mean(T))
