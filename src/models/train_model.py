@@ -1021,10 +1021,16 @@ if __name__ == '__main__':
 
                         Ttp1 = countT(tLabel)[::, np.newaxis] - tp1
 
+                        if not args.mean:
+                            extrat = [pi[:maxin] for pi in tp1.T] + [pi[:maxin] for pi in Ttp1.T]
+                        else:
+                            stp1 = np.ones_like(countT(tLabel))[::, np.newaxis] * stp1
+                            extrat = [pi for pi in stp1.T]
+
                         r2t = ntwk.evaluate([tX_new, tLabel, np.array([subseq_size * args.n_output_network] *
                                                                       len(tLength)),
                                              tLength],
-                                            [tLabel] + [pi[:maxin] for pi in tp1.T] + [pi[:maxin] for pi in Ttp1.T])
+                                            [tLabel] + extra)
                         row.extend(r2t)
 
                         """
