@@ -317,7 +317,7 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
 
                     #l3b = Concatenate()([out_layer1, out_layer2])
                     #out_layer1 = Reshape((input_length * 2, Nbases))(l3b)
-                    if mean:
+                    if not mean:
 
                         ot.append(Lambda(average, output_shape=average_output_shape,
                                          name="o%i" % n)([ext[n], out_layer1]))
@@ -333,7 +333,7 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                     losst = "poisson"
                 else:
                     losst = "mean_squared_error"
-                if mean:
+                if not mean:
                     extra = [losst for i in range(extra_output)] + \
                         [losst for i in range(extra_output)]
                 else:
