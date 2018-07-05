@@ -1010,10 +1010,11 @@ if __name__ == '__main__':
                                             [tLabel] + [pi[:maxin] for pi in tp1.T] + [pi[:maxin] for pi in Ttp1.T])
                         row.extend(r2t)
 
+                        """
                         if epoch == 20:
                             from IPython import embed
 
-                            embed()
+                            embed()"""
 
                     row = [float("%.2f" % rrr) for rrr in row]
                     writer = csv.writer(csv_file)
