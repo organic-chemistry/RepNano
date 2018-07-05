@@ -679,7 +679,7 @@ if __name__ == '__main__':
                                                              normed=args.normed, all_quality=args.all_quality,
                                                              raw=args.raw, Nbases=args.Nbases, substitution=args.substitution,
                                                              correct_ref=args.correct_ref, probas=args.probas, sclean=args.sclean,
-                                                             mapping=mapping, minimal_length=subseq_size + 1)
+                                                             mapping=mapping, minimal_length=subseq_size + 1, mean=args.mean)
     if args.all_test_datasets != []:
         tdata_x, tdata_y, tdata_y2, tprobas, tindexes = load_datasets(args.all_test_datasets,
                                                                       norm2=args.norm2, norm3=args.norm3, maxleninf=args.maxleninf,
@@ -687,7 +687,7 @@ if __name__ == '__main__':
                                                                       normed=args.normed, all_quality=args.all_quality,
                                                                       raw=args.raw, Nbases=args.Nbases, substitution=args.substitution,
                                                                       correct_ref=args.correct_ref, probas=args.probas, sclean=args.sclean, mapping=mapping,
-                                                                      minimal_length=subseq_size + 1)
+                                                                      minimal_length=subseq_size + 1, mean=args.mean)
     else:
         tdata_x, tdata_y, tdata_y2, tprobas, tindexes = data_x, data_y, data_y2, probas, indexes
         args.all_test_datasets = args.all_datasets
@@ -929,14 +929,25 @@ if __name__ == '__main__':
                     print(sp1)
                     print(p1)
 
+                    if not args.mean:
+                        extra = [pi[:maxin] for pi in p1.T] + [pi[:maxin] for pi in Tp1.T]
+                        extrat = [pi[:maxin] for pi in tp1.T] + [pi[:maxin] for pi in Ttp1.T]
+                    else:
+                        ssp1 = np.ones_like(countT(Label))[::, np.newaxis] * sp1
+
+                        extra = [pi[:maxin] for pi in ssp1.T]
+                        sstp1 = np.ones_like(countT(tLabel[:40]))[::, np.newaxis] * stp1[:40]
+
+                        extrat = [pi[:40] for pi in sstp1.T]
+
                     r = ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size * args.n_output_network] * len(Length))[:maxin], Length[:maxin]],
-                                 [Label[:maxin]] + [pi[:maxin] for pi in p1.T] + [pi[:maxin] for pi in T_p1.T], nb_epoch=1, batch_size=batch_size,
+                                 [Label[:maxin]] + extra, nb_epoch=1, batch_size=batch_size,
                                  validation_data=([tX_new,
                                                    tLabel,
                                                    np.array([subseq_size * args.n_output_network] *
                                                             len(tLength)),
                                                    tLength],
-                                                  [tLabel] + [pi[:maxin] for pi in tp1.T] + [pi[:maxin] for pi in T_tp1.T]))
+                                                  [tLabel] + extrat))
 
             else:
                 r = ntwk.fit([X_new[:maxin], Label[:maxin], np.array([subseq_size * args.n_output_network] * len(Length))[:maxin], Length[:maxin]],
