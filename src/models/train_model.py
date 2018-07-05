@@ -1031,7 +1031,7 @@ if __name__ == '__main__':
                         r2t = ntwk.evaluate([tX_new, tLabel, np.array([subseq_size * args.n_output_network] *
                                                                       len(tLength)),
                                              tLength],
-                                            [tLabel] + extra)
+                                            [tLabel] + extrat)
                         row.extend(r2t)
 
                         """
