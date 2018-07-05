@@ -985,7 +985,7 @@ if __name__ == '__main__':
 
                         predictor.load_weights(os.path.join(
                             args.root, 'my_model_weights-%i.h5' % epoch))
-                        rt = predictor.predict(tX_new)[0]
+                        rt = predictor.predict(tX_new)
 
                         print(rt.shape)
                         T = np.sum(rt.argmax(-1) == 3)
