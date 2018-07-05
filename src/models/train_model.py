@@ -568,6 +568,7 @@ if __name__ == '__main__':
     parser.add_argument('--batchnorm', dest='batchnorm', action="store_true")
     parser.add_argument('--dropout', dest='dropout', default=0, type=float)
     parser.add_argument('--pmix', dest="pmix", type=float, default=0.1)
+    parser.add_argument('--mean', dest="mean", action="store_true")
 
     args = parser.parse_args()
 
