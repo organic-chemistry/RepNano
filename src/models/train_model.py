@@ -983,6 +983,8 @@ if __name__ == '__main__':
                             ctc=args.ctc, Nbases=args.Nbases, correct_ref=args.correct_ref,
                             n_output_network=args.n_output_network, mapping=mapping, pmix=args.pmix)
 
+                        predictor.load_weights(os.path.join(
+                            args.root, 'my_model_weights-%i.h5' % epoch))
                         rt = predictor.predict(tX_new)[0]
 
                         print(rt.shape)
