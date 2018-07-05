@@ -930,8 +930,8 @@ if __name__ == '__main__':
                     print(p1)
 
                     if not args.mean:
-                        extra = [pi[:maxin] for pi in p1.T] + [pi[:maxin] for pi in Tp1.T]
-                        extrat = [pi[:maxin] for pi in tp1.T] + [pi[:maxin] for pi in Ttp1.T]
+                        extra = [pi[:maxin] for pi in p1.T] + [pi[:maxin] for pi in T_p1.T]
+                        extrat = [pi[:maxin] for pi in tp1.T] + [pi[:maxin] for pi in T_tp1.T]
                     else:
                         ssp1 = np.ones_like(countT(Label))[::, np.newaxis] * sp1
 
