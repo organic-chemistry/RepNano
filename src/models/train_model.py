@@ -639,7 +639,7 @@ if __name__ == '__main__':
                                     attention=args.attention,
                                     n_feat=n_feat, simple=args.simple,
                                     extra_output=args.extra_output, poisson=args.poisson, batchnorm=args.batchnorm,
-                                    recurrent_dropout=args.dropout)
+                                    recurrent_dropout=args.dropout, mean=args.mean)
     predictor, _ = build_models(args.size, nbase=args.Nbases - 4,
                                 ctc_length=ctc_length,
                                 trainable=args.trainable,
@@ -647,7 +647,7 @@ if __name__ == '__main__':
                                 lr=args.lr, res=args.res, attention=args.attention,
                                 n_feat=n_feat, simple=args.simple, extra_output=args.extra_output,
                                 poisson=args.poisson, batchnorm=args.batchnorm,
-                                recurrent_dropout=args.dropout)
+                                recurrent_dropout=args.dropout, mean=args.mean)
 
     if args.pre_trained_weight is not None:
 
@@ -679,7 +679,7 @@ if __name__ == '__main__':
                                                              normed=args.normed, all_quality=args.all_quality,
                                                              raw=args.raw, Nbases=args.Nbases, substitution=args.substitution,
                                                              correct_ref=args.correct_ref, probas=args.probas, sclean=args.sclean,
-                                                             mapping=mapping, minimal_length=subseq_size + 1, mean=args.mean)
+                                                             mapping=mapping, minimal_length=subseq_size + 1)
     if args.all_test_datasets != []:
         tdata_x, tdata_y, tdata_y2, tprobas, tindexes = load_datasets(args.all_test_datasets,
                                                                       norm2=args.norm2, norm3=args.norm3, maxleninf=args.maxleninf,
@@ -687,7 +687,7 @@ if __name__ == '__main__':
                                                                       normed=args.normed, all_quality=args.all_quality,
                                                                       raw=args.raw, Nbases=args.Nbases, substitution=args.substitution,
                                                                       correct_ref=args.correct_ref, probas=args.probas, sclean=args.sclean, mapping=mapping,
-                                                                      minimal_length=subseq_size + 1, mean=args.mean)
+                                                                      minimal_length=subseq_size + 1)
     else:
         tdata_x, tdata_y, tdata_y2, tprobas, tindexes = data_x, data_y, data_y2, probas, indexes
         args.all_test_datasets = args.all_datasets
