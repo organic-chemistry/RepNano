@@ -18,7 +18,7 @@ except:
 def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                  uniform=True, input_length=None, n_output=1,
                  n_feat=4, recurrent_dropout=0, lr=0.01, res=False, attention=False, simple=False,
-                 extra_output=0, poisson=False, batchnorm=False):
+                 extra_output=0, poisson=False, batchnorm=False, mean=False):
     if keras.backend.backend() == 'tensorflow':
         import tensorflow as tf
 
@@ -276,13 +276,15 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                     return tf.sqrt(reduce_var(x, axis=axis, keepdims=keepdims))
 
                 def soft_argmax(v):
-                    std = reduce_std(v, axis=2, keepdims=True)
-                    xp = v - ((0.95 - 0.4) * std / 0.4 + 0.4)  # tf.reduce_mean(x,axis=-1)
-                    n = 5
-                    beta = 100
-                    betap = std * (4 * beta - n * beta) / 0.4 + 3 * beta
 
-                    return tf.exp(betap * xp) / tf.reduce_sum(tf.exp(betap * xp), axis=2, keep_dims=True)
+                    std = reduce_std(v, axis=2, keepdims=True)
+                    # xp = v - ((0.95 - 0.4) * std / 0.4 + 0.4)  # tf.reduce_mean(x,axis=-1)
+                    p = [9.16666667, -3.21428571, 1.69404762, 0.20671429]
+
+                    xp = v - (p[0] * std**3 + p[1] * std**2 + p[2] * std + p[3])
+                    beta = 500
+
+                    return tf.exp(beta * xp) / tf.reduce_sum(tf.exp(beta * xp), axis=2, keep_dims=True)
 
                 def average(v, B=True):
                     p, b = v
@@ -298,6 +300,11 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                 def averageT(v):
                     return average(v, B=False)
 
+                def mean_v(v):
+                    T = averageT(v)
+                    B = average(v)
+                    return B / (T + B + 1e-7)
+
                 def average_output_shape(input_shape):
                     shape = list(input_shape[0])
                     # assert len(shape) == 3  # only valid for 2D tensors
@@ -310,11 +317,15 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
 
                     #l3b = Concatenate()([out_layer1, out_layer2])
                     #out_layer1 = Reshape((input_length * 2, Nbases))(l3b)
+                    if mean:
 
-                    ot.append(Lambda(average, output_shape=average_output_shape,
-                                     name="o%i" % n)([ext[n], out_layer1]))
-                    ot.append(Lambda(averageT, output_shape=average_output_shape,
-                                     name="To%i" % n)([ext[n], out_layer1]))
+                        ot.append(Lambda(average, output_shape=average_output_shape,
+                                         name="o%i" % n)([ext[n], out_layer1]))
+                        ot.append(Lambda(averageT, output_shape=average_output_shape,
+                                         name="To%i" % n)([ext[n], out_layer1]))
+                    else:
+                        ot.append(Lambda(mean_v, output_shape=average_output_shape,
+                                         name="To%i" % n)([ext[n], out_layer1]))
 
                 model2 = Model(inputs=[inputs, labels, input_length,
                                        label_length], outputs=[loss_out] + ot)
@@ -322,8 +333,12 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                     losst = "poisson"
                 else:
                     losst = "mean_squared_error"
-                model2.compile(loss=[lambda y_true, y_pred: y_pred] +
-                               [losst for i in range(extra_output)] + [losst for i in range(extra_output)], optimizer="adadelta")
+                if mean:
+                    extra = [losst for i in range(extra_output)] + \
+                        [losst for i in range(extra_output)]
+                else:
+                    extra = [losst for i in range(extra_output)]
+                model2.compile(loss=[lambda y_true, y_pred: y_pred] + extra, optimizer="adadelta")
 
     return model, model2
 
