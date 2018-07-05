@@ -975,7 +975,8 @@ if __name__ == '__main__':
                             row.append(na + "_tot_loss")
                             row.append(na + "_ctc_loss")
                             row.append(na + "_loss_o0")
-                            row.append(na + "_loss_o02")
+                            if not args.mean:
+                                row.append(na + "_loss_o02")
 
                         writer = csv.writer(csv_file)
                         # from IPython import embed
@@ -1050,7 +1051,8 @@ if __name__ == '__main__':
 
             for i in range(args.extra_output):
                 csv_keys.extend(["o%i_loss" % i, "val_o%i_loss" % i])
-                csv_keys.extend(["To%i_loss" % i, "val_To%i_loss" % i])
+                if not args.mean:
+                    csv_keys.extend(["To%i_loss" % i, "val_To%i_loss" % i])
 
         lr = Schedul.set_new_lr(r.history["loss"][0])
 
