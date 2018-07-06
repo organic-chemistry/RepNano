@@ -325,11 +325,17 @@ if __name__ == "__main__":
             else:
                 All[gamma].append(v[1])
 
+        Density_network[gamma] = np.array(Density_network[gamma])
+        B[gamma] = np.array(B[gamma])
+        Nb[gamma] = np.array(Nb[gamma])
+        All[gamma] = np.array(All[gamma])
+        Length[gamma] = np.array(Length[gamma])
+
     np.set_printoptions(precision=2, suppress=True)
 
     print("Segment length")
     for gamma in rg:
-        print(gamma, Length[gamma])
+        print(gamma, np.array(Length[gamma]))
 
     print("Base Density_network")
     for gamma in rg:
