@@ -164,7 +164,7 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                         t2 = TimeDistributed(
                             Dense(1, activation="sigmoid"), name="extra%i_2" % n)(Concatenate()([l3, out_layer1]))
 
-                    ext.append(t2)
+                        ext.append(t2)
 
             if input_length is not None:
 
