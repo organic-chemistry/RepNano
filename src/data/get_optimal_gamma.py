@@ -277,12 +277,14 @@ if __name__ == "__main__":
     Density_network = {}
     B = {}
     Nb = {}
+    All = {}
 
     rg = [10, 20, 40, 60, 80]
     for gamma in rg:
         Density_network[gamma] = []
         B[gamma] = []
         Nb[gamma] = []
+        All[gamma] = []
         for istrand, s in enumerate(D.strands):
             print(istrand)
             t = time.time()
@@ -313,6 +315,13 @@ if __name__ == "__main__":
             B[gamma].append(p)
             Nb[gamma].append(len("".join(s.transfered["seq"]).replace("N", "")))
 
+            # Allignement
+            v = compute_attributes(s)
+            if v[0] is None:
+                All[gamma].append(0)
+            else:
+                All[gamma].append(v[1])
+
     np.set_printoptions(precision=2, suppress=True)
 
     print("Base Density_network")
@@ -324,21 +333,27 @@ if __name__ == "__main__":
     print("Number of bases")
     for gamma in rg:
         print(gamma, Nb[gamma])
+    print("Allignement")
+    for gamma in rg:
+        print(gamma, All[gamma])
 
     print("Sampling rate", s.sl)
     print("Summary")
-    print("Gamma,Density,Percent")
+    print("Gamma,Density,Percent,Nb,Score al")
     for gamma in rg:
-        print(gamma, np.mean(Density_network[gamma]), np.mean(B[gamma]), np.mean(Nb[gamma]))
+        print(gamma, np.mean(Density_network[gamma]), np.mean(
+            B[gamma]), np.mean(Nb[gamma]), np.mean(All[gamma]))
 
     import pandas as pd
     df = pd.DataFrame({"gamma": rg,
                        "Density_base_mean": [np.mean(Density_network[gamma]) for gamma in rg],
                        "Percent_mean": [np.mean(B[gamma]) for gamma in rg],
                        "Nb_mean": [np.mean(Nb[gamma]) for gamma in rg],
+                       "Al_mean": [np.mean(All[gamma]) for gamma in rg],
                        "Density_base": [Density_network[gamma] for gamma in rg],
                        "Percent": [B[gamma] for gamma in rg],
                        "Nb": [Nb[gamma] for gamma in rg],
+                       "Al": [All[gamma] for gamma in rg],
                        "Samplingrate": [s.sl for gamma in rg]})
     df.to_csv(args.name)
 
@@ -347,7 +362,7 @@ if __name__ == "__main__":
         Length = []
 
         t = time.time()
-        v = compute_attributes(s)
+
         print("Cattr", time.time() - t)
         if v[0] is not None:
             s.transfered = v[0]
