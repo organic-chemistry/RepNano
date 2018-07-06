@@ -317,8 +317,9 @@ if __name__ == "__main__":
     print("Percent B")
     for gamma in rg:
         print(gamma, B[gamma])
-    print("Summary")
 
+    print("Sampling rate", s.sl)
+    print("Summary")
     print("Gamma,Density,Percent")
     for gamma in rg:
         print(gamma, np.mean(Density_network[gamma]), np.mean(B[gamma]))
