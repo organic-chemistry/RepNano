@@ -353,9 +353,12 @@ if __name__ == "__main__":
     print("Sampling rate", s.sl)
     print("Summary")
     print("Gamma,Density,Percent,Nb,Score al")
+
+    def mean(v):
+        return float("%.2f" % np.mean(v))
     for gamma in rg:
-        print(gamma, np.mean(Density_network[gamma]), np.mean(
-            B[gamma]), np.mean(Nb[gamma]), np.mean(All[gamma]))
+        print(gamma, mean(Density_network[gamma]), mean(
+            B[gamma]), mean(Nb[gamma]), mean(All[gamma]))
 
     import pandas as pd
     df = pd.DataFrame({"gamma": rg,
