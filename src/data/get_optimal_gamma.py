@@ -78,7 +78,7 @@ if __name__ == "__main__":
 
     os.makedirs(args.root, exist_ok=True)
     rac = os.path.split(args.name)[0]
-    if rac = '':
+    if rac == '':
         rac = "./"
 
     os.makedirs(rac, exist_ok=True)
