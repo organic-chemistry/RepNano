@@ -18,7 +18,7 @@ except:
 def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                  uniform=True, input_length=None, n_output=1,
                  n_feat=4, recurrent_dropout=0, lr=0.01, res=False, attention=False, simple=False,
-                 extra_output=0, poisson=False, batchnorm=False, mean=False):
+                 extra_output=0, poisson=False, batchnorm=False, mean=False, one=False):
     if keras.backend.backend() == 'tensorflow':
         import tensorflow as tf
 
@@ -160,9 +160,9 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                     t1 = TimeDistributed(
                         Dense(1, activation="sigmoid"), name="extra%i" % n)(l3)
                     ext.append(t1)
-
-                    t2 = TimeDistributed(
-                        Dense(1, activation="sigmoid"), name="extra%i_2" % n)(Concatenate()([l3, out_layer1]))
+                    if not one:
+                        t2 = TimeDistributed(
+                            Dense(1, activation="sigmoid"), name="extra%i_2" % n)(Concatenate()([l3, out_layer1]))
 
                     ext.append(t2)
 
