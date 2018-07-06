@@ -20,7 +20,7 @@ if __name__ == "__main__":
                         type=int, choices=[2, 4, 5, 8], default=5)
     parser.add_argument('--Nbases', type=int, choices=[4, 5, 8], default=4)
 
-    parser.add_argument('--root', type=str, default="data/training/")
+    parser.add_argument('--root', type=str, default="./")
     parser.add_argument('--test', dest='test', action='store_true')
     parser.add_argument('--size', type=int, default=20)
     parser.add_argument("--metadata", type=str, default=None)
@@ -77,7 +77,8 @@ if __name__ == "__main__":
     argparse_dict["commit"] = str(repo.head.commit)
 
     os.makedirs(args.root, exist_ok=True)
-    os.makedirs(os.path.split(args.name)[0], exist_ok=True)
+    if os.path.split(args.name)[0] != '':
+        os.makedirs(os.path.split(args.name)[0], exist_ok=True)
 
     if not args.debug:
         f = open(os.devnull, 'w')
