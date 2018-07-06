@@ -276,11 +276,13 @@ if __name__ == "__main__":
     # print(res)
     Density_network = {}
     B = {}
+    Nb = {}
 
     rg = [10, 20, 40, 60, 80]
     for gamma in rg:
         Density_network[gamma] = []
         B[gamma] = []
+        Nb[gamma] = []
         for istrand, s in enumerate(D.strands):
             print(istrand)
             t = time.time()
@@ -306,9 +308,10 @@ if __name__ == "__main__":
                 len("".join(s.transfered["seq"]).replace("N", "")) / len(s.transfered))
             seq = "".join(s.transfered["seq"])
             lseq = np.array([l for l in seq])
-            print(lseq)
+            # print(lseq)
             p = np.sum(lseq == "B") / (1 + np.sum(lseq == "T") + np.sum(lseq == "B"))
             B[gamma].append(p)
+            Nb[gamma].append(len("".join(s.transfered["seq"]).replace("N", "")))
 
     np.set_printoptions(precision=2, suppress=True)
 
@@ -327,8 +330,12 @@ if __name__ == "__main__":
 
     import pandas as pd
     df = pd.DataFrame({"gamma": rg,
-                       "Density_base": [np.mean(Density_network[gamma]) for gamma in rg],
-                       "Percent": [np.mean(B[gamma]) for gamma in rg]})
+                       "Density_base_mean": [np.mean(Density_network[gamma]) for gamma in rg],
+                       "Percent_mean": [np.mean(B[gamma]) for gamma in rg],
+                       "Nb_mean": [np.mean(Nb[gamma]) for gamma in rg],
+                       "Density_base": [Density_network[gamma] for gamma in rg],
+                       "Percent": [B[gamma] for gamma in rg],
+                       "Nb": [Nb[gamma] for gamma in rg]})
     df.to_csv(args.name)
 
     """
