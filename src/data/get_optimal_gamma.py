@@ -271,7 +271,7 @@ if __name__ == "__main__":
     Density_network = {}
     rg = [5, 10, 20, 40]
     for gamma in [5, 10, 20, 40]:
-        Density_network[gamma] = gamma
+        Density_network[gamma] = []
         for istrand, s in enumerate(D.strands):
             print(istrand)
             t = time.time()
