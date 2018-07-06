@@ -67,7 +67,7 @@ if __name__ == "__main__":
     parser.add_argument('--batchnorm', dest='batchnorm', action="store_true")
     parser.add_argument('--dropout', dest='dropout', default=0, type=float)
     parser.add_argument("--human", dest="human", default=None, type=int)
-    parser.add_argument("--one", dest="one", daction="store_true")
+    parser.add_argument("--one", dest="one", action="store_true")
 
     # parser.add_argument("--substitution", dest="substitution", default="T", type=str)
 
