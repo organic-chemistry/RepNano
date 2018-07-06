@@ -304,7 +304,7 @@ if __name__ == "__main__":
 
             Density_network[gamma].append(
                 len("".join(s.transfered["seq"]).replace("N", "")) / len(s.transfered))
-            seq = s.transfered["seq"]
+            seq = "".join(s.transfered["seq"])
             lseq = np.array([l for l in seq])
             print(lseq)
             p = np.sum(lseq == "B") / (1 + np.sum(lseq == "T") + np.sum(lseq == "B"))
