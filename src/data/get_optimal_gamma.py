@@ -271,8 +271,8 @@ if __name__ == "__main__":
 
     # print(res)
     Density_network = {}
-    rg = [5, 10, 20, 40]
-    for gamma in [5, 10, 20, 40]:
+    rg = [10, 20, 40, 60]
+    for gamma in rg:
         Density_network[gamma] = []
         for istrand, s in enumerate(D.strands):
             print(istrand)
@@ -328,7 +328,7 @@ if __name__ == "__main__":
             Length.append(np.mean([len(t) for t in s.segments["all"]]))
     """
     # print(output.shape, len(s.transfered))
-
+    """
     data_x = []
 
     # except:
@@ -357,6 +357,7 @@ if __name__ == "__main__":
         print(Density_alligned)
         print("lengths of segment", np.mean(Length))
         print(Length)
+    """
 
     if K.backend() == 'tensorflow':
 
