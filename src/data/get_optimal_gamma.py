@@ -325,8 +325,8 @@ if __name__ == "__main__":
 
     import pandas as pd
     df = pd.DataFrame({"gamma": rg,
-                       "Density_base": [Density_network[gamma] for gamma in rg],
-                       "Percent": [B[gamma] for gamma in rg]})
+                       "Density_base": [np.mean(Density_network[gamma]) for gamma in rg],
+                       "Percent": [np.mean(B[gamma]) for gamma in rg]})
     df.to_csv(args.name)
 
     """
