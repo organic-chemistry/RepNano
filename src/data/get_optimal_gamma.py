@@ -321,12 +321,15 @@ if __name__ == "__main__":
     print("Percent B")
     for gamma in rg:
         print(gamma, B[gamma])
+    print("Number of bases")
+    for gamma in rg:
+        print(gamma, Nb[gamma])
 
     print("Sampling rate", s.sl)
     print("Summary")
     print("Gamma,Density,Percent")
     for gamma in rg:
-        print(gamma, np.mean(Density_network[gamma]), np.mean(B[gamma]))
+        print(gamma, np.mean(Density_network[gamma]), np.mean(B[gamma]), np.mean(Nb[gamma]))
 
     import pandas as pd
     df = pd.DataFrame({"gamma": rg,
@@ -335,7 +338,8 @@ if __name__ == "__main__":
                        "Nb_mean": [np.mean(Nb[gamma]) for gamma in rg],
                        "Density_base": [Density_network[gamma] for gamma in rg],
                        "Percent": [B[gamma] for gamma in rg],
-                       "Nb": [Nb[gamma] for gamma in rg]})
+                       "Nb": [Nb[gamma] for gamma in rg],
+                       "Samplingrate": [s.sl for gamma in rg]})
     df.to_csv(args.name)
 
     """
