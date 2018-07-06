@@ -278,6 +278,7 @@ if __name__ == "__main__":
     B = {}
     Nb = {}
     All = {}
+    Length = {}
 
     rg = [10, 20, 40, 60, 80]
     for gamma in rg:
@@ -285,6 +286,8 @@ if __name__ == "__main__":
         B[gamma] = []
         Nb[gamma] = []
         All[gamma] = []
+        Length[gamma] = []
+
         for istrand, s in enumerate(D.strands):
             print(istrand)
             t = time.time()
@@ -314,7 +317,7 @@ if __name__ == "__main__":
             p = np.sum(lseq == "B") / (1 + np.sum(lseq == "T") + np.sum(lseq == "B"))
             B[gamma].append(p)
             Nb[gamma].append(len("".join(s.transfered["seq"]).replace("N", "")))
-
+            Length[gamma].append(np.mean(s.transfered["length"] * s.sl))
             # Allignement
             v = compute_attributes(s)
             if v[0] is None:
@@ -323,6 +326,10 @@ if __name__ == "__main__":
                 All[gamma].append(v[1])
 
     np.set_printoptions(precision=2, suppress=True)
+
+    print("Segment length")
+    for gamma in rg:
+        print(gamma, Length[gamma])
 
     print("Base Density_network")
     for gamma in rg:
@@ -349,11 +356,13 @@ if __name__ == "__main__":
                        "Density_base_mean": [np.mean(Density_network[gamma]) for gamma in rg],
                        "Percent_mean": [np.mean(B[gamma]) for gamma in rg],
                        "Nb_mean": [np.mean(Nb[gamma]) for gamma in rg],
+                       "length_mean": [np.mean(Length[gamma]) for gamma in rg],
                        "Al_mean": [np.mean(All[gamma]) for gamma in rg],
                        "Density_base": [Density_network[gamma] for gamma in rg],
                        "Percent": [B[gamma] for gamma in rg],
                        "Nb": [Nb[gamma] for gamma in rg],
                        "Al": [All[gamma] for gamma in rg],
+                       "length": [Length[gamma] for gamma in rg],
                        "Samplingrate": [s.sl for gamma in rg]})
     df.to_csv(args.name)
 
