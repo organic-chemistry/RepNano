@@ -319,7 +319,7 @@ if __name__ == "__main__":
     for gamma in rg:
         print(gamma, np.mean(Density_network[gamma]), np.mean(B[gamma]))
 
-    import pandas as import pd
+    import pandas as pd
     df = pd.DataFrame({"gamma": rg,
                        "Density_base": [Density_network[gamma] for gamma in rg],
                        "Percent": [B[gamma] for gamma in rg]})
