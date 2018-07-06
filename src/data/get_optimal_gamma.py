@@ -271,9 +271,12 @@ if __name__ == "__main__":
 
     # print(res)
     Density_network = {}
+    B = {}
+
     rg = [10, 20, 40, 60, 80]
     for gamma in rg:
         Density_network[gamma] = []
+        B[gamma] = []
         for istrand, s in enumerate(D.strands):
             print(istrand)
             t = time.time()
@@ -297,14 +300,30 @@ if __name__ == "__main__":
 
             Density_network[gamma].append(
                 len("".join(s.transfered["seq"]).replace("N", "")) / len(s.transfered))
+            seq = s.transfered["seq"]
+            lseq = np.array([l for l in seq])
+            p = np.sum(lseq == "B") / (1 + np.sum(lseq == "T") + np.sum(lseq == "B")))
+            B[gamma].append(p)
 
-    np.set_printoptions(precision=2, suppress=True)
+    np.set_printoptions(precision = 2, suppress = True)
 
+    print("Base Density_network")
     for gamma in rg:
         print(gamma, Density_network[gamma])
-    print("Summary")
+    print("Percent B")
     for gamma in rg:
-        print(gamma, np.mean(Density_network[gamma]))
+        print(gamma, B[gamma])
+    print("Summary")
+
+    print("Gamma,Density,Percent")
+    for gamma in rg:
+        print(gamma, np.mean(Density_network[gamma]), np.mean(B[gamma]))
+
+    import pandas as import pd
+    df=pd.DataFrame({"gamma": rg,
+                       "Density_base": [Density_network[gamma] for gamma in rg],
+                        "Percent": [B[gamma] for gamma in rg]})
+    df.to_csv(args.name)
 
     """
         Density_alligned = []
