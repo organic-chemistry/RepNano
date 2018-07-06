@@ -302,10 +302,10 @@ if __name__ == "__main__":
                 len("".join(s.transfered["seq"]).replace("N", "")) / len(s.transfered))
             seq = s.transfered["seq"]
             lseq = np.array([l for l in seq])
-            p = np.sum(lseq == "B") / (1 + np.sum(lseq == "T") + np.sum(lseq == "B")))
+            p = np.sum(lseq == "B") / (1 + np.sum(lseq == "T") + np.sum(lseq == "B"))
             B[gamma].append(p)
 
-    np.set_printoptions(precision = 2, suppress = True)
+    np.set_printoptions(precision=2, suppress=True)
 
     print("Base Density_network")
     for gamma in rg:
@@ -320,9 +320,9 @@ if __name__ == "__main__":
         print(gamma, np.mean(Density_network[gamma]), np.mean(B[gamma]))
 
     import pandas as import pd
-    df=pd.DataFrame({"gamma": rg,
+    df = pd.DataFrame({"gamma": rg,
                        "Density_base": [Density_network[gamma] for gamma in rg],
-                        "Percent": [B[gamma] for gamma in rg]})
+                       "Percent": [B[gamma] for gamma in rg]})
     df.to_csv(args.name)
 
     """
