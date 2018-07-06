@@ -149,6 +149,8 @@ if __name__ == "__main__":
                filter_ch=ran, basecall=False, minion=False, arange=args.range,
                base_call=base_call)
     print("Popul", len(D.strands))
+    D.strands = D.strands[:args.maxf]
+    print("Popul", len(D.strands))
 
     from ..models.model import build_models
 
