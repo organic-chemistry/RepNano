@@ -77,14 +77,17 @@ if __name__ == "__main__":
     argparse_dict["commit"] = str(repo.head.commit)
 
     os.makedirs(args.root, exist_ok=True)
-    if os.path.split(args.name)[0] != '':
-        os.makedirs(os.path.split(args.name)[0], exist_ok=True)
+    rac = os.path.split(args.name)[0]
+    if rac = '':
+        rac = "./"
+
+    os.makedirs(rac, exist_ok=True)
 
     if not args.debug:
         f = open(os.devnull, 'w')
         sys.stdout = f
 
-    with open(os.path.split(args.name)[0] + '/params.json', 'w') as fp:
+    with open(rac + '/params.json', 'w') as fp:
         json.dump(argparse_dict, fp, indent=True)
 
     if args.n_cpu is not None:
