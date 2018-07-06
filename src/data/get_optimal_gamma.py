@@ -271,7 +271,7 @@ if __name__ == "__main__":
 
     # print(res)
     Density_network = {}
-    rg = [10, 20, 40, 60]
+    rg = [10, 20, 40, 60, 80]
     for gamma in rg:
         Density_network[gamma] = []
         for istrand, s in enumerate(D.strands):
@@ -298,6 +298,11 @@ if __name__ == "__main__":
             Density_network[gamma].append(
                 len("".join(s.transfered["seq"]).replace("N", "")) / len(s.transfered))
 
+    np.set_printoptions(precision=2, suppress=True)
+
+    for gamma in rg:
+        print(gamma, Density_network[gamma])
+    print("Summary")
     for gamma in rg:
         print(gamma, np.mean(Density_network[gamma]))
 
