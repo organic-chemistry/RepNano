@@ -96,6 +96,45 @@ def scale_named4(X, normalise_window=True, maxleninf=35, maxi=5, silent=False):
     return Xd
 
 
+def scale_named4_summary(X, normalise_window=True, maxleninf=35, maxi=5, silent=False):
+    Xd = np.zeros((len(X), maxleninf))
+    iis = 0
+    # print(X.columns)
+    tot = []
+    for s in X["all"]:
+        tot.extend(s)
+
+    #tot = np.array(tot)
+    med = np.median(tot)
+    std = np.percentile(np.array(tot) - med, 75) - np.percentile(np.array(tot) - med, 25)
+
+    ncut = 0
+
+    for s in X["all"]:
+        Xd[iis][:len(s)] = s
+        iis += 1
+    z = Xd == 0
+    Xd = (Xd - med) / std
+    Xd[z] = 0
+    ncut = np.sum(Xd > maxi) + np.sum(Xd < -maxi)
+    Xd[Xd > maxi] = maxi
+    Xd[Xd < -maxi] = -maxi
+
+    Xf = []
+    for s, normed in zip(X["all"], Xd):
+        Xf.append([np.mean(normed[:len(s)]), np.std(normed[:len(s)]),
+                   np.min(normed[:len(s)]), np.max(normed[:len(s)])])
+    # - med) / std
+    #ncut += sum(Xd[iis] > maxi)
+    #ncut += sum(Xd[iis] < -maxi)
+    #Xd[iis][Xd[iis] > maxi] = maxi
+    #Xd[iis][Xd[iis] < -maxi] = -maxi
+    #
+    if not silent:
+        print("Median", med, std, ncut, len(tot))
+    return np.array(Xf)
+
+
 def scale_named4s(X, normalise_window=True, maxleninf=35):
     Xd = np.zeros((len(X), maxleninf))
     iis = 0

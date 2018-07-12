@@ -201,13 +201,13 @@ from ..data import dataset
 import sys
 sys.path.append("src/")
 
-from ..features.helpers import scale_simple, scale_named, scale_named2, scale_named3, scale_named4, scale_named4s
+from ..features.helpers import scale_simple, scale_named, scale_named2, scale_named3, scale_named4, scale_named4s, scale_named4_summary
 root = "data/raw/20170908-R9.5/"
 
 
 def load_datasets(argdatasets, norm2, norm3, maxleninf,
                   maxf, allinfos, normed, all_quality,
-                  raw, Nbases, substitution, correct_ref, probas, sclean, mapping, minimal_length):
+                  raw, Nbases, substitution, correct_ref, probas, sclean, mapping, minimal_length, summary):
     Datasets = []
     for d in argdatasets:
         with open(d, "rb") as fich:
@@ -224,6 +224,9 @@ def load_datasets(argdatasets, norm2, norm3, maxleninf,
             fnorm = lambda x: scale_named4(x, maxleninf=maxleninf)
         else:
             fnorm = lambda x: scale_named4s(x, maxleninf=maxleninf)
+
+        if summary:
+            fnorm = lambda x: scale_named4_summary(x, maxleninf=maxleninf)
 
     data_x = []
     data_y = []
@@ -569,6 +572,7 @@ if __name__ == '__main__':
     parser.add_argument('--dropout', dest='dropout', default=0, type=float)
     parser.add_argument('--pmix', dest="pmix", type=float, default=0.1)
     parser.add_argument('--mean', dest="mean", action="store_true")
+    parser.add_argument('--summary', dest="summary", action="store_true")
 
     args = parser.parse_args()
 
@@ -627,6 +631,9 @@ if __name__ == '__main__':
     if args.allinfos:
         n_feat = args.maxleninf
 
+    if args.summary:
+        n_feat = 4
+
     if len(args.probas) != args.extra_output:
         print("Pproba must match extra output")
         raise
@@ -679,7 +686,7 @@ if __name__ == '__main__':
                                                              normed=args.normed, all_quality=args.all_quality,
                                                              raw=args.raw, Nbases=args.Nbases, substitution=args.substitution,
                                                              correct_ref=args.correct_ref, probas=args.probas, sclean=args.sclean,
-                                                             mapping=mapping, minimal_length=subseq_size + 1)
+                                                             mapping=mapping, minimal_length=subseq_size + 1, summary=args.summary)
     if args.all_test_datasets != []:
         tdata_x, tdata_y, tdata_y2, tprobas, tindexes = load_datasets(args.all_test_datasets,
                                                                       norm2=args.norm2, norm3=args.norm3, maxleninf=args.maxleninf,
@@ -687,7 +694,7 @@ if __name__ == '__main__':
                                                                       normed=args.normed, all_quality=args.all_quality,
                                                                       raw=args.raw, Nbases=args.Nbases, substitution=args.substitution,
                                                                       correct_ref=args.correct_ref, probas=args.probas, sclean=args.sclean, mapping=mapping,
-                                                                      minimal_length=subseq_size + 1)
+                                                                      minimal_length=subseq_size + 1, summary=args.summary)
     else:
         tdata_x, tdata_y, tdata_y2, tprobas, tindexes = data_x, data_y, data_y2, probas, indexes
         args.all_test_datasets = args.all_datasets
