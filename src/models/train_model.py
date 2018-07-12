@@ -329,7 +329,8 @@ def sample(sig, maxleninf=36, up=True, append=False):
 
 
 def get_transformed_sets(d_x, d_y, d_y2, d_prob, s_arr, p_arr, subseq_size,
-                         ctc, Nbases, correct_ref, n_output_network, mapping, maxi=None, mini=40, pupdown=0.05, pmix=0.1):
+                         ctc, Nbases, correct_ref, n_output_network, mapping, maxi=None,
+                         mini=40, pupdown=0.05, pmix=0.1, summary=True):
 
     print(len(d_x), len(d_y))
     X_new = []
@@ -388,7 +389,7 @@ def get_transformed_sets(d_x, d_y, d_y2, d_prob, s_arr, p_arr, subseq_size,
                 if y == [] or len(y) > subseq_size:
                     continue
 
-                if np.random.rand() < pupdown:
+                if np.random.rand() < pupdown and not summary:
                     X_new.append(sample(x.copy(), up=np.random.choice([False, True])))
                 else:
                     X_new.append(x.copy())
