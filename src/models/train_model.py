@@ -574,6 +574,7 @@ if __name__ == '__main__':
     parser.add_argument('--pmix', dest="pmix", type=float, default=0.1)
     parser.add_argument('--mean', dest="mean", action="store_true")
     parser.add_argument('--summary', dest="summary", action="store_true")
+    parser.add_argument('--log', dest="log", action="store_true")
 
     args = parser.parse_args()
 
@@ -647,7 +648,7 @@ if __name__ == '__main__':
                                     attention=args.attention,
                                     n_feat=n_feat, simple=args.simple,
                                     extra_output=args.extra_output, poisson=args.poisson, batchnorm=args.batchnorm,
-                                    recurrent_dropout=args.dropout, mean=args.mean)
+                                    recurrent_dropout=args.dropout, mean=args.mean, log=args.log)
     predictor, _ = build_models(args.size, nbase=args.Nbases - 4,
                                 ctc_length=ctc_length,
                                 trainable=args.trainable,
@@ -655,7 +656,7 @@ if __name__ == '__main__':
                                 lr=args.lr, res=args.res, attention=args.attention,
                                 n_feat=n_feat, simple=args.simple, extra_output=args.extra_output,
                                 poisson=args.poisson, batchnorm=args.batchnorm,
-                                recurrent_dropout=args.dropout, mean=args.mean)
+                                recurrent_dropout=args.dropout, mean=args.mean, log=args.log)
 
     if args.pre_trained_weight is not None:
 

@@ -18,7 +18,7 @@ except:
 def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                  uniform=True, input_length=None, n_output=1,
                  n_feat=4, recurrent_dropout=0, lr=0.01, res=False, attention=False, simple=False,
-                 extra_output=0, poisson=False, batchnorm=False, mean=False, one=False):
+                 extra_output=0, poisson=False, batchnorm=False, mean=False, one=False, log=False):
     if keras.backend.backend() == 'tensorflow':
         import tensorflow as tf
 
@@ -331,6 +331,8 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
                                        label_length], outputs=[loss_out] + ot)
                 if poisson:
                     losst = "poisson"
+                elif log:
+                    losst = "mean_squared_logarithmic_error"
                 else:
                     losst = "mean_squared_error"
                 if not mean:
