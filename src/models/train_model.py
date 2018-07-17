@@ -575,7 +575,7 @@ if __name__ == '__main__':
     parser.add_argument('--mean', dest="mean", action="store_true")
     parser.add_argument('--summary', dest="summary", action="store_true")
     parser.add_argument('--log', dest="log", action="store_true")
-    parser.add_argument('--loss-weights', nargs='+', dest="loss_weights", default=None, type=str)
+    parser.add_argument('--loss-weights', nargs='+', dest="loss_weights", default=None, type=float)
 
     args = parser.parse_args()
 
