@@ -189,12 +189,12 @@ if __name__ == "__main__":
         if args.allinfos:
             n_feat = args.maxleninf
 
-        predictor, _, _ = build_models(args.size, nbase=args.Nbases - 4,
-                                       ctc_length=ctc_length,
-                                       input_length=None, n_output=n_output_network,
-                                       lr=1, res=args.res, attention=args.attention,
-                                       n_feat=n_feat, simple=args.simple, extra_output=args.extra_output, batchnorm=args.batchnorm,
-                                       recurrent_dropout=args.dropout)
+        predictor, _ = build_models(args.size, nbase=args.Nbases - 4,
+                                    ctc_length=ctc_length,
+                                    input_length=None, n_output=n_output_network,
+                                    lr=1, res=args.res, attention=args.attention,
+                                    n_feat=n_feat, simple=args.simple, extra_output=args.extra_output, batchnorm=args.batchnorm,
+                                    recurrent_dropout=args.dropout)
 
         if args.weights is not None:
 
