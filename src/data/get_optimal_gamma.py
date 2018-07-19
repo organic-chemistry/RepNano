@@ -194,7 +194,7 @@ if __name__ == "__main__":
                                     input_length=None, n_output=n_output_network,
                                     lr=1, res=args.res, attention=args.attention,
                                     n_feat=n_feat, simple=args.simple, extra_output=args.extra_output, batchnorm=args.batchnorm,
-                                    recurrent_dropout=args.dropout)
+                                    recurrent_dropout=args.dropout, one=args.one)
 
         if args.weights is not None:
 
