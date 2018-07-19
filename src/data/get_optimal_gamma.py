@@ -67,6 +67,7 @@ if __name__ == "__main__":
     parser.add_argument('--dropout', dest='dropout', default=0, type=float)
     parser.add_argument("--human", dest="human", default=None, type=int)
     parser.add_argument("--one", dest="one", action="store_true")
+    parser.add_argument('--gammas', nargs='+', dest="rg", type=int, default=[10, 20, 40, 60, 80])
 
     # parser.add_argument("--substitution", dest="substitution", default="T", type=str)
 
@@ -188,12 +189,12 @@ if __name__ == "__main__":
         if args.allinfos:
             n_feat = args.maxleninf
 
-        predictor, _ = build_models(args.size, nbase=args.Nbases - 4,
-                                    ctc_length=ctc_length,
-                                    input_length=None, n_output=n_output_network,
-                                    lr=1, res=args.res, attention=args.attention,
-                                    n_feat=n_feat, simple=args.simple, extra_output=args.extra_output, batchnorm=args.batchnorm,
-                                    recurrent_dropout=args.dropout, one=args.one)
+        predictor, _, _ = build_models(args.size, nbase=args.Nbases - 4,
+                                       ctc_length=ctc_length,
+                                       input_length=None, n_output=n_output_network,
+                                       lr=1, res=args.res, attention=args.attention,
+                                       n_feat=n_feat, simple=args.simple, extra_output=args.extra_output, batchnorm=args.batchnorm,
+                                       recurrent_dropout=args.dropout)
 
         if args.weights is not None:
 
@@ -279,8 +280,7 @@ if __name__ == "__main__":
     Nb = {}
     All = {}
     Length = {}
-
-    rg = [10, 20, 40, 60, 80]
+    rg = args.rg
     for gamma in rg:
         Density_network[gamma] = []
         B[gamma] = []
@@ -352,7 +352,7 @@ if __name__ == "__main__":
 
     print("Sampling rate", s.sl)
     print("Summary")
-    print("Gamma,Density,Percent,Nb,Score al", "Length")
+    print("Gamma,Density,Percent,Nb,Score al", "Lengt   h")
 
     def mean(v):
         return float("%.2f" % np.mean(v))
