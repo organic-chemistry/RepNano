@@ -504,11 +504,20 @@ class Strand:
 
         return self.segments
 
-    def analyse_segmentation(self, ntwk, signal, no2=False, already_pre=None):
+    def analyse_segmentation(self, ntwk, signal, no2=False, already_pre=None, cut=None):
 
         if already_pre is None:
-
-            pre = ntwk.predict(signal[np.newaxis, ::, ::])
+            if cut is None:
+                pre = ntwk.predict(signal[np.newaxis, ::, ::])
+            else:
+                if len(signal) > cut:
+                    lc = cut * (len(signal) // cut)
+                    signal = signal[:lc]
+                    # print(X.shape)
+                    signal = np.array(signal).reshape(-1, cut, signal.shape[-1])
+                else:
+                    signal = np.array(signal)[np.newaxis, ::, ::]
+                pre = ntwk.predict(signal[np.newaxis, ::, ::])
         else:
             pre = already_pre
 
@@ -522,8 +531,10 @@ class Strand:
             # return np.concatenate((output1, output2, signal), axis=-1)
 
         else:
-            om1,  *other = pre
-            om1 = np.argmax(om1[0], axis=-1)
+            om1, *other = pre
+
+            om1 = om1.reshape(-1, o1.shape[-1])
+            om1 = np.argmax(om1, axis=-1)
             outputs = [om1]
 
         if other == []:

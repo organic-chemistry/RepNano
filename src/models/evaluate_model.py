@@ -249,6 +249,7 @@ if __name__ == '__main__':
     parser.add_argument('--batchnorm', dest='batchnorm', action="store_true")
     parser.add_argument('--dropout', dest='dropout', default=0, type=float)
     parser.add_argument('--human', dest='human', action="store_true")
+    parser.add_argument('--cut', dest='cut', type=int, default=None)
 
     args = parser.parse_args()
 
