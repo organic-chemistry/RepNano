@@ -249,6 +249,8 @@ if __name__ == '__main__':
     parser.add_argument('--batchnorm', dest='batchnorm', action="store_true")
     parser.add_argument('--dropout', dest='dropout', default=0, type=float)
     parser.add_argument('--human', dest='human', action="store_true")
+    parser.add_argument('--old-model', dest='old_model', action="store_true")
+
     parser.add_argument('--cut', dest='cut', type=int, default=None)
 
     args = parser.parse_args()
@@ -484,7 +486,7 @@ if __name__ == '__main__':
     from ..data.dataset import Dataset
     sys.path.append("src/")
 
-    from ..features.helpers import scale_simple, scale_named, scale_named2, scale_named3, scale_named4, scale_named4s
+    from ..features.helpers import scale_simple, scale_named, scale_named2, scale_named3, scale_named4, scale_named4s, scale_clean_two_pd
 
     def load_datasets(argdatasets):
 
@@ -503,6 +505,9 @@ if __name__ == '__main__':
                 fnorm = lambda x: scale_named4s(x, maxleninf=args.maxleninf)
             else:
                 fnorm = lambda x: scale_named4(x, maxleninf=args.maxleninf)
+
+        if args.old_model:
+            fnorm = scale_clean_two_pd
 
         data_x = []
 
@@ -551,7 +556,7 @@ if __name__ == '__main__':
 
             # print(sig.shape)
             ns = s.analyse_segmentation(ntwk=predictor, signal=sig[
-                                        :args.maxlen_input], no2=n_output_network == 2)
+                                        :args.maxlen_input], no2=n_output_network == 2, cut=args.cut)
 
             new = copy.deepcopy(transfered)
             # print(ns.shape)
