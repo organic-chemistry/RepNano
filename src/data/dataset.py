@@ -541,8 +541,10 @@ class Strand:
                 signal = signal.reshape(-1, signal.shape[-1])
 
             om1 = om1.reshape(-1, om1.shape[-1])
-            print(om1.shape, pre)
+            # print(om1)
             om1 = np.argmax(om1, axis=-1)
+            print(om1)
+
             outputs = [om1]
 
         if other == []:
@@ -593,7 +595,7 @@ class Strand:
 
         outputs = [np.array(list(map(lambda x: str(alph)[x], o)))
                    [::, np.newaxis] for o in outputs]
-
+        print(outputs)
         if len(outputs) == 2:
 
             #print(outputs[0].shape, outputs[1].shape, signal.shape)
