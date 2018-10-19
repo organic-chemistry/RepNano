@@ -219,4 +219,4 @@ if __name__ == "__main__":
             directory=args.directory, reads=args.reads, filter=args.filter,
             already_detected=args.already_detected, filter_size=args.filter_size, size=args.size,
             chemistry=args.chemistry, window_size=args.window_size,
-            old=args.old, res=args.res, attention=args.attention, clean=args.clean)
+            old=args.old, res=args.res, attention=args.attention, clean=args.clean, cut=args.cut)
