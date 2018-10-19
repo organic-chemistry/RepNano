@@ -461,6 +461,8 @@ if __name__ == '__main__':
         n_feat = 2
     if args.norm3:
         n_feat = 3
+    if args.old_model:
+        n_feat = 3
 
     if args.allinfos:
         n_feat = args.maxleninf
