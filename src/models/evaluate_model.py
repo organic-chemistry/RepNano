@@ -287,6 +287,7 @@ if __name__ == '__main__':
                     args.all_datasets = [
                         "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-T-TV-allsg_40/dataset.pick"]
         elif args.method == "FW":
+            print("La")
             if args.target == "T":
                 args.all_datasets = [
                     "/data/bioinfo@borvo/users/jarbona/deepnano5bases/set-sorted-second-half-T-FW-cfalse/dataset.pick"]
@@ -297,6 +298,7 @@ if __name__ == '__main__':
                 args.all_datasets = [
                     "/data/bioinfo@borvo/users/jarbona/deepnano5bases/D-dataset-w5/dataset.pick"]
             if args.target == "H_B":
+                print("Ici")
                 args.all_datasets = [
                     "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human_B/dataset.pick"]
                 dataset.REF = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/human/all_chra.fa"
