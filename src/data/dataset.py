@@ -510,6 +510,7 @@ class Strand:
             if cut is None:
                 pre = ntwk.predict(signal[np.newaxis, ::, ::])
             else:
+                print("Signal", signal.shape)
                 if len(signal) > cut:
                     lc = cut * (len(signal) // cut)
                     signal = signal[:lc]
@@ -517,6 +518,7 @@ class Strand:
                     signal = np.array(signal).reshape(-1, cut, signal.shape[-1])
                 else:
                     signal = np.array(signal)[np.newaxis, ::, ::]
+                print("Signal", signal.shape)
                 pre = ntwk.predict(signal)
         else:
             pre = already_pre
@@ -534,7 +536,7 @@ class Strand:
             om1, *other = pre
 
             om1 = om1.reshape(-1, om1.shape[-1])
-            print(om1.shape)
+            print(om1.shape, pre)
             om1 = np.argmax(om1, axis=-1)
             outputs = [om1]
 
