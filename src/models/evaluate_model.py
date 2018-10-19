@@ -268,6 +268,8 @@ if __name__ == '__main__':
     from ..data import dataset
     find_ref = True
 
+    print(args.method, args.target)
+
     if args.all_datasets == []:
 
         if args.allinfos:
