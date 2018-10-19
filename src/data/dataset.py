@@ -533,7 +533,7 @@ class Strand:
         else:
             om1, *other = pre
 
-            om1 = om1.reshape(-1, o1.shape[-1])
+            om1 = om1.reshape(-1, om1.shape[-1])
             om1 = np.argmax(om1, axis=-1)
             outputs = [om1]
 
