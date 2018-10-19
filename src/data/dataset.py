@@ -517,7 +517,7 @@ class Strand:
                     signal = np.array(signal).reshape(-1, cut, signal.shape[-1])
                 else:
                     signal = np.array(signal)[np.newaxis, ::, ::]
-                pre = ntwk.predict(signal[np.newaxis, ::, ::])
+                pre = ntwk.predict(signal)
         else:
             pre = already_pre
 
