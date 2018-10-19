@@ -24,7 +24,7 @@ def get_events(h5, already_detected=True, chemistry="r9.5", window_size=None, ol
 
 
 def basecall_one_file(filename, output_file, ntwk, alph, already_detected,
-                      n_input=1, filter_size=None, chemistry="r9.5", window_size=None, clean=False, old=True):
+                      n_input=1, filter_size=None, chemistry="r9.5", window_size=None, clean=False, old=True, cut=None):
     # try:
     assert(os.path.exists(filename)), "File %s does no exists" % filename
     h5 = h5py.File(filename, "r")
@@ -51,38 +51,53 @@ def basecall_one_file(filename, output_file, ntwk, alph, already_detected,
     else:
         X = scale(np.array(np.vstack([mean, mean * mean, std, length]).T, dtype=np.float32))
     # return
-    print(X.shape)
-    if n_input == 2:
-        X = []
-        for m, s, l in zip(mean, std, length):
-            X.append([m, m * m, s, l])
-            X.append([m, m * m, s, l])
-        X = scale(np.array(X))
+    if cut is None:
+        print(X.shape)
+        if n_input == 2:
+            X = []
+            for m, s, l in zip(mean, std, length):
+                X.append([m, m * m, s, l])
+                X.append([m, m * m, s, l])
+            X = scale(np.array(X))
 
-    # print(np.mean(X[:, 0]))
+        # print(np.mean(X[:, 0]))
 
-    p = ntwk.predict(X[np.newaxis, ::, ::])
-    # print(p[0, 50:60])
-    # print(X[50:60])
-    # print(np.max(p[0, ::, :5]))
-    if len(p) == 2:
-        o1, o2 = p
-        o1m = (np.argmax(o1[0], -1))
-        o2m = (np.argmax(o2[0], -1))
-        om = np.vstack((o1m, o2m)).reshape((-1,), order='F')
-        print("len", len(om))
+        p = ntwk.predict(X[np.newaxis, ::, ::])
+        # print(p[0, 50:60])
+        # print(X[50:60])
+        # print(np.max(p[0, ::, :5]))
+        if len(p) == 2:
+            o1, o2 = p
+            o1m = (np.argmax(o1[0], -1))
+            o2m = (np.argmax(o2[0], -1))
+            om = np.vstack((o1m, o2m)).reshape((-1,), order='F')
+            print("len", len(om))
+        else:
+            o1 = p[0]
+            om = np.argmax(o1, axis=-1)
+            """
+            rBT = o1[::, 4] / o1[::, 3]
+            d = 20
+            r = (1 / d < rBT) & (rBT < d) & ((om == 3) | (om == 4))
+
+            om[r] = 6"""
     else:
-        o1 = p[0]
-        om = np.argmax(o1, axis=-1)
-        """
-        rBT = o1[::, 4] / o1[::, 3]
-        d = 20
-        r = (1 / d < rBT) & (rBT < d) & ((om == 3) | (om == 4))
+        if len(X) > cut:
+            lc = cut * (len(X) // cut)
+            X = X[:lc]
+            # print(X.shape)
+            X = np.array(X).reshape(-1, cut, X.shape[-1])
+        else:
+            X = np.array(X)[np.newaxis, ::, ::]
+        # print(X.shape)
+        o1 = ntwk.predict(X)
 
-        om[r] = 6"""
-# print(o1[:20])
-# print(o2[:20])
-# exit()
+        o1 = o1.reshape(-1, o1.shape[-1])
+        om = np.argmax(o1, axis=-1)
+
+    # print(o1[:20])
+    # print(o2[:20])
+    # exit()
 
     output = "".join(map(lambda x: str(alph + "T")[x], om)).replace("N", "")
 
@@ -108,7 +123,7 @@ def basecall_one_file(filename, output_file, ntwk, alph, already_detected,
 
 def process(weights, Nbases, output, directory, reads=[], filter="",
             already_detected=True, Nmax=None, size=20, n_output_network=1, n_input=1, filter_size=None,
-            chemistry="r9.5", window_size=None, clean=False, old=True, res=False, attention=False):
+            chemistry="r9.5", window_size=None, clean=False, old=True, res=False, attention=False, cut=None):
     assert len(reads) != 0 or len(directory) != 0, "Nothing to basecall"
 
     alph = "ACGTN"
@@ -170,7 +185,7 @@ def process(weights, Nbases, output, directory, reads=[], filter="",
             print("Processing read %s" % read)
             basecall_one_file(read, fo, ntwk, alph, already_detected,
                               n_input=n_input, filter_size=filter_size,
-                              chemistry=chemistry, window_size=window_size, clean=clean, old=old)
+                              chemistry=chemistry, window_size=window_size, clean=clean, old=old, cut=cut)
 
         fo.close()
 
@@ -196,6 +211,7 @@ if __name__ == "__main__":
 
     parser.add_argument('--attention', dest="attention", action="store_true")
     parser.add_argument('--size', dest="size", type=int, default=20)
+    parser.add_argument('--cut', dest="cut", type=int, default=None)
 
     args = parser.parse_args()
     # exit()
