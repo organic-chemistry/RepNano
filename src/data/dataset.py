@@ -538,6 +538,7 @@ class Strand:
             else:
                 om1 = pre
                 other = []
+                signal = signal.reshape(-1, signal.shape[-1])
 
             om1 = om1.reshape(-1, om1.shape[-1])
             print(om1.shape, pre)
