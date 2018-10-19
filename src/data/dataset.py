@@ -534,12 +534,14 @@ class Strand:
             om1, *other = pre
 
             om1 = om1.reshape(-1, om1.shape[-1])
+            print(om1.shape)
             om1 = np.argmax(om1, axis=-1)
             outputs = [om1]
 
         if other == []:
 
             n = outputs[0].shape[-1]
+            n = 6
 
         else:
 
