@@ -533,7 +533,11 @@ class Strand:
             # return np.concatenate((output1, output2, signal), axis=-1)
 
         else:
-            om1, *other = pre
+            if cut is None:
+                om1, *other = pre
+            else:
+                om1 = pre
+                other = []
 
             om1 = om1.reshape(-1, om1.shape[-1])
             print(om1.shape, pre)
