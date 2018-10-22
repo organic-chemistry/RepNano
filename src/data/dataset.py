@@ -521,23 +521,23 @@ class Strand:
                     else:
                         signal = np.array(signal)[np.newaxis, ::, ::]
                     print("Signal", signal.shape)
+                pre = ntwk.predict(signal)
 
             else:
-                X = signal
                 cut = int(overlap * (cut // overlap))
                 lw = cut // overlap
-                lc = cut * (len(X) // cut)
+                lc = cut * (len(signal) // cut)
 
-                X = X[:lc]
+                signal = signal[:lc]
                 An = []
                 for i in range(overlap - 1):
                     print(lc, cut, lw, i * lw, -cut + (i + 1) * lw)
-                    An.append(X[i * lw:-cut + (i + 1) * lw])
+                    An.append(signal[i * lw:-cut + (i + 1) * lw])
 
-                An.append(X[(overlap - 1) * lw:])
-                signal = np.array(An)
+                An.append(signal[(overlap - 1) * lw:])
+                Signal = np.array(An)
 
-            pre = ntwk.predict(signal)
+                pre = ntwk.predict(Signal)
         else:
             pre = already_pre
 
