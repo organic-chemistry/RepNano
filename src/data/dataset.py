@@ -79,7 +79,7 @@ class Dataset:
                 # print(line)
 
                 if arange != []:
-                    #print(arange, iline, tot, iline / tot > arange[0] and iline / tot < arange[1])
+                    # print(arange, iline, tot, iline / tot > arange[0] and iline / tot < arange[1])
                     if iline / tot > arange[0] and iline / tot < arange[1]:
                         pass
                     else:
@@ -218,7 +218,7 @@ class Strand:
                     else:
 
                         self.signal_bc.append([state, m, stdv, length, s])
-                        #sup[-1] = state[0]
+                        # sup[-1] = state[0]
                         if not dimer:
                             left = state[1]
 
@@ -424,9 +424,9 @@ class Strand:
 
     def show_segmentation_bc(self):
         self.allign_basecall_raw()
-        #l = len(self.to_match)
+        # l = len(self.to_match)
 
-        #pylab.plot(self.raw[:l + self.imin])
+        # pylab.plot(self.raw[:l + self.imin])
         pylab.plot(self.raw)
 
         pylab.plot(*self.segmentation_to_plot(self.signal_bc, shift=self.imin))
@@ -439,7 +439,7 @@ class Strand:
             s0 = sign["start"][0]
         else:
             shift = 0
-        #print("shift", shift)
+        # print("shift", shift)
         f2 = "mean"
         if nanoraw:
             f2 = "norm_mean"
@@ -479,27 +479,27 @@ class Strand:
             self.segments = extract_events(h5, chem="rf", window_size=w, old=False)
         elif method == "TV":
             raw, sl = get_raw(h5)
-            #self.segments = tv_segment(raw, gamma=130, maxlen=45, minlen=2, sl=sl)
+            # self.segments = tv_segment(raw, gamma=130, maxlen=45, minlen=2, sl=sl)
             self.segments = tv_segment(raw, gamma=gamma, maxlen=maxlen,
                                        minlen=minlen, sl=sl, allinfos=allinfos, flatten=flatten)
             self.sl = sl
             # print(self.segments.columns)
         elif method == "TVb":
             raw, sl = get_raw(h5)
-            #self.segments = tv_segment(raw, gamma=130, maxlen=45, minlen=2, sl=sl)
+            # self.segments = tv_segment(raw, gamma=130, maxlen=45, minlen=2, sl=sl)
             self.segments = tv_segment(raw, gamma=gamma, maxlen=100,
                                        minlen=1, sl=sl, allinfos=allinfos)
         elif method == "TV45":
             raw, sl = get_raw(h5)
-            #self.segments = tv_segment(raw, gamma=130, maxlen=45, minlen=2, sl=sl)
+            # self.segments = tv_segment(raw, gamma=130, maxlen=45, minlen=2, sl=sl)
             self.segments = tv_segment(raw, gamma=45, maxlen=70, minlen=2, sl=sl, allinfos=allinfos)
         elif method == "TV25":
             raw, sl = get_raw(h5)
-            #self.segments = tv_segment(raw, gamma=130, maxlen=45, minlen=2, sl=sl)
+            # self.segments = tv_segment(raw, gamma=130, maxlen=45, minlen=2, sl=sl)
             self.segments = tv_segment(raw, gamma=25, maxlen=70, minlen=2, sl=sl, allinfos=allinfos)
         elif method == "TV5":
             raw, sl = get_raw(h5)
-            #self.segments = tv_segment(raw, gamma=130, maxlen=45, minlen=2, sl=sl)
+            # self.segments = tv_segment(raw, gamma=130, maxlen=45, minlen=2, sl=sl)
             self.segments = tv_segment(raw, gamma=5, maxlen=30, minlen=2, sl=sl, allinfos=allinfos)
 
         return self.segments
@@ -535,17 +535,21 @@ class Strand:
         else:
             if cut is None:
                 om1, *other = pre
+                om1 = om1.reshape(-1, om1.shape[-1])[np.newaxis, ::, ::]
+                # print(om1)
+                om1 = np.argmax(om1, axis=-1)
             else:
                 om1 = pre
                 other = []
                 signal = signal.reshape(-1, signal.shape[-1])
+                om1 = om1.reshape(-1, om1.shape[-1])[np.newaxis, ::, ::]
+                # print(om1)
+                om1 = np.argmax(om1, axis=-1)
+                om1 = om1[0]
 
-            om1 = om1.reshape(-1, om1.shape[-1])[np.newaxis, ::, ::]
-            # print(om1)
-            om1 = np.argmax(om1, axis=-1)
             print(om1)
 
-            outputs = [om1]
+            outputs = [om1
 
         if other == []:
 
@@ -569,7 +573,7 @@ class Strand:
 
             elif len(other) == 3:
                 print("Warning, not implemented")
-                #pre = pre[0][0]
+                # pre = pre[0][0]
                 b = np.argmax(pre[0][0], axis=-1)
                 TouB = np.argmax(pre[0][0], axis=-1) == 3
                 empty = np.argmax(pre[0][0], axis=-1) == pre[0][0].shape[-1] - 1
@@ -599,7 +603,7 @@ class Strand:
         print(outputs)
         if len(outputs) == 2:
 
-            #print(outputs[0].shape, outputs[1].shape, signal.shape)
+            # print(outputs[0].shape, outputs[1].shape, signal.shape)
 
             return np.concatenate((outputs[0], outputs[1], signal), axis=-1)
         else:
@@ -633,11 +637,11 @@ class Strand:
                     if stl_base[where] == "NN":
                         stl_base[where] == b
                         # print("one")
-                        #print(stl_base[where], b)
+                        # print(stl_base[where], b)
                     stl_base[where] += b
                     stl_base[where] = stl_base[where].replace("N", "")
                     # First try to transfer at previouss:
-                    #print(stl_base[where - 1], stl_base[where], stl_base[where + 1])
+                    # print(stl_base[where - 1], stl_base[where], stl_base[where + 1])
                     if len(stl_base[where]) > 2 and where > 0:
                         if "NN" in stl_base[where - 1]:
 
@@ -647,7 +651,7 @@ class Strand:
                         elif "N" in stl_base[where - 1]:
                             stl_base[where - 1] += stl_base[where][:1]
                             stl_base[where - 1] = stl_base[where - 1].replace("N", "")
-                            #print(stl_base[where - 1])
+                            # print(stl_base[where - 1])
                             stl_base[where] = stl_base[where][1:]
 
                     elif len(stl_base[where]) == 2 and where > 0:
@@ -670,9 +674,9 @@ class Strand:
                     stl_base[where] = stl_base[where][:2]
                     stl_base[where] = stl_base[where] + \
                         "N" * (2 - len(stl_base[where]))
-                    #print(stl_base[where - 1], stl_base[where], stl_base[where + 1])
+                    # print(stl_base[where - 1], stl_base[where], stl_base[where + 1])
 
-                    #print("After", stl_base[where])
+                    # print("After", stl_base[where])
 
         new_signal = []
         if not allinfos:
