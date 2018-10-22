@@ -549,7 +549,7 @@ class Strand:
 
             print(om1)
 
-            outputs = [om1
+            outputs = [om1]
 
         if other == []:
 
