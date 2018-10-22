@@ -545,7 +545,7 @@ class Strand:
                 om1 = om1.reshape(-1, om1.shape[-1])[np.newaxis, ::, ::]
                 # print(om1)
                 om1 = np.argmax(om1, axis=-1)
-                om1 = om1[0]
+            om1 = om1[0]
 
             print(om1)
 
