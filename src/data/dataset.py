@@ -575,67 +575,67 @@ class Strand:
                         res[i * lw:-cut + (i + 1) * lw] *= o1[i]
                     res[(overlap - 1) * lw:] *= o1[i]
                     ptb = res[-2] / (res[-3] + res[-2])
-                    for i in range(overlap:
-                        om1=np.argmax(pre[i], axis=-1)
-                        toub=(om1 == 3) & & (om1 == 4)
+                    for i in range(overlap):
+                        om1 = np.argmax(pre[i], axis=-1)
+                        toub = (om1 == 3) & & (om1 == 4)
                         print("vaules", np.sum(om1 == 4) / np.sum(toub))
-                    om1=np.argmax(pre[0], axis=-1)
-                    toub=(om1 == 3) & & (om1 == 4)
-                    om1[toub][ptb[toub] > 0.5]=4
-                    om1[toub][ptb[toub] < 0.5]=3
+                    om1 = np.argmax(pre[0], axis=-1)
+                    toub = (om1 == 3) & & (om1 == 4)
+                    om1[toub][ptb[toub] > 0.5] = 4
+                    om1[toub][ptb[toub] < 0.5] = 3
                     # om1 = res
 
             # print(om1)
 
-            outputs=[om1]
+            outputs = [om1]
 
         if other == []:
 
-            n=outputs[0].shape[-1]
-            n=6
+            n = outputs[0].shape[-1]
+            n = 6
 
         else:
 
             if len(other) == 1:
-                tmp_outputs=[]
+                tmp_outputs = []
                 for b in outputs:
 
-                    TouB=b == 3
-                    empty=b == pre[0][0].shape[-1] - 1
-                    IsB=other[0][0][::, 0] > 0.5
-                    b[TouB & IsB]=4
-                    b[empty]=5
-                    n=6
+                    TouB = b == 3
+                    empty = b == pre[0][0].shape[-1] - 1
+                    IsB = other[0][0][::, 0] > 0.5
+                    b[TouB & IsB] = 4
+                    b[empty] = 5
+                    n = 6
                     tmp_outputs.append(copy.deepcopy(b))
-                outputs=tmp_outputs
+                outputs = tmp_outputs
 
             elif len(other) == 3:
                 print("Warning, not implemented")
                 # pre = pre[0][0]
-                b=np.argmax(pre[0][0], axis=-1)
-                TouB=np.argmax(pre[0][0], axis=-1) == 3
-                empty=np.argmax(pre[0][0], axis=-1) == pre[0][0].shape[-1] - 1
+                b = np.argmax(pre[0][0], axis=-1)
+                TouB = np.argmax(pre[0][0], axis=-1) == 3
+                empty = np.argmax(pre[0][0], axis=-1) == pre[0][0].shape[-1] - 1
 
-                Base=np.concatenate([np.zeros_like(pre[1][0][::, ]) + 0.500001,
+                Base = np.concatenate([np.zeros_like(pre[1][0][::, ]) + 0.500001,
                                        pre[1][0][::, ], pre[2][0][::, ], pre[3][0][::, ]], axis=-1)
 
-                KBase=np.argmax(Base, axis=1) + 3
+                KBase = np.argmax(Base, axis=1) + 3
 
-                b[TouB]=KBase[TouB]
+                b[TouB] = KBase[TouB]
 
-                b[empty]=7
-                n=8
+                b[empty] = 7
+                n = 8
 
         if n == 4 + 1:
-            alph="ACGTN"
+            alph = "ACGTN"
         if n == 5 + 1:
-            alph="ACGTBN"
+            alph = "ACGTBN"
         if n == 7 + 1:
-            alph="ACGTBEIN"
+            alph = "ACGTBEIN"
         if n == 8 + 1:
-            alph="ACGTBLEIN"
+            alph = "ACGTBLEIN"
 
-        outputs=[np.array(list(map(lambda x: str(alph)[x], o)))
+        outputs = [np.array(list(map(lambda x: str(alph)[x], o)))
                    [::, np.newaxis] for o in outputs]
 
         # print(outputs)
@@ -650,92 +650,92 @@ class Strand:
     def transfer(self, root_signal, signal_to_label, center_of_mass=False, seqt="seq", allinfos=False):
         # Compute center:
 
-        r_center=root_signal["start"] + root_signal["length"] / 2
-        stl_center=signal_to_label["start"] + signal_to_label["length"] / 2
+        r_center = root_signal["start"] + root_signal["length"] / 2
+        stl_center = signal_to_label["start"] + signal_to_label["length"] / 2
 
-        stl_base=[]
+        stl_base = []
 
         if center_of_mass:
 
             for c in stl_center:
-                where=np.argmin(np.abs(r_center - c))
+                where = np.argmin(np.abs(r_center - c))
                 stl_base.append(root_signal[seqt][where])
 
         else:
             # Force assignation of bases
-            stl_base=["NN" for i in range(len(signal_to_label))]
+            stl_base = ["NN" for i in range(len(signal_to_label))]
             for ib, b in enumerate(root_signal[seqt]):
                 if b != "NN":
 
-                    s=(r_center[ib] > signal_to_label["start"]) &  \
+                    s = (r_center[ib] > signal_to_label["start"]) &  \
                         (r_center[ib] < (signal_to_label["start"] + signal_to_label["length"]))
 
                     # where = np.argmin( np.abs(stl_center-r_center[ib]))
-                    where=np.argmax(s)
+                    where = np.argmax(s)
                     if stl_base[where] == "NN":
                         stl_base[where] == b
                         # print("one")
                         # print(stl_base[where], b)
                     stl_base[where] += b
-                    stl_base[where]=stl_base[where].replace("N", "")
+                    stl_base[where] = stl_base[where].replace("N", "")
                     # First try to transfer at previouss:
                     # print(stl_base[where - 1], stl_base[where], stl_base[where + 1])
                     if len(stl_base[where]) > 2 and where > 0:
                         if "NN" in stl_base[where - 1]:
 
                             #
-                            stl_base[where - 1]=stl_base[where][:2]
-                            stl_base[where]=stl_base[where][2:]
+                            stl_base[where - 1] = stl_base[where][:2]
+                            stl_base[where] = stl_base[where][2:]
                         elif "N" in stl_base[where - 1]:
                             stl_base[where - 1] += stl_base[where][:1]
-                            stl_base[where - 1]=stl_base[where - 1].replace("N", "")
+                            stl_base[where - 1] = stl_base[where - 1].replace("N", "")
                             # print(stl_base[where - 1])
-                            stl_base[where]=stl_base[where][1:]
+                            stl_base[where] = stl_base[where][1:]
 
                     elif len(stl_base[where]) == 2 and where > 0:
                         if "NN" in stl_base[where - 1]:
 
                             #
-                            stl_base[where - 1]=stl_base[where][:1] + "N"
-                            stl_base[where]=stl_base[where][1:] + "N"
+                            stl_base[where - 1] = stl_base[where][:1] + "N"
+                            stl_base[where] = stl_base[where][1:] + "N"
                             # print(stl_base[where])"""
 
                     if len(stl_base[where]) > 2 and where < len(stl_base):
 
-                        stl_base[where + 1]=stl_base[where][2:] + \
+                        stl_base[where + 1] = stl_base[where][2:] + \
                             "N" * (2 - len(stl_base[where][2:]))
 
-                        stl_base[where]=stl_base[where][:2]
+                        stl_base[where] = stl_base[where][:2]
 
                     if len(stl_base[where]) > 2:
                         print("Loss", stl_base[where])
-                    stl_base[where]=stl_base[where][:2]
-                    stl_base[where]=stl_base[where] + \
+                    stl_base[where] = stl_base[where][:2]
+                    stl_base[where] = stl_base[where] + \
                         "N" * (2 - len(stl_base[where]))
                     # print(stl_base[where - 1], stl_base[where], stl_base[where + 1])
 
                     # print("After", stl_base[where])
 
-        new_signal=[]
+        new_signal = []
         if not allinfos:
             for s, m, std, l, start in zip(stl_base, signal_to_label["mean"], signal_to_label["stdv"],
                                            signal_to_label["length"], signal_to_label["start"]):
                 new_signal.append([s, m, std, l, start])
 
-            names=[seqt, "mean", "stdv", "length", "start"]
+            names = [seqt, "mean", "stdv", "length", "start"]
             return pd.DataFrame({n: v for n, v in zip(
                 names, np.array(new_signal).T)}).convert_objects(convert_numeric=True)
         else:
-            Alls=[]
+            Alls = []
             for s, m, std, l, start, alls in zip(stl_base, signal_to_label["mean"], signal_to_label["stdv"],
                                                  signal_to_label["length"], signal_to_label["start"], signal_to_label["all"]):
                 new_signal.append([s, m, std, l, start])
                 Alls.append(alls)
 
-            names=[seqt, "mean", "stdv", "length", "start"]
-            df=pd.DataFrame({n: v for n, v in zip(
+            names = [seqt, "mean", "stdv", "length", "start"]
+            df = pd.DataFrame({n: v for n, v in zip(
                 names, np.array(new_signal).T)}).convert_objects(convert_numeric=True)
-            df["all"]=Alls
+            df["all"] = Alls
             return df
 
 """
