@@ -284,6 +284,7 @@ class Strand:
                 print(ref, "not found")
         else:
             pre = ""
+        print("Ref", pre + ref)
         exex = "bwa mem -x ont2d  %s  %s.fasta > %s.sam" % (pre + ref, name, name)
         try:
             subprocess.check_output(exex, shell=True, stderr=subprocess.STDOUT, close_fds=True)
