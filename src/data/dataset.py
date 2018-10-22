@@ -567,6 +567,7 @@ class Strand:
                     om1 = np.argmax(om1, axis=-1)
                     om1 = om1[0]
                 else:
+                    other = []
                     o1 = pre
                     res = np.ones((lc, o1.shape[-1]))
                     for i in range(overlap - 1):
