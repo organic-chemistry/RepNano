@@ -574,7 +574,8 @@ class Strand:
                         #print(i * lw, -cut + (i + 1) * lw)
                         res[i * lw:-cut + (i + 1) * lw] *= o1[i]
                     res[(overlap - 1) * lw:] *= o1[i]
-                    om1 = res
+                    om1 = np.argmax(res, axis=-1)
+                    #om1 = res
 
             # print(om1)
 
