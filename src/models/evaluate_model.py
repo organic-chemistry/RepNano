@@ -617,7 +617,7 @@ if __name__ == '__main__':
                                        find_ref=find_ref, human=args.human)
                 # print(s.ref_ntwk)
                 print(seq)
-                print("len ref, len seq", len(s.ref_ntwk), len(seq))
+                print("len ref, len seq", len(s.ref_ntwk[0]), len(seq))
 
                 s.score_ntwk = s.score(seq, s.ref_ntwk[0], maxlen=args.maxlen)
                 print("score al", s.score_ntwk)
