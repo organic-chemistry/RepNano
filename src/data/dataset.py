@@ -583,8 +583,9 @@ class Strand:
                     om1 = np.argmax(pre[0], axis=-1)
                     toub = (om1 == 3) | (om1 == 4)
                     ptb = ptb[:len(toub)]
-                    om1[toub & (ptb > 0.5)] = 4
-                    om1[toub & (ptb < 0.5)] = 3
+                    thres = 0.9
+                    om1[toub & (ptb > thres)] = 4
+                    om1[toub & (ptb < thres)] = 3
                     signal = signal[:len(om1)]
                     # om1 = res
 
