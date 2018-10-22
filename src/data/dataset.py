@@ -508,19 +508,35 @@ class Strand:
     def analyse_segmentation(self, ntwk, signal, no2=False, already_pre=None, cut=None):
 
         if already_pre is None:
-            if cut is None:
-                pre = ntwk.predict(signal[np.newaxis, ::, ::])
-            else:
-                print("Signal", signal.shape)
-                if len(signal) > cut:
-                    lc = cut * (len(signal) // cut)
-                    signal = signal[:lc]
-                    # print(X.shape)
-                    signal = np.array(signal).reshape(-1, cut, signal.shape[-1])
+            if overlap is None or overlap == 1:
+                if cut is None:
+                    pre = ntwk.predict(signal[np.newaxis, ::, ::])
                 else:
-                    signal = np.array(signal)[np.newaxis, ::, ::]
-                print("Signal", signal.shape)
-                pre = ntwk.predict(signal)
+                    print("Signal", signal.shape)
+                    if len(signal) > cut:
+                        lc = cut * (len(signal) // cut)
+                        signal = signal[:lc]
+                        # print(X.shape)
+                        signal = np.array(signal).reshape(-1, cut, signal.shape[-1])
+                    else:
+                        signal = np.array(signal)[np.newaxis, ::, ::]
+                    print("Signal", signal.shape)
+
+            else:
+                cut = int(overlap * (cut // overlap))
+                lw = cut // overlap
+                lc = cut * (len(X) // cut)
+
+                X = X[:lc]
+                An = []
+                for i in range(overlap - 1):
+                    print(lc, cut, lw, i * lw, -cut + (i + 1) * lw)
+                    An.append(X[i * lw:-cut + (i + 1) * lw])
+
+                An.append(X[(overlap - 1) * lw:])
+                signal = np.array(An)
+
+            pre = ntwk.predict(signal)
         else:
             pre = already_pre
 
@@ -539,14 +555,24 @@ class Strand:
                 om1 = om1.reshape(-1, om1.shape[-1])[np.newaxis, ::, ::]
                 # print(om1)
                 om1 = np.argmax(om1, axis=-1)
+                om1 = om1[0]
             else:
-                om1 = pre
-                other = []
-                signal = signal.reshape(-1, signal.shape[-1])
-                om1 = om1.reshape(-1, om1.shape[-1])[np.newaxis, ::, ::]
-                # print(om1)
-                om1 = np.argmax(om1, axis=-1)
-            om1 = om1[0]
+                if overlap is None or overlap == 1:
+                    om1 = pre
+                    other = []
+                    signal = signal.reshape(-1, signal.shape[-1])
+                    om1 = om1.reshape(-1, om1.shape[-1])[np.newaxis, ::, ::]
+                    # print(om1)
+                    om1 = np.argmax(om1, axis=-1)
+                    om1 = om1[0]
+                else:
+                    o1 = pre
+                    res = np.ones((lc, o1.shape[-1]))
+                    for i in range(overlap - 1):
+                        #print(i * lw, -cut + (i + 1) * lw)
+                        res[i * lw:-cut + (i + 1) * lw] *= o1[i]
+                    res[(overlap - 1) * lw:] *= o1[i]
+                    om1 = res
 
             # print(om1)
 
