@@ -564,7 +564,7 @@ if __name__ == '__main__':
             ns = s.analyse_segmentation(ntwk=predictor, signal=sig[
                                         :args.maxlen_input], no2=n_output_network == 2, cut=args.cut)
 
-            new = copy.deepcopy(transfered)
+            new = copy.deepcopy(transfered[:len(ns)])
             # print(ns.shape)
             # print(ns)
             print(ns)
