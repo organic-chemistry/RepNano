@@ -577,7 +577,7 @@ class Strand:
                     ptb = res[-2] / (res[-3] + res[-2])
                     for i in range(overlap):
                         om1 = np.argmax(pre[i], axis=-1)
-                        toub = (om1 == 3) & & (om1 == 4)
+                        toub = (om1 == 3) & (om1 == 4)
                         print("vaules", np.sum(om1 == 4) / np.sum(toub))
                     om1 = np.argmax(pre[0], axis=-1)
                     toub = (om1 == 3) & & (om1 == 4)
