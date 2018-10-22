@@ -505,7 +505,7 @@ class Strand:
 
         return self.segments
 
-    def analyse_segmentation(self, ntwk, signal, no2=False, already_pre=None, cut=None):
+    def analyse_segmentation(self, ntwk, signal, no2=False, already_pre=None, cut=None, overlap=None):
 
         if already_pre is None:
             if overlap is None or overlap == 1:

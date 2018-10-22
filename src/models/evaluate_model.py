@@ -252,6 +252,7 @@ if __name__ == '__main__':
     parser.add_argument('--old-model', dest='old_model', action="store_true")
 
     parser.add_argument('--cut', dest='cut', type=int, default=None)
+    parser.add_argument('--overlap', dest='overlap', type=int, default=None)
 
     args = parser.parse_args()
 
@@ -562,7 +563,7 @@ if __name__ == '__main__':
 
             # print(sig.shape)
             ns = s.analyse_segmentation(ntwk=predictor, signal=sig[
-                                        :args.maxlen_input], no2=n_output_network == 2, cut=args.cut)
+                                        :args.maxlen_input], no2=n_output_network == 2, cut=args.cut, overlap=args.overlap)
 
             new = copy.deepcopy(transfered[:len(ns)])
             # print(ns.shape)
