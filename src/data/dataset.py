@@ -582,8 +582,8 @@ class Strand:
                         print("vaules", np.sum(om1 == 4), np.sum(om1 == 4) / np.sum(toub))
                     om1 = np.argmax(pre[0], axis=-1)
                     toub = (om1 == 3) | (om1 == 4)
-                    om1[toub & (ptb[toub] > 0.5)] = 4
-                    om1[toub & (ptb[toub] < 0.5)] = 3
+                    om1[toub & (ptb > 0.5)] = 4
+                    om1[toub & (ptb < 0.5)] = 3
                     signal = signal[:len(om1)]
                     # om1 = res
 
