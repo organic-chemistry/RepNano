@@ -87,6 +87,11 @@ if __name__ == "__main__":
         samf = ""
         rf = "Albacore-human/HQ/workspace/"
 
+    if args.target == "B69":
+        root = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/"
+        samf = ""
+        rf = "BB-BrdU_69_ms/"
+
     D = Dataset(samfile=root + samf,
                 root_files=root + rf)
     D.metadata = argparse_dict
