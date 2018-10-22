@@ -567,6 +567,7 @@ if __name__ == '__main__':
             new = copy.deepcopy(transfered)
             # print(ns.shape)
             # print(ns)
+            print(ns)
             new["seq"] = ns[::, 0]
             if n_output_network == 2:
 
