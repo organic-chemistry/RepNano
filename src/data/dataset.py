@@ -584,6 +584,7 @@ class Strand:
                     toub = (om1 == 3) | (om1 == 4)
                     om1[toub][ptb[toub] > 0.5] = 4
                     om1[toub][ptb[toub] < 0.5] = 3
+                    signal = signal[:len(om1)]
                     # om1 = res
 
             # print(om1)
