@@ -523,6 +523,7 @@ class Strand:
                     print("Signal", signal.shape)
 
             else:
+                X = signal
                 cut = int(overlap * (cut // overlap))
                 lw = cut // overlap
                 lc = cut * (len(X) // cut)
