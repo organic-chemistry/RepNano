@@ -521,7 +521,7 @@ class Strand:
                     else:
                         signal = np.array(signal)[np.newaxis, ::, ::]
                     print("Signal", signal.shape)
-                pre = ntwk.predict(signal)
+                    pre = ntwk.predict(signal)
 
             else:
                 cut = int(overlap * (cut // overlap))
