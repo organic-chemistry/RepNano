@@ -271,6 +271,8 @@ if __name__ == '__main__':
     find_ref = True
 
     print(args.method, args.target)
+    if args.cut == 0:
+        args.cut = None
 
     if args.all_datasets == []:
 
