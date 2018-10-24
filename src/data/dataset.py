@@ -562,7 +562,7 @@ class Strand:
                     om1 = pre
                     other = []
                     signal = signal.reshape(-1, signal.shape[-1])
-                    om1 = om1.reshape(-1, om1.shape[-1])[np.newaxis, ::, ::]
+                    om1 = om1.reshape(-1, om1.shape[-1])
                     # print(om1)
                     ptb = om1[::, -2] / (om1[::, -3] + om1[::, -2])
 
@@ -573,7 +573,7 @@ class Strand:
                     om1[toub & (ptb > thres)] = 4
                     om1[toub & (ptb < thres)] = 3
 
-                    om1 = om1[0]
+                    #om1 = om1[0]
                 else:
                     other = []
                     o1 = pre
