@@ -564,7 +564,15 @@ class Strand:
                     signal = signal.reshape(-1, signal.shape[-1])
                     om1 = om1.reshape(-1, om1.shape[-1])[np.newaxis, ::, ::]
                     # print(om1)
+                    ptb = om1[::, -2] / (om1[::, -3] + om1[::, -2])
+
                     om1 = np.argmax(om1, axis=-1)
+
+                    toub = (om1 == 3) | (om1 == 4)
+                    #ptb = ptb[:len(toub)]
+                    om1[toub & (ptb > thres)] = 4
+                    om1[toub & (ptb < thres)] = 3
+
                     om1 = om1[0]
                 else:
                     other = []
