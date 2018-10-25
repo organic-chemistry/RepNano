@@ -24,7 +24,7 @@ def get_events(h5, already_detected=True, chemistry="r9.5", window_size=None, ol
 
 
 def basecall_one_file(filename, output_file, ntwk, alph, already_detected,
-                      n_input=1, filter_size=None, chemistry="r9.5", window_size=None, clean=False, old=True, cut=None):
+                      n_input=1, filter_size=None, chemistry="r9.5", window_size=None, clean=False, old=True, cut=None, thres=0.5):
     # try:
     assert(os.path.exists(filename)), "File %s does no exists" % filename
     h5 = h5py.File(filename, "r")
@@ -93,7 +93,17 @@ def basecall_one_file(filename, output_file, ntwk, alph, already_detected,
         o1 = ntwk.predict(X)
 
         o1 = o1.reshape(-1, o1.shape[-1])
-        om = np.argmax(o1, axis=-1)
+
+        ptb = o1[::, -2] / (o1[::, -3] + o1[::, -2])
+
+        om1 = np.argmax(o1, axis=-1)
+
+        toub = (om1 == 3) | (om1 == 4)
+        #ptb = ptb[:len(toub)]
+        om1[toub & (ptb > thres)] = 4
+        om1[toub & (ptb < thres)] = 3
+
+        om = om1
 
     # print(o1[:20])
     # print(o2[:20])
@@ -123,7 +133,7 @@ def basecall_one_file(filename, output_file, ntwk, alph, already_detected,
 
 def process(weights, Nbases, output, directory, reads=[], filter="",
             already_detected=True, Nmax=None, size=20, n_output_network=1, n_input=1, filter_size=None,
-            chemistry="r9.5", window_size=None, clean=False, old=True, res=False, attention=False, cut=None):
+            chemistry="r9.5", window_size=None, clean=False, old=True, res=False, attention=False, cut=None, thres=0.5):
     assert len(reads) != 0 or len(directory) != 0, "Nothing to basecall"
 
     alph = "ACGTN"
@@ -185,7 +195,7 @@ def process(weights, Nbases, output, directory, reads=[], filter="",
             print("Processing read %s" % read)
             basecall_one_file(read, fo, ntwk, alph, already_detected,
                               n_input=n_input, filter_size=filter_size,
-                              chemistry=chemistry, window_size=window_size, clean=clean, old=old, cut=cut)
+                              chemistry=chemistry, window_size=window_size, clean=clean, old=old, cut=cut, thres=thres)
 
         fo.close()
 
@@ -212,6 +222,7 @@ if __name__ == "__main__":
     parser.add_argument('--attention', dest="attention", action="store_true")
     parser.add_argument('--size', dest="size", type=int, default=20)
     parser.add_argument('--cut', dest="cut", type=int, default=None)
+    parser.add_argument('--thres', dest="thres", type=float, default=0.5)
 
     args = parser.parse_args()
     # exit()
