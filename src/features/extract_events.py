@@ -131,10 +131,12 @@ def get_tstat(s, s2, wl):
     return np.concatenate([np.zeros(wl), np.abs(delta / np.sqrt(deltav)), np.zeros(wl - 1)])
 
 
-def extract_events(h5, chem, window_size=None, old=True, verbose=True):
+def extract_events(h5, chem, window_size=None, old=True, verbose=True, about_max_len=None):
     # print("ed")
     raw, sl = get_raw(h5)
 
+    if about_max_len != None:
+        raw = raw[:window_size * 2 * about_max_len]
     param = defs[chem]["ed_params"]
     param["old"] = old
     if window_size is not None:
