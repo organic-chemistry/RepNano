@@ -131,7 +131,7 @@ def get_tstat(s, s2, wl):
     return np.concatenate([np.zeros(wl), np.abs(delta / np.sqrt(deltav)), np.zeros(wl - 1)])
 
 
-def extract_events(h5, chem, window_size=None, old=True):
+def extract_events(h5, chem, window_size=None, old=True, verbose=True):
     # print("ed")
     raw, sl = get_raw(h5)
 
@@ -139,7 +139,9 @@ def extract_events(h5, chem, window_size=None, old=True):
     param["old"] = old
     if window_size is not None:
         param['window_lengths'] = [window_size - 1, window_size + 1]
-        print("Modif length", window_size)
+        if verbose:
+            print("Modif length", window_size)
+    param["verbose"] = verbose
     events = event_detect(raw, sl, **param)
     med, mad = med_mad(events['mean'][-100:])
     max_thresh = med + 1.48 * 2 + mad
@@ -149,8 +151,9 @@ def extract_events(h5, chem, window_size=None, old=True):
     #    events, threshold=0.05, raw=raw, sampling_rate=sl, max_under_threshold=100)
 
     first_event, last_event = find_stall(
-        events, start_threshold=8.5, end_threshold=4, raw=raw, sampling_rate=sl, max_under_threshold=750)
-    print("First event", first_event)
+        events, start_threshold=8.5, end_threshold=4, raw=raw, sampling_rate=sl, max_under_threshold=750, verbose)
+    if verbose:
+        print("First event", first_event)
     return events[:]
 
 
@@ -330,8 +333,9 @@ def tv_segment(signal, gamma=0.1, maxlen=10, minlen=1, sl=6024, allinfos=False, 
         return d
 
 
-def generate_events(ss1, ss2, peaks, sample_rate, raw):
-    print("New")
+def generate_events(ss1, ss2, peaks, sample_rate, raw, verbose=True):
+    if verbose:
+        print("New")
     peaks.append(len(ss1))
     events = np.empty(len(peaks), dtype=[('start', float), ('length', float),
                                          ('mean', float), ('stdv', float)])
@@ -348,7 +352,8 @@ def generate_events(ss1, ss2, peaks, sample_rate, raw):
         events[i]["stdv"] = np.sqrt(np.mean((raw[s:s + l] - m)**2))
         #print(l, sample_rate)
         s = e
-    print("Generate med")
+    if verbose:
+        print("Generate med")
     events["start"] /= sample_rate
     events["length"] /= sample_rate
 
@@ -356,7 +361,7 @@ def generate_events(ss1, ss2, peaks, sample_rate, raw):
 
 
 def event_detect(raw_data, sample_rate,
-                 window_lengths=[16, 40], thresholds=[8.0, 4.0], peak_height=1.0, old=True):
+                 window_lengths=[16, 40], thresholds=[8.0, 4.0], peak_height=1.0, old=True, verbose=True):
     """Basic, standard even detection using two t-tests
 
     :param raw_data: ADC values
@@ -379,6 +384,6 @@ def event_detect(raw_data, sample_rate,
     if old:
         events = generate_events_old(sums, sumsqs, peaks, sample_rate)
     else:
-        events = generate_events(sums, sumsqs, peaks, sample_rate, raw_data)
+        events = generate_events(sums, sumsqs, peaks, sample_rate, raw_data, verbose=verbose)
 
     return events
