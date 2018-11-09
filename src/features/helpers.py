@@ -234,12 +234,12 @@ def scale_clean_two_pd(X):
     return scale_clean_two(np.array([X["mean"], X["mean"]**2, X["stdv"], X["length"]]).T)
 
 
-def scale_clean_two(X, normalise_window=True, nw=100):
+def scale_clean_two(X, normalise_window=True, nw=100, verbose=True):
 
     ret = np.array(X)
-
-    print("std", np.std(ret[:, 0]), np.std(ret[:, 2]), np.std(ret[:, 3]))
-    print("mean", np.mean(ret[:, 0]), np.mean(ret[:, 2]), np.mean(ret[:, 3]))
+    if verbose:
+        print("std", np.std(ret[:, 0]), np.std(ret[:, 2]), np.std(ret[:, 3]))
+        print("mean", np.mean(ret[:, 0]), np.mean(ret[:, 2]), np.mean(ret[:, 3]))
 
     # print(pd.rolling_mean(X[:, 0], nw))
 
@@ -270,9 +270,11 @@ def scale_clean_two(X, normalise_window=True, nw=100):
     ret[:, 2] = ret[:, 2] / np.std(ret[:, 2])
 
     ret = ret[:, : 3]
-    print(ret.shape)
-    # ret[:, 3] = 0.002 * ret[:, 3] / np.mean(ret[:, 3])
-    print("Mean window scale_clean_two", np.mean(ret[:, : 3], axis=0), np.std(ret[:, : 3], axis=0))
+    if verbose:
+        print(ret.shape)
+        # ret[:, 3] = 0.002 * ret[:, 3] / np.mean(ret[:, 3]
+        print("Mean window scale_clean_two", np.mean(
+            ret[:, : 3], axis=0), np.std(ret[:, : 3], axis=0))
     return ret[:, : 3]
 
 
