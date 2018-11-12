@@ -118,7 +118,7 @@ def load_data_complete(dataset, root, per_dataset=None):
     Xp, yp = load_events(X, y, min_length=None)
     assert(len(Xp) == len(yp))
 
-    Xpp, ypp = transform_reads(Xp, yp)
+    Xpp, ypp = transform_reads(Xp, np.array(yp))
     Xpp = np.concatenate(Xpp, axis=0)
     ypp = np.concatenate(ypp, axis=0)
     return Xp, Xpp, yp, ypp
