@@ -148,8 +148,8 @@ for val in indep_val:
     train_test.remove(val)
 
 
-_, X_train, _, y_train = load_data_complete(train_test, root=root, per_dataset=5, lenv=200)
-_, X_test, _, y_test = load_data_complete(train_test, root=root, per_dataset=5)
+_, X_train, _, y_train = load_data_complete(train_test, root=root, per_dataset=100, lenv=200)
+_, X_test, _, y_test = load_data_complete(train_test, root=root, per_dataset=10)
 
 print(X_train.shape, y_train.shape)
 model = Sequential()
