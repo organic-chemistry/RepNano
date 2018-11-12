@@ -112,7 +112,13 @@ def transform_reads(X, y, lenv=200):
     return Xt, yt
 
 
-def load_data_complete(dataset, root, per_dataset=None, lenv=200):
+def unison_shuffled_copies(a, b):
+    assert len(a) == len(b)
+    p = numpy.random.permutation(len(a))
+    return a[p], b[p]
+
+
+def load_data_complete(dataset, root, per_dataset=None, lenv=200, shuffle=True):
     X, y = load_data(dataset, root=root, per_dataset=per_dataset)  # X filename,y B amount
     # X events y B amount  filtered for length < 10000
     Xp, yp = load_events(X, y, min_length=None)
@@ -121,6 +127,9 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200):
     Xpp, ypp = transform_reads(Xp, np.array(yp), lenv=lenv)
     Xpp = np.concatenate(Xpp, axis=0)
     ypp = np.concatenate(ypp, axis=0)
+
+    if shuffle:
+        Xpp, ypp = unison_shuffled_copies(Xpp, ypp)
     return Xp, Xpp, yp, ypp
 
 # fix random seed for reproducibility
@@ -149,7 +158,8 @@ model.add(LSTM(100))
 model.add(Dense(1, activation='linear'))
 model.compile(loss='mse', optimizer='adam')  # , metrics=['accuracy'])
 print(model.summary())
-model.fit(X_train, y_train[::, 0], epochs=3, batch_size=64, sample_weight=y_train[::, 1])
+model.fit(X_train, y_train[::, 0], epochs=3, batch_size=64,
+          sample_weight=y_train[::, 1], validation_split=0.1)
 # Final evaluation of the model
 scores = model.evaluate(X_test, y_test[::, 0], verbose=0)
 print("Accuracy: %.2f%%" % (scores))
