@@ -140,7 +140,7 @@ for val in indep_val:
 _, X_train, _, y_train = load_data_complete(train_test, root=root, per_dataset=5, lenv=200)
 #_, X_test, _, y_test = load_data_complete(train_test, root=root, per_dataset=20)
 
-
+print(X_train.shape, y_train.shape)
 model = Sequential()
 # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
 model.add(Conv1D(filters=32, kernel_size=3, padding='same', activation='relu', input_shape=(200, 3)))
