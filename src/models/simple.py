@@ -118,7 +118,7 @@ def load_data_complete(dataset, root, per_dataset=None):
     Xp, yp = load_events(X, y, min_length=None)
     assert(len(Xp) == len(yp))
 
-    Xpp, ypp = transform_reads(Xp)
+    Xpp, ypp = transform_reads(Xp, yp)
     Xpp = np.concatenate(Xpp, axis=0)
     ypp = np.concatenate(ypp, axis=0)
     return Xp, Xpp, yp, ypp
@@ -137,8 +137,8 @@ for val in indep_val:
     train_test.remove(val)
 
 
-_, X_train, _, y_train = load_data_complete(train_test, root=root, per_dataset=100)
-_, X_test, _, y_test = load_data_complete(train_test, root=root, per_dataset=20)
+_, X_train, _, y_train = load_data_complete(train_test, root=root, per_dataset=5)
+#_, X_test, _, y_test = load_data_complete(train_test, root=root, per_dataset=20)
 
 
 model = Sequential()
