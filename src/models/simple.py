@@ -161,7 +161,8 @@ model.add(Dense(1, activation='linear'))
 model.compile(loss='mse', optimizer='adam')  # , metrics=['accuracy'])
 print(model.summary())
 
-checkpointer = ModelCheckpoint(filepath='./weights.hdf5', verbose=1, save_best_only=True)
+checkpointer = ModelCheckpoint(
+    filepath='./weights.{epoch:02d}-{val_loss:.2f}.hdf5', verbose=1, save_best_only=True)
 
 
 model.fit(X_train, y_train[::, 0], epochs=100, batch_size=64,
