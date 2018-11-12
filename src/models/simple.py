@@ -165,7 +165,7 @@ checkpointer = ModelCheckpoint(filepath='./weights.hdf5', verbose=1, save_best_o
 
 
 model.fit(X_train, y_train[::, 0], epochs=100, batch_size=64,
-          sample_weight=y_train[::, 1], validation_split=0.1, callbacks=[checkpointer]))
+          sample_weight=y_train[::, 1], validation_split=0.1, callbacks=[checkpointer])
 # Final evaluation of the model
-scores=model.evaluate(X_test, y_test[::, 0], verbose = 0)
+scores = model.evaluate(X_test, y_test[::, 0], verbose=0)
 print("Accuracy: %.2f%%" % (scores))
