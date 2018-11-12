@@ -10,7 +10,9 @@ import glob
 import pandas as pd
 import numpy as np
 
+
 from ..features.extract_events import extract_events
+from keras.callbacks import ModelCheckpoint
 
 
 def load_data(lfiles, value="init_B", root=".", per_dataset=None):
@@ -158,8 +160,12 @@ model.add(LSTM(100))
 model.add(Dense(1, activation='linear'))
 model.compile(loss='mse', optimizer='adam')  # , metrics=['accuracy'])
 print(model.summary())
-model.fit(X_train, y_train[::, 0], epochs=3, batch_size=64,
-          sample_weight=y_train[::, 1], validation_split=0.1)
+
+checkpointer = ModelCheckpoint(filepath='./weights.hdf5', verbose=1, save_best_only=True)
+
+
+model.fit(X_train, y_train[::, 0], epochs=100, batch_size=64,
+          sample_weight=y_train[::, 1], validation_split=0.1, callbacks=[checkpointer]))
 # Final evaluation of the model
-scores = model.evaluate(X_test, y_test[::, 0], verbose=0)
+scores=model.evaluate(X_test, y_test[::, 0], verbose = 0)
 print("Accuracy: %.2f%%" % (scores))
