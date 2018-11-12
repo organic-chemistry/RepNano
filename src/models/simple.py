@@ -112,13 +112,13 @@ def transform_reads(X, y, lenv=200):
     return Xt, yt
 
 
-def load_data_complete(dataset, root, per_dataset=None):
+def load_data_complete(dataset, root, per_dataset=None, lenv=200):
     X, y = load_data(dataset, root=root, per_dataset=per_dataset)  # X filename,y B amount
     # X events y B amount  filtered for length < 10000
     Xp, yp = load_events(X, y, min_length=None)
     assert(len(Xp) == len(yp))
 
-    Xpp, ypp = transform_reads(Xp, np.array(yp))
+    Xpp, ypp = transform_reads(Xp, np.array(yp), lenv=lenv)
     Xpp = np.concatenate(Xpp, axis=0)
     ypp = np.concatenate(ypp, axis=0)
     return Xp, Xpp, yp, ypp
@@ -137,13 +137,13 @@ for val in indep_val:
     train_test.remove(val)
 
 
-_, X_train, _, y_train = load_data_complete(train_test, root=root, per_dataset=5)
+_, X_train, _, y_train = load_data_complete(train_test, root=root, per_dataset=5, lenv=200)
 #_, X_test, _, y_test = load_data_complete(train_test, root=root, per_dataset=20)
 
 
 model = Sequential()
 #model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
-model.add(Conv1D(filters=32, kernel_size=3, padding='same', activation='relu'))
+model.add(Conv1D(filters=32, kernel_size=3, padding='same', activation='relu', input_length=200))
 model.add(MaxPooling1D(pool_size=2))
 model.add(LSTM(100))
 model.add(Dense(1, activation='linear'))
