@@ -138,7 +138,7 @@ for val in indep_val:
 
 
 _, X_train, _, y_train = load_data_complete(train_test, root=root, per_dataset=5, lenv=200)
-#_, X_test, _, y_test = load_data_complete(train_test, root=root, per_dataset=20)
+_, X_test, _, y_test = load_data_complete(train_test, root=root, per_dataset=5)
 
 print(X_train.shape, y_train.shape)
 model = Sequential()
@@ -149,7 +149,7 @@ model.add(LSTM(100))
 model.add(Dense(1, activation='linear'))
 model.compile(loss='mse', optimizer='adam')  # , metrics=['accuracy'])
 print(model.summary())
-model.fit(X_train, y_train[::,  0], epochs=3, batch_size=64, sample_weight=y_train[::, 1])
+model.fit(X_train, y_train[::, 0], epochs=3, batch_size=64, sample_weight=y_train[::, 1])
 # Final evaluation of the model
-scores = model.evaluate(X_test, y_test, verbose=0)
+scores = model.evaluate(X_test, y_test[::, 0], verbose=0)
 print("Accuracy: %.2f%%" % (scores))
