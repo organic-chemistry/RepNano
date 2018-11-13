@@ -142,14 +142,14 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200, shuffle=True):
 root = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw"
 files = glob.glob(root + "/*.csv")
 
-indep_val = ["/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-human.csv",
-             "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T1-yeast.csv"]
+indep_val = ["/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T-human.csv",
+             "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B1-yeast.csv"]
 train_test = files
 for val in indep_val:
     train_test.remove(val)
 
 
-_, X_train, _, y_train = load_data_complete(train_test, root=root, per_dataset=100, lenv=200)
+_, X_train, _, y_train = load_data_complete(train_test, root=root, per_dataset=400, lenv=200)
 _, X_test, _, y_test = load_data_complete(indep_val, root=root, per_dataset=10)
 
 print(X_train.shape, y_train.shape)
