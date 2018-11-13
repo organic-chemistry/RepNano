@@ -12,7 +12,7 @@ import numpy as np
 
 
 from ..features.extract_events import extract_events
-from keras.callbacks import ModelCheckpoint
+from keras.callbacks import ModelCheckpoint, EarlyStopping
 
 
 def load_data(lfiles, value="init_B", root=".", per_dataset=None):
@@ -80,11 +80,11 @@ def transform_reads(X, y, lenv=200):
     for events, yi in zip(X, y):
         mean = events["mean"]
         std = events["stdv"]
-        length = events["length"]
+        #length = events["length"]
 
         def scale(x):
             x -= np.percentile(x, 25)
-            scale = np.percentile(x, 75) - np.percentile(x, 25)
+            #scale = np.percentile(x, 75) - np.percentile(x, 25)
             # print(scale,np.percentile(x, 75) , np.percentile(x, 25))
             x /= scale
             if np.sum(x > 10) > len(x) * 0.05:
@@ -98,9 +98,9 @@ def transform_reads(X, y, lenv=200):
         mean = scale(mean.copy())
         std = scale(std.copy())
         # print("stl")
-        length = scale(length.copy())
+        #length = scale(length.copy())
         # print("el")
-        V = np.array([mean, std, length]).T
+        V = np.array([mean, std]).T
         # print(V.shape,yi.shape)
 
         lc = lenv * (len(V) // lenv)
@@ -141,15 +141,15 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200, shuffle=True):
 root = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw"
 files = glob.glob(root + "/*.csv")
 
-indep_val = ["/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-27-human.csv",
-             "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T-human.csv"]
+indep_val = ["/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-human.csv",
+             "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T1-yeast.csv"]
 train_test = files
 for val in indep_val:
     train_test.remove(val)
 
 
 _, X_train, _, y_train = load_data_complete(train_test, root=root, per_dataset=100, lenv=200)
-_, X_test, _, y_test = load_data_complete(train_test, root=root, per_dataset=10)
+_, X_test, _, y_test = load_data_complete(indep_val, root=root, per_dataset=10)
 
 print(X_train.shape, y_train.shape)
 model = Sequential()
@@ -163,10 +163,10 @@ print(model.summary())
 
 checkpointer = ModelCheckpoint(
     filepath='./weights.{epoch:02d}-{val_loss:.2f}.hdf5', verbose=1, save_best_only=True)
-
+es = EarlyStopping(patience=5)
 
 model.fit(X_train, y_train[::, 0], epochs=100, batch_size=64,
-          sample_weight=y_train[::, 1], validation_split=0.1, callbacks=[checkpointer])
+          sample_weight=y_train[::, 1], validation_split=0.1, callbacks=[checkpointer, es])
 # Final evaluation of the model
 scores = model.evaluate(X_test, y_test[::, 0], verbose=0)
 print("Accuracy: %.2f%%" % (scores))
