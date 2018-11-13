@@ -86,7 +86,8 @@ def transform_reads(X, y, lenv=200):
             x -= np.percentile(x, 25)
             #scale = np.percentile(x, 75) - np.percentile(x, 25)
             # print(scale,np.percentile(x, 75) , np.percentile(x, 25))
-            x /= scale
+            #x /= scale
+            x /= 20
             if np.sum(x > 10) > len(x) * 0.05:
                 print("Warning lotl of rare events")
                 print(np.sum(x > 10 * scale), len(x))
@@ -96,11 +97,11 @@ def transform_reads(X, y, lenv=200):
             return x
 
         mean = scale(mean.copy())
-        std = scale(std.copy())
+        #std = scale(std.copy())
         # print("stl")
         #length = scale(length.copy())
         # print("el")
-        V = np.array([mean, std]).T
+        V = np.array([mean]).T
         # print(V.shape,yi.shape)
 
         lc = lenv * (len(V) // lenv)
@@ -154,7 +155,7 @@ _, X_test, _, y_test = load_data_complete(indep_val, root=root, per_dataset=10)
 print(X_train.shape, y_train.shape)
 model = Sequential()
 # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
-model.add(Conv1D(filters=32, kernel_size=3, padding='same', activation='relu', input_shape=(200, 3)))
+model.add(Conv1D(filters=32, kernel_size=3, padding='same', activation='relu', input_shape=(200, 1)))
 model.add(MaxPooling1D(pool_size=2))
 model.add(LSTM(100))
 model.add(Dense(1, activation='linear'))
