@@ -21,7 +21,11 @@ def load_data(lfiles, value="init_B", root=".", per_dataset=None):
     for file in lfiles:
         d = pd.read_csv(file)
         X1 = [root + "/" + f for f in d["filename"]]
-        y1 = d[value]
+        if "savedweights.13-0.05.hdf5" in d.columns:
+            print("loading from savedweights.13-0.05.hdf5")
+            y1 = d["savedweights.13-0.05.hdf5"]
+        else:
+            y1 = d[value]
         yw = d["init_w"]
 
         y1 = [[iy1, iyw] for iy1, iyw in zip(y1, yw)]
@@ -148,7 +152,8 @@ train_test = files
 for val in indep_val:
     train_test.remove(val)
 
-
+print(train_test)
+print(indep_val)
 _, X_train, _, y_train = load_data_complete(train_test, root=root, per_dataset=400, lenv=200)
 _, X_test, _, y_test = load_data_complete(indep_val, root=root, per_dataset=10)
 
@@ -160,6 +165,7 @@ model.add(MaxPooling1D(pool_size=2))
 model.add(LSTM(100))
 model.add(Dense(1, activation='linear'))
 model.compile(loss='mse', optimizer='adam')  # , metrics=['accuracy'])
+model.load_weights("savedweights.13-0.05.hdf5")
 print(model.summary())
 
 checkpointer = ModelCheckpoint(
