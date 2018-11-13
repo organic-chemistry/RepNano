@@ -143,6 +143,16 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200, shuffle=True):
 # load the dataset but only keep the top n words, zero the rest
 #(X_train, y_train), (X_test, y_test) = imdb.load_data(num_words=top_words)
 
+model = Sequential()
+# model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
+model.add(Conv1D(filters=32, kernel_size=3, padding='same', activation='relu', input_shape=(200, 1)))
+model.add(MaxPooling1D(pool_size=2))
+model.add(LSTM(100))
+model.add(Dense(1, activation='linear'))
+model.compile(loss='mse', optimizer='adam')  # , metrics=['accuracy'])
+model.load_weights("saved-weights.13-0.05.hdf5")
+print(model.summary())
+
 root = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw"
 files = glob.glob(root + "/*.csv")
 
@@ -158,15 +168,7 @@ _, X_train, _, y_train = load_data_complete(train_test, root=root, per_dataset=4
 _, X_test, _, y_test = load_data_complete(indep_val, root=root, per_dataset=10)
 
 print(X_train.shape, y_train.shape)
-model = Sequential()
-# model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
-model.add(Conv1D(filters=32, kernel_size=3, padding='same', activation='relu', input_shape=(200, 1)))
-model.add(MaxPooling1D(pool_size=2))
-model.add(LSTM(100))
-model.add(Dense(1, activation='linear'))
-model.compile(loss='mse', optimizer='adam')  # , metrics=['accuracy'])
-model.load_weights("savedweights.13-0.05.hdf5")
-print(model.summary())
+
 
 checkpointer = ModelCheckpoint(
     filepath='./weights.{epoch:02d}-{val_loss:.2f}.hdf5', verbose=1, save_best_only=True)
