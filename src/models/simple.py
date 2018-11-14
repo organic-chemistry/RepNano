@@ -176,8 +176,8 @@ _, X_train, _, y_train = load_data_complete(train_test, root=root, per_dataset=5
 _, X_val, _, y_val = load_data_complete(indep_val, root=root, per_dataset=5, lenv=1200)
 
 print(X_train.shape, y_train.shape)
-X_val = X_val[:len(X_val) // 64]
-y_val = y_val[:len(y_val) // 64]
+X_val = X_val[:64 * len(X_val) // 64]
+y_val = y_val[:64 * len(y_val) // 64]
 
 model.fit(X_train, y_train[::, 0], epochs=100, batch_size=64,
           sample_weight=y_train[::, 1], validation_data=(X_val, y_val[::, 0], y_val[::, 1]), callbacks=[checkpointer, es])
