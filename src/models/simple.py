@@ -172,8 +172,8 @@ for val in indep_val:
 
 print(train_test)
 print(indep_val)
-_, X_train, _, y_train = load_data_complete(train_test, root=root, per_dataset=5, lenv=1200)
-_, X_val, _, y_val = load_data_complete(indep_val, root=root, per_dataset=5, lenv=1200)
+_, X_train, _, y_train = load_data_complete(train_test, root=root, per_dataset=400, lenv=1200)
+_, X_val, _, y_val = load_data_complete(indep_val, root=root, per_dataset=40, lenv=1200)
 
 print(X_train.shape, y_train.shape)
 X_val = X_val[:64 * len(X_val) // 64]
