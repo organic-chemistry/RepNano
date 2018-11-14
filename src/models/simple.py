@@ -147,7 +147,7 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200, shuffle=True):
 model = Sequential()
 # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
 model.add(Conv1D(filters=32, kernel_size=3, padding='same',
-                 activation='relu', input_shape=(1200, 1)))
+                 activation='relu', input_shape=(400, 1)))
 model.add(MaxPooling1D(pool_size=2))
 model.add(LSTM(100))
 model.add(Dense(1, activation='linear'))
@@ -165,15 +165,15 @@ files = glob.glob(root + "/*.csv")
 
 indep_val = ["/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T-human.csv",
              "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-40-yeast.csv",
-             "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-9-yeast.csv"]
+             "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B1-yeast.csv"]
 train_test = files
 for val in indep_val:
     train_test.remove(val)
 
 print(train_test)
 print(indep_val)
-_, X_train, _, y_train = load_data_complete(train_test, root=root, per_dataset=400, lenv=1200)
-_, X_val, _, y_val = load_data_complete(indep_val, root=root, per_dataset=40, lenv=1200)
+_, X_train, _, y_train = load_data_complete(train_test, root=root, per_dataset=400, lenv=400)
+_, X_val, _, y_val = load_data_complete(indep_val, root=root, per_dataset=40, lenv=400)
 
 print(X_train.shape, y_train.shape)
 X_val = X_val[:64 * len(X_val) // 64]
