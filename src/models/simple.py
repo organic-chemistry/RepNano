@@ -12,7 +12,7 @@ import numpy as np
 
 
 from ..features.extract_events import extract_events
-from keras.callbacks import ModelCheckpoint, EarlyStopping
+from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 
 
 def load_data(lfiles, value="init_B", root=".", per_dataset=None):
@@ -22,8 +22,8 @@ def load_data(lfiles, value="init_B", root=".", per_dataset=None):
         d = pd.read_csv(file)
         X1 = [root + "/" + f for f in d["filename"]]
         if "savedweights.13-0.05.hdf5" in d.columns:
-            print("loading from savedweights.13-0.05.hdf5")
-            y1 = d["savedweights.13-0.05.hdf5"]
+            print("loading from savedweights.17-0.04.hdf5")
+            y1 = d["savedweights.17-0.04.hdf5"]
         else:
             y1 = d[value]
         yw = d["init_w"]
@@ -150,29 +150,31 @@ model.add(MaxPooling1D(pool_size=2))
 model.add(LSTM(100))
 model.add(Dense(1, activation='linear'))
 model.compile(loss='mse', optimizer='adam')  # , metrics=['accuracy'])
-model.load_weights("saved-weights.13-0.05.hdf5")
+model.load_weights("saved-weights.17-0.04.hdf5")
+checkpointer = ModelCheckpoint(
+    filepath='./weights.{epoch:02d}-{val_loss:.2f}.hdf5', verbose=1, save_best_only=True)
+es = EarlyStopping(patience=10)
+reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,
+                              patience=5, min_lr=0.0001)
 print(model.summary())
 
 root = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw"
 files = glob.glob(root + "/*.csv")
 
 indep_val = ["/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T-human.csv",
-             "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B1-yeast.csv"]
+             "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B1-yeast.csv",
+             "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-9-yeast.csv"]
 train_test = files
 for val in indep_val:
     train_test.remove(val)
 
 print(train_test)
 print(indep_val)
-_, X_train, _, y_train = load_data_complete(train_test, root=root, per_dataset=400, lenv=200)
+_, X_train, _, y_train = load_data_complete(train_test, root=root, per_dataset=800, lenv=200)
 _, X_test, _, y_test = load_data_complete(indep_val, root=root, per_dataset=10)
 
 print(X_train.shape, y_train.shape)
 
-
-checkpointer = ModelCheckpoint(
-    filepath='./weights.{epoch:02d}-{val_loss:.2f}.hdf5', verbose=1, save_best_only=True)
-es = EarlyStopping(patience=5)
 
 model.fit(X_train, y_train[::, 0], epochs=100, batch_size=64,
           sample_weight=y_train[::, 1], validation_split=0.1, callbacks=[checkpointer, es])
