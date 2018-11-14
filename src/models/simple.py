@@ -143,14 +143,16 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200, shuffle=True):
 # load the dataset but only keep the top n words, zero the rest
 #(X_train, y_train), (X_test, y_test) = imdb.load_data(num_words=top_words)
 
+
 model = Sequential()
 # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
-model.add(Conv1D(filters=32, kernel_size=3, padding='same', activation='relu', input_shape=(200, 1)))
+model.add(Conv1D(filters=32, kernel_size=3, padding='same',
+                 activation='relu', input_shape=(1200, 1)))
 model.add(MaxPooling1D(pool_size=2))
 model.add(LSTM(100))
 model.add(Dense(1, activation='linear'))
 model.compile(loss='mse', optimizer='adam')  # , metrics=['accuracy'])
-model.load_weights("saved-weights.17-0.04.hdf5")
+# model.load_weights("saved-weights.17-0.04.hdf5")
 checkpointer = ModelCheckpoint(
     filepath='./weights.{epoch:02d}-{val_loss:.2f}.hdf5', verbose=1, save_best_only=True)
 es = EarlyStopping(patience=10)
@@ -162,7 +164,7 @@ root = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw"
 files = glob.glob(root + "/*.csv")
 
 indep_val = ["/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T-human.csv",
-             "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B1-yeast.csv",
+             "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-40-yeast.csv",
              "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-9-yeast.csv"]
 train_test = files
 for val in indep_val:
@@ -170,14 +172,14 @@ for val in indep_val:
 
 print(train_test)
 print(indep_val)
-_, X_train, _, y_train = load_data_complete(train_test, root=root, per_dataset=800, lenv=200)
-_, X_test, _, y_test = load_data_complete(indep_val, root=root, per_dataset=10)
+_, X_train, _, y_train = load_data_complete(train_test, root=root, per_dataset=5, lenv=1200)
+_, X_val, _, y_val = load_data_complete(indep_val, root=root, per_dataset=5, lenv=1200)
 
 print(X_train.shape, y_train.shape)
 
 
 model.fit(X_train, y_train[::, 0], epochs=100, batch_size=64,
-          sample_weight=y_train[::, 1], validation_split=0.1, callbacks=[checkpointer, es])
+          sample_weight=y_train[::, 1], validation_data=(X_val, y_val[::, 0], y_val[::, 1]), callbacks=[checkpointer, es])
 # Final evaluation of the model
-scores = model.evaluate(X_test, y_test[::, 0], verbose=0)
+scores = model.evaluate(X_val, y_val[::, 0], verbose=0)
 print("Accuracy: %.2f%%" % (scores))
