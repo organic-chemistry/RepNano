@@ -159,17 +159,20 @@ def extract_events(h5, chem, window_size=None, old=True, verbose=True, about_max
     return events[:]
 
 
+@jit
 def med_mad(data):
     dmed = np.median(data)
     dmad = np.median(abs(data - dmed))
     return dmed, dmad
 
 
+@jit
 def compute_prefix_sums(data):
     data_sq = data * data
     return np.cumsum(data), np.cumsum(data_sq)
 
 
+@jit
 def peak_detect(short_data, long_data, short_window, long_window, short_threshold, long_threshold,
                 peak_height):
     long_mask = 0
