@@ -100,11 +100,12 @@ def transform_reads(X, y, lenv=200):
 
             return x
 
-        #mean = scale(mean.copy())
+        mean = scale(mean.copy())
+        """
         mean -= np.percentile(mean, 50)
         delta = mean[1:] - mean[:-1]
         rmuninf = (delta > -15) & (delta < 15)
-        mean = delta[~rmuninf]
+        mean = delta[~rmuninf]"""
         #std = scale(std.copy())
         # print("stl")
         #length = scale(length.copy())
@@ -155,13 +156,13 @@ model = Sequential()
 model.add(Conv1D(filters=16, kernel_size=5, padding='same',
                  activation='relu', input_shape=(200, 1)))
 model.add(MaxPooling1D(pool_size=2))
-model.add(Conv1D(filters=32, kernel_size=5, padding='same',
-                 activation='relu'))
-model.add(MaxPooling1D(pool_size=2))
-model.add(Conv1D(filters=64, kernel_size=5, padding='same',
-                 activation='relu'))
-model.add(MaxPooling1D(pool_size=2))
-model.add(LSTM(10))
+# model.add(Conv1D(filters=32, kernel_size=5, padding='same',
+#                 activation='relu'))
+# model.add(MaxPooling1D(pool_size=2))
+# model.add(Conv1D(filters=64, kernel_size=5, padding='same',
+#                 activation='relu'))
+# model.add(MaxPooling1D(pool_size=2))
+model.add(LSTM(100))
 model.add(Dense(1, activation='linear'))
 model.compile(loss='mse', optimizer='adam')  # , metrics=['accuracy'])
 # model.load_weights("saved-weights.17-0.04.hdf5")
