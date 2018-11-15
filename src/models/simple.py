@@ -100,11 +100,17 @@ def transform_reads(X, y, lenv=200):
 
             return x
 
-        mean = scale(mean.copy())
+        #mean = scale(mean.copy())
+        mean -= np.percentile(mean, 50)
+        delta = mean[1:] - mean[:-1]
+        rmuninf = (delta > -15) & (delta < 15)
+        mean = delta[~rmuninf]
         #std = scale(std.copy())
         # print("stl")
         #length = scale(length.copy())
         # print("el")
+        if len(mean) < lenv:
+            continue
         V = np.array([mean]).T
         # print(V.shape,yi.shape)
 
