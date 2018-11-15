@@ -146,10 +146,16 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200, shuffle=True):
 
 model = Sequential()
 # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
-model.add(Conv1D(filters=32, kernel_size=3, padding='same',
-                 activation='relu', input_shape=(400, 1)))
+model.add(Conv1D(filters=16, kernel_size=5, padding='same',
+                 activation='relu', input_shape=(200, 1)))
 model.add(MaxPooling1D(pool_size=2))
-model.add(LSTM(100))
+model.add(Conv1D(filters=32, kernel_size=5, padding='same',
+                 activation='relu'))
+model.add(MaxPooling1D(pool_size=2))
+model.add(Conv1D(filters=64, kernel_size=5, padding='same',
+                 activation='relu'))
+model.add(MaxPooling1D(pool_size=2))
+model.add(LSTM(10))
 model.add(Dense(1, activation='linear'))
 model.compile(loss='mse', optimizer='adam')  # , metrics=['accuracy'])
 # model.load_weights("saved-weights.17-0.04.hdf5")
@@ -172,8 +178,8 @@ for val in indep_val:
 
 print(train_test)
 print(indep_val)
-_, X_train, _, y_train = load_data_complete(train_test, root=root, per_dataset=400, lenv=400)
-_, X_val, _, y_val = load_data_complete(indep_val, root=root, per_dataset=40, lenv=400)
+_, X_train, _, y_train = load_data_complete(train_test, root=root, per_dataset=100, lenv=200)
+_, X_val, _, y_val = load_data_complete(indep_val, root=root, per_dataset=40, lenv=200)
 
 print(X_train.shape, y_train.shape)
 X_val = X_val[:64 * len(X_val) // 64]
