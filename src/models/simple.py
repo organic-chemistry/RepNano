@@ -198,8 +198,9 @@ print(X_train.shape, y_train.shape)
 X_val = X_val[:64 * len(X_val) // 64]
 y_val = y_val[:64 * len(y_val) // 64]
 
+#, validation_data=(X_val, y_val[::, 0], y_val[::, 1])
 model.fit(X_train, y_train[::, 0], epochs=100, batch_size=64,
-          sample_weight=y_train[::, 1], validation_data=(X_val, y_val[::, 0], y_val[::, 1]), callbacks=[checkpointer, es])
+          sample_weight=y_train[::, 1], validation_split=0.1, callbacks=[checkpointer, es])
 # Final evaluation of the model
 scores = model.evaluate(X_val, y_val[::, 0], verbose=0)
 print("Accuracy: %.2f%%" % (scores))
