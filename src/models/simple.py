@@ -82,7 +82,7 @@ def load_events(X, y, min_length=1000):
             # print(y[ifi])
             Xt.append(events)
         else:
-            Xt.append{"mean": filename}
+            Xt.append({"mean": filename})
         yt.append(y[ifi])
         indexes.append(ifi)
     return Xt, yt
