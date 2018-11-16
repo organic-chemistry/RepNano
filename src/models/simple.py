@@ -197,8 +197,13 @@ files = ['/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T-yeast.csv'
          '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-40-yeast.csv',
          '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B1-yeast.csv',
          '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-27-human.csv']
+
+
 indep_val = ["/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-9-yeast.csv",
              "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B1-yeast.csv"]
+
+files = ["./notebooks/exploratory/test.csv"]
+indep_val = files
 train_test = files
 for val in indep_val:
     train_test.remove(val)
