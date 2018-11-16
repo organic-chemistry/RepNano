@@ -20,7 +20,7 @@ def load_data(lfiles, value="init_B", root=".", per_dataset=None):
     y = []
     for file in lfiles:
         d = pd.read_csv(file)
-        print(d)
+        print(file, d)
         if "mean" in d.columns:
             def get_list(slist):
                 slist = slist[2:-2]
