@@ -25,6 +25,7 @@ def load_data(lfiles, value="init_B", root=".", per_dataset=None):
                 slist = slist[2:-2]
                 slist = slist.split(", ")
                 slist = [float(si) for si in slist]
+                print(slist)
                 return slist
             X1 = [get_list(f) for f in d["mean"]]
         else:
