@@ -153,7 +153,7 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200, shuffle=True):
 
 model = Sequential()
 # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
-model.add(Conv1D(filters=16, kernel_size=5, padding='same',
+model.add(Conv1D(filters=16, kernel_size=3, padding='same',
                  activation='relu', input_shape=(200, 1)))
 model.add(MaxPooling1D(pool_size=2))
 # model.add(Conv1D(filters=32, kernel_size=5, padding='same',
@@ -165,7 +165,7 @@ model.add(MaxPooling1D(pool_size=2))
 model.add(LSTM(100))
 model.add(Dense(1, activation='linear'))
 model.compile(loss='mse', optimizer='adam')  # , metrics=['accuracy'])
-# model.load_weights("saved-weights.17-0.04.hdf5")
+model.load_weights("saved-weights.17-0.04.hdf5")
 checkpointer = ModelCheckpoint(
     filepath='./weights.{epoch:02d}-{val_loss:.2f}.hdf5', verbose=1, save_best_only=True)
 es = EarlyStopping(patience=10)
