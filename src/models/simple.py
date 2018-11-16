@@ -20,13 +20,13 @@ def load_data(lfiles, value="init_B", root=".", per_dataset=None):
     y = []
     for file in lfiles:
         d = pd.read_csv(file)
-        print(file, d)
+        #print(file, d)
         if "mean" in d.columns:
             def get_list(slist):
                 slist = slist[2:-2]
                 slist = slist.split(", ")
                 slist = [float(si) for si in slist]
-                print(slist)
+                # print(slist)
                 return slist
             X1 = [get_list(f) for f in d["mean"]]
         else:
