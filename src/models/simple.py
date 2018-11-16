@@ -177,13 +177,14 @@ root = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw"
 files = glob.glob(root + "/*.csv")
 #['/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T-yeast.csv',
 
-files = ['/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-yeast.csv',
+files = ['/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T-yeast.csv',
+         '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-yeast.csv',
          '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T1-yeast.csv',
          '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-69-yeast.csv',
          '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-9-yeast.csv',
          '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-40-yeast.csv',
-         '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B1-yeast.csv']
-#     '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-27-human.csv']
+         '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B1-yeast.csv',
+         '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-27-human.csv']
 indep_val = ["/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-9-yeast.csv",
              "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B1-yeast.csv"]
 train_test = files
