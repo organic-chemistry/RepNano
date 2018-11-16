@@ -20,7 +20,16 @@ def load_data(lfiles, value="init_B", root=".", per_dataset=None):
     y = []
     for file in lfiles:
         d = pd.read_csv(file)
-        X1 = [root + "/" + f for f in d["filename"]]
+        if "mean" in d.columns:
+            def get_list(slist):
+                slist = slist[2:-2]
+                slist = slist.split(", ")
+                slist = [float(si) for si in slist]
+                return slist
+            X1 = [get_list(f) for f in d["mean"]]
+        else:
+            X1 = [root + "/" + f for f in d["filename"]]
+
         if "savedweights.13-0.05.hdf5" in d.columns:
             print("loading from savedweights.17-0.04.hdf5")
             y1 = d["savedweights.17-0.04.hdf5"]
@@ -62,15 +71,18 @@ def load_events(X, y, min_length=1000):
     yt = []
     for ifi, filename in enumerate(X):
         # print(filename)
-        h5 = h5py.File(filename, "r")
-        events = get_events(h5, already_detected=False,
-                            chemistry="rf", window_size=np.random.randint(5, 8), old=False, verbose=False, about_max_len=None)
-        events = events[1:-1]
+        if type(filename) == str:
+            h5 = h5py.File(filename, "r")
+            events = get_events(h5, already_detected=False,
+                                chemistry="rf", window_size=np.random.randint(5, 8), old=False, verbose=False, about_max_len=None)
+            events = events[1:-1]
 
-        if min_length is not None and len(events) < min_length:
-            continue
-        # print(y[ifi])
-        Xt.append(events)
+            if min_length is not None and len(events) < min_length:
+                continue
+            # print(y[ifi])
+            Xt.append(events)
+        else:
+            Xt.append{"mean": filename}
         yt.append(y[ifi])
         indexes.append(ifi)
     return Xt, yt
@@ -83,7 +95,7 @@ def transform_reads(X, y, lenv=200):
     # print(y)
     for events, yi in zip(X, y):
         mean = events["mean"]
-        std = events["stdv"]
+        #std = events["stdv"]
         #length = events["length"]
 
         def scale(x):
@@ -167,7 +179,7 @@ model.add(Dense(1, activation='linear'))
 model.compile(loss='mse', optimizer='adam')  # , metrics=['accuracy'])
 model.load_weights("saved-weights.17-0.04.hdf5")
 checkpointer = ModelCheckpoint(
-    filepath='./weights.{epoch:02d}-{val_loss:.2f}.hdf5', verbose=1, save_best_only=True)
+    filepath='./newb/weights.{epoch:02d}-{val_loss:.2f}.hdf5', verbose=1, save_best_only=True)
 es = EarlyStopping(patience=10)
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,
                               patience=5, min_lr=0.0001)
