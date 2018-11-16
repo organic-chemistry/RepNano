@@ -39,7 +39,7 @@ def load_data(lfiles, value="init_B", root=".", per_dataset=None):
             y1 = d[value]
         print(np.mean(y1), np.std(y1))
         yw = d["init_w"]
-
+        print("Weight", np.mean(yw))
         y1 = [[iy1, iyw] for iy1, iyw in zip(y1, yw)]
         if per_dataset is None:
             X.extend(X1)
