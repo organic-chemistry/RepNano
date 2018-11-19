@@ -170,7 +170,7 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200, shuffle=True):
     y_t = np.concatenate(y_t, axis=0)
 
     if shuffle:
-        X_t, y_t = unison_shuffled_copies(X_t, y_)
+        X_t, y_t = unison_shuffled_copies(X_t, y_t)
     return  X_t,  y_t
 
 # fix random seed for reproducibility
