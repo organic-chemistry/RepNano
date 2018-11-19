@@ -31,17 +31,14 @@ def add_segment(filename,ws):
     return 0
 
 
-    with Pool(n_cpu) as p:
-        res = p.map(load_from_bc, D.strands)
 
-
-files = glob.glob(args.root)
+files = glob.glob(args.root+"/*.fast5")
 
 def Add_segment(filename):
     return add_segment(filename,ws=args.ws)
 
 
-with Pool(n_cpu) as p:
-    res = p.map(load_from_bc, files)
+with Pool(args.n_cpu) as p:
+    res = p.map(Add_segment, files)
 
 print(np.mean(res))
