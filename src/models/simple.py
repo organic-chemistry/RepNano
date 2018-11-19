@@ -154,9 +154,9 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200, shuffle=True):
         ws=5
         if "T-yeast" in data:
             ws=8
-        X, y = load_data(dataset, root=root, per_dataset=per_dataset,ws=ws)  # X filename,y B amount
+        X, y = load_data(dataset, root=root, per_dataset=per_dataset)  # X filename,y B amount
         # X events y B amount  filtered for length < 10000
-        Xp, yp = load_events(X, y, min_length=None)
+        Xp, yp = load_events(X, y, min_length=None,ws=ws)
         assert(len(Xp) == len(yp))
 
         Xpp, ypp = transform_reads(Xp, np.array(yp), lenv=lenv)
