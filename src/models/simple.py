@@ -254,8 +254,8 @@ train_test = files
 
 print(train_test)
 print(indep_val)
-_, X_train, _, y_train = load_data_complete(train_test, root=root, per_dataset=400, lenv=200)
-_, X_val, _, y_val = load_data_complete(indep_val, root=root, per_dataset=40, lenv=200)
+X_train, y_train = load_data_complete(train_test, root=root, per_dataset=400, lenv=200)
+X_val, y_val = load_data_complete(indep_val, root=root, per_dataset=40, lenv=200)
 
 print(X_train.shape, y_train.shape)
 X_val = X_val[:64 * len(X_val) // 64]
