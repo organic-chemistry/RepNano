@@ -204,7 +204,7 @@ model.add(MaxPooling1D(pool_size=2))
 model.add(LSTM(100))
 model.add(Dense(1, activation='linear'))
 model.compile(loss='mse', optimizer='adam')  # , metrics=['accuracy'])
-model.load_weights("saved-weights.17-0.04.hdf5")
+model.load_weights("saved_weights_ratio.05-0.03.hdf5")
 checkpointer = ModelCheckpoint(
     filepath=args.root+'/weights.{epoch:02d}-{val_loss:.2f}.hdf5', verbose=1, save_best_only=True)
 es = EarlyStopping(patience=10)
@@ -231,18 +231,19 @@ indep_val = ["/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-9-yeas
 indep_val = files
 train_test = files
 per_dataset=400
-
+"""
 for val in indep_val:
     train_test.remove(val)
 files = ["/home/jarbona/deepnano5bases/notebooks/exploratory/test.csv"]
 indep_val = files
 train_test = files
-per_dataset=None
 
+per_dataset=None
+"""
 print(train_test)
 print(indep_val)
-X_train, y_train = load_data_complete(train_test, root=root, per_dataset=None, lenv=200)
-X_val, y_val = load_data_complete(indep_val, root=root, per_dataset=40, lenv=200)
+X_train, y_train = load_data_complete(train_test, root=root, per_dataset=2000, lenv=200)
+X_val, y_val = load_data_complete(indep_val, root=root, per_dataset=50, lenv=200)
 
 print(X_train.shape, y_train.shape)
 X_val = X_val[:64 * len(X_val) // 64]
