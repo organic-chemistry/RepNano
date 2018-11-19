@@ -45,6 +45,20 @@ def find2(event,maxi=1000,safe=10):
 
     return min(np.argmax(d2[safe:]>30)+safe,len(m)-1),min(len(d2)-np.argmax(d2[::-1]>30)+safe,len(m)-1)
 
+def scale_ratio(x):
+    x -= np.percentile(x, 25)
+    #scale = np.percentile(x, 75) - np.percentile(x, 25)
+    # print(scale,np.percentile(x, 75) , np.percentile(x, 25))
+    #x /= scale
+    x /= 20
+    if np.sum(x > 10) > len(x) * 0.05:
+        print("Warning lotl of rare events")
+        print(np.sum(x > 10 * scale), len(x))
+    x[x > 5] = 0
+    x[x < -5] = 0
+
+    return x
+
 def get_raw(h5):
     # print(h5["Raw/Reads"].keys())
     rk = list(h5["Raw/Reads"].keys())[0]

@@ -352,7 +352,7 @@ def build_models(size=20, nbase=1, trainable=True, ctc_length=40, ctc=True,
 
 
 import h5py
-from keras.engine.topology import preprocess_weights_for_loading
+#from keras.engine.topology import preprocess_weights_for_loading
 
 
 def load_weights_from_hdf5_group_what_you_can(filepath, layers, extra=True):

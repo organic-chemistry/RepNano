@@ -3,8 +3,13 @@ import argparse
 import os
 import numpy as np
 from .model import build_models
-from ..features.extract_events import extract_events, scale, scale_clean
+from ..features.extract_events import extract_events, scale, scale_clean,scale_ratio,find2
 from ..features.helpers import scale_clean_two
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.layers import LSTM
+from keras.layers.convolutional import Conv1D
+from keras.layers.convolutional import MaxPooling1D
 
 
 def get_events(h5, already_detected=True, chemistry="r9.5", window_size=None, old=True):
@@ -23,7 +28,7 @@ def get_events(h5, already_detected=True, chemistry="r9.5", window_size=None, ol
         return extract_events(h5, chemistry, window_size, old=old)
 
 
-def basecall_one_file(filename, output_file, ntwk, alph, already_detected,
+def basecall_one_file(filename, output_file,output_file2, ntwk,ntwk2, alph, already_detected,
                       n_input=1, filter_size=None, chemistry="r9.5", window_size=None, clean=False, old=True, cut=None, thres=0.5):
     # try:
     assert(os.path.exists(filename)), "File %s does no exists" % filename
@@ -40,7 +45,14 @@ def basecall_one_file(filename, output_file, ntwk, alph, already_detected,
         return 0
 
     # print(len(events))
+
     events = events[1:-1]
+
+    v = find2(events)
+    first_event,last_event = v
+    #print(first_event)
+    events = events[first_event:last_event]
+
     mean = events["mean"]
     std = events["stdv"]
     length = events["length"]
@@ -51,36 +63,68 @@ def basecall_one_file(filename, output_file, ntwk, alph, already_detected,
     else:
         X = scale(np.array(np.vstack([mean, mean * mean, std, length]).T, dtype=np.float32))
     # return
+    X2 = scale_ratio(mean.copy())
+    X2 = np.array([X2]).T
+
+
+    print(np.mean(X[:, 0]))
+
     if cut is None:
-        print(X.shape)
-        if n_input == 2:
-            X = []
-            for m, s, l in zip(mean, std, length):
-                X.append([m, m * m, s, l])
-                X.append([m, m * m, s, l])
-            X = scale(np.array(X))
 
-        # print(np.mean(X[:, 0]))
+        try:
+            o1 = ntwk.predict(np.array(X)[np.newaxis, ::, ::])
+            o1 = o1[0]
 
-        p = ntwk.predict(X[np.newaxis, ::, ::])
-        # print(p[0, 50:60])
-        # print(X[50:60])
-        # print(np.max(p[0, ::, :5]))
-        if len(p) == 2:
-            o1, o2 = p
-            o1m = (np.argmax(o1[0], -1))
-            o2m = (np.argmax(o2[0], -1))
-            om = np.vstack((o1m, o2m)).reshape((-1,), order='F')
-            print("len", len(om))
-        else:
-            o1 = p[0]
-            om = np.argmax(o1, axis=-1)
-            """
-            rBT = o1[::, 4] / o1[::, 3]
-            d = 20
-            r = (1 / d < rBT) & (rBT < d) & ((om == 3) | (om == 4))
+        except:
+            o1, o2 = ntwk.predict(X)
 
-            om[r] = 6"""
+
+        icut=200
+
+        lc = icut * (len(X2) // icut)
+
+
+        X2 = X2[:lc]
+        # print(X.shape)
+
+        X2 = np.array(X2).reshape(-1, icut, X2.shape[-1])
+
+        ntw2p = ntwk2.predict(X2)
+
+        res = np.ones_like(X2) * ntw2p[::,np.newaxis]
+        res = res.flatten()
+
+        o1 = o1[:lc]
+
+        # print(o1[:20])
+
+        om = np.argmax(o1, axis=-1)
+        print("T", np.sum(om == 3), "B", np.sum(om == 4), "B/T+B",
+              (np.sum(om == 4) / (np.sum(om == 3) + np.sum(om == 4))))
+        # print(o2[:20])
+        # exit()
+        print(res.shape,np.array(om!=5).shape)
+        res2 = res[om!=5]
+
+
+        output = "".join(map(lambda x: alph[x], om)).replace("N", "")
+        assert len(output) == len(res2)
+
+        print(om.shape, len(output), len(output) / om.shape[0])
+
+        output_file.writelines(">%s_template_deepnano\n" % filename)
+        output_file.writelines(output + "\n")
+
+        output_file2.writelines(">%s_template_deepnano\n" % filename)
+        output_file2.writelines(" ".join(["%.2f" % ires2 for ires2 in res2 ])+"\n")
+
+        h5.close()
+        return len(events)
+        # except Exception as e:
+        print("Read %s failed with %s" % (filename, e))
+        return 0
+
+
     else:
         if len(X) > cut:
             lc = cut * (len(X) // cut)
@@ -130,8 +174,26 @@ def basecall_one_file(filename, output_file, ntwk, alph, already_detected,
     print("Read %s failed with %s" % (filename, e))
     return 0
 
+def load_model2(weight):
+    model = Sequential()
+    # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
+    model.add(Conv1D(filters=32, kernel_size=3, padding='same',
+                     activation='relu', input_shape=(200, 1)))
+    model.add(MaxPooling1D(pool_size=2))
+    # model.add(Conv1D(filters=32, kernel_size=5, padding='same',
+    #                 activation='relu'))
+    # model.add(MaxPooling1D(pool_size=2))
+    # model.add(Conv1D(filters=64, kernel_size=5, padding='same',
+    #                 activation='relu'))
+    # model.add(MaxPooling1D(pool_size=2))
+    model.add(LSTM(100))
+    model.add(Dense(1, activation='linear'))
+    assert(os.path.exists(weight)), "Weights %s does not exist" % weight
+    #model.compile(loss='mse', optimizer='adam')  # , metrics=['accuracy'])
+    model.load_weights(weight)
+    return model
 
-def process(weights, Nbases, output, directory, reads=[], filter="",
+def process(weights,weights1, Nbases, output, directory, reads=[], filter="",
             already_detected=True, Nmax=None, size=20, n_output_network=1, n_input=1, filter_size=None,
             chemistry="r9.5", window_size=None, clean=False, old=True, res=False, attention=False, cut=None, thres=0.5):
     assert len(reads) != 0 or len(directory) != 0, "Nothing to basecall"
@@ -154,6 +216,8 @@ def process(weights, Nbases, output, directory, reads=[], filter="",
     ntwk.load_weights(weights)
     print("loaded")
 
+    ntwk2 = load_model2(weights1)
+
     Files = []
     if filter != "" and filter is not None:
         assert(os.path.exists(filter)), "Filter %s does not exist" % filter
@@ -168,6 +232,7 @@ def process(weights, Nbases, output, directory, reads=[], filter="",
         print("Writing on %s" % output)
 
         fo = open(output, "w")
+        fo1 = open(output+"_ratio", "w")
 
         files = reads
         if reads == "":
@@ -193,7 +258,7 @@ def process(weights, Nbases, output, directory, reads=[], filter="",
                 if os.path.split(read)[1] not in Files:
                     continue
             print("Processing read %s" % read)
-            basecall_one_file(read, fo, ntwk, alph, already_detected,
+            basecall_one_file(read, fo,fo1, ntwk,ntwk2, alph, already_detected,
                               n_input=n_input, filter_size=filter_size,
                               chemistry=chemistry, window_size=window_size, clean=clean, old=old, cut=cut, thres=thres)
 
@@ -204,6 +269,8 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--weights", default="None")
+    parser.add_argument("--weights1", default="None")
+
     parser.add_argument('--Nbases', type=int, choices=[4, 5, 8], default=4)
     parser.add_argument('--output', type=str, default="output.fasta")
     parser.add_argument('--directory', type=str, default='',
@@ -226,7 +293,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     # exit()
-    process(weights=args.weights, Nbases=args.Nbases, output=args.output,
+    process(weights=args.weights,weights1=args.weights1, Nbases=args.Nbases, output=args.output,
             directory=args.directory, reads=args.reads, filter=args.filter,
             already_detected=args.already_detected, filter_size=args.filter_size, size=args.size,
             chemistry=args.chemistry, window_size=args.window_size,
