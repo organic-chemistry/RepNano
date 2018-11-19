@@ -19,7 +19,7 @@ def add_segment(filename,ws):
     h5 = h5py.File(filename, "a")
     try:
         events = get_events(h5, already_detected=False,
-                            chemistry="rf", window_size=ws, old=False,verbose=False,about_max_len=about_max_len)
+                            chemistry="rf", window_size=wsi, old=False,verbose=False,about_max_len=about_max_len)
     except:
         return 1
 
@@ -34,10 +34,11 @@ def add_segment(filename,ws):
 
 files = glob.glob(args.root+"/*.fast5")
 
+
 def Add_segment(filename):
     return add_segment(filename,ws=args.ws)
 
-
+Add_segment(files[0])
 with Pool(args.n_cpu) as p:
     res = p.map(Add_segment, files)
 
