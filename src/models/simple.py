@@ -68,7 +68,7 @@ def get_events(h5, already_detected=True, chemistry="r9.5", window_size=None,
         return extract_events(h5, chemistry, window_size, old=old, verbose=verbose, about_max_len=about_max_len)
 
 
-def load_events(X, y, min_length=1000):
+def load_events(X, y, min_length=1000,ws=5):
     Xt = []
     indexes = []
     yt = []
@@ -77,7 +77,7 @@ def load_events(X, y, min_length=1000):
         if type(filename) == str:
             h5 = h5py.File(filename, "r")
             events = get_events(h5, already_detected=False,
-                                chemistry="rf", window_size=np.random.randint(5, 8), old=False, verbose=False, about_max_len=None)
+                                chemistry="rf", window_size=np.random.randint(ws, ws+3), old=False, verbose=False, about_max_len=None)
             events = events[1:-1]
 
             if min_length is not None and len(events) < min_length:
@@ -148,18 +148,30 @@ def unison_shuffled_copies(a, b):
 
 
 def load_data_complete(dataset, root, per_dataset=None, lenv=200, shuffle=True):
-    X, y = load_data(dataset, root=root, per_dataset=per_dataset)  # X filename,y B amount
-    # X events y B amount  filtered for length < 10000
-    Xp, yp = load_events(X, y, min_length=None)
-    assert(len(Xp) == len(yp))
 
-    Xpp, ypp = transform_reads(Xp, np.array(yp), lenv=lenv)
-    Xpp = np.concatenate(Xpp, axis=0)
-    ypp = np.concatenate(ypp, axis=0)
+    X_t,y_t=[],[]
+    for data in dataset:
+        ws=5
+        if "T-yeast" in data:
+            ws=8
+        X, y = load_data(dataset, root=root, per_dataset=per_dataset,ws=ws)  # X filename,y B amount
+        # X events y B amount  filtered for length < 10000
+        Xp, yp = load_events(X, y, min_length=None)
+        assert(len(Xp) == len(yp))
+
+        Xpp, ypp = transform_reads(Xp, np.array(yp), lenv=lenv)
+        Xpp = np.concatenate(Xpp, axis=0)
+        ypp = np.concatenate(ypp, axis=0)
+
+        X_t.append(Xpp)
+        y_t.append(ypp)
+
+    X_t = np.concatenate(X_t, axis=0)
+    y_t = np.concatenate(y_t, axis=0)
 
     if shuffle:
-        Xpp, ypp = unison_shuffled_copies(Xpp, ypp)
-    return Xp, Xpp, yp, ypp
+        X_t, y_t = unison_shuffled_copies(X_t, y_)
+    return  X_t,  y_t
 
 # fix random seed for reproducibility
 # load the dataset but only keep the top n words, zero the rest
@@ -207,13 +219,14 @@ indep_val = ["/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-9-yeas
 indep_val = files
 train_test = files
 
+"""
 for val in indep_val:
     train_test.remove(val)
 files = ["/home/jarbona/deepnano5bases/notebooks/exploratory/test.csv"]
 indep_val = files
 train_test = files
 
-
+"""
 print(train_test)
 print(indep_val)
 _, X_train, _, y_train = load_data_complete(train_test, root=root, per_dataset=400, lenv=200)
