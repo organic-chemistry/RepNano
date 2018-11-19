@@ -63,10 +63,10 @@ files = glob.glob(args.root+"/*.fast5")
 
 
 def Add_segment(filename):
-    try:
-        return add_segment(filename,ws=args.ws)
-    except:
-        return 1
+    #try:
+    return add_segment(filename,ws=args.ws)
+    #except:
+    #    return 1
 
 #Add_segment(files[0])
 with Pool(args.n_cpu) as p:
