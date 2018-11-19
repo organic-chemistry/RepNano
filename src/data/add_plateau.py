@@ -47,8 +47,8 @@ def add_segment(filename,ws):
         Segmentation.create_dataset(name="window_size",data=wsi,dtype="int")
     except:
         Segmentation = h5["/Segmentation_Rep"]
-        Segmentation["events"] = events
-        Segmentation["window_size"] = wsi
+        Segmentation["events"][...] = events
+        Segmentation["window_size"][...] = wsi
 
 
     h5.close()
