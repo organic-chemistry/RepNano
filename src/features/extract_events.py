@@ -39,6 +39,12 @@ defs = {
 }
 
 
+def find2(event,maxi=1000,safe=10):
+    m = event["mean"]
+    d2 = np.sqrt((m[1:]-m[:-1])**2)
+
+    return min(np.argmax(d2[safe:]>30)+safe,len(m)-1),min(len(d2)-np.argmax(d2[::-1]>30)+safe,len(m)-1)
+
 def get_raw(h5):
     # print(h5["Raw/Reads"].keys())
     rk = list(h5["Raw/Reads"].keys())[0]

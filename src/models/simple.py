@@ -178,6 +178,30 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200, shuffle=True):
 #(X_train, y_train), (X_test, y_test) = imdb.load_data(num_words=top_words)
 
 
+import argparse
+import json
+from git import Repo
+import tensorflow as tf
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--root', type=str, default="data/training/")
+
+args = parser.parse_args()
+
+argparse_dict = vars(args)
+
+# sess = tf.Session(config=tf.ConfigProto(
+#        intra_op_parallelism_threads=args.num_threads))
+
+repo = Repo("./")
+argparse_dict["commit"] = str(repo.head.commit)
+
+os.makedirs(args.root, exist_ok=True)
+
+with open(args.root + '/params.json', 'w') as fp:
+    json.dump(argparse_dict, fp, indent=True)
+
+
 model = Sequential()
 # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
 model.add(Conv1D(filters=32, kernel_size=3, padding='same',
@@ -194,7 +218,7 @@ model.add(Dense(1, activation='linear'))
 model.compile(loss='mse', optimizer='adam')  # , metrics=['accuracy'])
 model.load_weights("saved-weights.17-0.04.hdf5")
 checkpointer = ModelCheckpoint(
-    filepath='./newb/weights.{epoch:02d}-{val_loss:.2f}.hdf5', verbose=1, save_best_only=True)
+    filepath=args.root+'/weights.{epoch:02d}-{val_loss:.2f}.hdf5', verbose=1, save_best_only=True)
 es = EarlyStopping(patience=10)
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,
                               patience=5, min_lr=0.0001)
