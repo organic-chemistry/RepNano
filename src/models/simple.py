@@ -37,11 +37,11 @@ def load_data(lfiles, value="init_B", root=".", per_dataset=None):
             y1 = d["savedweights.17-0.04.hdf5"]
         else:
             y1 = d[value]
-        print(np.mean(y1), np.std(y1),len(y1),len(X1))
+        #print(np.mean(y1), np.std(y1),len(y1),len(X1))
         yw = d["init_w"]
-        print("Weight", np.mean(yw),len(yw))
+        #print("Weight", np.mean(yw),len(yw))
         y1 = [[iy1, iyw] for iy1, iyw in zip(y1, yw)]
-        print(len(y1))
+        #print(len(y1))
         if per_dataset is None:
             X.extend(X1)
             y.extend(y1)
@@ -49,7 +49,7 @@ def load_data(lfiles, value="init_B", root=".", per_dataset=None):
             X.extend(X1[:per_dataset])
             y.extend(y1[:per_dataset])
     assert (len(X) == len(y))
-    print(y)
+    #print(y)
     return X, y
 
 
@@ -245,18 +245,18 @@ indep_val = ["/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-9-yeas
              "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B1-yeast.csv"]
 indep_val = files
 train_test = files
-
+per_dataset=400
 
 for val in indep_val:
     train_test.remove(val)
 files = ["/home/jarbona/deepnano5bases/notebooks/exploratory/test.csv"]
 indep_val = files
 train_test = files
-
+per_dataset=None
 
 print(train_test)
 print(indep_val)
-X_train, y_train = load_data_complete(train_test, root=root, per_dataset=400, lenv=200)
+X_train, y_train = load_data_complete(train_test, root=root, per_dataset=None, lenv=200)
 X_val, y_val = load_data_complete(indep_val, root=root, per_dataset=40, lenv=200)
 
 print(X_train.shape, y_train.shape)
