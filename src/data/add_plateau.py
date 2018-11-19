@@ -41,8 +41,10 @@ def add_segment(filename,ws):
                             old=False,verbose=False,about_max_len=None)
     except:
         return 1
-
-    Segmentation = h5.create_group('/Segmentation_Rep')
+    try:
+        Segmentation = h5.create_group('/Segmentation_Rep')
+    except:
+        pass
     Segmentation.create_dataset(name='events', data=events)
     Segmentation.create_dataset(name="window_size",data=ws,dtype="int")
     h5.close()
