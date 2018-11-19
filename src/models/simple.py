@@ -11,7 +11,7 @@ import pandas as pd
 import numpy as np
 
 
-from ..features.extract_events import extract_events
+from ..features.extract_events import extract_events,get_events
 from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 
 
@@ -53,21 +53,6 @@ def load_data(lfiles, value="init_B", root=".", per_dataset=None):
     return X, y
 
 
-def get_events(h5, already_detected=True, chemistry="r9.5", window_size=None,
-               old=True, verbose=True, about_max_len=None):
-    if already_detected:
-        try:
-            e = h5["Analyses/Basecall_RNN_1D_000/BaseCalled_template/Events"]
-            return e
-        except:
-            pass
-        try:
-            e = h5["Analyses/Basecall_1D_000/BaseCalled_template/Events"]
-            return e
-        except:
-            pass
-    else:
-        return extract_events(h5, chemistry, window_size, old=old, verbose=verbose, about_max_len=about_max_len)
 
 
 def load_events(X, y, min_length=1000,ws=5):
