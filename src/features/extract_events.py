@@ -55,7 +55,7 @@ def get_events(h5, already_detected=True, chemistry="r9.5", window_size=None,
         try:
             return h5["Segmentation_Rep/events"]
         except:
-            print("la")
+            #print("la")
             return extract_events(h5, chemistry, window_size, old=old,verbose=verbose,about_max_len=about_max_len)
 
 def find2(event,maxi=1000,safe=10):
