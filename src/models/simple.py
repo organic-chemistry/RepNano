@@ -41,6 +41,7 @@ def load_data(lfiles, value="init_B", root=".", per_dataset=None):
         yw = d["init_w"]
         print("Weight", np.mean(yw))
         y1 = [[iy1, iyw] for iy1, iyw in zip(y1, yw)]
+
         if per_dataset is None:
             X.extend(X1)
             y.extend(y1)
@@ -48,6 +49,7 @@ def load_data(lfiles, value="init_B", root=".", per_dataset=None):
             X.extend(X1[:per_dataset])
             y.extend(y1[:per_dataset])
     assert (len(X) == len(y))
+    print(y)
     return X, y
 
 
