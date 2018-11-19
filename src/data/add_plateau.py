@@ -4,6 +4,8 @@ from multiprocessing import Pool
 import argparse
 import numpy as np
 
+parser = argparse.ArgumentParser()
+
 parser.add_argument('--root', type=str, default="data/training/")
 parser.add_argument("--n-cpu", dest="n_cpu", type=int, default=None)
 parser.add_argument("--ws", dest="ws", type=int, default=5)
