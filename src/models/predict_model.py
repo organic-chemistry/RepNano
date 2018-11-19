@@ -46,13 +46,13 @@ def basecall_one_file(filename, output_file,output_file2, ntwk,ntwk2, alph, alre
 
     # print(len(events))
 
-    events = events[1:-1]
-
+    #events = events[1:-1]
+    """
     v = find2(events)
     first_event,last_event = v
     #print(first_event)
     events = events[first_event:last_event]
-
+    """
     mean = events["mean"]
     std = events["stdv"]
     length = events["length"]
@@ -119,9 +119,9 @@ def basecall_one_file(filename, output_file,output_file2, ntwk,ntwk2, alph, alre
         output_file2.writelines(" ".join(["%.2f" % ires2 for ires2 in res2 ])+"\n")
 
         h5.close()
-        return len(events)
+        #return len(events)
         # except Exception as e:
-        print("Read %s failed with %s" % (filename, e))
+        #print("Read %s failed with %s" % (filename, e))
         return 0
 
 
