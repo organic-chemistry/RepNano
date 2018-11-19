@@ -16,10 +16,12 @@ args = parser.parse_args()
 def add_segment(filename,ws):
 
     wsi = np.random.randint(ws,ws+3)
+    
     h5 = h5py.File(filename, "a")
     try:
         events = get_events(h5, already_detected=False,
-                            chemistry="rf", window_size=wsi, old=False,verbose=False,about_max_len=about_max_len)
+                            chemistry="rf", window_size=wsi,
+                            old=False,verbose=False,about_max_len=None)
     except:
         return 1
 
@@ -38,7 +40,7 @@ files = glob.glob(args.root+"/*.fast5")
 def Add_segment(filename):
     return add_segment(filename,ws=args.ws)
 
-Add_segment(files[0])
+#Add_segment(files[0])
 with Pool(args.n_cpu) as p:
     res = p.map(Add_segment, files)
 
