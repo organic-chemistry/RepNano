@@ -219,7 +219,7 @@ else:
                      activation='relu'))
     model.add(MaxPooling1D(pool_size=4)) #16
     model.add(Conv1D(filters=64, kernel_size=3, padding='same',
-    #                 activation='relu'))
+                     activation='relu'))
     model.add(MaxPooling1D(pool_size=4))
 
     model.add(Flatten())
