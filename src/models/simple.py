@@ -32,9 +32,9 @@ def load_data(lfiles, value="init_B", root=".", per_dataset=None):
         else:
             X1 = [root + "/" + f for f in d["filename"]]
 
-        if "savedweights.13-0.05.hdf5" in d.columns:
-            print("loading from savedweights.17-0.04.hdf5")
-            y1 = d["savedweights.17-0.04.hdf5"]
+        if "saved_weights_ratio.05-0.03" in d.columns:
+            print("loading from saved_weights_ratio.05-0.03.hdf5")
+            y1 = d["saved_weights_ratio.05-0.03"]
         else:
             y1 = d[value]
         #print(np.mean(y1), np.std(y1),len(y1),len(X1))
@@ -70,7 +70,8 @@ def load_events(X, y, min_length=1000,ws=5):
             if min_length is not None and len(events) < min_length:
                 continue
             # print(y[ifi])
-            Xt.append(events)
+            Xt.append({"mean":events["mean"]})
+            h5.close()
         else:
             Xt.append({"mean": filename})
         yt.append(y[ifi])
@@ -138,6 +139,7 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200, shuffle=True):
 
     X_t,y_t=[],[]
     for data in dataset:
+        print("Loading",data)
         ws=5
         if "T-yeast" in data:
             ws=8
