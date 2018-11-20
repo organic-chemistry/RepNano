@@ -176,6 +176,7 @@ import tensorflow as tf
 parser = argparse.ArgumentParser()
 parser.add_argument('--root', type=str, default="data/training/")
 parser.add_argument('--cnv', dest="lstm",type=bool, action="store_false")
+parser.add_argument('--per-dataset', dest="per_dataset",type=int, default="400")
 
 args = parser.parse_args()
 
@@ -265,11 +266,9 @@ print(indep_val)
 
 if args.lstm:
     lenv=200
-    per_dataset=2000
 else:
     lenv=256
-    per_dataset=400
-X_train, y_train = load_data_complete(train_test, root=root, per_dataset=2000, lenv=lenv)
+X_train, y_train = load_data_complete(train_test, root=root, per_dataset=args.per_dataset, lenv=lenv)
 X_val, y_val = load_data_complete(indep_val, root=root, per_dataset=50, lenv=lenv)
 
 print(X_train.shape, y_train.shape)
