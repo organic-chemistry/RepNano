@@ -175,7 +175,7 @@ import tensorflow as tf
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--root', type=str, default="data/training/")
-parser.add_argument('--cnv', dest="lstm",type=bool, action="store_false")
+parser.add_argument('--cnv', dest="lstm", action="store_false")
 parser.add_argument('--per-dataset', dest="per_dataset",type=int, default="400")
 
 args = parser.parse_args()
