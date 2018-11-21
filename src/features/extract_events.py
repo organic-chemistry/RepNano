@@ -188,15 +188,16 @@ def extract_events(h5, chem, window_size=None, old=True, verbose=True, about_max
     max_thresh = med + 1.48 * 2 + mad
 
     #first_event = find_stall(events, max_thresh)
-    # first_event, last_event = find_stall(
+    #first_event, last_event = find_stall(
     #    events, threshold=0.05, raw=raw, sampling_rate=sl, max_under_threshold=100)
     """
-        first_event, last_event = find_stall(
+    first_event, last_event = find_stall(
             events, start_threshold=8.5, end_threshold=4, raw=raw, sampling_rate=sl, max_under_threshold=750)
-
     """
     v = find2(events)
     first_event,last_event = v
+    #last_event = None
+    #first_event,last_event = 0,None
     #print(first_event)
     #events = events[first_event:last_event]
 

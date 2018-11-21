@@ -39,7 +39,7 @@ def basecall_one_file(filename, output_file,output_file2, ntwk,ntwk2, alph, alre
         h5.close()
         return 0
 
-    if len(events) < 30:
+    if len(events) < 200:
         print("Read %s too short, not basecalling" % filename)
         h5.close()
         return 0
