@@ -13,9 +13,11 @@ def load_data(lfiles, values=["saved_weights_ratio.05-0.03.hdf5","init_B"], root
 
                 y1 = d[value]
                 print("using value",value)
+                found=True
                 break
         if not found:
             print("Values not found",values)
+            print("Available",d.columns)
             raise
         #print(np.mean(y1), np.std(y1),len(y1),len(X1))
         yw = d["init_w"]
