@@ -212,13 +212,13 @@ if args.lstm:
 else:
     model = Sequential()
     # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
-    model.add(Conv1D(filters=32, kernel_size=3, padding='same',
+    model.add(Conv1D(filters=64, kernel_size=5, padding='same',
                      activation='relu', input_shape=(256, 1)))
     model.add(MaxPooling1D(pool_size=4)) # 64
-    model.add(Conv1D(filters=32, kernel_size=3, padding='same',
+    model.add(Conv1D(filters=64, kernel_size=5, padding='same',
                      activation='relu'))
     model.add(MaxPooling1D(pool_size=4)) #16
-    model.add(Conv1D(filters=64, kernel_size=3, padding='same',
+    model.add(Conv1D(filters=64, kernel_size=5, padding='same',
                      activation='relu'))
     model.add(MaxPooling1D(pool_size=4))
 
