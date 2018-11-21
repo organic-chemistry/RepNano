@@ -96,7 +96,7 @@ if args.lstm:
     model.add(LSTM(100))
     model.add(Dense(1, activation='linear'))
     model.compile(loss='mse', optimizer='adam')  # , metrics=['accuracy'])
-    model.load_weights("saved_weights_ratio.05-0.03.hdf5")
+    model.load_weights("test_longueur/weights.05-0.02.hdf5")
 else:
     model = Sequential()
     # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
@@ -136,7 +136,7 @@ files = ['/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T-yeast.csv'
 
 
 indep_val = ["/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-9-yeast.csv",
-             "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B1-yeast.csv"]
+             "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-yeast.csv"]
 #indep_val = files
 train_test = files
 per_dataset=400
@@ -168,7 +168,7 @@ y_val = y_val[:64 * len(y_val) // 64]
 print(y_train[::40],np.mean(y_train,axis=0))
 #, validation_data=(X_val, y_val[::, 0], y_val[::, 1])
 model.fit(X_train, y_train[::, 0], epochs=100, batch_size=64,
-          sample_weight=y_train[::, 1], validation_split=0.1, callbacks=[checkpointer, es])
+          sample_weight=y_train[::, 1], validation_split=0.1, callbacks=[checkpointer, es,reduce_lr])
 # Final evaluation of the model
 scores = model.evaluate(X_val, y_val[::, 0], verbose=0)
 print("Accuracy: %.2f%%" % (scores))
