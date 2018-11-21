@@ -62,3 +62,58 @@ def load_events(X, y, min_length=1000,ws=5):
         indexes.append(ifi)
         fnames.append(filename)
     return Xt, yt,fn
+
+
+
+def transform_reads(X, y, lenv=200):
+    Xt = []
+    yt = []
+    # print(y.shape)
+    # print(y)
+    for events, yi in zip(X, y):
+        mean = events["mean"]
+        #std = events["stdv"]
+        #length = events["length"]
+
+        def scale(x):
+            x -= np.percentile(x, 25)
+            #scale = np.percentile(x, 75) - np.percentile(x, 25)
+            # print(scale,np.percentile(x, 75) , np.percentile(x, 25))
+            #x /= scale
+            x /= 20
+            if np.sum(x > 10) > len(x) * 0.05:
+                print("Warning lotl of rare events")
+                print(np.sum(x > 10 * scale), len(x))
+            x[x > 5] = 0
+            x[x < -5] = 0
+
+            return x
+
+        mean = scale(mean.copy())
+        """
+        mean -= np.percentile(mean, 50)
+        delta = mean[1:] - mean[:-1]
+        rmuninf = (delta > -15) & (delta < 15)
+        mean = delta[~rmuninf]"""
+        #std = scale(std.copy())
+        # print("stl")
+        #length = scale(length.copy())
+        # print("el")
+        V = np.array([mean]).T
+
+        if lenv is not None:
+            if len(mean) < lenv:
+                continue
+            # print(V.shape,yi.shape)
+
+            lc = lenv * (len(V) // lenv)
+            V = V[:lc]
+            V = np.array(V).reshape(-1, lenv, V.shape[-1])
+
+            yip = np.zeros((V.shape[0], yi.shape[0]))
+            yip[::] = yi
+        else:
+            ypi=yi
+        Xt.append(V)
+        yt.append(yip)
+    return Xt, yt
