@@ -13,44 +13,7 @@ import numpy as np
 
 from ..features.extract_events import extract_events,get_events
 from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
-
-
-def load_data(lfiles, value="init_B", root=".", per_dataset=None):
-    X = []
-    y = []
-    for file in lfiles:
-        d = pd.read_csv(file)
-        #print(file, d)
-        if "mean" in d.columns:
-            def get_list(slist):
-                slist = slist[2:-2]
-                slist = slist.split(", ")
-                slist = [float(si) for si in slist]
-                # print(slist)
-                return slist
-            X1 = [get_list(f) for f in d["mean"]]
-        else:
-            X1 = [root + "/" + f for f in d["filename"]]
-
-        if "saved_weights_ratio.05-0.03" in d.columns:
-            print("loading from saved_weights_ratio.05-0.03.hdf5")
-            y1 = d["saved_weights_ratio.05-0.03"]
-        else:
-            y1 = d[value]
-        #print(np.mean(y1), np.std(y1),len(y1),len(X1))
-        yw = d["init_w"]
-        #print("Weight", np.mean(yw),len(yw))
-        y1 = [[iy1, iyw] for iy1, iyw in zip(y1, yw)]
-        #print(len(y1))
-        if per_dataset is None:
-            X.extend(X1)
-            y.extend(y1)
-        else:
-            X.extend(X1[:per_dataset])
-            y.extend(y1[:per_dataset])
-    assert (len(X) == len(y))
-    #print(y)
-    return X, y
+from .simple_utilities import load_data
 
 
 
