@@ -11,35 +11,8 @@ import pandas as pd
 import numpy as np
 
 
-from ..features.extract_events import extract_events,get_events
 from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
-from .simple_utilities import load_data
-
-
-
-
-def load_events(X, y, min_length=1000,ws=5):
-    Xt = []
-    indexes = []
-    yt = []
-    for ifi, filename in enumerate(X):
-        # print(filename)
-        if type(filename) == str:
-            h5 = h5py.File(filename, "r")
-            events = get_events(h5, already_detected=False,
-                                chemistry="rf", window_size=np.random.randint(ws, ws+3), old=False, verbose=False, about_max_len=None)
-            events = events[1:-1]
-
-            if min_length is not None and len(events) < min_length:
-                continue
-            # print(y[ifi])
-            Xt.append({"mean":events["mean"]})
-            h5.close()
-        else:
-            Xt.append({"mean": filename})
-        yt.append(y[ifi])
-        indexes.append(ifi)
-    return Xt, yt
+from .simple_utilities import load_data,load_events
 
 
 def transform_reads(X, y, lenv=200):
@@ -108,7 +81,7 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200, shuffle=True):
             ws=8
         X, y = load_data(dataset, root=root, per_dataset=per_dataset)  # X filename,y B amount
         # X events y B amount  filtered for length < 10000
-        Xp, yp = load_events(X, y, min_length=None,ws=ws)
+        Xp, yp,fn = load_events(X, y, min_length=None,ws=ws)
         assert(len(Xp) == len(yp))
 
         Xpp, ypp = transform_reads(Xp, np.array(yp), lenv=lenv)
