@@ -61,7 +61,7 @@ def load_events(X, y, min_length=1000,ws=5):
         yt.append(y[ifi])
         indexes.append(ifi)
         fnames.append(filename)
-    return Xt, yt,fn
+    return Xt, yt,fnames
 
 
 
