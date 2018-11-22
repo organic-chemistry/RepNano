@@ -83,8 +83,8 @@ for d in closer:
 
 
 Predicts = np.array(Predicts)
-plot(Predicts)
-plot(yr)
-xlabel("Sample #")
-ylabel("Ratio_b")
+pylab.plot(Predicts)
+pylab.plot(yr)
+pylab.xlabel("Sample #")
+pylab.ylabel("Ratio_b")
 pylab.savefig("sample_values_%s"%(weight_name[:-5])+extra+".pdf")
