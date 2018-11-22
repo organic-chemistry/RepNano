@@ -49,6 +49,7 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200, shuffle=True,p
 
     if pmix is not None:
         print("Mixing",pmix)
+        a=np.arange(len(X_t))
         m1 = np.random.choice(a,int(len(a)*pmix))
         m2 = np.random.choice(a,int(len(a)*pmix))
         nX =np.concatenate((X_t[m1,:100,::],X_t[m2,100:,::]),axis=1)
