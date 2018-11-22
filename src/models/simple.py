@@ -55,7 +55,7 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200, shuffle=True,p
         nX =np.concatenate((X_t[m1,:100,::],X_t[m2,100:,::]),axis=1)
         ny = y_t[m1]/2+y_t[m2]/2
         X_t = np.concatenate([X_t,nX], axis=0)
-        y_t = np.concatenate([X_t,ny], axis=0)
+        y_t = np.concatenate([y_t,ny], axis=0)
 
 
     if shuffle:
