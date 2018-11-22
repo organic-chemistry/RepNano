@@ -102,7 +102,7 @@ def transform_reads(X, y, lenv=200):
     # print(y)
     for events, yi in zip(X, y):
 
-        mean = scale_one_read(events)
+        V = scale_one_read(events)
 
         if lenv is not None:
             if len(mean) < lenv:
