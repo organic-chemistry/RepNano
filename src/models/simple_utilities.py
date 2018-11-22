@@ -105,7 +105,7 @@ def transform_reads(X, y, lenv=200):
         V = scale_one_read(events)
 
         if lenv is not None:
-            if len(mean) < lenv:
+            if len(V) < lenv:
                 continue
             # print(V.shape,yi.shape)
 
