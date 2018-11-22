@@ -5,6 +5,7 @@ from keras.layers import LSTM
 from keras.layers.convolutional import Conv1D
 from keras.layers.convolutional import MaxPooling1D
 import numpy as np
+import pylab
 
 def model(typem=1):
     if typem==1:
@@ -42,7 +43,6 @@ weight_name=args.weight_name
 typem=args.typem
 
 X,y = load_data([filename],root=args.root)
-y = np.array(y)[::,0]
 Xr,yr,fn = load_events(X[:maxf],y[:maxf],min_length=length_window)
 Xt,yt =transform_reads(Xr,yr,lenv=length_window)
 
