@@ -27,7 +27,7 @@ import argparse
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--file', dest='filename', type=str)
-parser.add_argument('--extra', dest='extra', type=str)
+parser.add_argument('--extra', dest='extra', type=str,default="")
 parser.add_argument('--root', dest='root', type=str,default="/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/")
 parser.add_argument('--weight-name', dest='weight_name', type=str)
 parser.add_argument('--typem', dest='typem', type=int,default=1)
