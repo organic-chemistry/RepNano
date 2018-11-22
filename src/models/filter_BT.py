@@ -28,7 +28,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--file', dest='filename', type=str)
 parser.add_argument('--weight-name', dest='weight_name', type=str)
 parser.add_argument('--typem', dest='typem', type=int,default=1)
-parser.add_argument('--maxf', dest='max', type=int,default=None)
+parser.add_argument('--maxf', dest='maxf', type=int,default=None)
 parser.add_argument('--window-length', dest='length_window', type=int,default=200)
 
 
