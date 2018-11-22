@@ -26,6 +26,7 @@ import argparse
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--file', dest='filename', type=str)
+parser.add_argument('--root', dest='root', type=str,default="/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/")
 parser.add_argument('--weight-name', dest='weight_name', type=str)
 parser.add_argument('--typem', dest='typem', type=int,default=1)
 parser.add_argument('--maxf', dest='maxf', type=int,default=None)
@@ -40,7 +41,7 @@ maxf=args.maxf
 weight_name=args.weight_name
 typem=args.typem
 
-X,y = load_data([filename],root=root)
+X,y = load_data([filename],root=args.root)
 y = np.array(y)[::,0]
 Xr,yr,fn = load_events(X[:maxf],y[:maxf],min_length=length_window)
 Xt,yt =transform_reads(Xr,yr,lenv=length_window)
