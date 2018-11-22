@@ -53,7 +53,7 @@ ntwk.load_weights(weight_name)
 
 Predicts = []
 for xt in Xt:
-    Predicts.append(np.mean(ntwk.predict(xt[np.newaxis, ::, ::])))
+    Predicts.append(np.mean(ntwk.predict(xt)))
 
 
 Predicts = np.array(Predicts)
