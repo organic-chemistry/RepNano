@@ -65,7 +65,7 @@ print("Percent of reads < 0.3",np.sum(Predicts<0.3)/np.sum(Predicts))
 pylab.savefig("histo_B_T_%s"%(weight_name[:-5])+extra+".pdf")
 
 csvf = pd.read_csv(filename)
-wn = aweight_name[:-5]
+wn = weight_name[:-5]
 csvf[wn] = [1 for _ in range(len(csvf))]
 
 assert len(Predicts) == len(fn)
