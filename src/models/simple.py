@@ -23,7 +23,7 @@ def unison_shuffled_copies(a, b):
     return a[p], b[p]
 
 
-def load_data_complete(dataset, root, per_dataset=None, lenv=200, shuffle=True):
+def load_data_complete(dataset, root, per_dataset=None, lenv=200, shuffle=True,pmix=None):
 
     X_t,y_t=[],[]
     for data in dataset:
@@ -46,6 +46,17 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200, shuffle=True):
     X_t = np.concatenate(X_t, axis=0)
     y_t = np.concatenate(y_t, axis=0)
 
+
+    if pmix is not None:
+        print("Mixing",pmix)
+        m1 = np.random.choice(a,int(len(a)*pmix))
+        m2 = np.random.choice(a,int(len(a)*pmix))
+        nX =np.concatenate((X_t[m1,:100,::],X_t[m2,100:,::]),axis=1)
+        ny = y_t[m1]/2+y_t[m2]/2
+        X_t = np.concatenate([X_t,nX], axis=0)
+        y_t = np.concatenate([X_t,ny], axis=0)
+
+
     if shuffle:
         X_t, y_t = unison_shuffled_copies(X_t, y_t)
     return  X_t,  y_t
@@ -65,6 +76,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--root', type=str, default="data/training/")
 parser.add_argument('--cnv', dest="lstm", action="store_false")
 parser.add_argument('--per-dataset', dest="per_dataset",type=int, default="400")
+parser.add_argument('--pmix', dest="pmix",type=float, default=None)
 
 args = parser.parse_args()
 
@@ -160,8 +172,9 @@ if args.lstm:
     lenv=200
 else:
     lenv=256
-X_train, y_train = load_data_complete(train_test, root=root, per_dataset=args.per_dataset, lenv=lenv)
-X_val, y_val = load_data_complete(indep_val, root=root, per_dataset=50, lenv=lenv)
+X_train, y_train = load_data_complete(train_test, root=root,
+                            per_dataset=args.per_dataset, lenv=lenv,pmix=args.pmix)
+X_val, y_val = load_data_complete(indep_val, root=root, per_dataset=50, lenv=lenv,pmix=args.pmix)
 
 print(X_train.shape, y_train.shape)
 X_val = X_val[:64 * len(X_val) // 64]
