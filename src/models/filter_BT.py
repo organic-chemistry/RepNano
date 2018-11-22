@@ -44,6 +44,7 @@ typem=args.typem
 
 X,y = load_data([filename],root=args.root)
 Xr,yr,fn = load_events(X[:maxf],y[:maxf],min_length=length_window)
+yr = np.array(yr)
 Xt,yt =transform_reads(Xr,yr,lenv=length_window)
 
 
