@@ -1,4 +1,4 @@
-from simple_utilities import load_data,load_events,transform_reads
+from .simple_utilities import load_data,load_events,transform_reads
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import LSTM
@@ -35,7 +35,7 @@ parser.add_argument('--window-length', dest='length_window', type=int,default=20
 args = parser.parse_args()
 
 filename=args.filename
-length_window=200
+length_window=args.length_window
 maxf=args.maxf
 weight_name=args.weight_name
 typem=args.typem
