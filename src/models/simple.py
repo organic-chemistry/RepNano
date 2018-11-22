@@ -96,7 +96,7 @@ if args.lstm:
     model.add(LSTM(100))
     model.add(Dense(1, activation='linear'))
     model.compile(loss='mse', optimizer='adam')  # , metrics=['accuracy'])
-    model.load_weights("test_longueur/weights.05-0.02.hdf5")
+    #model.load_weights("test_longueur/weights.05-0.02.hdf5")
 else:
     model = Sequential()
     # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
@@ -113,7 +113,7 @@ else:
     model.add(Flatten())
     model.add(Dense(1, activation='linear'))
     model.compile(loss='mse', optimizer='adam')  # , metrics=['accuracy'])
-    model.load_weights("test_cnv2/weights.18-0.03.hdf5")
+    #model.load_weights("test_cnv2/weights.18-0.03.hdf5")
 
 checkpointer = ModelCheckpoint(
     filepath=args.root+'/weights.{epoch:02d}-{val_loss:.2f}.hdf5', verbose=1, save_best_only=True)
