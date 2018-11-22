@@ -95,7 +95,7 @@ def scale_one_read(events):
     V = np.array([mean]).T
     return V
 
-def transform_reads(X, y, lenv=200):
+def transform_reads(X, y, lenv=200,max_len=None):
     Xt = []
     yt = []
     # print(y.shape)
@@ -103,6 +103,9 @@ def transform_reads(X, y, lenv=200):
     for events, yi in zip(X, y):
 
         V = scale_one_read(events)
+
+        if max_len is not None:
+            V = V[:max_len]
 
         if lenv is not None:
             #print(V.shape,yi.shape)
