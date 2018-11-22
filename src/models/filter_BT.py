@@ -27,6 +27,7 @@ import argparse
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--file', dest='filename', type=str)
+parser.add_argument('--extra', dest='extra', type=str)
 parser.add_argument('--root', dest='root', type=str,default="/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/")
 parser.add_argument('--weight-name', dest='weight_name', type=str)
 parser.add_argument('--typem', dest='typem', type=int,default=1)
@@ -41,6 +42,7 @@ length_window=args.length_window
 maxf=args.maxf
 weight_name=args.weight_name
 typem=args.typem
+extra=args.extra
 
 X,y = load_data([filename],root=args.root)
 Xr,yr,fn = load_events(X[:maxf],y[:maxf],min_length=length_window)
@@ -59,7 +61,7 @@ for xt in Xt:
 Predicts = np.array(Predicts)
 pylab.hist(Predicts,bins=40)
 print("Percent of reads < 0.3",np.sum(Predicts<0.3)/np.sum(Predicts))
-pylab.savefig("histo_B_T_%s"%(weight_name[:-5])+args.extra)
+pylab.savefig("histo_B_T_%s"%(weight_name[:-5])+extra)
 
 csvf = pd.read_csv(filenanme)
 wn = aweight_name[:-5]
