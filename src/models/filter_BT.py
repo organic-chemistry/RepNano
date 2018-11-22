@@ -4,7 +4,7 @@ from keras.layers import Dense
 from keras.layers import LSTM
 from keras.layers.convolutional import Conv1D
 from keras.layers.convolutional import MaxPooling1D
-
+import numpy as np
 
 def model(typem=1):
     if typem==1:
