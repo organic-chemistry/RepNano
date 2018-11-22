@@ -6,6 +6,7 @@ from keras.layers.convolutional import Conv1D
 from keras.layers.convolutional import MaxPooling1D
 import numpy as np
 import pylab
+import pandas as pd
 
 def model(typem=1):
     if typem==1:
@@ -61,7 +62,7 @@ for xt in Xt:
 Predicts = np.array(Predicts)
 pylab.hist(Predicts,bins=40)
 print("Percent of reads < 0.3",np.sum(Predicts<0.3)/np.sum(Predicts))
-pylab.savefig("histo_B_T_%s"%(weight_name[:-5])+extra+".png")
+pylab.savefig("histo_B_T_%s"%(weight_name[:-5])+extra+".pdf")
 
 csvf = pd.read_csv(filenanme)
 wn = aweight_name[:-5]
