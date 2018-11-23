@@ -35,6 +35,7 @@ def model(typem=1):
 
         model.add(Flatten())
         model.add(Dense(1, activation='linear'))
+        ntwk=model
     return ntwk
 
 
