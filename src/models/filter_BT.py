@@ -67,7 +67,7 @@ pylab.savefig("histo_B_T_%s"%(weight_name[:-5])+extra+".pdf")
 csvf = pd.read_csv(filename)
 wn = weight_name[:-5]
 csvf[wn] = [1 for _ in range(len(csvf))]
-
+fourd=0
 assert len(Predicts) == len(fn)
 for f,r in zip(fn,Predicts):
     if r > 0.3:
@@ -75,9 +75,10 @@ for f,r in zip(fn,Predicts):
     else:
         b=0
     fnshort = f.replace("/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/","")
-    print(fnshort)
-    print(csvf["filename"][:1])
-    print(np.sum(csvf["filename"]==fnshort))
-    csvf.loc[csvf["filename"]==fnshort,wn]=b
 
+    which = csvf["filename"]==fnshort
+    found += np.sum(which)
+    csvf.loc[which,wn]=b
+
+print("Number processed",found)
 csvf.to_csv(filename, index=False)
