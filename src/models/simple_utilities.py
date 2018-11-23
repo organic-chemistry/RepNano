@@ -2,14 +2,14 @@ import pandas as pd
 from ..features.extract_events import extract_events,get_events
 import h5py
 import numpy as np
-
+import os
 def load_data(lfiles, values=["saved_weights_ratio.05-0.03","init_B"], root=".", per_dataset=None):
     X = []
     y = []
     for file in lfiles:
         d = pd.read_csv(file)
         #print(file, d)
-        X1 = [root + "/" + f for f in d["filename"]]
+        X1 = [os.path.join(root,f) for f in d["filename"]]
         found = False
         for value in values:
             if value in d.columns:
