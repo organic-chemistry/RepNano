@@ -94,7 +94,7 @@ for d in closer:
 Predicts = np.array(Predicts)
 Predicts2 = np.array(Predicts2)
 
-pylab.title("Deviation %.1f, on test only (9 and B1) %.1f" % (np.std(Predicts-yr),np.std(Predicts2-yr2)))
+pylab.title("Deviation %.2f, on test only (9 and B1) %.2f" % (np.std(Predicts-yr),np.std(Predicts2-yr2)))
 pylab.plot(Predicts)
 pylab.plot(yr,"o")
 pylab.xlabel("Sample #")
