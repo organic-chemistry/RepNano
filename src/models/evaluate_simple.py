@@ -64,7 +64,7 @@ for t in train_test:
     Xrt,yrt,fnt = load_events(X[:40],y[:40],min_length=length_window)
 
     Xt,yt =transform_reads(Xrt,np.array(yrt),lenv=length_window,max_len=2000)
-    data[t.split("/")[-1][:-4]]=[Xt,yt[::,0]]
+    data[t.split("/")[-1][:-4]]=[Xt,np.array(yt)[::,0]]
 
 
 ntwk = model(typem=typem)

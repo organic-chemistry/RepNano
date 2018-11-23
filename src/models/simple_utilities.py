@@ -61,7 +61,7 @@ def load_events(X, y, min_length=1000,ws=5):
         yt.append(y[ifi])
         indexes.append(ifi)
         fnames.append(filename)
-    return Xt, yt,fnames
+    return Xt, np.array(yt),fnames
 
 def scale_one_read(events):
     mean = events["mean"]
@@ -123,4 +123,4 @@ def transform_reads(X, y, lenv=200,max_len=None):
             ypi=yi
         Xt.append(V)
         yt.append(yip)
-    return Xt, yt
+    return Xt, np.array(yt)
