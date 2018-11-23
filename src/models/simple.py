@@ -178,7 +178,8 @@ X_train, y_train = load_data_complete(train_test, root=root,
                                       per_dataset=args.per_dataset,
                                       lenv=lenv,pmix=args.pmix,
                                       values=["test_longueur_lstm_from_scratch_without_human_weights.25-0.02"])
-X_val, y_val = load_data_complete(indep_val, root=root, per_dataset=50, lenv=lenv,pmix=args.pmix)
+X_val, y_val = load_data_complete(indep_val, root=root, per_dataset=50, lenv=lenv,pmix=args.pmix,
+                                  values=["test_longueur_lstm_from_scratch_without_human_weights.25-0.02"])
 
 print(X_train.shape, y_train.shape)
 X_val = X_val[:64 * len(X_val) // 64]
