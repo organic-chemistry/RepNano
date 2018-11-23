@@ -99,4 +99,6 @@ pylab.plot(Predicts)
 pylab.plot(yr,"o")
 pylab.xlabel("Sample #")
 pylab.ylabel("Ratio_b")
-pylab.savefig("sample_values_%s"%(weight_name[:-5])+extra+".pdf")
+filen =weight_name[:-5]+"sample_values"+extra+".pdf"
+print("Writing on %s"% filen)
+pylab.savefig(filen)
