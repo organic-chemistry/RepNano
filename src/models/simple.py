@@ -191,7 +191,7 @@ print(y_train[::40],np.mean(y_train,axis=0))
 #, validation_data=(X_val, y_val[::, 0], y_val[::, 1])
 if args.incweightT is not None:
     print(np.mean(y_train,axis=0))
-    y_train[y_train[::,0]==0,1]= * args.incweightT
+    y_train[y_train[::,0]==0,1]  *= args.incweightT
     print(np.mean(y_train,axis=0))
 
 model.fit(X_train, y_train[::, 0], epochs=100, batch_size=64,
