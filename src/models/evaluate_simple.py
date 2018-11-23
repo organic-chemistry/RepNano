@@ -19,6 +19,7 @@ def model(typem=1):
         model.add(Dense(1, activation='linear'))
         model.compile(loss='mse', optimizer='adam')  # , metrics=['accuracy'])
         ntwk=model
+        lenv=200
 
     if typem==2:
         model = Sequential()
@@ -36,7 +37,8 @@ def model(typem=1):
         model.add(Flatten())
         model.add(Dense(1, activation='linear'))
         ntwk=model
-    return ntwk
+        lenv=256
+    return ntwk,lenv
 
 
 
@@ -50,7 +52,7 @@ parser.add_argument('--root', dest='root', type=str,default="/data/bioinfo@borvo
 parser.add_argument('--weight-name', dest='weight_name', type=str)
 parser.add_argument('--typem', dest='typem', type=int,default=1)
 parser.add_argument('--maxf', dest='maxf', type=int,default=None)
-parser.add_argument('--window-length', dest='length_window', type=int,default=200)
+parser.add_argument('--window-length', dest='length_window', type=int,default=None)
 
 
 args = parser.parse_args()
@@ -61,6 +63,12 @@ maxf=args.maxf
 weight_name=args.weight_name
 typem=args.typem
 extra=args.extra
+
+ntwk,lenv = model(typem=typem)
+ntwk.load_weights(weight_name)
+
+if length_window in None:
+    length_window = lenv
 
 train_test=['/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T-yeast.csv',
             '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-yeast.csv',
@@ -84,8 +92,7 @@ for t in train_test:
     data[t.split("/")[-1][:-4]]=[Xt,[yti[0][0] for yti in yt]]
 
 
-ntwk = model(typem=typem)
-ntwk.load_weights(weight_name)
+
 
 Predicts = []
 
