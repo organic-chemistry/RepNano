@@ -81,7 +81,7 @@ for d in closer:
     for xt in data[d][0]:
         Predicts.append(np.mean(ntwk.predict(xt)))
 
-Predict2 = []
+Predicts2 = []
 closer = ["B-9-yeast","B-yeast"]
 Xr=[]
 yr2=[]
@@ -92,7 +92,9 @@ for d in closer:
         Predicts2.append(np.mean(ntwk.predict(xt)))
 
 Predicts = np.array(Predicts)
-pylab.title("Deviation %.1f, on test only (9 and B1) %.1f" % (np.std(Predicts-yr),np.std(Predict2-yr2)))
+Predicts2 = np.array(Predicts2)
+
+pylab.title("Deviation %.1f, on test only (9 and B1) %.1f" % (np.std(Predicts-yr),np.std(Predicts2-yr2)))
 pylab.plot(Predicts)
 pylab.plot(yr)
 pylab.xlabel("Sample #")
