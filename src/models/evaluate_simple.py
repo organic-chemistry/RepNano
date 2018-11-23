@@ -67,7 +67,7 @@ extra=args.extra
 ntwk,lenv = model(typem=typem)
 ntwk.load_weights(weight_name)
 
-if length_window in None:
+if length_window is None:
     length_window = lenv
 
 train_test=['/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T-yeast.csv',
