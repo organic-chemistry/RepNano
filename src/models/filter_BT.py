@@ -75,6 +75,8 @@ for f,r in zip(fn,Predicts):
     else:
         b=0
     fnshort = f.replace("/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/","")
+    print(fnshort)
+    print(csvf["filename"][:1])
     print(np.sum(csvf["filename"]==fnshort))
     csvf.loc[csvf["filename"]==fnshort,wn]=b
 
