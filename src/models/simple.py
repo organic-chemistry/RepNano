@@ -23,7 +23,7 @@ def unison_shuffled_copies(a, b):
     return a[p], b[p]
 
 
-def load_data_complete(dataset, root, per_dataset=None, lenv=200, shuffle=True,pmix=None):
+def load_data_complete(dataset, root, per_dataset=None, lenv=200, shuffle=True,pmix=None,values=[]):
 
     X_t,y_t=[],[]
     for data in dataset:
@@ -31,7 +31,7 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200, shuffle=True,p
         ws=5
         if "T-yeast" in data:
             ws=8
-        X, y = load_data([data], root=root, per_dataset=per_dataset)  # X filename,y B amount
+        X, y = load_data([data], root=root, per_dataset=per_dataset,values=values+["init_B"])  # X filename,y B amount
         # X events y B amount  filtered for length < 10000
         Xp, yp,fn = load_events(X, y, min_length=None,ws=ws)
         assert(len(Xp) == len(yp))
@@ -109,6 +109,7 @@ if args.lstm:
     model.add(LSTM(100))
     model.add(Dense(1, activation='linear'))
     model.compile(loss='mse', optimizer='adam')  # , metrics=['accuracy'])
+    model.load_weights("test_longueur_lstm_from_scratch_without_human/weights.25-0.02.hdf5")
     #model.load_weights("test_longueur/weights.05-0.02.hdf5")
 else:
     model = Sequential()
@@ -174,7 +175,8 @@ if args.lstm:
 else:
     lenv=256
 X_train, y_train = load_data_complete(train_test, root=root,
-                            per_dataset=args.per_dataset, lenv=lenv,pmix=args.pmix)
+                                      per_dataset=args.per_dataset,
+                                      lenv=lenv,pmix=args.pmix,values=["test_longueur_lstm_from_scratch_without_human_weights.25-0.02.hdf5"])
 X_val, y_val = load_data_complete(indep_val, root=root, per_dataset=50, lenv=lenv,pmix=args.pmix)
 
 print(X_train.shape, y_train.shape)
