@@ -62,9 +62,10 @@ for t in train_test:
     #print(ws)
     X,y = load_data([t],root=args.root)
     Xrt,yrt,fnt = load_events(X[:40],y[:40],min_length=length_window)
-
+    print(yrt)
     Xt,yt =transform_reads(Xrt,np.array(yrt),lenv=length_window,max_len=2000)
     print(yt.shape)
+    print(yt)
     data[t.split("/")[-1][:-4]]=[Xt,np.array(yt)[::,0]]
 
 
