@@ -66,7 +66,7 @@ for t in train_test:
     Xt,yt =transform_reads(Xrt,np.array(yrt),lenv=length_window,max_len=2000)
     print(yt.shape)
     print(yt)
-    data[t.split("/")[-1][:-4]]=[Xt,np.array(yt)[::,0]]
+    data[t.split("/")[-1][:-4]]=[Xt,[yti[0][0] for yti in yt]]
 
 
 ntwk = model(typem=typem)
