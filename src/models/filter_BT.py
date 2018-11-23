@@ -67,7 +67,7 @@ pylab.savefig("histo_B_T_%s"%(weight_name[:-5])+extra+".pdf")
 csvf = pd.read_csv(filename)
 wn = weight_name[:-5]
 csvf[wn] = [1 for _ in range(len(csvf))]
-fourd=0
+found=0
 assert len(Predicts) == len(fn)
 for f,r in zip(fn,Predicts):
     if r > 0.3:
