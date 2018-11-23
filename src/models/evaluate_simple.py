@@ -96,7 +96,7 @@ Predicts2 = np.array(Predicts2)
 
 pylab.title("Deviation %.1f, on test only (9 and B1) %.1f" % (np.std(Predicts-yr),np.std(Predicts2-yr2)))
 pylab.plot(Predicts)
-pylab.plot(yr)
+pylab.plot(yr,"o")
 pylab.xlabel("Sample #")
 pylab.ylabel("Ratio_b")
 pylab.savefig("sample_values_%s"%(weight_name[:-5])+extra+".pdf")
