@@ -78,6 +78,7 @@ parser.add_argument('--root', type=str, default="data/training/")
 parser.add_argument('--cnv', dest="lstm", action="store_false")
 parser.add_argument('--per-dataset', dest="per_dataset",type=int, default="400")
 parser.add_argument('--pmix', dest="pmix",type=float, default=None)
+parser.add_argument('--incweightT', dest="incweightT",type=float, default=None)
 
 args = parser.parse_args()
 
@@ -174,6 +175,8 @@ if args.lstm:
     lenv=200
 else:
     lenv=256
+
+
 X_train, y_train = load_data_complete(train_test, root=root,
                                       per_dataset=args.per_dataset,
                                       lenv=lenv,pmix=args.pmix,
@@ -186,6 +189,11 @@ X_val = X_val[:64 * len(X_val) // 64]
 y_val = y_val[:64 * len(y_val) // 64]
 print(y_train[::40],np.mean(y_train,axis=0))
 #, validation_data=(X_val, y_val[::, 0], y_val[::, 1])
+if args.incweightT is not None:
+    print(np.mean(y_train,axis=0))
+    y_train[y_train[::,0]==0,1]= * args.incweightT
+    print(np.mean(y_train,axis=0))
+
 model.fit(X_train, y_train[::, 0], epochs=100, batch_size=64,
           sample_weight=y_train[::, 1], validation_split=0.1, callbacks=[checkpointer, es,reduce_lr])
 # Final evaluation of the model
