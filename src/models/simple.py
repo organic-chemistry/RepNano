@@ -99,7 +99,7 @@ if args.lstm:
     model = Sequential()
     # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
     model.add(Conv1D(filters=32, kernel_size=3, padding='same',
-                     activation='relu', input_shape=(200, 1)))
+                     activation='relu', input_shape=(500, 1)))
     model.add(MaxPooling1D(pool_size=2))
     # model.add(Conv1D(filters=32, kernel_size=5, padding='same',
     #                 activation='relu'))
@@ -110,7 +110,7 @@ if args.lstm:
     model.add(LSTM(100))
     model.add(Dense(1, activation='linear'))
     model.compile(loss='mse', optimizer='adam')  # , metrics=['accuracy'])
-    model.load_weights("test_longueur_lstm_from_scratch_without_human/weights.25-0.02.hdf5")
+    #model.load_weights("test_longueur_lstm_from_scratch_without_human/weights.25-0.02.hdf5")
     #model.load_weights("test_longueur/weights.05-0.02.hdf5")
 else:
     model = Sequential()
@@ -172,7 +172,7 @@ print(train_test)
 print(indep_val)
 
 if args.lstm:
-    lenv=200
+    lenv=500
 else:
     lenv=256
 
