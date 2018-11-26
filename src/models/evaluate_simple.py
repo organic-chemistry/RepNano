@@ -120,6 +120,7 @@ for d in closer:
             print(r.shape)
             Predicts.append(np.mean(np.median(r,axis=0)))
 if args.overlap is not None:
+    print(yr)
     yr = [iyr[0] for iyr in yr]
 
 Predicts2 = []
