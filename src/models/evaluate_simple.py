@@ -111,7 +111,7 @@ for d in closer:
     print(d)
     yr.extend(data[d][1])
     for xt in data[d][0]:
-        if overlap is None:
+        if args.overlap is None:
             Predicts.append(np.mean(ntwk.predict(xt)))
         else:
             r = ntwk.predict(xt.reshape(-1,length_window,xt.shape[-1])).reshape(overlap,-1,1)
