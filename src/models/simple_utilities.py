@@ -137,7 +137,7 @@ def transform_reads(X, y, lenv=200,max_len=None,overlap=None):
             minl = np.min([len(r //lenv) for r in Res])
             An = np.array([ian[:int(minl*lenv)] for ian in An])
             print(An.shape)
-            X = np.array(An
+            X = np.array(An)
             print(X.shape)
 
         Xt.append(V)
