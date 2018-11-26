@@ -134,9 +134,9 @@ def transform_reads(X, y, lenv=200,max_len=None,overlap=None):
 
             minl = np.min([len(r)//lenv for r in An])
             An = np.array([ian[:int(minl*lenv)] for ian in An])
-            X = np.array(An)
+            V= np.array(An)
 
-            yip = np.zeros((X.shape[0], yi.shape[0]))
+            yip = np.zeros((V.shape[0], yi.shape[0]))
             yip[::] = yi
 
         Xt.append(V)
