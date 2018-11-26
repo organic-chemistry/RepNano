@@ -117,7 +117,9 @@ for d in closer:
             #print(xt)
             xt=np.array(xt)
             r = ntwk.predict(xt.reshape(-1,length_window,xt.shape[-1])).reshape(args.overlap,-1,1)
+            print(r.shape)
             Predicts.append(np.median(r,axis=0))
+
 Predicts2 = []
 closer = ["B-9-yeast","B-yeast"]
 Xr=[]
