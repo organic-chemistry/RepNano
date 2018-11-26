@@ -118,7 +118,9 @@ for d in closer:
             xt=np.array(xt)
             r = ntwk.predict(xt.reshape(-1,length_window,xt.shape[-1])).reshape(args.overlap,-1,1)
             print(r.shape)
-            Predicts.append(np.median(r,axis=0))
+            Predicts.append(np.mean(np.median(r,axis=0)))
+if args.overlap is not None:
+    yr = [iyr[0] for iyr in yr]
 
 Predicts2 = []
 closer = ["B-9-yeast","B-yeast"]
@@ -134,7 +136,9 @@ for d in closer:
             #print(xt)
             xt=np.array(xt)
             r = ntwk.predict(xt.reshape(-1,length_window,xt.shape[-1])).reshape(args.overlap,-1,1)
-            Predicts2.append(np.median(r,axis=0))
+            Predicts2.append(np.mean(np.median(r,axis=0)))
+if args.overlap is not None:
+    yr2 = [iyr[0] for iyr in yr2]
 Predicts = np.array(Predicts)
 Predicts2 = np.array(Predicts2)
 
