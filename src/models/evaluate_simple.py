@@ -94,7 +94,7 @@ for t in train_test:
         ws=8
     #print(ws)
     X,y = load_data([t],root=args.root)
-    Xrt,yrt,fnt = load_events(X[:args.maxf],y[:args.maxf],min_length=length_window)
+    Xrt,yrt,fnt = load_events(X[:args.maxf],y[:args.maxf],min_length=2*length_window)
     Xt,yt =transform_reads(Xrt,np.array(yrt),lenv=length_window,max_len=2000,overlap=args.overlap)
 
     data[t.split("/")[-1][:-4]]=[Xt,[yti[0][0] for yti in yt]]
