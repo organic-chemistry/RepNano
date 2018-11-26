@@ -123,7 +123,7 @@ def transform_reads(X, y, lenv=200,max_len=None,overlap=None):
             else:
                 ypi=yi
         else:
-            cut = int(overlap * (cut // overlap))
+            cut = int(overlap * (lenv // overlap))
             lw = cut // overlap
             lc = cut * (len(X) // cut)
 
