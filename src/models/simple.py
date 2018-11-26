@@ -101,7 +101,7 @@ if args.lstm:
     model = Sequential()
     # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
     model.add(Conv1D(filters=32, kernel_size=3, padding='same',
-                     activation='relu', input_shape=(500, 1)))
+                     activation='relu', input_shape=(200, 1)))
     model.add(MaxPooling1D(pool_size=2))
     # model.add(Conv1D(filters=32, kernel_size=5, padding='same',
     #                 activation='relu'))
@@ -174,7 +174,7 @@ print(train_test)
 print(indep_val)
 
 if args.lstm:
-    lenv=500
+    lenv=200
 else:
     lenv=256
 
