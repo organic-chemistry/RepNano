@@ -126,7 +126,6 @@ def transform_reads(X, y, lenv=200,max_len=None,overlap=None):
             lw = int(lenv // overlap)
 
 
-            print(len(V))
             An = []
             for i in range(overlap - 1):
                 An.append(V[i * lw:])
@@ -135,9 +134,10 @@ def transform_reads(X, y, lenv=200,max_len=None,overlap=None):
 
             minl = np.min([len(r)//lenv for r in An])
             An = np.array([ian[:int(minl*lenv)] for ian in An])
-            print(An.shape)
             X = np.array(An)
-            print(X.shape)
+
+            yip = np.zeros((X.shape[0], yi.shape[0]))
+            yip[::] = yi
 
         Xt.append(V)
         yt.append(yip)
