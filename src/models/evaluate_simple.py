@@ -68,7 +68,7 @@ weight_name=args.weight_name
 typem=args.typem
 extra=args.extra
 
-ntwk,lenv = model(typem=typem)
+ntwk,lenv = model(typem=typem,window_length=length_window)
 ntwk.load_weights(weight_name)
 
 if length_window is None:
