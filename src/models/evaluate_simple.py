@@ -114,6 +114,8 @@ for d in closer:
         if args.overlap is None:
             Predicts.append(np.mean(ntwk.predict(xt)))
         else:
+            print(xt)
+            xt=np.array(xt)
             r = ntwk.predict(xt.reshape(-1,length_window,xt.shape[-1])).reshape(args.overlap,-1,1)
             Predicts.append(np.median(r,axis=0))
 Predicts2 = []
