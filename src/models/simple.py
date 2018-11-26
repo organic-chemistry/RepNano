@@ -23,7 +23,8 @@ def unison_shuffled_copies(a, b):
     return a[p], b[p]
 
 
-def load_data_complete(dataset, root, per_dataset=None, lenv=200, shuffle=True,pmix=None,values=[]):
+def load_data_complete(dataset, root, per_dataset=None, lenv=200,
+                       shuffle=True,pmix=None,values=[],delta=False):
 
     X_t,y_t=[],[]
     for data in dataset:
@@ -36,7 +37,7 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200, shuffle=True,p
         Xp, yp,fn = load_events(X, y, min_length=None,ws=ws)
         assert(len(Xp) == len(yp))
 
-        Xpp, ypp = transform_reads(Xp, np.array(yp), lenv=lenv)
+        Xpp, ypp = transform_reads(Xp, np.array(yp), lenv=lenv,delta=delta)
         Xpp = np.concatenate(Xpp, axis=0)
         ypp = np.concatenate(ypp, axis=0)
 
@@ -79,6 +80,7 @@ parser.add_argument('--cnv', dest="lstm", action="store_false")
 parser.add_argument('--per-dataset', dest="per_dataset",type=int, default="400")
 parser.add_argument('--pmix', dest="pmix",type=float, default=None)
 parser.add_argument('--incweightT', dest="incweightT",type=float, default=None)
+parser.add_argument('--delta', dest="delta", action="store_true")
 
 args = parser.parse_args()
 
@@ -180,9 +182,10 @@ else:
 X_train, y_train = load_data_complete(train_test, root=root,
                                       per_dataset=args.per_dataset,
                                       lenv=lenv,pmix=args.pmix,
-                                      values=["test_longueur_lstm_from_scratch_without_human_weights.25-0.02"])
+                                      values=["test_longueur_lstm_from_scratch_without_human_weights.25-0.02"],
+                                      delta=args.delta)
 X_val, y_val = load_data_complete(indep_val, root=root, per_dataset=50, lenv=lenv,pmix=args.pmix,
-                                  values=["test_longueur_lstm_from_scratch_without_human_weights.25-0.02"])
+                                  values=["test_longueur_lstm_from_scratch_without_human_weights.25-0.02"],delta=args.delta)
 
 print(X_train.shape, y_train.shape)
 X_val = X_val[:64 * len(X_val) // 64]

@@ -116,11 +116,11 @@ for d in closer:
         else:
             #print(xt)
             xt=np.array(xt)
-            print(xt.shape)
+            #print(xt.shape)
             r = ntwk.predict(xt.reshape(-1,length_window,xt.shape[-1]))
-            print(len(r))
+            #print(len(r))
             r= r.reshape(args.overlap,-1,1)
-            print(r.shape)
+            #print(r.shape)
             Predicts.append(np.mean(np.median(r,axis=0)))
 
 
