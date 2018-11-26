@@ -131,9 +131,9 @@ def transform_reads(X, y, lenv=200,max_len=None,overlap=None):
             An = []
             for i in range(overlap - 1):
                 print(lc, cut, lw, i * lw, -cut + (i + 1) * lw)
-                An.append(X[i * lw:-cut + (i + 1) * lw])
+                An.append(V[i * lw:-cut + (i + 1) * lw])
 
-            An.append(X[(overlap - 1) * lw:])
+            An.append(V[(overlap - 1) * lw:])
 
             X = np.array(An)
             print(X.shape)
