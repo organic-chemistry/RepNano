@@ -114,7 +114,7 @@ for d in closer:
         if args.overlap is None:
             Predicts.append(np.mean(ntwk.predict(xt)))
         else:
-            print(xt)
+            #print(xt)
             xt=np.array(xt)
             r = ntwk.predict(xt.reshape(-1,length_window,xt.shape[-1])).reshape(args.overlap,-1,1)
             Predicts.append(np.median(r,axis=0))
@@ -126,8 +126,13 @@ for d in closer:
     print(d)
     yr2.extend(data[d][1])
     for xt in data[d][0]:
-        Predicts2.append(np.mean(ntwk.predict(xt)))
-
+        if args.overlap is None:
+            Predicts2.append(np.mean(ntwk.predict(xt)))
+        else:
+            #print(xt)
+            xt=np.array(xt)
+            r = ntwk.predict(xt.reshape(-1,length_window,xt.shape[-1])).reshape(args.overlap,-1,1)
+            Predicts2.append(np.median(r,axis=0))
 Predicts = np.array(Predicts)
 Predicts2 = np.array(Predicts2)
 
