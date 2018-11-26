@@ -125,7 +125,7 @@ def transform_reads(X, y, lenv=200,max_len=None,overlap=None):
         else:
             cut = int(overlap * (lenv // overlap))
             lw = cut // overlap
-            lc = cut * (len(X) // cut)
+            lc = cut * (len(V) // cut)
 
             V = V[:lc]
             print(len(V))
