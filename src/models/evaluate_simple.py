@@ -14,6 +14,8 @@ def model(typem=1,window_length=None):
 
         if window_length is None:
             lenv=200
+        else:
+            lenv=window_length
 
         model = Sequential()
         # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
