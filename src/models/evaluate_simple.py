@@ -114,7 +114,7 @@ for d in closer:
         if args.overlap is None:
             Predicts.append(np.mean(ntwk.predict(xt)))
         else:
-            r = ntwk.predict(xt.reshape(-1,length_window,xt.shape[-1])).reshape(overlap,-1,1)
+            r = ntwk.predict(xt.reshape(-1,length_window,xt.shape[-1])).reshape(args.overlap,-1,1)
             Predicts.append(np.median(r,axis=0))
 Predicts2 = []
 closer = ["B-9-yeast","B-yeast"]
