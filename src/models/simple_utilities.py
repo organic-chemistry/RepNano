@@ -133,7 +133,7 @@ def transform_reads(X, y, lenv=200,max_len=None,overlap=None):
             An.append(V[(overlap - 1) * lw:])
 
             minl = np.min([len(r)//lenv for r in An])
-            An = np.array([ian[:int(minl*lenv)].reshape(-1,lenv,X.shape[-1]) for ian in An])
+            An = np.array([np.array(ian[:int(minl*lenv)]).reshape(-1,lenv,V.shape[-1]) for ian in An])
             V= np.array(An)
 
             yip = np.zeros((V.shape[0], yi.shape[0]))
