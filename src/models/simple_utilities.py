@@ -95,7 +95,7 @@ def scale_one_read(events):
     V = np.array([mean]).T
     return V
 
-def transform_reads(X, y, lenv=200,max_len=None):
+def transform_reads(X, y, lenv=200,max_len=None,overlap=None):
     Xt = []
     yt = []
     # print(y.shape)
@@ -107,20 +107,37 @@ def transform_reads(X, y, lenv=200,max_len=None):
         if max_len is not None:
             V = V[:max_len]
 
-        if lenv is not None:
-            #print(V.shape,yi.shape)
-            if len(V) < lenv:
-                continue
-            # print(V.shape,yi.shape)
+        if overlap is None:
+            if lenv is not None:
+                #print(V.shape,yi.shape)
+                if len(V) < lenv:
+                    continue
+                # print(V.shape,yi.shape)
 
-            lc = lenv * (len(V) // lenv)
-            V = V[:lc]
-            V = np.array(V).reshape(-1, lenv, V.shape[-1])
+                lc = lenv * (len(V) // lenv)
+                V = V[:lc]
+                V = np.array(V).reshape(-1, lenv, V.shape[-1])
 
-            yip = np.zeros((V.shape[0], yi.shape[0]))
-            yip[::] = yi
+                yip = np.zeros((V.shape[0], yi.shape[0]))
+                yip[::] = yi
+            else:
+                ypi=yi
         else:
-            ypi=yi
+            cut = int(overlap * (cut // overlap))
+            lw = cut // overlap
+            lc = cut * (len(X) // cut)
+
+            X = X[:lc]
+            An = []
+            for i in range(overlap - 1):
+                print(lc, cut, lw, i * lw, -cut + (i + 1) * lw)
+                An.append(X[i * lw:-cut + (i + 1) * lw])
+
+            An.append(X[(overlap - 1) * lw:])
+
+            X = np.array(An)
+            print(X.shape)
+
         Xt.append(V)
         yt.append(yip)
     return Xt, np.array(yt)
