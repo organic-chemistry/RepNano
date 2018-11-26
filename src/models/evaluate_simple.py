@@ -59,6 +59,8 @@ parser.add_argument('--weight-name', dest='weight_name', type=str)
 parser.add_argument('--typem', dest='typem', type=int,default=1)
 parser.add_argument('--maxf', dest='maxf', type=int,default=None)
 parser.add_argument('--window-length', dest='length_window', type=int,default=None)
+parser.add_argument('--overlap', dest='overlap', type=int,default=None)
+
 
 
 args = parser.parse_args()
@@ -93,7 +95,7 @@ for t in train_test:
     #print(ws)
     X,y = load_data([t],root=args.root)
     Xrt,yrt,fnt = load_events(X[:args.maxf],y[:args.maxf],min_length=length_window)
-    Xt,yt =transform_reads(Xrt,np.array(yrt),lenv=length_window,max_len=2000)
+    Xt,yt =transform_reads(Xrt,np.array(yrt),lenv=length_window,max_len=2000,overlap=args.overlap)
 
     data[t.split("/")[-1][:-4]]=[Xt,[yti[0][0] for yti in yt]]
 
@@ -109,8 +111,11 @@ for d in closer:
     print(d)
     yr.extend(data[d][1])
     for xt in data[d][0]:
-        Predicts.append(np.mean(ntwk.predict(xt)))
-
+        if overlap is None:
+            Predicts.append(np.mean(ntwk.predict(xt)))
+        else:
+            r = ntwk.predict(xt.reshape(-1,length_window,xt.shape[-1])).reshape(overlap,-1,1)
+            Predicts.append(np.median(r,axis=0))
 Predicts2 = []
 closer = ["B-9-yeast","B-yeast"]
 Xr=[]
