@@ -1,10 +1,11 @@
 # LSTM and CNN for sequence classification in the IMDB dataset
 import numpy
 from keras.models import Sequential
-from keras.layers import Dense,Flatten,Average
+from keras.layers import Dense,Flatten,Average,TimeDistributed
 from keras.layers import LSTM
 from keras.layers.convolutional import Conv1D
 from keras.layers.convolutional import MaxPooling1D
+
 import h5py
 import glob
 import pandas as pd
