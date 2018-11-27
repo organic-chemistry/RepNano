@@ -7,7 +7,7 @@ from keras.layers.convolutional import MaxPooling1D
 import numpy as np
 import pylab
 import pandas as pd
-
+import os
 def model(typem=1):
     if typem==1:
 
