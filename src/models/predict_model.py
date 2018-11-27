@@ -5,6 +5,7 @@ import numpy as np
 from .model import build_models
 from ..features.extract_events import extract_events, scale, scale_clean,scale_ratio,find2
 from ..features.helpers import scale_clean_two
+from .simple_utilities import transform_reads
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import LSTM
@@ -29,7 +30,8 @@ def get_events(h5, already_detected=True, chemistry="r9.5", window_size=None, ol
 
 
 def basecall_one_file(filename, output_file,output_file2, ntwk,ntwk2, alph, already_detected,
-                      n_input=1, filter_size=None, chemistry="r9.5", window_size=None, clean=False, old=True, cut=None, thres=0.5):
+                      n_input=1, filter_size=None, chemistry="r9.5",
+                       window_size=None, clean=False, old=True, cut=None, thres=0.5,overlap=None):
     # try:
     assert(os.path.exists(filename)), "File %s does no exists" % filename
     h5 = h5py.File(filename, "r")
@@ -81,18 +83,33 @@ def basecall_one_file(filename, output_file,output_file2, ntwk,ntwk2, alph, alre
 
         icut=200
 
-        lc = icut * (len(X2) // icut)
+        if overlap is None:
+            lc = icut * (len(X2) // icut)
 
 
-        X2 = X2[:lc]
-        # print(X.shape)
+            X2 = X2[:lc]
+            # print(X.shape)
 
-        X2 = np.array(X2).reshape(-1, icut, X2.shape[-1])
+            X2 = np.array(X2).reshape(-1, icut, X2.shape[-1])
 
-        ntw2p = ntwk2.predict(X2)
+            ntw2p = ntwk2.predict(X2)
 
-        res = np.ones_like(X2) * ntw2p[::,np.newaxis]
-        res = res.flatten()
+
+
+            res = np.ones_like(X2) * ntw2p[::,np.newaxis]
+            res = res.flatten()
+        else:
+            X2,_ = transform_reads([events],np.array([[0]]),lenv=icut,overlap=overlap)
+            X2 = X2[0]
+            assert X2.shape[0] == overlap
+
+            r = ntwk.predict(X2.reshape(-1,icut,xt.shape[-1]))
+            #print(len(r))
+            r= r.reshape(overlap,-1,1)
+            #print(r.shape)
+            res2 = np.median(r,axis=0)
+            lc = len(res2)
+
 
         o1 = o1[:lc]
 
@@ -195,7 +212,8 @@ def load_model2(weight):
 
 def process(weights,weights1, Nbases, output, directory, reads=[], filter="",
             already_detected=True, Nmax=None, size=20, n_output_network=1, n_input=1, filter_size=None,
-            chemistry="r9.5", window_size=None, clean=False, old=True, res=False, attention=False, cut=None, thres=0.5):
+            chemistry="r9.5", window_size=None, clean=False, old=True, res=False,
+             attention=False, cut=None, thres=0.5,overlap=None):
     assert len(reads) != 0 or len(directory) != 0, "Nothing to basecall"
 
     alph = "ACGTN"
@@ -260,7 +278,8 @@ def process(weights,weights1, Nbases, output, directory, reads=[], filter="",
             print("Processing read %s" % read)
             basecall_one_file(read, fo,fo1, ntwk,ntwk2, alph, already_detected,
                               n_input=n_input, filter_size=filter_size,
-                              chemistry=chemistry, window_size=window_size, clean=clean, old=old, cut=cut, thres=thres)
+                              chemistry=chemistry, window_size=window_size,
+                              clean=clean, old=old, cut=cut, thres=thres,overlap=overlap)
 
         fo.close()
 
@@ -284,6 +303,8 @@ if __name__ == "__main__":
     parser.add_argument('--window-size', type=int, default=6, dest="window_size")
     parser.add_argument('--not-old',  dest="old", action="store_false")
     parser.add_argument('--res', dest="res", action="store_true")
+    parser.add_argument('--overlap',type=int,default=None)
+
     parser.add_argument('--clean', dest="clean", action="store_true")
 
     parser.add_argument('--attention', dest="attention", action="store_true")
@@ -297,4 +318,5 @@ if __name__ == "__main__":
             directory=args.directory, reads=args.reads, filter=args.filter,
             already_detected=args.already_detected, filter_size=args.filter_size, size=args.size,
             chemistry=args.chemistry, window_size=args.window_size,
-            old=args.old, res=args.res, attention=args.attention, clean=args.clean, cut=args.cut, thres=args.thres)
+            old=args.old, res=args.res, attention=args.attention,
+            clean=args.clean, cut=args.cut, thres=args.thres,overlap=args.overlap)
