@@ -94,7 +94,7 @@ for t in train_test:
         #print("la")
         ws=8
     #print(ws)
-    X,y = load_data([t],root=args.root,=["test_longueur_lstm_from_scratch_without_human_weights.25-0.02"])
+    X,y = load_data([t],root=args.root,values=["test_longueur_lstm_from_scratch_without_human_weights.25-0.02"])
     Xrt,yrt,fnt = load_events(X[:args.maxf],y[:args.maxf],min_length=2*length_window)
     Xt,yt =transform_reads(Xrt,np.array(yrt),lenv=length_window,max_len=2000,overlap=args.overlap,delta=args.delta)
 
