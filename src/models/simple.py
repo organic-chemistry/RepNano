@@ -148,9 +148,13 @@ else:
     model.add(MaxPooling1D(pool_size=4)) # 64
     model.add(Conv1D(filters=64, kernel_size=5, padding='same',
                      activation='relu'))
+    model.add(MaxPooling1D(pool_size=4)) #16
+    model.add(Conv1D(filters=64, kernel_size=5, padding='same',
+                             activation='relu'))
+
     model.add(TimeDistributed(Dense(1, activation='sigmoid')))
 
-    model.add(AveragePooling1D(pool_size=64))
+    model.add(AveragePooling1D(pool_size=16))
     model.add(Flatten())
     model.compile(loss='mse', optimizer='adam')  # , metrics=['accuracy'])
     #model.load_weights("test_cnv2/weights.18-0.03.hdf5")

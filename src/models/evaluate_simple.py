@@ -52,7 +52,7 @@ def model(typem=1,window_length=None):
                          activation='relu', input_shape=(256, 1)))
         model.add(MaxPooling1D(pool_size=4)) # 64
         model.add(Conv1D(filters=64, kernel_size=5, padding='same',
-                         activation='relu'))
+                         activation='relu')) # 16
         model.add(TimeDistributed(Dense(1, activation='sigmoid')))
 
         model.add(AveragePooling1D(pool_size=64))
