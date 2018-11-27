@@ -152,10 +152,14 @@ else:
     model.add(Conv1D(filters=64, kernel_size=5, padding='same',
                              activation='relu'))
 
+    model.add(LSTM(100))
+    model.add(Dense(1, activation='linear'))
+    """
     model.add(TimeDistributed(Dense(1, activation='sigmoid')))
 
+    
     model.add(AveragePooling1D(pool_size=16))
-    model.add(Flatten())
+    model.add(Flatten())"""
     model.compile(loss='mse', optimizer='adam')  # , metrics=['accuracy'])
     #model.load_weights("test_cnv2/weights.18-0.03.hdf5")
 
