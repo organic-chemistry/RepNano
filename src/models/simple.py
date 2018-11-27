@@ -1,7 +1,7 @@
 # LSTM and CNN for sequence classification in the IMDB dataset
 import numpy
 from keras.models import Sequential
-from keras.layers import Dense,Flatten
+from keras.layers import Dense,Flatten,Average
 from keras.layers import LSTM
 from keras.layers.convolutional import Conv1D
 from keras.layers.convolutional import MaxPooling1D
@@ -113,7 +113,7 @@ files = ['/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T-yeast.csv'
 indep_val = ["/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-9-yeast.csv",
              "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-yeast.csv"]
 
-indep_val = ["/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-yeast.csv"]
+#indep_val = ["/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-yeast.csv"]
 argparse_dict["traning"]=files
 argparse_dict["indep_val"]= indep_val
 
@@ -147,13 +147,9 @@ else:
     model.add(MaxPooling1D(pool_size=4)) # 64
     model.add(Conv1D(filters=64, kernel_size=5, padding='same',
                      activation='relu'))
-    model.add(MaxPooling1D(pool_size=4)) #16
-    model.add(Conv1D(filters=64, kernel_size=5, padding='same',
-                     activation='relu'))
-    model.add(MaxPooling1D(pool_size=4))
+    model.add(TimeDistributed(Dense(1, activation='sigmoid')))
 
-    model.add(Flatten())
-    model.add(Dense(1, activation='linear'))
+    model.add(Average())
     model.compile(loss='mse', optimizer='adam')  # , metrics=['accuracy'])
     #model.load_weights("test_cnv2/weights.18-0.03.hdf5")
 
