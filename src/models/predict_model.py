@@ -102,13 +102,13 @@ def basecall_one_file(filename, output_file,output_file2, ntwk,ntwk2, alph, alre
             X2,_ = transform_reads([events],np.array([[0]]),lenv=icut,overlap=overlap)
             X2 = X2[0]
             assert X2.shape[0] == overlap
-
-            r = ntwk.predict(X2.reshape(-1,icut,X2.shape[-1]))
+            #print(X2.shape,)
+            r = ntwk2.predict(X2.reshape(-1,icut,X2.shape[-1]))
             #print(len(r))
             r= r.reshape(overlap,-1,1)
             #print(r.shape)
-            res2 = np.median(r,axis=0)
-            lc = len(res2)
+            res = np.median(r,axis=0)
+            lc = len(res)
 
 
         o1 = o1[:lc]

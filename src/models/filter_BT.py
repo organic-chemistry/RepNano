@@ -34,6 +34,7 @@ parser.add_argument('--weight-name', dest='weight_name', type=str)
 parser.add_argument('--typem', dest='typem', type=int,default=1)
 parser.add_argument('--maxf', dest='maxf', type=int,default=None)
 parser.add_argument('--window-length', dest='length_window', type=int,default=200)
+parser.add_argument('--compute-only',dest="compute_only",action="store_true")
 
 
 args = parser.parse_args()
@@ -70,10 +71,13 @@ csvf[wn] = [1 for _ in range(len(csvf))]
 found=0
 assert len(Predicts) == len(fn)
 for f,r in zip(fn,Predicts):
-    if r > 0.3:
-        b=1
+    if args.compute_only:
+        b=r
     else:
-        b=0
+        if r > 0.3:
+            b=1
+        else:
+            b=0
     fnshort = f.replace("/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/","")
 
     which = csvf["filename"]==fnshort

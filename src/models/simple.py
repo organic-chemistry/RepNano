@@ -96,6 +96,29 @@ argparse_dict["commit"] = str(repo.head.commit)
 
 os.makedirs(args.root, exist_ok=True)
 
+root = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw"
+files = glob.glob(root + "/*.csv")
+#['/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T-yeast.csv',
+
+files = ['/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T-yeast.csv',
+         '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-yeast.csv',
+         '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T1-yeast.csv',
+         '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-69-yeast.csv',
+         '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-9-yeast.csv',
+         '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-40-yeast.csv',
+         '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B1-yeast.csv']
+#         '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-27-human.csv']
+
+
+indep_val = ["/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-9-yeast.csv",
+             "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-yeast.csv"]
+
+indep_val = ["/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-yeast.csv"]
+argparse["traning"]=files
+argparse["indep_val"]= indep_val
+
+
+
 with open(args.root + '/params.json', 'w') as fp:
     json.dump(argparse_dict, fp, indent=True)
 
@@ -141,22 +164,7 @@ reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,
                               patience=5, min_lr=0.0001)
 print(model.summary())
 
-root = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw"
-files = glob.glob(root + "/*.csv")
-#['/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T-yeast.csv',
 
-files = ['/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T-yeast.csv',
-         '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-yeast.csv',
-         '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T1-yeast.csv',
-         '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-69-yeast.csv',
-         '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-9-yeast.csv',
-         '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-40-yeast.csv',
-         '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B1-yeast.csv']
-#         '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-27-human.csv']
-
-
-indep_val = ["/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-9-yeast.csv",
-             "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-yeast.csv"]
 #indep_val = files
 train_test = files
 per_dataset=400
