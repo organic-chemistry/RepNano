@@ -150,7 +150,8 @@ else:
                      activation='relu'))
     model.add(TimeDistributed(Dense(1, activation='sigmoid')))
 
-    model.add(AveragePooling1D(pool_size=32))
+    model.add(AveragePooling1D(pool_size=64))
+    model.add(Flatten())
     model.compile(loss='mse', optimizer='adam')  # , metrics=['accuracy'])
     #model.load_weights("test_cnv2/weights.18-0.03.hdf5")
 
