@@ -1,7 +1,7 @@
 # LSTM and CNN for sequence classification in the IMDB dataset
 import numpy
 from keras.models import Sequential
-from keras.layers import Dense,Flatten,Average,TimeDistributed
+from keras.layers import Dense,Flatten,AveragePooling1D,TimeDistributed
 from keras.layers import LSTM
 from keras.layers.convolutional import Conv1D
 from keras.layers.convolutional import MaxPooling1D
@@ -150,7 +150,7 @@ else:
                      activation='relu'))
     model.add(TimeDistributed(Dense(1, activation='sigmoid')))
 
-    model.add(Average())
+    model.add(AveragePooling1D(pool_size=64))
     model.compile(loss='mse', optimizer='adam')  # , metrics=['accuracy'])
     #model.load_weights("test_cnv2/weights.18-0.03.hdf5")
 
