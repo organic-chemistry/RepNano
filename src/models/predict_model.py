@@ -103,7 +103,7 @@ def basecall_one_file(filename, output_file,output_file2, ntwk,ntwk2, alph, alre
             X2 = X2[0]
             assert X2.shape[0] == overlap
 
-            r = ntwk.predict(X2.reshape(-1,icut,xt.shape[-1]))
+            r = ntwk.predict(X2.reshape(-1,icut,X2.shape[-1]))
             #print(len(r))
             r= r.reshape(overlap,-1,1)
             #print(r.shape)
