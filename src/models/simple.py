@@ -194,7 +194,7 @@ print(indep_val)
 if args.lstm:
     lenv=200
 else:
-    lenv=256
+    lenv=256*2
 
 
 X_train, y_train = load_data_complete(train_test, root=root,
