@@ -54,6 +54,7 @@ def load_events(X, y, min_length=1000,ws=5,raw=False):
                             old=False, verbose=False, about_max_len=None,extra=True)
 
         if raw:
+            print(rawV)
             events={"mean":rawV}
 
         #events = events[1:-1]
