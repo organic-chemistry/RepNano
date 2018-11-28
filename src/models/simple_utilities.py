@@ -54,12 +54,12 @@ def load_events(X, y, min_length=1000,ws=5,raw=False):
                             old=False, verbose=False, about_max_len=None,extra=True)
 
         if raw:
-            print(rawV)
+            #print(len(rawV))
             events={"mean":rawV}
 
         #events = events[1:-1]
 
-        if min_length is not None and len(events) < min_length:
+        if min_length is not None and  len(events["mean"]) < min_length:
             continue
         # print(y[ifi])
 
