@@ -97,6 +97,7 @@ parser.add_argument('--maxf', dest='maxf', type=int,default=None)
 parser.add_argument('--window-length', dest='length_window', type=int,default=None)
 parser.add_argument('--overlap', dest='overlap', type=int,default=None)
 parser.add_argument('--delta', dest="delta", action="store_true")
+parser.add_argument('--raw', dest="raw", action="store_true")
 
 
 
@@ -131,7 +132,7 @@ for t in train_test:
         ws=8
     #print(ws)
     X,y = load_data([t],root=args.root,values=["test_longueur_lstm_from_scratch_without_human_weights.25-0.02","init_B"])
-    Xrt,yrt,fnt = load_events(X[:args.maxf],y[:args.maxf],min_length=2*length_window)
+    Xrt,yrt,fnt = load_events(X[:args.maxf],y[:args.maxf],min_length=2*length_window,raw=args.raw)
     Xt,yt =transform_reads(Xrt,np.array(yrt),lenv=length_window,max_len=2000,overlap=args.overlap,delta=args.delta)
 
     data[t.split("/")[-1][:-4]]=[Xt,[yti[0][0] for yti in yt]]
