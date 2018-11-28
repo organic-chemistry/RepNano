@@ -138,7 +138,7 @@ for t in train_test:
     else:
         max_len = 2000
     Xt,yt =transform_reads(Xrt,np.array(yrt),lenv=length_window,max_len=2000,overlap=args.overlap,delta=args.delta)
-    print(Xt)
+    #print(Xt)
     data[t.split("/")[-1][:-4]]=[Xt,[yti[0][0] for yti in yt]]
 
 
@@ -146,7 +146,7 @@ for t in train_test:
 
 Predicts = []
 
-closer = ["T-yeast","T1-yeast","B-9-yeast","B-40-yeast","B-69-yeast","B-yeast","B1-yeast"]
+closer = ["T-yeast","T1-yeast","B-9-yeast","B-40-yeast","B-69-yeast","B1-yeast","B-yeast"]
 Xr=[]
 yr=[]
 for d in closer:
