@@ -39,7 +39,7 @@ defs = {
 }
 
 def get_events(h5, already_detected=True, chemistry="r9.5", window_size=None,
-               old=True,verbose=True,about_max_len=None):
+               old=True,verbose=True,about_max_len=None,raw=False):
     if already_detected:
         try:
             e = h5["Analyses/Basecall_RNN_1D_000/BaseCalled_template/Events"]
@@ -52,12 +52,16 @@ def get_events(h5, already_detected=True, chemistry="r9.5", window_size=None,
         except:
             pass
     else:
-        try:
-            return h5["Segmentation_Rep/events"]
-        except:
-            #print("la")
-            return extract_events(h5, chemistry, window_size, old=old,verbose=verbose,about_max_len=about_max_len)
-
+        if not raw:
+            try:
+                return h5["Segmentation_Rep/events"]
+            except:
+                #print("la")
+                return extract_events(h5, chemistry, window_size,
+                                      old=old,verbose=verbose,about_max_len=about_max_len)
+        else:
+            return extract_events(h5, chemistry, window_size,
+                                  old=old,verbose=verbose,about_max_len=about_max_len,extra=True)
 def find2(event,maxi=1000,safe=10):
     m = event["mean"]
     d2 = np.sqrt((m[1:]-m[:-1])**2)
