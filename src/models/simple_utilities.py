@@ -83,7 +83,7 @@ def scale_one_read(events,rescale=False):
         if rescale:
 
             scale = np.percentile(x, 60) - np.percentile(x, 20)
-            print("la")
+            #print("la")
         else:
             scale=20
         # print(scale,np.percentile(x, 75) , np.percentile(x, 25))
