@@ -133,6 +133,10 @@ for t in train_test:
     #print(ws)
     X,y = load_data([t],root=args.root,values=["test_longueur_lstm_from_scratch_without_human_weights.25-0.02","init_B"])
     Xrt,yrt,fnt = load_events(X[:args.maxf],y[:args.maxf],min_length=2*length_window,raw=args.raw)
+    if args.raw:
+        max_len = 10000
+    else:
+        max_len = 2000
     Xt,yt =transform_reads(Xrt,np.array(yrt),lenv=length_window,max_len=2000,overlap=args.overlap,delta=args.delta)
 
     data[t.split("/")[-1][:-4]]=[Xt,[yti[0][0] for yti in yt]]
