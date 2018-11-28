@@ -38,6 +38,13 @@ defs = {
 
 }
 
+def smooth(ser,sc):
+    return np.array(pd.Series(ser).rolling(sc,min_periods=1,center=True).mean())
+def find_raw(raw,maxi=1000,safe=10):
+    m = raw
+    d2 = smooth(np.sqrt((m[1:]-m[:-1])**2),1000)
+
+    return min(np.argmax(d2[safe:]>3)+safe,len(m)-1),min(len(d2)-np.argmax(d2[::-1]>3)+safe,len(m)-1)
 def get_events(h5, already_detected=True, chemistry="r9.5", window_size=None,
                old=True,verbose=True,about_max_len=None,extra=False):
     if already_detected:
@@ -52,16 +59,18 @@ def get_events(h5, already_detected=True, chemistry="r9.5", window_size=None,
         except:
             pass
     else:
-        if not extra:
-            try:
+        try:
+            if not extra:
                 return h5["Segmentation_Rep/events"]
-            except:
-                #print("la")
-                return extract_events(h5, chemistry, window_size,
-                                      old=old,verbose=verbose,about_max_len=about_max_len)
-        else:
+            else:
+                raw, sl = get_raw(h5)
+                s,e = find_raw(raw)
+                return h5["Segmentation_Rep/events"],raw[s:e],sl
+        except:
+            #print("la")
             return extract_events(h5, chemistry, window_size,
-                                  old=old,verbose=verbose,about_max_len=about_max_len,extra=True)
+                                  old=old,verbose=verbose,about_max_len=about_max_len)
+
 def find2(event,maxi=1000,safe=10):
     m = event["mean"]
     d2 = np.sqrt((m[1:]-m[:-1])**2)
@@ -210,9 +219,9 @@ def extract_events(h5, chem, window_size=None, old=True, verbose=True, about_max
     if not extra:
         return events[first_event:last_event]
     else:
-        startraw = int(np.sum(events[:first_event]["length"])*sl)
-        endraw = int(np.sum(events[last_event:]["length"])*sl)
-        print(startraw,endraw,len(raw))
+        #startraw = int(np.sum(events[:first_event]["length"])*sl)
+        #endraw = int(np.sum(events[last_event:]["length"])*sl)
+        #print(startraw,endraw,len(raw))
         return events[first_event:last_event],raw[startraw:-endraw],sl
 
 
