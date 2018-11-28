@@ -25,7 +25,7 @@ def unison_shuffled_copies(a, b):
 
 
 def load_data_complete(dataset, root, per_dataset=None, lenv=200,
-                       shuffle=True,pmix=None,values=[],delta=False):
+                       shuffle=True,pmix=None,values=[],delta=False,raw=False):
 
     X_t,y_t=[],[]
     for data in dataset:
@@ -35,7 +35,7 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200,
             ws=8
         X, y = load_data([data], root=root, per_dataset=per_dataset,values=values+["init_B"])  # X filename,y B amount
         # X events y B amount  filtered for length < 10000
-        Xp, yp,fn = load_events(X, y, min_length=None,ws=ws)
+        Xp, yp,fn = load_events(X, y, min_length=None,ws=ws,raw=raw)
         assert(len(Xp) == len(yp))
 
         Xpp, ypp = transform_reads(Xp, np.array(yp), lenv=lenv,delta=delta)
@@ -82,6 +82,8 @@ parser.add_argument('--per-dataset', dest="per_dataset",type=int, default="400")
 parser.add_argument('--pmix', dest="pmix",type=float, default=None)
 parser.add_argument('--incweightT', dest="incweightT",type=float, default=None)
 parser.add_argument('--delta', dest="delta", action="store_true")
+parser.add_argument('--raw', dest="raw", action="store_true")
+
 parser.add_argument('--initw', type=str, default=None)
 
 
@@ -144,7 +146,7 @@ else:
     model = Sequential()
     # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
     model.add(Conv1D(filters=64, kernel_size=5, padding='same',
-                     activation='relu', input_shape=(256, 1)))
+                     activation='relu', input_shape=(256*2, 1)))
     model.add(MaxPooling1D(pool_size=4)) # 64
     model.add(Conv1D(filters=64, kernel_size=5, padding='same',
                      activation='relu'))
@@ -157,7 +159,7 @@ else:
     """
     model.add(TimeDistributed(Dense(1, activation='sigmoid')))
 
-    
+
     model.add(AveragePooling1D(pool_size=16))
     model.add(Flatten())"""
     model.compile(loss='mse', optimizer='adam')  # , metrics=['accuracy'])
@@ -199,10 +201,10 @@ X_train, y_train = load_data_complete(train_test, root=root,
                                       per_dataset=args.per_dataset,
                                       lenv=lenv,pmix=args.pmix,
                                       values=["test_longueur_lstm_from_scratch_without_human_weights.25-0.02"],
-                                      delta=args.delta)
+                                      delta=args.delta,raw=args.raw)
 X_val, y_val = load_data_complete(indep_val, root=root, per_dataset=50, lenv=lenv,pmix=args.pmix,
                                   values=["test_longueur_lstm_from_scratch_without_human_weights.25-0.02"],
-                                  delta=args.delta)
+                                  delta=args.delta,raw=args.raw)
 
 if args.initw is not None:
     model.load_weights(args.initw)

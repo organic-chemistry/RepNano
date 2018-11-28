@@ -170,7 +170,7 @@ def get_tstat(s, s2, wl):
     return np.concatenate([np.zeros(wl), np.abs(delta / np.sqrt(deltav)), np.zeros(wl - 1)])
 
 
-def extract_events(h5, chem, window_size=None, old=True, verbose=True, about_max_len=None):
+def extract_events(h5, chem, window_size=None, old=True, verbose=True, about_max_len=None,extra=False):
     # print("ed")
     raw, sl = get_raw(h5)
 
@@ -203,7 +203,12 @@ def extract_events(h5, chem, window_size=None, old=True, verbose=True, about_max
 
     if verbose:
         print("First event", first_event)
-    return events[first_event:last_event]
+    if not extra:
+        return events[first_event:last_event]
+    else:
+        startraw = np.sum(events[:first_event]["length"])*sl
+        endraw = np.sum(events[last_event]["length"])*sl
+        return events[first_event:last_event],raw[startraw:endraw],sl
 
 
 @jit

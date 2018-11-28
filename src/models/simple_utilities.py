@@ -39,7 +39,7 @@ def load_data(lfiles, values=["saved_weights_ratio.05-0.03","init_B"], root=".",
 
 
 
-def load_events(X, y, min_length=1000,ws=5):
+def load_events(X, y, min_length=1000,ws=5,raw=False):
     Xt = []
     indexes = []
     yt = []
@@ -48,14 +48,23 @@ def load_events(X, y, min_length=1000,ws=5):
         # print(filename)
 
         h5 = h5py.File(filename, "r")
-        events = get_events(h5, already_detected=False,
-                            chemistry="rf", window_size=np.random.randint(ws, ws+3), old=False, verbose=False, about_max_len=None)
+
+        events,rawV,sl = get_events(h5, already_detected=False,
+                            chemistry="rf", window_size=np.random.randint(ws, ws+3),
+                            old=False, verbose=False, about_max_len=None,extra=True)
+
+        if raw:
+            events={"mean":rawV}
+
         #events = events[1:-1]
 
         if min_length is not None and len(events) < min_length:
             continue
         # print(y[ifi])
+
         Xt.append({"mean":events["mean"]})
+
+
         h5.close()
 
         yt.append(y[ifi])
