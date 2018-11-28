@@ -210,8 +210,8 @@ def extract_events(h5, chem, window_size=None, old=True, verbose=True, about_max
     if not extra:
         return events[first_event:last_event]
     else:
-        startraw = np.sum(events[:first_event]["length"])*sl
-        endraw = np.sum(events[last_event]["length"])*sl
+        startraw = int(np.sum(events[:first_event]["length"])*sl)
+        endraw = int(np.sum(events[last_event]["length"])*sl)
         return events[first_event:last_event],raw[startraw:endraw],sl
 
 
