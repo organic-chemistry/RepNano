@@ -39,7 +39,7 @@ defs = {
 }
 
 def get_events(h5, already_detected=True, chemistry="r9.5", window_size=None,
-               old=True,verbose=True,about_max_len=None,raw=False):
+               old=True,verbose=True,about_max_len=None,extra=False):
     if already_detected:
         try:
             e = h5["Analyses/Basecall_RNN_1D_000/BaseCalled_template/Events"]
@@ -52,7 +52,7 @@ def get_events(h5, already_detected=True, chemistry="r9.5", window_size=None,
         except:
             pass
     else:
-        if not raw:
+        if not extra:
             try:
                 return h5["Segmentation_Rep/events"]
             except:
