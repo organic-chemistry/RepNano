@@ -213,7 +213,7 @@ def extract_events(h5, chem, window_size=None, old=True, verbose=True, about_max
         startraw = int(np.sum(events[:first_event]["length"])*sl)
         endraw = int(np.sum(events[last_event:]["length"])*sl)
         print(startraw,endraw,len(raw))
-        return events[first_event:last_event],raw[startraw:endraw],sl
+        return events[first_event:last_event],raw[startraw:-endraw],sl
 
 
 @jit
