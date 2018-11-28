@@ -25,7 +25,7 @@ def unison_shuffled_copies(a, b):
 
 
 def load_data_complete(dataset, root, per_dataset=None, lenv=200,
-                       shuffle=True,pmix=None,values=[],delta=False,raw=False):
+                       shuffle=True,pmix=None,values=[],delta=False,raw=False,rescale=False):
 
     X_t,y_t=[],[]
     for data in dataset:
@@ -38,7 +38,7 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200,
         Xp, yp,fn = load_events(X, y, min_length=None,ws=ws,raw=raw)
         assert(len(Xp) == len(yp))
 
-        Xpp, ypp = transform_reads(Xp, np.array(yp), lenv=lenv,delta=delta)
+        Xpp, ypp = transform_reads(Xp, np.array(yp), lenv=lenv,delta=delta,rescale=rescale)
         Xpp = np.concatenate(Xpp, axis=0)
         ypp = np.concatenate(ypp, axis=0)
 
@@ -83,7 +83,7 @@ parser.add_argument('--pmix', dest="pmix",type=float, default=None)
 parser.add_argument('--incweightT', dest="incweightT",type=float, default=None)
 parser.add_argument('--delta', dest="delta", action="store_true")
 parser.add_argument('--raw', dest="raw", action="store_true")
-
+parser.add_argument('--rescale', dest="rescale", action="store_true")
 parser.add_argument('--initw', type=str, default=None)
 
 
@@ -200,10 +200,10 @@ X_train, y_train = load_data_complete(train_test, root=root,
                                       per_dataset=args.per_dataset,
                                       lenv=lenv,pmix=args.pmix,
                                       values=["test_longueur_lstm_from_scratch_without_human_weights.25-0.02"],
-                                      delta=args.delta,raw=args.raw)
+                                      delta=args.delta,raw=args.raw,rescale=args.rescale)
 X_val, y_val = load_data_complete(indep_val, root=root, per_dataset=50, lenv=lenv,pmix=args.pmix,
                                   values=["test_longueur_lstm_from_scratch_without_human_weights.25-0.02"],
-                                  delta=args.delta,raw=args.raw)
+                                  delta=args.delta,raw=args.raw,rescale=args.rescale)
 
 if args.initw is not None:
     model.load_weights(args.initw)
