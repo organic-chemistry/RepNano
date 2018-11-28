@@ -68,7 +68,7 @@ def model(typem=1,window_length=None):
         model = Sequential()
         # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
         model.add(Conv1D(filters=64, kernel_size=5, padding='same',
-                         activation='relu', input_shape=(256, 1)))
+                         activation='relu', input_shape=(256*2, 1)))
         model.add(MaxPooling1D(pool_size=4)) # 64
         model.add(Conv1D(filters=64, kernel_size=5, padding='same',
                          activation='relu'))
@@ -79,7 +79,7 @@ def model(typem=1,window_length=None):
         model.add(LSTM(100))
         model.add(Dense(1, activation='linear'))
         ntwk =model
-        lenv=256
+        lenv=256*2
     return ntwk,lenv
 
 
