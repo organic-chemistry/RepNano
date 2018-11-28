@@ -73,17 +73,21 @@ def load_events(X, y, min_length=1000,ws=5,raw=False):
         fnames.append(filename)
     return Xt, np.array(yt),fnames
 
-def scale_one_read(events):
+def scale_one_read(events,rescale=False):
     mean = events["mean"]
     #std = events["stdv"]
     #length = events["length"]
 
     def scale(x):
         x -= np.percentile(x, 25)
-        #scale = np.percentile(x, 75) - np.percentile(x, 25)
+        if rescale:
+
+            scale = np.percentile(x, 75) - np.percentile(x, 25)
+        else:
+            scale=20
         # print(scale,np.percentile(x, 75) , np.percentile(x, 25))
         #x /= scale
-        x /= 20
+        x /= scale
         if np.sum(x > 10) > len(x) * 0.05:
             print("Warning lotl of rare events")
             print(np.sum(x > 10 * scale), len(x))
@@ -105,14 +109,14 @@ def scale_one_read(events):
     V = np.array([mean]).T
     return V
 
-def transform_reads(X, y, lenv=200,max_len=None,overlap=None,delta=False):
+def transform_reads(X, y, lenv=200,max_len=None,overlap=None,delta=False,rescale=False):
     Xt = []
     yt = []
     # print(y.shape)
     # print(y)
     for events, yi in zip(X, y):
 
-        V = scale_one_read(events)
+        V = scale_one_read(events,rescale=rescale)
 
         if delta:
             V = V[1:]-V[:-1]

@@ -97,6 +97,7 @@ parser.add_argument('--maxf', dest='maxf', type=int,default=None)
 parser.add_argument('--window-length', dest='length_window', type=int,default=None)
 parser.add_argument('--overlap', dest='overlap', type=int,default=None)
 parser.add_argument('--delta', dest="delta", action="store_true")
+parser.add_argument('--rescale', dest="rescale", action="store_true")
 parser.add_argument('--raw', dest="raw", action="store_true")
 
 
@@ -137,7 +138,7 @@ for t in train_test:
         max_len = 10000
     else:
         max_len = 2000
-    Xt,yt =transform_reads(Xrt,np.array(yrt),lenv=length_window,max_len=2000,overlap=args.overlap,delta=args.delta)
+    Xt,yt =transform_reads(Xrt,np.array(yrt),lenv=length_window,max_len=2000,overlap=args.overlap,delta=args.delta,rescale=rescale)
     #print(Xt)
     data[t.split("/")[-1][:-4]]=[Xt,[yti[0][0] for yti in yt]]
 
