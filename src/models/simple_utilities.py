@@ -39,7 +39,7 @@ def load_data(lfiles, values=["saved_weights_ratio.05-0.03","init_B"], root=".",
 
 
 
-def load_events(X, y, min_length=1000,ws=5,raw=False):
+def load_events(X, y, min_length=1000,ws=5,raw=False,base=False):
     Xt = []
     indexes = []
     yt = []
@@ -49,9 +49,11 @@ def load_events(X, y, min_length=1000,ws=5,raw=False):
 
         h5 = h5py.File(filename, "r")
 
+
         events,rawV,sl = get_events(h5, already_detected=False,
                             chemistry="rf", window_size=np.random.randint(ws, ws+3),
                             old=False, verbose=False, about_max_len=None,extra=True)
+
 
         if raw:
             #print(len(rawV))
@@ -62,8 +64,10 @@ def load_events(X, y, min_length=1000,ws=5,raw=False):
         if min_length is not None and  len(events["mean"]) < min_length:
             continue
         # print(y[ifi])
-
-        Xt.append({"mean":events["mean"]})
+        if base:
+            Xt.append({"mean":events["mean"],"bases":events["bases"]})
+        else:
+            Xt.append({"mean":events["mean"]})
 
 
         h5.close()
@@ -115,9 +119,18 @@ def transform_reads(X, y, lenv=200,max_len=None,overlap=None,delta=False,rescale
     yt = []
     # print(y.shape)
     # print(y)
-    for events, yi in zip(X, y):
+    def mapb(B):
+        s ="ATCG"
+        r = [0,0,0,0]
+        r[s.index(B)]=1
+        return r
 
-        V = scale_one_read(events,rescale=rescale)
+    for events, yi in zip(X, y):
+        if "bases" in events.keys():
+            V = np.array([ [m] + mapb(b) for m,b in zip(events["mean"],event["bases"])])
+
+        else:
+            V = scale_one_read(events,rescale=rescale)
 
         if delta:
             V = V[1:]-V[:-1]

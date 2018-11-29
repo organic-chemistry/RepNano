@@ -25,7 +25,7 @@ if os.path.exists(args.filename) and not args.replace:
 """
 path, name = os.path.split(args.filename)
 ls = glob.glob(path + "/" + args.root_directory + "/*")
-
+print("found %i files",%len(ls))
 if os.path.exists(args.filename):
     datas = pd.read_csv(args.filename)
 else:
