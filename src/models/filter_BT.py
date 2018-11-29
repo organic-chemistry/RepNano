@@ -73,9 +73,10 @@ for xt in Xt:
 fname = os.path.split(filename)[-1][:-4]
 Predicts = np.array(Predicts)
 pylab.hist(Predicts,bins=40)
+fnf = weight_name[:-5]+"histo_B_T_%s"%(fname)+extra+".pdf"
 print("Percent of reads < 0.3",np.sum(Predicts<0.3)/np.sum(Predicts))
-pylab.savefig(weight_name[:-5]+"histo_B_T_%s"%(fname)+extra+".pdf")
-
+pylab.savefig(fnf)
+print("Writing",weight_name[:-5]+"histo_B_T_%s"%(fname)+extra+".pdf")
 csvf = pd.read_csv(filename)
 wn = weight_name[:-5]
 csvf[wn] = [1 for _ in range(len(csvf))]
