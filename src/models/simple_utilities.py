@@ -44,6 +44,7 @@ def load_events(X, y, min_length=1000,ws=5,raw=False,base=False):
     indexes = []
     yt = []
     fnames = []
+    empty = 0
     for ifi, filename in enumerate(X):
         # print(filename)
 
@@ -56,7 +57,9 @@ def load_events(X, y, min_length=1000,ws=5,raw=False,base=False):
                             old=False, verbose=False,
                              about_max_len=None,extra=True,tomb=tomb)
 
-
+        if events is None:
+            empty += 1
+            events={"mean":[],"bases":[]}
         if raw:
             #print(len(rawV))
             events={"mean":rawV}
@@ -77,6 +80,7 @@ def load_events(X, y, min_length=1000,ws=5,raw=False,base=False):
         yt.append(y[ifi])
         indexes.append(ifi)
         fnames.append(filename)
+    print("N empty %i, N file"%(len(X),len(empty)))
     return Xt, np.array(yt),fnames
 
 def scale_one_read(events,rescale=False):
