@@ -10,7 +10,7 @@ import pandas as pd
 
 def model(typem=1,window_length=None,base=False):
     init=1
-    if args.base:
+    if base:
         init = 4
     if typem==1:
 
