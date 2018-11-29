@@ -8,7 +8,7 @@ import numpy as np
 import pylab
 import pandas as pd
 
-def model(typem=1,window_length=None):
+def model(typem=1,window_length=None,base=False):
     init=1
     if args.base:
         init = 4
@@ -91,7 +91,6 @@ import argparse
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument('--file', dest='filename', type=str)
 parser.add_argument('--extra', dest='extra', type=str,default="")
 parser.add_argument('--root', dest='root', type=str,default="/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/")
 parser.add_argument('--weight-name', dest='weight_name', type=str)
@@ -108,12 +107,12 @@ parser.add_argument('--base', dest="base", action="store_true")
 
 args = parser.parse_args()
 
-filename=args.filename
 length_window=args.length_window
 maxf=args.maxf
 weight_name=args.weight_name
 typem=args.typem
 extra=args.extra
+root=args.root
 
 ntwk,lenv = model(typem=typem,window_length=length_window,base=args.base)
 ntwk.load_weights(weight_name)
@@ -140,7 +139,7 @@ for t in train_test:
         #print("la")
         ws=8
     #print(ws)
-    X,y = load_data([t],root=args.root,values=["test_longueur_lstm_from_scratch_without_human_weights.25-0.02","init_B"])
+    X,y = load_data([t],root=root,values=["test_longueur_lstm_from_scratch_without_human_weights.25-0.02","init_B"])
     Xrt,yrt,fnt = load_events(X[:args.maxf],y[:args.maxf],min_length=2*length_window,raw=args.raw,base=args.base)
     if args.raw:
         max_len = 10000
