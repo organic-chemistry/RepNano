@@ -9,6 +9,9 @@ import pylab
 import pandas as pd
 
 def model(typem=1,window_length=None):
+    init=1
+    if args.base:
+        init = 4
     if typem==1:
 
 
@@ -19,7 +22,7 @@ def model(typem=1,window_length=None):
 
         model = Sequential()
         # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
-        model.add(Conv1D(filters=32, kernel_size=3, padding='same', activation='relu', input_shape=(lenv, 1)))
+        model.add(Conv1D(filters=32, kernel_size=3, padding='same', activation='relu', input_shape=(lenv, init)))
         model.add(MaxPooling1D(pool_size=2))
         model.add(LSTM(100))
         model.add(Dense(1, activation='linear'))
@@ -99,6 +102,7 @@ parser.add_argument('--overlap', dest='overlap', type=int,default=None)
 parser.add_argument('--delta', dest="delta", action="store_true")
 parser.add_argument('--rescale', dest="rescale", action="store_true")
 parser.add_argument('--raw', dest="raw", action="store_true")
+parser.add_argument('--base', dest="base", action="store_true")
 
 
 
@@ -111,7 +115,7 @@ weight_name=args.weight_name
 typem=args.typem
 extra=args.extra
 
-ntwk,lenv = model(typem=typem,window_length=length_window)
+ntwk,lenv = model(typem=typem,window_length=length_window,base=args.base)
 ntwk.load_weights(weight_name)
 
 if length_window is None:
@@ -124,8 +128,12 @@ train_test=['/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T-yeast.c
             '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-9-yeast.csv',
             '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-40-yeast.csv',
             '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B1-yeast.csv']
+if args.base:
+    root = '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name'
 data = {}
 for t in train_test:
+    if args.base:
+        t = t.replace("raw","tomb/clean_name")
     print(t)
     ws=5
     if "T-yeast" in t:
@@ -133,7 +141,7 @@ for t in train_test:
         ws=8
     #print(ws)
     X,y = load_data([t],root=args.root,values=["test_longueur_lstm_from_scratch_without_human_weights.25-0.02","init_B"])
-    Xrt,yrt,fnt = load_events(X[:args.maxf],y[:args.maxf],min_length=2*length_window,raw=args.raw)
+    Xrt,yrt,fnt = load_events(X[:args.maxf],y[:args.maxf],min_length=2*length_window,raw=args.raw,base=args.base)
     if args.raw:
         max_len = 10000
     else:
