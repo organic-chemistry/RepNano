@@ -57,6 +57,8 @@ if args.base:
 
 X,y = load_data([filename],root=root)
 Xr,yr,fn = load_events(X,y,min_length=length_window,base=args.base,maxf=args.maxf)
+assert(len(fn)==len(Xr))
+print("Nfiles",len(Xr))
 yr = np.array(yr)
 Xt,yt =transform_reads(Xr,yr,lenv=length_window)
 
