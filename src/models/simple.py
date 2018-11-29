@@ -100,7 +100,7 @@ repo = Repo("./")
 argparse_dict["commit"] = str(repo.head.commit)
 
 os.makedirs(args.root, exist_ok=True)
-if args.base:
+if not args.base:
     root = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw"
 else:
     root = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean"
