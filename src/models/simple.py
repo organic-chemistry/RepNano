@@ -218,10 +218,10 @@ else:
 X_train, y_train = load_data_complete(train_test, root=root,
                                       per_dataset=args.per_dataset,
                                       lenv=lenv,pmix=args.pmix,
-                                      values=["test_longueur_lstm_from_scratch_without_human_weights.25-0.02"],
+                                      values=["test_with_tombo/weights.03-0.03","test_longueur_lstm_from_scratch_without_human_weights.25-0.02"],
                                       delta=args.delta,raw=args.raw,rescale=args.rescale,base=args.base)
 X_val, y_val = load_data_complete(indep_val, root=root, per_dataset=50, lenv=lenv,pmix=args.pmix,
-                                  values=["test_longueur_lstm_from_scratch_without_human_weights.25-0.02"],
+                                  values=["test_with_tombo/weights.03-0.03","test_longueur_lstm_from_scratch_without_human_weights.25-0.02"],
                                   delta=args.delta,raw=args.raw,rescale=args.rescale,base=args.base)
 
 if args.initw is not None:
