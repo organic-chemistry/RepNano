@@ -50,6 +50,7 @@ def get_events(h5, already_detected=True, chemistry="r9.5", window_size=None,
     if tomb:
         print("la")
         try:
+            print(h5.filename)
             e = h5["Analyses/RawGenomeCorrected_000/BaseCalled_template/Events"]
             print(e)
         except:
