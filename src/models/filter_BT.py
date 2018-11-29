@@ -22,6 +22,7 @@ def model(typem=1,base=False):
         model.add(Dense(1, activation='linear'))
         model.compile(loss='mse', optimizer='adam')  # , metrics=['accuracy'])
         ntwk=model
+    ntwk.summary()
     return ntwk
 
 
@@ -60,7 +61,7 @@ yr = np.array(yr)
 Xt,yt =transform_reads(Xr,yr,lenv=length_window)
 
 
-ntwk = model(typem=typem)
+ntwk = model(typem=typem,base=args.base)
 ntwk.load_weights(weight_name)
 
 Predicts = []
