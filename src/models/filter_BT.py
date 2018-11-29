@@ -45,9 +45,13 @@ maxf=args.maxf
 weight_name=args.weight_name
 typem=args.typem
 extra=args.extra
+root = args.root
+
+if args.base:
+    root = '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name'
 
 X,y = load_data([filename],root=args.root)
-Xr,yr,fn = load_events(X[:maxf],y[:maxf],min_length=length_window)
+Xr,yr,fn = load_events(X,y,min_length=length_window,base=args.base,maxf=args.maxf)
 yr = np.array(yr)
 Xt,yt =transform_reads(Xr,yr,lenv=length_window)
 

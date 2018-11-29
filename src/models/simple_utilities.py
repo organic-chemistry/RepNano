@@ -81,8 +81,8 @@ def load_events(X, y, min_length=1000,ws=5,raw=False,base=False,maxf=None):
         indexes.append(ifi)
         fnames.append(filename)
         if ifi -empty> maxf:
-            break 
-    print("N empty %i, N files %i"%(empty,len(X)))
+            break
+    print("N empty %i, N files %i"%(empty,ifi))
     return Xt, np.array(yt),fnames
 
 def scale_one_read(events,rescale=False):
