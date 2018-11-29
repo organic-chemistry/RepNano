@@ -41,7 +41,7 @@ def basecall_one_file(filename, output_file,output_file2, ntwk,ntwk2, alph, alre
         h5.close()
         return 0
 
-    if len(events) < 200:
+    if len(events) < 400:
         print("Read %s too short, not basecalling" % filename)
         h5.close()
         return 0
@@ -69,7 +69,7 @@ def basecall_one_file(filename, output_file,output_file2, ntwk,ntwk2, alph, alre
     X2 = np.array([X2]).T
 
 
-    print(np.mean(X[:, 0]))
+    #print(np.mean(X[:, 0]))
 
     if cut is None:
 
@@ -105,6 +105,7 @@ def basecall_one_file(filename, output_file,output_file2, ntwk,ntwk2, alph, alre
             #print(X2.shape,)
             r = ntwk2.predict(X2.reshape(-1,icut,X2.shape[-1]))
             #print(len(r))
+            #print(r,X2,len(events))
             r= r.reshape(overlap,-1,1)
             #print(r.shape)
             res = np.median(r,axis=0)
@@ -311,11 +312,12 @@ if __name__ == "__main__":
     parser.add_argument('--size', dest="size", type=int, default=20)
     parser.add_argument('--cut', dest="cut", type=int, default=None)
     parser.add_argument('--thres', dest="thres", type=float, default=0.5)
+    parser.add_argument('--maxf', dest="Nmax", type=int, default=20)
 
     args = parser.parse_args()
     # exit()
     process(weights=args.weights,weights1=args.weights1, Nbases=args.Nbases, output=args.output,
-            directory=args.directory, reads=args.reads, filter=args.filter,
+            directory=args.directory, Nmax=args.Nmax,reads=args.reads, filter=args.filter,
             already_detected=args.already_detected, filter_size=args.filter_size, size=args.size,
             chemistry=args.chemistry, window_size=args.window_size,
             old=args.old, res=args.res, attention=args.attention,
