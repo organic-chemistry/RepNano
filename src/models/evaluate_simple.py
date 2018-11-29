@@ -11,7 +11,7 @@ import pandas as pd
 def model(typem=1,window_length=None,base=False):
     init=1
     if base:
-        init = 4
+        init = 5
     print(init)
     if typem==1:
 
@@ -20,10 +20,10 @@ def model(typem=1,window_length=None,base=False):
             lenv=200
         else:
             lenv=window_length
-
         model = Sequential()
         # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
-        model.add(Conv1D(filters=32, kernel_size=3, padding='same', activation='relu', input_shape=(lenv, init)))
+        model.add(Conv1D(filters=32, kernel_size=3, padding='same',
+                         activation='relu', input_shape=(lenv, init)))
         model.add(MaxPooling1D(pool_size=2))
         model.add(LSTM(100))
         model.add(Dense(1, activation='linear'))
