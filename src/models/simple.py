@@ -103,7 +103,7 @@ os.makedirs(args.root, exist_ok=True)
 if not args.base:
     root = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw"
 else:
-    root = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean"
+    root = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name"
 files = glob.glob(root + "/*.csv")
 #['/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T-yeast.csv',
 if not args.base:
