@@ -39,7 +39,7 @@ def load_data(lfiles, values=["saved_weights_ratio.05-0.03","init_B"], root=".",
 
 
 
-def load_events(X, y, min_length=1000,ws=5,raw=False,base=False):
+def load_events(X, y, min_length=1000,ws=5,raw=False,base=False,maxf=None):
     Xt = []
     indexes = []
     yt = []
@@ -80,6 +80,8 @@ def load_events(X, y, min_length=1000,ws=5,raw=False,base=False):
         yt.append(y[ifi])
         indexes.append(ifi)
         fnames.append(filename)
+        if ifi -empty> maxf:
+            break 
     print("N empty %i, N files %i"%(empty,len(X)))
     return Xt, np.array(yt),fnames
 
