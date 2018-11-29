@@ -48,7 +48,7 @@ def find_raw(raw,maxi=1000,safe=10):
 def get_events(h5, already_detected=True, chemistry="r9.5", window_size=None,
                old=True,verbose=True,about_max_len=None,extra=False,tomb=False):
     if tomb:
-        #print("la")
+        print("la",h5.filename)
         try:
             #print(h5.filename)
             e = h5["Analyses/RawGenomeCorrected_000/BaseCalled_template/Events"].value
