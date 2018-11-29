@@ -12,6 +12,7 @@ def model(typem=1,window_length=None,base=False):
     init=1
     if base:
         init = 4
+    print(init)
     if typem==1:
 
 
