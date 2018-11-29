@@ -35,6 +35,7 @@ parser.add_argument('--typem', dest='typem', type=int,default=1)
 parser.add_argument('--maxf', dest='maxf', type=int,default=None)
 parser.add_argument('--window-length', dest='length_window', type=int,default=200)
 parser.add_argument('--compute-only',dest="compute_only",action="store_true")
+parser.add_argument('--base', dest="base", action="store_true")
 
 
 args = parser.parse_args()
