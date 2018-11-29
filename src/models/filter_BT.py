@@ -53,7 +53,7 @@ extra=args.extra
 root = args.root
 
 if args.base:
-    root = '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name'
+    root = '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/'
 
 X,y = load_data([filename],root=root)
 Xr,yr,fn = load_events(X,y,min_length=length_window,base=args.base,maxf=args.maxf)
@@ -87,7 +87,7 @@ for f,r in zip(fn,Predicts):
             b=1
         else:
             b=0
-    fnshort = f.replace("/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/","")
+    fnshort = f.replace(root,"")
 
     which = csvf["filename"]==fnshort
     found += np.sum(which)
