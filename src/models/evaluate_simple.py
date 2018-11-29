@@ -84,6 +84,7 @@ def model(typem=1,window_length=None,base=False):
         model.add(Dense(1, activation='linear'))
         ntwk =model
         lenv=256*2
+    print(ntwk.summary())
     return ntwk,lenv
 
 
