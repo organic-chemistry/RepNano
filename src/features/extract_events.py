@@ -46,7 +46,7 @@ def find_raw(raw,maxi=1000,safe=10):
 
     return min(np.argmax(d2[safe:]>3)+safe,len(m)-1),min(len(d2)-np.argmax(d2[::-1]>3)+safe,len(m)-1)
 def get_events(h5, already_detected=True, chemistry="r9.5", window_size=None,
-               old=True,verbose=True,about_max_len=None,extra=False,tomb=True):
+               old=True,verbose=True,about_max_len=None,extra=False,tomb=False):
     if tomb:
         try:
             e = h5["Analyses/RawGenomeCorrected_000/BaseCalled_template/Events"]

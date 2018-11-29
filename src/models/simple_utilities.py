@@ -48,11 +48,13 @@ def load_events(X, y, min_length=1000,ws=5,raw=False,base=False):
         # print(filename)
 
         h5 = h5py.File(filename, "r")
-
-
+        tomb=False
+        if args.bases:
+            tomb=True
         events,rawV,sl = get_events(h5, already_detected=False,
                             chemistry="rf", window_size=np.random.randint(ws, ws+3),
-                            old=False, verbose=False, about_max_len=None,extra=True)
+                            old=False, verbose=False,
+                             about_max_len=None,extra=True,tomb=tomb)
 
 
         if raw:
