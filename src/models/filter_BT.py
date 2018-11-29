@@ -8,12 +8,15 @@ import numpy as np
 import pylab
 import pandas as pd
 import os
-def model(typem=1):
+def model(typem=1,base=False):
+    init = 1
+    if base:
+        init=5
     if typem==1:
 
         model = Sequential()
         # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
-        model.add(Conv1D(filters=32, kernel_size=3, padding='same', activation='relu', input_shape=(200, 1)))
+        model.add(Conv1D(filters=32, kernel_size=3, padding='same', activation='relu', input_shape=(200, init)))
         model.add(MaxPooling1D(pool_size=2))
         model.add(LSTM(100))
         model.add(Dense(1, activation='linear'))
@@ -51,8 +54,8 @@ root = args.root
 if args.base:
     root = '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name'
 
-X,y = load_data([filename],root=args.root)
-Xr,yr,fn = load_events(X,y,min_length=length_window,base=args.base,maxf=args.maxf)
+X,y = load_data([filename],root=root)
+Xr,yr,fn = load_events(X,y,min_length=length_window,base=args.base,maxf=args.maxf,base=args.base)
 yr = np.array(yr)
 Xt,yt =transform_reads(Xr,yr,lenv=length_window)
 
