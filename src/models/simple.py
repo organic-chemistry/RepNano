@@ -100,8 +100,10 @@ repo = Repo("./")
 argparse_dict["commit"] = str(repo.head.commit)
 
 os.makedirs(args.root, exist_ok=True)
-
-root = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw"
+if args.base:
+    root = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw"
+else:
+    root = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean"
 files = glob.glob(root + "/*.csv")
 #['/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T-yeast.csv',
 if not args.base:
