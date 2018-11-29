@@ -133,7 +133,7 @@ def transform_reads(X, y, lenv=200,max_len=None,overlap=None,delta=False,rescale
 
     for events, yi in zip(X, y):
         if "bases" in events.keys():
-            V = np.array([ [m] + mapb(b) for m,b in zip(events["mean"],event["bases"])])
+            V = np.array([ [m] + mapb(b) for m,b in zip(events["mean"],events["bases"])])
 
         else:
             V = scale_one_read(events,rescale=rescale)
