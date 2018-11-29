@@ -48,22 +48,23 @@ def find_raw(raw,maxi=1000,safe=10):
 def get_events(h5, already_detected=True, chemistry="r9.5", window_size=None,
                old=True,verbose=True,about_max_len=None,extra=False,tomb=False):
     if tomb:
-        print("la")
+        #print("la")
         try:
-            print(h5.filename)
-            e = h5["Analyses/RawGenomeCorrected_000/BaseCalled_template/Events"]
-            print(e)
+            #print(h5.filename)
+            e = h5["Analyses/RawGenomeCorrected_000/BaseCalled_template/Events"].value
+            #print(e)
         except:
-            print("failed")
+            #print("failed")
             h5.close()
             return None,None,None
-        e = list(e)
+        #e = list(e)
         mean = []
         bases = []
         for ie in e:
             mean.append(ie[0])
             base = "%s"%ie[4]
             bases.append(base[2:-1])
+        h5.close()
         return {"mean":mean,"bases":bases},None,None
 
     if already_detected:
