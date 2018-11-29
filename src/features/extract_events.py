@@ -55,7 +55,9 @@ def get_events(h5, already_detected=True, chemistry="r9.5", window_size=None,
             print(e)
         except:
             print("failed")
+            h5.close()
             return None,None,None
+        e = list(e)
         mean = []
         bases = []
         for ie in e:
