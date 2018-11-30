@@ -25,7 +25,7 @@ def unison_shuffled_copies(a, b):
 
 
 def load_data_complete(dataset, root, per_dataset=None, lenv=200,
-                       shuffle=False,pmix=None,values=[],delta=False,
+                       shuffle=True,pmix=None,values=[],delta=False,
                        raw=False,rescale=False,base=False):
 
     X_t,y_t=[],[]
@@ -239,8 +239,8 @@ print(X_train.shape, y_train.shape)
 X_val = X_val[:64 * len(X_val) // 64]
 y_val = y_val[:64 * len(y_val) // 64]
 print(y_train[::40],np.mean(y_train,axis=0))
-for yi in y_train:
-    print(yi)
+#for yi in y_train:
+#    print(yi)
 #, validation_data=(X_val, y_val[::, 0], y_val[::, 1])
 if args.incweightT is not None:
     print(np.mean(y_train,axis=0))
