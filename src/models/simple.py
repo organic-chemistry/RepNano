@@ -37,6 +37,7 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200,
         X, y = load_data([data], root=root, per_dataset=per_dataset,values=values+["init_B"])  # X filename,y B amount
         # X events y B amount  filtered for length < 10000
         Xp, yp,fn = load_events(X, y, min_length=None,ws=ws,raw=raw,base=base)
+        print("Mean Values",np.mean(yp,axis=0))
         assert(len(Xp) == len(yp))
 
         Xpp, ypp = transform_reads(Xp, np.array(yp), lenv=lenv,delta=delta,rescale=rescale)
