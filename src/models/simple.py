@@ -42,6 +42,7 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200,
         assert(len(Xp) == len(yp))
 
         Xpp, ypp = transform_reads(Xp, np.array(yp), lenv=lenv,delta=delta,rescale=rescale)
+        print(Xpp[0].shape)
         Xpp = np.concatenate(Xpp, axis=0)
         ypp = np.concatenate(ypp, axis=0)
         print("Total cumulated read length_after_cut",np.sum([xi.shape[0] for xi in Xpp]))
