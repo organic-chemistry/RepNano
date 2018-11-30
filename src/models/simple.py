@@ -132,8 +132,8 @@ else:
     #         '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-27-human.csv']
 
 
-    indep_val = [ '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/B-40-yeast.csv',
-        "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/B-yeast.csv"]
+    indep_val = []#[ '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/B-40-yeast.csv',
+    #    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/B-yeast.csv"]
 
 #indep_val = ["/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-yeast.csv"]
 argparse_dict["traning"]=files
@@ -232,7 +232,7 @@ else:
 X_train, y_train = load_data_complete(train_test, root=root,
                                       per_dataset=args.per_dataset,
                                       lenv=lenv,pmix=args.pmix,
-                                      values=["test_with_tombo/weights.03-0.03","test_longueur_lstm_from_scratch_without_human_weights.25-0.02"],
+                                      values=["test_with_tombo_CNV_logcosh_3layers/weights.22-0.01","test_with_tombo/weights.03-0.03","test_longueur_lstm_from_scratch_without_human_weights.25-0.02"],
                                       delta=args.delta,raw=args.raw,rescale=args.rescale,base=args.base)
 X_val, y_val = load_data_complete(indep_val, root=root, per_dataset=50, lenv=lenv,pmix=args.pmix,
                                   values=["test_with_tombo/weights.03-0.03","test_longueur_lstm_from_scratch_without_human_weights.25-0.02"],
