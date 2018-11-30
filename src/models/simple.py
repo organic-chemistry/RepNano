@@ -181,13 +181,15 @@ else:
     #model.add(Dense(1, activation='linear'))
     """
     model.add(MaxPooling1D(pool_size=4))
+    model.add(Conv1D(filters=32, kernel_size=5, padding='same',
+                             activation='relu'))
     model.add(TimeDistributed(Dense(1, activation='sigmoid')))
     model.add(AveragePooling1D(pool_size=25))
 
 
 
     model.add(Flatten())
-    model.compile(loss='logcosh', optimizer='sgd')  # , metrics=['accuracy'])
+    model.compile(loss='logcosh', optimizer='adam')  # , metrics=['accuracy'])
     #model.load_weights("test_cnv2/weights.18-0.03.hdf5")
 
 checkpointer = ModelCheckpoint(
