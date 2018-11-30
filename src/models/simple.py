@@ -187,7 +187,7 @@ else:
 
 
     model.add(Flatten())
-    model.compile(loss='logcosh', optimizer='adam')  # , metrics=['accuracy'])
+    model.compile(loss='logcosh', optimizer='sgd')  # , metrics=['accuracy'])
     #model.load_weights("test_cnv2/weights.18-0.03.hdf5")
 
 checkpointer = ModelCheckpoint(
