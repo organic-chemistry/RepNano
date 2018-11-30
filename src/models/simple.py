@@ -38,7 +38,7 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200,
         # X events y B amount  filtered for length < 10000
         Xp, yp,fn = load_events(X, y, min_length=None,ws=ws,raw=raw,base=base)
         print("Mean Values",np.mean(yp,axis=0))
-        print("Total cumulated read length",np.sum([len(xi) for xi in Xp]))
+        print("Total cumulated read length",np.sum([len(xi["mean"]) for xi in Xp]))
         assert(len(Xp) == len(yp))
 
         Xpp, ypp = transform_reads(Xp, np.array(yp), lenv=lenv,delta=delta,rescale=rescale)
