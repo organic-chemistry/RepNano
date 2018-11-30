@@ -25,7 +25,7 @@ def unison_shuffled_copies(a, b):
 
 
 def load_data_complete(dataset, root, per_dataset=None, lenv=200,
-                       shuffle=True,pmix=None,values=[],delta=False,
+                       shuffle=False,pmix=None,values=[],delta=False,
                        raw=False,rescale=False,base=False):
 
     X_t,y_t=[],[]
