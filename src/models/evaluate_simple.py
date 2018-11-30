@@ -157,7 +157,7 @@ def model(typem=1,window_length=None,base=False):
         model.add(AveragePooling1D(pool_size=6))
         model.add(Flatten())
         ntwk =model
-        lenv=100
+        lenv=96
     print(ntwk.summary())
     return ntwk,lenv
 
