@@ -234,7 +234,7 @@ if args.initw is not None:
 print(X_train.shape, y_train.shape)
 X_val = X_val[:64 * len(X_val) // 64]
 y_val = y_val[:64 * len(y_val) // 64]
-print(y_train[::20],np.mean(y_train,axis=0))
+print(y_train,np.mean(y_train,axis=0))
 #, validation_data=(X_val, y_val[::, 0], y_val[::, 1])
 if args.incweightT is not None:
     print(np.mean(y_train,axis=0))
