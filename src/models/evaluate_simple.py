@@ -106,6 +106,31 @@ def model(typem=1,window_length=None,base=False):
         model.add(Flatten())
         ntwk =model
         lenv=100
+
+    if typem==6:
+        model = Sequential()
+        # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
+        model.add(Conv1D(filters=32, kernel_size=5, padding='same',
+                         activation='relu', input_shape=(100, init)))
+        """
+        model.add(MaxPooling1D(pool_size=4)) # 16
+        model.add(Conv1D(filters=64, kernel_size=5, padding='same',
+                         activation='relu'))
+        model.add(MaxPooling1D(pool_size=4)) #4
+        model.add(Conv1D(filters=64, kernel_size=5, padding='same',
+                                 activation='relu'))
+
+        #model.add(LSTM(100))
+        #model.add(Dense(1, activation='linear'))
+        """
+        model.add(MaxPooling1D(pool_size=4))
+        model.add(Conv1D(filters=32, kernel_size=5, padding='same',
+                                 activation='relu'))
+        model.add(TimeDistributed(Dense(1, activation='sigmoid')))
+        model.add(AveragePooling1D(pool_size=25))
+        model.add(Flatten())
+        ntwk =model
+        lenv=100
     print(ntwk.summary())
     return ntwk,lenv
 
