@@ -49,7 +49,7 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200,
         X_t.append(Xpp)
         y_t.append(ypp)
 
-    print(X_t)
+    #print(X_t)
     X_t = np.concatenate(X_t, axis=0)
     y_t = np.concatenate(y_t, axis=0)
 
