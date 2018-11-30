@@ -1,6 +1,6 @@
 from .simple_utilities import load_data,load_events,transform_reads
 from keras.models import Sequential
-from keras.layers import Dense
+from keras.layers import Dense,Flatten,TimeDistributed,AveragePooling1D
 from keras.layers import LSTM
 from keras.layers.convolutional import Conv1D
 from keras.layers.convolutional import MaxPooling1D
