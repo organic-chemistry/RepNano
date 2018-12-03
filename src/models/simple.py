@@ -248,6 +248,7 @@ if args.initw is not None:
     model.load_weights(args.initw)
 print(X_train.shape, y_train.shape)
 print(y_train[::40],np.mean(y_train,axis=0))
+print(X_train.dtype,y_train.dtype)
 #for yi in y_train:
 #    print(yi)
 #, validation_data=(X_val, y_val[::, 0], y_val[::, 1])
