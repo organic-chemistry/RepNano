@@ -202,6 +202,7 @@ train_test=['/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T-yeast.c
             '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-69-yeast.csv',
             '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-9-yeast.csv',
             '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-40-yeast.csv',
+            '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-27-human.csv'
             '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B1-yeast.csv']
 if args.base:
     root = '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name'
@@ -231,7 +232,7 @@ for t in train_test:
 
 Predicts = []
 
-closer = ["T-yeast","T1-yeast","B-9-yeast","B-40-yeast","B-69-yeast","B1-yeast","B-yeast"]
+closer = ["T-yeast","T1-yeast","B-9-yeast","B-27-human","B-40-yeast","B-69-yeast","B1-yeast","B-yeast"]
 Xr=[]
 yr=[]
 for d in closer:
