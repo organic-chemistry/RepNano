@@ -197,6 +197,7 @@ if length_window is None:
     length_window = lenv
 
 train_test=['/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T-yeast.csv',
+            '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T-human.csv',
             '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-yeast.csv',
             '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T1-yeast.csv',
             '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-69-yeast.csv',
@@ -232,7 +233,7 @@ for t in train_test:
 
 Predicts = []
 
-closer = ["T-yeast","T1-yeast","B-9-yeast","B-27-human","B-40-yeast","B-69-yeast","B1-yeast","B-yeast"]
+closer = ["T-yeast","T1-yeast","T-human","B-9-yeast","B-27-human","B-40-yeast","B-69-yeast","B1-yeast","B-yeast"]
 Xr=[]
 yr=[]
 for d in closer:
