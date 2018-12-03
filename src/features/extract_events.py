@@ -56,13 +56,8 @@ def get_events(h5, already_detected=True, chemistry="r9.5", window_size=None,
             #print("failed")
             return None,None,None
         #e = list(e)
-        mean = []
-        bases = []
-        for ie in e:
-            mean.append(ie[0])
-            base = "%s"%ie[4]
-            bases.append(base[2:-1])
-        return {"mean":mean,"bases":bases},None,None
+        return {"mean":e["norm_mean"],"bases":np.array(e["base"],dtype=str)},None,None
+    
 
     if already_detected:
         try:
