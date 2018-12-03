@@ -135,7 +135,7 @@ def transform_reads(X, y, lenv=200,max_len=None,overlap=None,delta=False,rescale
         return r
 
     for events, yi in zip(X, y):
-        if "bases" in events.keys():
+        if type(events) == dict and "bases" in events.keys():
             V = np.array([ [m] + mapb(b) for m,b in zip(events["mean"],events["bases"])])
 
         else:
