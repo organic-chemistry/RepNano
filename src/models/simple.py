@@ -123,7 +123,7 @@ if not args.base:
     indep_val = ["/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-9-yeast.csv",
                  "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-yeast.csv"]
 else:
-    files = ['/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/T-human.csv', 
+    files = ['/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/T-human.csv',
             '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/B-27-human.csv',
              '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/T-yeast.csv',
             '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/B-yeast.csv',
@@ -170,7 +170,7 @@ if args.lstm:
 else:
     model = Sequential()
     # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
-    model.add(Conv1D(filters=32, kernel_size=5, padding='same',
+    model.add(Conv1D(filters=64, kernel_size=5, padding='same',
                      activation='relu', input_shape=(96, init)))
     """
     model.add(MaxPooling1D(pool_size=4)) # 16
@@ -184,10 +184,10 @@ else:
     #model.add(Dense(1, activation='linear'))
     """
     model.add(MaxPooling1D(pool_size=4))
-    model.add(Conv1D(filters=32, kernel_size=5, padding='same',
+    model.add(Conv1D(filters=64, kernel_size=5, padding='same',
                              activation='relu'))
     model.add(MaxPooling1D(pool_size=4))
-    model.add(Conv1D(filters=32, kernel_size=5, padding='same',
+    model.add(Conv1D(filters=64, kernel_size=5, padding='same',
                              activation='relu'))
     model.add(TimeDistributed(Dense(1, activation='sigmoid')))
     model.add(AveragePooling1D(pool_size=6))
