@@ -55,6 +55,7 @@ def basecall_one_file(filename, output_file,output_file2, ntwk,ntwk2, alph, alre
     #print(first_event)
     events = events[first_event:last_event]
     """
+    #print(len(events),"La")
     mean = events["mean"]
     std = events["stdv"]
     length = events["length"]
@@ -80,6 +81,7 @@ def basecall_one_file(filename, output_file,output_file2, ntwk,ntwk2, alph, alre
         except:
             o1, o2 = ntwk.predict(X)
 
+        #print(len(o1))
 
         icut=200
 
@@ -100,7 +102,9 @@ def basecall_one_file(filename, output_file,output_file2, ntwk,ntwk2, alph, alre
             res = res.flatten()
         else:
             X2,_ = transform_reads([events],np.array([[0]]),lenv=icut,overlap=overlap)
+
             X2 = X2[0]
+            #print(X2.shape)
             assert X2.shape[0] == overlap
             #print(X2.shape,)
             r = ntwk2.predict(X2.reshape(-1,icut,X2.shape[-1]))
@@ -108,7 +112,18 @@ def basecall_one_file(filename, output_file,output_file2, ntwk,ntwk2, alph, alre
             #print(r,X2,len(events))
             r= r.reshape(overlap,-1,1)
             #print(r.shape)
+            #print(r.shape)
             res = np.median(r,axis=0)
+            #print(res.shape)
+            res0 = np.ones((res.shape[0],icut,1)) * res[::,np.newaxis,::]
+            #print("Res0",icut,res0.shape,(res.shape[0],icut,1))
+            res0 = res0.flatten()
+            #print("Res0",res0.shape)
+
+            res = res0
+            #print(len(res),len(o1))
+            #print(res)
+
             lc = len(res)
 
 

@@ -226,6 +226,8 @@ def extract_events(h5, chem, window_size=None, old=True, verbose=True, about_max
     """
     v = find2(events)
     first_event,last_event = v
+
+    #print(len(events),first_event,last_event)
     #last_event = None
     #first_event,last_event = 0,None
     #print(first_event)
