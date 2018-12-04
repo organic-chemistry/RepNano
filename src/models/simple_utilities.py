@@ -189,7 +189,8 @@ def transform_reads(X, y, lenv=200,max_len=None,overlap=None,delta=False,rescale
             yip[::] = yi
 
         if noise:
-            V[::,::,0] *= (0.9+0.2*np.random.rand(len(V))[::,np.newaxis])
+            #print(V.shape)
+            V[::,::,::,0] *= (0.9+0.2*np.random.rand(V.shape[0])[np.newaxis,::,np.newaxis])
 
         Xt.append(V)
         yt.append(yip)
