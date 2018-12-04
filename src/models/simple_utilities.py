@@ -195,7 +195,7 @@ def transform_reads(X, y, lenv=200,max_len=None,overlap=None,delta=False,rescale
                 rs = rescale_deltas(real,th,Tm)
                 new = real.copy()
                 new = (new-rs["x"][0])/rs["x"][1]
-                V=V[2:]
+                V=V[2:2+len(new)]
                 V[::,0]=new
 
         else:
