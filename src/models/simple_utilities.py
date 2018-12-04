@@ -3,6 +3,46 @@ from ..features.extract_events import extract_events,get_events
 import h5py
 import numpy as np
 import os
+
+import itertoolsertools
+
+def list_transition(length=5):
+    return [list(s) for s in itertools.product(["A","T","C","G"], repeat=length)]
+
+list_trans = list_transition()
+
+def get_signal_expected(x,Tt):
+    global list_trans
+    real = []
+    th = []
+    for n in range(2,len(x["bases"])-6):
+        delta = x["mean"][n+1]-x["mean"][n]
+        i1 = list_trans.index(x["bases"][n-2:n+3].tolist())
+        i2 = list_trans.index(x["bases"][n-1:n+4].tolist())
+        real.append(delta)
+        th.append(Tt[i1,i2])
+    return np.array(real),np.array(th)
+
+def get_tmiddle(x):
+    Tm = []
+    for n in range(2,len(x["bases"])-6):
+        if x["bases"][n] == "T" or x["bases"][n+1]=="T":
+            Tm.append(True)
+        else:
+            Tm.append(False)
+    return np.array(Tm)
+
+from scipy import optimize
+
+def rescale(real,th,Tm):
+
+    def f(x):
+        return np.sum(((real[~Tm]-x[0])/x[1] - th[~Tm])**2)
+    return optimize.minimize(f, [0,1], method="CG")
+def deltas(which,th,Tm):
+    return np.mean((which-th)**2),np.mean((which[~Tm]-th[~Tm])**2),np.mean((which[Tm]-th[Tm])**2)
+
+
 def load_data(lfiles, values=["saved_weights_ratio.05-0.03","init_B"], root=".", per_dataset=None):
     X = []
     y = []
@@ -133,7 +173,7 @@ def scale_one_read(events,rescale=False):
     V = np.array([mean]).T
     return V
 
-def transform_reads(X, y, lenv=200,max_len=None,overlap=None,delta=False,rescale=False,noise=False,extra_e=[]):
+def transform_reads(X, y, lenv=200,max_len=None,overlap=None,delta=False,rescale=False,noise=False,extra_e=[],Tt=[]):
     Xt = []
     yt = []
     # print(y.shape)
@@ -148,11 +188,15 @@ def transform_reads(X, y, lenv=200,max_len=None,overlap=None,delta=False,rescale
         if type(events) == dict and "bases" in events.keys():
             V = np.array([ [m] + mapb(b) for m,b in zip(events["mean"],events["bases"])])
             if rescale and extra_e !=[] and len(V) !=0:
-                e = extra_e[ip][0]
-                #print(e)
-                #print(V)
-                V[::,0] = V[::,0]*e["scale"] +e["shift"]
-                V[::,0] = scale(V[::,0])
+
+
+                real,th = get_signal_expected(V[::,0],Tt)
+                Tm = get_tmiddle(x)
+                rs = rescale(real,th,Tm)
+                new = real.copy()
+                new = (new-rs["x"][0])/rs["x"][1]
+                V[::,0]=new
+
         else:
             V = scale_one_read(events,rescale=rescale)
 
