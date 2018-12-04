@@ -247,7 +247,7 @@ if args.lstm:
 else:
     lenv=256*2
     lenv=100
-    lenv=96
+    lenv=96*2
 
 
 X_train, y_train = load_data_complete(train_test, root=root,
