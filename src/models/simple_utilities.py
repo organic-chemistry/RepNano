@@ -4,7 +4,7 @@ import h5py
 import numpy as np
 import os
 
-import itertoolsertools
+import itertools
 
 def list_transition(length=5):
     return [list(s) for s in itertools.product(["A","T","C","G"], repeat=length)]
