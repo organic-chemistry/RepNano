@@ -149,8 +149,8 @@ def transform_reads(X, y, lenv=200,max_len=None,overlap=None,delta=False,rescale
             V = np.array([ [m] + mapb(b) for m,b in zip(events["mean"],events["bases"])])
             if rescale and extra_e !=[] and len(V) !=0:
                 e = extra_e[ip][0]
-                print(e)
-                print(V)
+                #print(e)
+                #print(V)
                 V[::,0] = V[::,0]*e["scale"] +e["shift"]
                 V[::,0] = scale(V[::,0])
         else:
