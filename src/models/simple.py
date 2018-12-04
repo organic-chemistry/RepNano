@@ -27,7 +27,7 @@ import time
 
 def load_data_complete(dataset, root, per_dataset=None, lenv=200,
                        shuffle=True,pmix=None,values=[],delta=False,
-                       raw=False,rescale=False,base=False):
+                       raw=False,rescale=False,base=False,noise=False):
 
     X_t,y_t=[],[]
     for data in dataset:
@@ -43,7 +43,7 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200,
         print(t1-t0,"load csv")
         t0=time.time()
         # X events y B amount  filtered for length < 10000
-        Xp, yp,fn = load_events(X, y, min_length=None,ws=ws,raw=raw,base=base)
+        Xp, yp,fn = load_events(X, y, min_length=None,ws=ws,raw=raw,base=base,noise=noise)
         t1=time.time()
         print(t1-t0,"load events")
         t0=time.time()
@@ -255,11 +255,12 @@ X_train, y_train = load_data_complete(train_test, root=root,
                                       per_dataset=args.per_dataset,
                                       lenv=lenv,pmix=args.pmix,
                                       values=["test_with_tombo_CNV_logcosh_3layers/weights.22-0.01","test_with_tombo/weights.03-0.03","test_longueur_lstm_from_scratch_without_human_weights.25-0.02"],
-                                      delta=args.delta,raw=args.raw,rescale=args.rescale,base=args.base)
+                                      delta=args.delta,raw=args.raw,
+                                      rescale=args.rescale,base=args.base,noise=args.noise_norm)
 if indep_val != []:
     X_val, y_val = load_data_complete(indep_val, root=root, per_dataset=50, lenv=lenv,pmix=args.pmix,
                                       values=["test_with_tombo/weights.03-0.03","test_longueur_lstm_from_scratch_without_human_weights.25-0.02"],
-                                      delta=args.delta,raw=args.raw,rescale=args.rescale,base=args.base)
+                                      delta=args.delta,raw=args.raw,rescale=args.rescale,base=args.base,,noise=args.noise_norm)
 
 
     X_val = X_val[:64 * len(X_val) // 64]
