@@ -109,7 +109,7 @@ def scale(x,rescale=False):
     x /= scale
     if np.sum(x > 10) > len(x) * 0.05:
         print("Warning lotl of rare events")
-        print(np.sum(x > 10 * scale), len(x))
+        print(np.sum(x > 10), len(x))
     x[x > 5] = 0
     x[x < -5] = 0
 
