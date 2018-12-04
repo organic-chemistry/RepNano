@@ -236,6 +236,9 @@ train_test=['/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T-yeast.c
 if args.base:
     root = '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name'
 data = {}
+
+Tt = np.load("T-transtion.npy")
+
 for t in train_test:
     if args.base:
         t = t.replace("raw","tomb/clean_name")
@@ -256,7 +259,7 @@ for t in train_test:
     else:
         max_len = 2000
     Xt,yt =transform_reads(Xrt,np.array(yrt),lenv=length_window,max_len=2000,overlap=args.overlap,
-                           delta=args.delta,rescale=args.rescale,extra_e=extra_e)
+                           delta=args.delta,rescale=args.rescale,extra_e=extra_e,Tt=Tt)
     #print(Xt)
     data[t.split("/")[-1][:-4]]=[Xt,[yti[0][0] for yti in yt]]
 
