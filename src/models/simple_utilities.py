@@ -191,10 +191,11 @@ def transform_reads(X, y, lenv=200,max_len=None,overlap=None,delta=False,rescale
 
 
                 real,th = get_signal_expected(events,Tt)
-                Tm = get_tmiddle(x)
+                Tm = get_tmiddle(events)
                 rs = rescale(real,th,Tm)
                 new = real.copy()
                 new = (new-rs["x"][0])/rs["x"][1]
+                V=V[2:]
                 V[::,0]=new
 
         else:
