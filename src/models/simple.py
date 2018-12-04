@@ -23,6 +23,7 @@ def unison_shuffled_copies(a, b):
     p = numpy.random.permutation(len(a))
     return a[p], b[p]
 
+import time
 
 def load_data_complete(dataset, root, per_dataset=None, lenv=200,
                        shuffle=True,pmix=None,values=[],delta=False,
@@ -34,16 +35,33 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200,
         ws=5
         if "T-yeast" in data:
             ws=8
+
+        t0 = time.time()
         X, y = load_data([data], root=root, per_dataset=per_dataset,values=values+["init_B"])  # X filename,y B amount
+
+        t1=time.time()
+        print(t1-t0,"load csv")
+        t0=time.time()
         # X events y B amount  filtered for length < 10000
         Xp, yp,fn = load_events(X, y, min_length=None,ws=ws,raw=raw,base=base)
+        t1=time.time()
+        print(t1-t0,"load events")
+        t0=time.time()
+
         print("Mean Values",np.mean(yp,axis=0))
         print("Total cumulated read length",np.sum([len(xi["mean"]) for xi in Xp]))
         assert(len(Xp) == len(yp))
 
         Xpp, ypp = transform_reads(Xp, np.array(yp), lenv=lenv,delta=delta,rescale=rescale)
+        t1=time.time()
+        print(t1-t0,"transform")
+        t0=time.time()
+
         Xpp = np.concatenate(Xpp, axis=0)
         ypp = np.concatenate(ypp, axis=0)
+        t1=time.time()
+        print(t1-t0,"concat")
+        t0=time.time()
         print("Total cumulated read length_after_cut",Xpp.shape[0])
 
         X_t.append(Xpp)

@@ -244,7 +244,7 @@ for t in train_test:
         #print("la")
         ws=8
     #print(ws)
-    X,y = load_data([t],root=root,values=["test_with_tombo/weights.03-0.03","test_longueur_lstm_from_scratch_without_human_weights.25-0.02","init_B"])
+    X,y = load_data([t],root=root,values=["test_with_tombo_CNV_logcosh_3layers/weights.22-0.01","test_longueur_lstm_from_scratch_without_human_weights.25-0.02","init_B"])
     Xrt,yrt,fnt = load_events(X,y,min_length=2*length_window,raw=args.raw,base=args.base,maxf=args.maxf)
     if args.raw:
         max_len = 10000
