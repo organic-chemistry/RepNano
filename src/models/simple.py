@@ -260,7 +260,7 @@ X_train, y_train = load_data_complete(train_test, root=root,
 if indep_val != []:
     X_val, y_val = load_data_complete(indep_val, root=root, per_dataset=50, lenv=lenv,pmix=args.pmix,
                                       values=["test_with_tombo/weights.03-0.03","test_longueur_lstm_from_scratch_without_human_weights.25-0.02"],
-                                      delta=args.delta,raw=args.raw,rescale=args.rescale,base=args.base,,noise=args.noise_norm)
+                                      delta=args.delta,raw=args.raw,rescale=args.rescale,base=args.base,noise=args.noise_norm)
 
 
     X_val = X_val[:64 * len(X_val) // 64]
