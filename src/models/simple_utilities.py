@@ -95,31 +95,32 @@ def load_events(X, y, min_length=1000,ws=5,raw=False,base=False,maxf=None,extra=
     else:
         return Xt, np.array(yt),fnames,extra_e
 
+
+def scale(x,rescale=False):
+    x -= np.percentile(x, 25)
+    if rescale:
+
+        scale = np.percentile(x, 60) - np.percentile(x, 20)
+        #print("la")
+    else:
+        scale=20
+    # print(scale,np.percentile(x, 75) , np.percentile(x, 25))
+    #x /= scale
+    x /= scale
+    if np.sum(x > 10) > len(x) * 0.05:
+        print("Warning lotl of rare events")
+        print(np.sum(x > 10 * scale), len(x))
+    x[x > 5] = 0
+    x[x < -5] = 0
+
+    return x
+
 def scale_one_read(events,rescale=False):
     mean = events["mean"]
     #std = events["stdv"]
     #length = events["length"]
 
-    def scale(x):
-        x -= np.percentile(x, 25)
-        if rescale:
-
-            scale = np.percentile(x, 60) - np.percentile(x, 20)
-            #print("la")
-        else:
-            scale=20
-        # print(scale,np.percentile(x, 75) , np.percentile(x, 25))
-        #x /= scale
-        x /= scale
-        if np.sum(x > 10) > len(x) * 0.05:
-            print("Warning lotl of rare events")
-            print(np.sum(x > 10 * scale), len(x))
-        x[x > 5] = 0
-        x[x < -5] = 0
-
-        return x
-
-    mean = scale(mean.copy())
+    mean = scale(mean.copy(),rescale=rescale)
     """
     mean -= np.percentile(mean, 50)
     delta = mean[1:] - mean[:-1]
@@ -132,7 +133,7 @@ def scale_one_read(events,rescale=False):
     V = np.array([mean]).T
     return V
 
-def transform_reads(X, y, lenv=200,max_len=None,overlap=None,delta=False,rescale=False,noise=False):
+def transform_reads(X, y, lenv=200,max_len=None,overlap=None,delta=False,rescale=False,noise=False,extra_e=[]):
     Xt = []
     yt = []
     # print(y.shape)
@@ -143,10 +144,13 @@ def transform_reads(X, y, lenv=200,max_len=None,overlap=None,delta=False,rescale
         r[s.index(B)]=1
         return r
 
-    for events, yi in zip(X, y):
+    for ip(events, yi) in enumerate(zip(X, y)):
         if type(events) == dict and "bases" in events.keys():
             V = np.array([ [m] + mapb(b) for m,b in zip(events["mean"],events["bases"])])
-
+            if rescale and extra_e !=[]:
+                e = extra_e[ip]
+                V[::,0] *= (e["scale"] +e["shift"])
+                V[::,0] = scale(V[::,0])
         else:
             V = scale_one_read(events,rescale=rescale)
 

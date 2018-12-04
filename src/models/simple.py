@@ -43,7 +43,11 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200,
         print(t1-t0,"load csv")
         t0=time.time()
         # X events y B amount  filtered for length < 10000
-        Xp, yp,fn = load_events(X, y, min_length=None,ws=ws,raw=raw,base=base)
+        if base:
+            Xp, yp,fn,extra_e = load_events(X, y, min_length=None,ws=ws,raw=raw,base=base,extra=True)
+        else:
+            extra_e = []
+            Xp, yp,fn = load_events(X, y, min_length=None,ws=ws,raw=raw,base=base)
         t1=time.time()
         print(t1-t0,"load events")
         t0=time.time()
@@ -52,7 +56,7 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200,
         print("Total cumulated read length",np.sum([len(xi["mean"]) for xi in Xp]))
         assert(len(Xp) == len(yp))
 
-        Xpp, ypp = transform_reads(Xp, np.array(yp), lenv=lenv,delta=delta,rescale=rescale,noise=noise)
+        Xpp, ypp = transform_reads(Xp, np.array(yp), lenv=lenv,delta=delta,rescale=rescale,noise=noise,extra_e=extra_e)
         t1=time.time()
         print(t1-t0,"transform")
         t0=time.time()
