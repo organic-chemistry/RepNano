@@ -190,7 +190,7 @@ def transform_reads(X, y, lenv=200,max_len=None,overlap=None,delta=False,rescale
             if rescale and extra_e !=[] and len(V) !=0:
 
 
-                real,th = get_signal_expected(V[::,0],Tt)
+                real,th = get_signal_expected(events,Tt)
                 Tm = get_tmiddle(x)
                 rs = rescale(real,th,Tm)
                 new = real.copy()
