@@ -34,7 +34,7 @@ def get_tmiddle(x):
 
 from scipy import optimize
 
-def rescale(real,th,Tm):
+def rescale_deltas(real,th,Tm):
 
     def f(x):
         return np.sum(((real[~Tm]-x[0])/x[1] - th[~Tm])**2)
@@ -192,7 +192,7 @@ def transform_reads(X, y, lenv=200,max_len=None,overlap=None,delta=False,rescale
 
                 real,th = get_signal_expected(events,Tt)
                 Tm = get_tmiddle(events)
-                rs = rescale(real,th,Tm)
+                rs = rescale_deltas(real,th,Tm)
                 new = real.copy()
                 new = (new-rs["x"][0])/rs["x"][1]
                 V=V[2:]
