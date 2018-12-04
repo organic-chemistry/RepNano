@@ -144,7 +144,7 @@ def transform_reads(X, y, lenv=200,max_len=None,overlap=None,delta=False,rescale
         r[s.index(B)]=1
         return r
 
-    for ip(events, yi) in enumerate(zip(X, y)):
+    for ip,(events, yi) in enumerate(zip(X, y)):
         if type(events) == dict and "bases" in events.keys():
             V = np.array([ [m] + mapb(b) for m,b in zip(events["mean"],events["bases"])])
             if rescale and extra_e !=[]:
