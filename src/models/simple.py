@@ -108,6 +108,7 @@ parser.add_argument('--delta', dest="delta", action="store_true")
 parser.add_argument('--raw', dest="raw", action="store_true")
 parser.add_argument('--rescale', dest="rescale", action="store_true")
 parser.add_argument('--base', dest="base", action="store_true")
+parser.add_argument('--noise-norm', dest="noise_norm", action="store_true")
 parser.add_argument('--initw', type=str, default=None)
 
 

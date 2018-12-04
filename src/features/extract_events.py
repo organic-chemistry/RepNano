@@ -56,8 +56,9 @@ def get_events(h5, already_detected=True, chemistry="r9.5", window_size=None,
             #print("failed")
             return None,None,None
         #e = list(e)
-        return {"mean":e["norm_mean"],"bases":np.array(e["base"],dtype=str)},None,None
-    
+        return {"mean":e["norm_mean"],"bases":np.array(e["base"],dtype=str)},
+                    (dict(h5["Analyses/RawGenomeCorrected_000/BaseCalled_template/"].attrs),dict(h5["Analyses/RawGenomeCorrected_000/BaseCalled_template/Alignment"].attrs)
+
 
     if already_detected:
         try:

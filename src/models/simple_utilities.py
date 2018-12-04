@@ -39,12 +39,13 @@ def load_data(lfiles, values=["saved_weights_ratio.05-0.03","init_B"], root=".",
 
 
 
-def load_events(X, y, min_length=1000,ws=5,raw=False,base=False,maxf=None):
+def load_events(X, y, min_length=1000,ws=5,raw=False,base=False,maxf=None,extra=False):
     Xt = []
     indexes = []
     yt = []
     fnames = []
     empty = 0
+    extra_e =[]
     for ifi, filename in enumerate(X):
         # print(filename)
 
@@ -64,10 +65,15 @@ def load_events(X, y, min_length=1000,ws=5,raw=False,base=False,maxf=None):
             #print(len(rawV))
             events={"mean":rawV}
 
+
+
         #events = events[1:-1]
 
         if min_length is not None and  len(events["mean"]) < min_length:
             continue
+
+        if extra:
+            extra_e.append([rawV,sl])
         # print(y[ifi])
         if base:
             Xt.append({"mean":events["mean"],"bases":events["bases"]})
@@ -84,7 +90,10 @@ def load_events(X, y, min_length=1000,ws=5,raw=False,base=False,maxf=None):
             if ifi -empty> maxf:
                 break
     print("N empty %i, N files %i"%(empty,ifi))
-    return Xt, np.array(yt),fnames
+    if not extra:
+        return Xt, np.array(yt),fnames
+    else:
+        return Xt, np.array(yt),fnames,extra_e
 
 def scale_one_read(events,rescale=False):
     mean = events["mean"]
