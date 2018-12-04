@@ -132,7 +132,7 @@ def scale_one_read(events,rescale=False):
     V = np.array([mean]).T
     return V
 
-def transform_reads(X, y, lenv=200,max_len=None,overlap=None,delta=False,rescale=False):
+def transform_reads(X, y, lenv=200,max_len=None,overlap=None,delta=False,rescale=False,noise=False):
     Xt = []
     yt = []
     # print(y.shape)
@@ -187,6 +187,9 @@ def transform_reads(X, y, lenv=200,max_len=None,overlap=None,delta=False,rescale
 
             yip = np.zeros((V.shape[0], yi.shape[0]))
             yip[::] = yi
+
+        if noise:
+            V[::,::,0] *= 0.9+0.2*(1-2*np.random.rand(len(V)))[::,np.newaxis]
 
         Xt.append(V)
         yt.append(yip)
