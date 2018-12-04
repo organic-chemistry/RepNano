@@ -193,7 +193,7 @@ def transform_reads(X, y, lenv=200,max_len=None,overlap=None,delta=False,rescale
             if overlap:
                 V[::,::,::,0] *= (0.9+0.2*np.random.rand(V.shape[1])[np.newaxis,::,np.newaxis])
             else:
-                V[::,::,0] *= (0.9+0.2*np.random.rand(V.shape[0])[::np.newaxis])
+                V[::,::,0] *= (0.9+0.2*np.random.rand(V.shape[0])[::,np.newaxis])
 
         Xt.append(V)
         yt.append(yip)
