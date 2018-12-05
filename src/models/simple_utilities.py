@@ -195,7 +195,7 @@ def transform_reads(X, y, lenv=200,max_len=None,overlap=None,delta=False,rescale
             V = np.array([ [m] + mapb(b) for m,b in zip(events["mean"],events["bases"])])
             if rescale and extra_e !=[] and len(V) !=0:
 
-
+                print("Resacl")
                 real,th = get_signal_expected(events,Tt)
                 Tm = get_tmiddle(events)
                 rs = rescale_deltas(real,th,Tm)
