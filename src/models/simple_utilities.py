@@ -39,7 +39,9 @@ from scipy import optimize
 def rescale_deltas(real,th,Tm):
 
     def f(x):
-        delta = ((real[~Tm]-x[0])/x[1] - th[~Tm])**2
+        #delta = ((real[~Tm]-x[0])/x[1] - th[~Tm])**2
+        delta = ((real-x[0])/x[1] - th)**2
+
         delta[delta>np.percentile(delta,90)]=0
         return np.sum(delta)
     return optimize.minimize(f, [0,1], method="CG")
