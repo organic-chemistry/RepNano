@@ -68,7 +68,9 @@ parser.add_argument('--maxf', dest='maxf', type=int,default=None)
 parser.add_argument('--window-length', dest='length_window', type=int,default=200)
 parser.add_argument('--compute-only',dest="compute_only",action="store_true")
 parser.add_argument('--base', dest="base", action="store_true")
+parser.add_argument('--rescale', dest="rescale", action="store_true")
 
+Tt = np.load("T-T1-corrected-transition.npy")
 
 args = parser.parse_args()
 
@@ -88,7 +90,7 @@ Xr,yr,fn = load_events(X,y,min_length=length_window,base=args.base,maxf=args.max
 assert(len(fn)==len(Xr))
 print("Nfiles",len(Xr))
 yr = np.array(yr)
-Xt,yt =transform_reads(Xr,yr,lenv=length_window)
+Xt,yt =transform_reads(Xr,yr,lenv=length_window,Tt,rescale=args.rescale)
 
 
 ntwk = model(typem=typem,base=args.base)
