@@ -39,7 +39,7 @@ from scipy import optimize
 def rescale_deltas(real,th,Tm):
 
     def f(x):
-        return np.sum(((real[~Tm]-x[0])/x[1] - th[~Tm])**2)
+        return np.median(((real[~Tm]-x[0])/x[1] - th[~Tm])**2)
     return optimize.minimize(f, [0,1], method="CG")
 def deltas(which,th,Tm):
     return np.mean((which-th)**2),np.mean((which[~Tm]-th[~Tm])**2),np.mean((which[Tm]-th[Tm])**2)
