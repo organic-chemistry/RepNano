@@ -86,11 +86,15 @@ if args.base:
     root = '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/'
 
 X,y = load_data([filename],root=root)
-Xr,yr,fn = load_events(X,y,min_length=length_window,base=args.base,maxf=args.maxf)
+if not args.base:
+    Xr,yr,fn = load_events(X,y,min_length=length_window,base=args.base,maxf=args.maxf)
+    extra_e = []
+else:
+    Xr,yr,fn,extra_e = load_events(X,y,min_length=length_window,base=args.base,maxf=args.maxf,extra=True)
 assert(len(fn)==len(Xr))
 print("Nfiles",len(Xr))
 yr = np.array(yr)
-Xt,yt =transform_reads(Xr,yr,lenv=length_window,Tt,rescale=args.rescale)
+Xt,yt =transform_reads(Xr,yr,lenv=length_window,Tt=Tt,rescale=args.rescale,extra_e=extra_e)
 
 
 ntwk = model(typem=typem,base=args.base)
