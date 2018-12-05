@@ -7,21 +7,23 @@ import os
 import itertools
 
 def list_transition(length=5):
-    return [list(s) for s in itertools.product(["A","T","C","G"], repeat=length)]
-
-list_trans = list_transition()
+    lt = [list(s) for s in itertools.product(["A","T","C","G"], repeat=length)]
+    return lt,{"".join(s):lt.index(s) for s in lt}
+list_trans,d_trans=list_transition(5)
 
 def get_signal_expected(x,Tt):
-    global list_trans
     real = []
-    th = []
+    th = np.zeros((len(x["bases"])-8))
+    real = np.zeros((len(x["bases"])-8))
+
     for n in range(2,len(x["bases"])-6):
         delta = x["mean"][n+1]-x["mean"][n]
-        i1 = list_trans.index(x["bases"][n-2:n+3].tolist())
-        i2 = list_trans.index(x["bases"][n-1:n+4].tolist())
-        real.append(delta)
-        th.append(Tt[i1,i2])
-    return np.array(real),np.array(th)
+
+        i1 = d_trans["".join(x["bases"][n-2:n+3].tolist())]
+        i2 = d_trans["".join(x["bases"][n-1:n+4].tolist())]
+        real[n-2]=delta
+        th[n-2]=Tt[i1,i2]
+    return real,th
 
 def get_tmiddle(x):
     Tm = []
