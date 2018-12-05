@@ -256,6 +256,8 @@ else:
     lenv=100
     lenv=96
 
+if args.initw is not None:
+    model.load_weights(args.initw)
 
 X_train, y_train = load_data_complete(train_test, root=root,
                                       per_dataset=args.per_dataset,
@@ -272,8 +274,7 @@ if indep_val != []:
     X_val = X_val[:64 * len(X_val) // 64]
     y_val = y_val[:64 * len(y_val) // 64]
 
-if args.initw is not None:
-    model.load_weights(args.initw)
+
 print(X_train.shape, y_train.shape)
 print(y_train[::40],np.mean(y_train,axis=0))
 print(X_train.dtype,y_train.dtype)
