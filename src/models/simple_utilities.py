@@ -264,7 +264,7 @@ def transform_reads(X, y, lenv=200,max_len=None,overlap=None,delta=False,rescale
         r = [0,0,0,0]
         r[s.index(B)]=1
         return r
-
+    which_keep = []
     for ip,(events, yi) in enumerate(zip(X, y)):
         if type(events) == dict and "bases" in events.keys():
             V = np.array([ [m] + mapb(b) for m,b in zip(events["mean"],events["bases"])])
@@ -277,6 +277,7 @@ def transform_reads(X, y, lenv=200,max_len=None,overlap=None,delta=False,rescale
                     V=V[2:2+len(new)]
                     V[::,0]=new
                 else:
+                    which_keep.append(False)
                     continue
 
         else:
@@ -292,6 +293,7 @@ def transform_reads(X, y, lenv=200,max_len=None,overlap=None,delta=False,rescale
             if lenv is not None:
                 #print(V.shape,yi.shape)
                 if len(V) < lenv:
+                    which_keep.append(False)
                     continue
                 # print(V.shape,yi.shape)
 
@@ -329,4 +331,8 @@ def transform_reads(X, y, lenv=200,max_len=None,overlap=None,delta=False,rescale
 
         Xt.append(V)
         yt.append(yip)
-    return Xt, np.array(yt)
+        which_keep.append(True)
+    which_keep = np.array(which_keep)
+    assert np.sump(which_keep) == len(Xt)
+    assert len(which_keep) == len(X)
+    return Xt, np.array(yt),np.array(which_keep)
