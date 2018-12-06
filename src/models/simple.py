@@ -57,7 +57,7 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200,
         print("Total cumulated read length",np.sum([len(xi["mean"]) for xi in Xp]))
         assert(len(Xp) == len(yp))
 
-        Xpp, ypp = transform_reads(Xp, np.array(yp), lenv=lenv,delta=delta,
+        Xpp, ypp,_ = transform_reads(Xp, np.array(yp), lenv=lenv,delta=delta,
                                    rescale=rescale,noise=noise,extra_e=extra_e,Tt=Tt)
         t1=time.time()
         print(t1-t0,"transform")
