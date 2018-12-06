@@ -237,7 +237,7 @@ if args.base:
     root = '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name'
 data = {}
 
-Tt = np.load("T-T1-corrected-transition.npy")
+Tt = np.load("T-T1-corrected-transition_iter3.npy")
 
 for t in train_test:
     if args.base:
