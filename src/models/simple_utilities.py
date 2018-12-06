@@ -7,6 +7,12 @@ import os
 import itertools
 
 
+def give_ratio_index(seq):
+    val =np.zeros(len(seq))*np.nan
+    val[np.array(seq)=="T"]=0
+    val[np.array(seq)=="B"]=1
+    index = [ind for ind,v in enumerate(val) if v in [0,1] ]
+    return index
 
 def get_T_ou_B_delta_ind(x,TransitionT,TransitionB,filtered=False,rs={}):
     new,Tm,th,rs = get_rescaled_deltas(x,TransitionT,filtered=filtered,rs=rs)
