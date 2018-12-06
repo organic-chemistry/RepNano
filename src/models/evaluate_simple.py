@@ -250,10 +250,10 @@ for t in train_test:
     #print(ws)
     X,y = load_data([t],root=root,values=["test_with_tombo_CNV_logcosh_3layers/weights.22-0.01","test_longueur_lstm_from_scratch_without_human_weights.25-0.02","init_B"])
     if not args.base:
-        Xrt,yrt,fnt = load_events(X,y,min_length=2*length_window,raw=args.raw,base=args.base,maxf=args.maxf)
+        Xrt,yrt,fnt = load_events(X,y,min_length=5*length_window,raw=args.raw,base=args.base,maxf=args.maxf)
         extra_e = []
     else:
-        Xrt,yrt,fnt,extra_e = load_events(X,y,min_length=2*length_window,raw=args.raw,base=args.base,maxf=args.maxf,extra=True)
+        Xrt,yrt,fnt,extra_e = load_events(X,y,min_length=5*length_window,raw=args.raw,base=args.base,maxf=args.maxf,extra=True)
     if args.raw:
         max_len = 10000
     else:
