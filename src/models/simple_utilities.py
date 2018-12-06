@@ -8,6 +8,29 @@ import itertools
 
 
 
+def get_T_ou_B_delta_ind(x,TransitionT,TransitionB,filtered=False,rs={}):
+    new,Tm,th,rs = get_rescaled_deltas(x,TransitionT,filtered=filtered,rs=rs)
+    if filtered  and len(new) ==0:
+        return [],[],False
+
+
+    #print(len(new),len(x["bases"]))
+    real,thT = get_signal_expected_ind(x,TransitionT)
+    real,thB = get_signal_expected_ind(x,TransitionB)
+
+    deltasT = np.abs(new-thT)
+    deltasB = np.abs(new-thB)
+
+    significatif=(np.abs(thT-thB)>0.4) #& ((deltasT<0.4) | (deltasB<0.4))
+
+    seq = x["bases"][2:-3].copy()
+    seq[(~significatif) & Tm]="X"
+    which = np.argmin(np.concatenate((deltasT[::,np.newaxis],deltasB[::,np.newaxis]),axis=1),axis=1)
+    #print(significatif)
+    #print(Tm)
+    seq[significatif & (which==1) & Tm] = "B"
+    TouB=[{"T":0,"B":1}[b] for b in seq if b in ["T","B"]]
+    return seq,TouB,True
 
 
 
