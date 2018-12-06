@@ -333,6 +333,6 @@ def transform_reads(X, y, lenv=200,max_len=None,overlap=None,delta=False,rescale
         yt.append(yip)
         which_keep.append(True)
     which_keep = np.array(which_keep)
-    assert np.sump(which_keep) == len(Xt)
+    assert np.sum(which_keep) == len(Xt)
     assert len(which_keep) == len(X)
     return Xt, np.array(yt),np.array(which_keep)
