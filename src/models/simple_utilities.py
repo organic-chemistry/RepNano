@@ -271,13 +271,13 @@ def transform_reads(X, y, lenv=200,max_len=None,overlap=None,delta=False,rescale
             if rescale and extra_e !=[] and len(V) !=0:
 
                 #print("Resacl")
-                real,th = get_signal_expected_ind(events,Tt)
-                Tm = get_tmiddle(events)
-                rs = rescale_deltas(real,th,Tm)
-                new = real.copy()
-                new = (new-rs["x"][0])/rs["x"][1]
-                V=V[2:2+len(new)]
-                V[::,0]=new
+                new,Tm,th,rs = get_rescaled_deltas(events,Tt,filtered=True,rs={})
+
+                if new != []:
+                    V=V[2:2+len(new)]
+                    V[::,0]=new
+                else:
+                    continue
 
         else:
             V = scale_one_read(events,rescale=rescale)
