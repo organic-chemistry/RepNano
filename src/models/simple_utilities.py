@@ -6,6 +6,11 @@ import os
 
 import itertools
 
+
+
+
+
+
 def list_transition(length=5):
     lt = [list(s) for s in itertools.product(["A","T","C","G"], repeat=length)]
     return lt,{"".join(s):lt.index(s) for s in lt}
@@ -13,10 +18,10 @@ list_trans,d_trans=list_transition(5)
 
 def get_signal_expected(x,Tt):
     real = []
-    th = np.zeros((len(x["bases"])-8))
-    real = np.zeros((len(x["bases"])-8))
+    th = np.zeros((len(x["bases"])-5))
+    real = np.zeros((len(x["bases"])-5))
 
-    for n in range(2,len(x["bases"])-6):
+    for n in range(2,len(x["bases"])-3):
         delta = x["mean"][n+1]-x["mean"][n]
 
         i1 = d_trans["".join(x["bases"][n-2:n+3].tolist())]
@@ -25,9 +30,33 @@ def get_signal_expected(x,Tt):
         th[n-2]=Tt[i1,i2]
     return real,th
 
-def get_tmiddle(x):
+def get_indexes(x):
+    number = np.zeros(len(x["bases"]),dtype=np.int)
+    number[x["bases"]=="T"]=1
+    number[x["bases"]=="C"]=2
+    number[x["bases"]=="G"]=3
+    indexes = np.zeros((len(number)-4),dtype=np.int)
+    for i in range(5):
+        #print(len(indexes),len(number[i:len(number)-5+i]))
+        indexes += number[i:len(number)-4+i]*4**i
+
+    return indexes
+
+def get_signal_expected_ind(x,Tt):
+    real = []
+
+    th = np.zeros((len(x["bases"])-5))
+    real = np.zeros((len(x["bases"])-5))
+    indexes = get_indexes(x)
+    #print(len(th),len(th2))
+    Plat = x["mean"][2:-2]
+
+    #print(len(th),len(th2))
+    return Plat[:-1]-Plat[1:],Tt[indexes[:-1],indexes[1:]]
+
+def get_tmiddle(x,d=3):
     Tm = []
-    for n in range(2,len(x["bases"])-6):
+    for n in range(2,len(x["bases"])-d):
         if x["bases"][n] == "T" or x["bases"][n+1]=="T":
             Tm.append(True)
         else:
@@ -45,6 +74,7 @@ def rescale_deltas(real,th,Tm):
         delta[delta>np.percentile(delta,80)]=0
         return np.sum(delta)
     return optimize.minimize(f, [0,1], method="Nelder-Mead")
+
 def deltas(which,th,Tm):
     return np.mean((which-th)**2),np.mean((which[~Tm]-th[~Tm])**2),np.mean((which[Tm]-th[Tm])**2)
 
@@ -196,7 +226,7 @@ def transform_reads(X, y, lenv=200,max_len=None,overlap=None,delta=False,rescale
             if rescale and extra_e !=[] and len(V) !=0:
 
                 #print("Resacl")
-                real,th = get_signal_expected(events,Tt)
+                real,th = get_signal_expected_ind(events,Tt)
                 Tm = get_tmiddle(events)
                 rs = rescale_deltas(real,th,Tm)
                 new = real.copy()

@@ -29,7 +29,7 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200,
                        shuffle=True,pmix=None,values=[],delta=False,
                        raw=False,rescale=False,base=False,noise=False):
 
-    Tt = np.load("T-T1-corrected-transition.npy")
+    Tt = np.load("T-T1-corrected-transition_iter3.npy")
     X_t,y_t=[],[]
     for data in dataset:
         print("Loading",data)
