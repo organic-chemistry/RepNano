@@ -19,7 +19,7 @@ def get_rescaled_deltas(x,TransitionM,filtered=False,rs={}):
     Tm = get_tmiddle(x)
     if rs == {}:
         #print("Comp")
-        rs = rescale(real,th,Tm)
+        rs = rescale_deltas(real,th,Tm)
 
     new = real.copy()
     new = (new-rs["x"][0])/rs["x"][1]
