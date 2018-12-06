@@ -14,6 +14,22 @@ def give_ratio_index(seq):
     index = [ind for ind,v in enumerate(val) if v in [0,1] ]
     return index
 
+def get_rescaled_deltas(x,TransitionM,filtered=False,rs={}):
+    real,th = get_signal_expected_ind(x,TransitionM)
+    Tm = get_tmiddle(x)
+    if rs == {}:
+        #print("Comp")
+        rs = rescale(real,th,Tm)
+
+    new = real.copy()
+    new = (new-rs["x"][0])/rs["x"][1]
+    #print(rs["x"])
+    if filtered:
+        whole,NotT,T = deltas(new,th,Tm)
+        if NotT > 0.25:
+            return [],[],[],[]
+    return new,Tm,th,rs
+
 def get_T_ou_B_delta_ind(x,TransitionT,TransitionB,filtered=False,rs={}):
     new,Tm,th,rs = get_rescaled_deltas(x,TransitionT,filtered=filtered,rs=rs)
     if filtered  and len(new) ==0:
