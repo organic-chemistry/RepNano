@@ -63,7 +63,7 @@ def model(typem=1, window_length=None, base=False):
 parser = argparse.ArgumentParser()
 
 
-parser.add_argument('--weight-name', dest='weight_name', type=str)
+parser.add_argument('--weight', dest='weight_name', type=str)
 parser.add_argument('--typem', dest='typem', type=int, default=7)
 parser.add_argument('--maxf', dest='maxf', type=int, default=None)
 parser.add_argument('--window-length', dest='length_window', type=int,
@@ -73,6 +73,7 @@ parser.add_argument('--delta', dest="delta", action="store_true")
 parser.add_argument('--norescale', dest="rescale", action="store_false")
 parser.add_argument('--raw', dest="raw", action="store_true")
 parser.add_argument('--nobase', dest="base", action="store_false")
+parser.add_argument('--verbose', dest="verbose", action="store_true")
 
 parser.add_argument('--output', type=str, default="output.fasta")
 parser.add_argument('--directory', type=str, default='',
@@ -86,8 +87,6 @@ length_window = args.length_window
 maxf = args.maxf
 weight_name = args.weight_name
 typem = args.typem
-extra = args.extra
-root = args.root
 reads = args.reads
 directory = args.directory
 output = args.output
@@ -103,77 +102,93 @@ Tt = np.load("data/training/T-T1-corrected-transition_iter3.npy")
 Tb = np.load("data/training/B-corrected-transition_iter1.npy")
 
 
-if (len(reads) != 0) or (len(directory) != 0):
-    dire = os.path.split(output)[0]
-    if dire != "":
-        os.makedirs(dire, exist_ok=True)
-    print("Writing on %s" % output)
+if len(reads) == 0 and len(directory) == 0:
+    print("No read found")
+    exit()
 
-    fo = open(output, "w")
-    fo1 = open(output+"_ratio", "w")
 
-    files = reads
-    if reads == "":
-        files = []
-    if len(directory):
-        files += [os.path.join(directory, x) for x in os.listdir(directory)]
-        nfiles = []
-        for f in files:
-            if os.path.isdir(f):
-                nfiles += [os.path.join(f, x) for x in os.listdir(f)]
-            else:
-                nfiles.append(f)
-        files = nfiles
+dire = os.path.split(output)[0]
+if dire != "":
+    os.makedirs(dire, exist_ok=True)
+print("Writing on %s" % output)
 
-    if Nmax is not None:
-        files = files[-Nmax:]
-    for i, read in enumerate(files):
+fo = open(output, "w")
+fo1 = open(output+"_ratio", "w")
 
-        X = [read]
-        y = [[0, 0]]
-        if not args.base:
-            Xrt, yrt, fnt = load_events(X, y, min_length=2*length_window,
-                                        raw=args.raw, base=args.base,
-                                        maxf=args.maxf)
-            extra_e = []
+files = reads
+if reads == "":
+    files = []
+if len(directory):
+    files += [os.path.join(directory, x) for x in os.listdir(directory)]
+    nfiles = []
+    for f in files:
+        if os.path.isdir(f):
+            nfiles += [os.path.join(f, x) for x in os.listdir(f)]
         else:
-            Xrt, yrt, fnt, extra_e = load_events(
-                X, y, min_length=10*length_window, raw=args.raw,
-                base=args.base, maxf=args.maxf, extra=True)
+            nfiles.append(f)
+    files = nfiles
 
-        seq2, TouB3, Success = get_T_ou_B_delta_ind(Xrt[0], Tt, Tb, True)
-        if Success:
-            Xt, yt, _ = transform_reads(Xrt, np.array(yrt), lenv=length_window,
-                                        max_len=None, overlap=args.overlap,
-                                        delta=args.delta, rescale=args.rescale,
-                                        extra_e=extra_e, Tt=Tt)
-            if len(Xt) != 0:
-                if args.overlap is None:
-                    res = ntwk.predict(Xt[0])[0]
-                else:
-                    xt = np.array(Xt[0])
-                    # print(xt.shape)
-                    r = ntwk.predict(xt.reshape(-1, length_window, xt.shape[-1]))
-                    # print(len(r))
-                    r = r.reshape(args.overlap, -1, 1)
+if Nmax is not None:
+    files = files[-Nmax:]
 
-                    res = np.median(r, axis=0)
+print("Found %i reads" % len(files))
+for i, read in enumerate(files):
+    if args.verbose:
+        print(read)
+    X = [read]
+    y = [[0, 0]]
+    if not args.base:
+        Xrt, yrt, fnt = load_events(X, y, min_length=2*length_window,
+                                    raw=args.raw, base=args.base,
+                                    maxf=args.maxf, verbose=False)
+        extra_e = []
+    else:
+        Xrt, yrt, fnt, extra_e = load_events(
+            X, y, min_length=2*length_window, raw=args.raw,
+            base=args.base, maxf=args.maxf, extra=True, verbose=False)
 
-                res0 = np.ones((res.shape[0], length_window, 1)) * res[::, np.newaxis, ::]
+    print(extra_e)
+    if len(Xrt) == 0:
+        if args.verbose:
+            print("No event or too short")
+        continue
+    seq2, TouB3, Success = get_T_ou_B_delta_ind(Xrt[0], Tt, Tb, True)
+    if not Success:
+        continue
+    Xt, yt, _ = transform_reads(Xrt, np.array(yrt), lenv=length_window,
+                                max_len=None, overlap=args.overlap,
+                                delta=args.delta, rescale=args.rescale,
+                                extra_e=extra_e, Tt=Tt)
+    if len(Xt) == 0:
+        continue
 
-                res0 = res0.flatten()
+    if args.overlap is None:
+        res = ntwk.predict(Xt[0])
+    else:
+        xt = np.array(Xt[0])
+        # print(xt.shape)
+        r = ntwk.predict(xt.reshape(-1, length_window, xt.shape[-1]))
+        # print(len(r))
+        r = r.reshape(args.overlap, -1, 1)
 
-                res = res0
+        res = np.median(r, axis=0)
 
-                lc = len(res)
+    # print(res.shape)
+    res0 = np.ones((res.shape[0], length_window, 1)) * res[::, np.newaxis, ::]
 
-                seq2 = seq2[:lc]
+    res0 = res0.flatten()
 
-                fo.writelines(">%s_template_deepnano\n" % read)
-                fo.writelines("".join(seq2) + "\n")
+    res = res0
 
-                fo1.writelines(">%s_template_deepnano\n" % read)
-                fo1.writelines(" ".join(["%.2f" % ires2 for ires2 in res])+"\n")
+    lc = len(res)
 
-    fo.close()
-    fo1.close()
+    seq2 = seq2[:lc]
+
+    fo.writelines(">%s_template_deepnano %s \n" % (read, str(extra_e[0][1])))
+    fo.writelines("".join(seq2) + "\n")
+
+    fo1.writelines(">%s_template_deepnano\n" % read)
+    fo1.writelines(" ".join(["%.2f" % ires2 for ires2 in res])+"\n")
+
+fo.close()
+fo1.close()
