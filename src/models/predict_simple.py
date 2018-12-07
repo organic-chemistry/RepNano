@@ -132,6 +132,7 @@ if Nmax is not None:
     files = files[-Nmax:]
 
 print("Found %i reads" % len(files))
+Nempty_short = 0
 for i, read in enumerate(files):
     if args.verbose:
         print(read)
@@ -147,8 +148,8 @@ for i, read in enumerate(files):
             X, y, min_length=2*length_window, raw=args.raw,
             base=args.base, maxf=args.maxf, extra=True, verbose=False)
 
-    print(extra_e)
     if len(Xrt) == 0:
+        Nempty_short += 1
         if args.verbose:
             print("No event or too short")
         continue
@@ -192,3 +193,6 @@ for i, read in enumerate(files):
 
 fo.close()
 fo1.close()
+
+
+print("Read empty or too short ", Nempty_short)
