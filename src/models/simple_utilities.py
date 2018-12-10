@@ -50,6 +50,7 @@ def get_T_ou_B_delta_ind(x, TransitionT, TransitionB, filtered=False, rs={}):
 
     seq = x["bases"][2:-3].copy()
     seq[(~significatif) & Tm] = "X"
+    print(np.sum((~significatif) & Tm))
     which = np.argmin(np.concatenate(
         (deltasT[::, np.newaxis], deltasB[::, np.newaxis]), axis=1), axis=1)
     # print(significatif)
