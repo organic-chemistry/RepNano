@@ -13,7 +13,7 @@ def give_ratio_index(seq):
     val[np.array(seq) == "T"] = 0
     val[np.array(seq) == "B"] = 1
     index = [ind for ind, v in enumerate(val) if v in [0, 1]]
-    return index
+    return index, val[~np.isnan(val)]
 
 
 def get_rescaled_deltas(x, TransitionM, filtered=False, rs={}):
@@ -38,6 +38,7 @@ def get_T_ou_B_delta_ind(x, TransitionT, TransitionB, filtered=False, rs={}):
     if filtered and len(new) == 0:
         return [], [], False
 
+    Tm = get_strict_T_middle(x)
     # print(len(new),len(x["bases"]))
     real, thT = get_signal_expected_ind(x, TransitionT)
     real, thB = get_signal_expected_ind(x, TransitionB)
@@ -111,6 +112,16 @@ def get_tmiddle(x, d=3):
     Tm = []
     for n in range(2, len(x["bases"])-d):
         if x["bases"][n] == "T" or x["bases"][n+1] == "T":
+            Tm.append(True)
+        else:
+            Tm.append(False)
+    return np.array(Tm)
+
+
+def get_strict_T_middle(x, d=3):
+    Tm = []
+    for n in range(2, len(x["bases"])-d):
+        if x["bases"][n] == "T":
             Tm.append(True)
         else:
             Tm.append(False)
