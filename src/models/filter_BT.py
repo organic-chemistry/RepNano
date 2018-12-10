@@ -72,7 +72,7 @@ parser.add_argument('--compute-only', dest="compute_only", action="store_true")
 parser.add_argument('--base', dest="base", action="store_true")
 parser.add_argument('--rescale', dest="rescale", action="store_true")
 
-Tt = np.load("T-T1-corrected-transition.npy")
+Tt = np.load("T-T1-corrected-transition_iter3.npy")
 
 args = parser.parse_args()
 
@@ -89,7 +89,8 @@ if args.base:
 
 X, y = load_data([filename], root=root)
 if not args.base:
-    Xr, yr, fn = load_events(X, y, min_length=length_window, base=args.base, maxf=args.maxf)
+    Xr, yr, fn = load_events(X, y, min_length=length_window, base=args.base,
+                             maxf=args.maxf)
     extra_e = []
 else:
     Xr, yr, fn, extra_e = load_events(X, y, min_length=length_window,

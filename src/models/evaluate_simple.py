@@ -1,6 +1,7 @@
-from .simple_utilities import load_data,load_events,transform_reads
+import argparse
+from .simple_utilities import load_data, load_events, transform_reads
 from keras.models import Sequential
-from keras.layers import Dense,Flatten,TimeDistributed,AveragePooling1D
+from keras.layers import Dense, Flatten, TimeDistributed, AveragePooling1D
 from keras.layers import LSTM
 from keras.layers.convolutional import Conv1D
 from keras.layers.convolutional import MaxPooling1D
@@ -8,18 +9,18 @@ import numpy as np
 import pylab
 import pandas as pd
 
-def model(typem=1,window_length=None,base=False):
-    init=1
+
+def model(typem=1, window_length=None, base=False):
+    init = 1
     if base:
         init = 5
     print(init)
-    if typem==1:
-
+    if typem == 1:
 
         if window_length is None:
-            lenv=200
+            lenv = 200
         else:
-            lenv=window_length
+            lenv = window_length
         model = Sequential()
         # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
         model.add(Conv1D(filters=32, kernel_size=3, padding='same',
@@ -28,62 +29,61 @@ def model(typem=1,window_length=None,base=False):
         model.add(LSTM(100))
         model.add(Dense(1, activation='linear'))
         model.compile(loss='mse', optimizer='adam')  # , metrics=['accuracy'])
-        ntwk=model
+        ntwk = model
 
-
-    if typem==2:
+    if typem == 2:
         model = Sequential()
         # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
         model.add(Conv1D(filters=64, kernel_size=5, padding='same',
                          activation='relu', input_shape=(256, 1)))
-        model.add(MaxPooling1D(pool_size=4)) # 64
+        model.add(MaxPooling1D(pool_size=4))  # 64
         model.add(Conv1D(filters=64, kernel_size=5, padding='same',
                          activation='relu'))
-        model.add(MaxPooling1D(pool_size=4)) #16
+        model.add(MaxPooling1D(pool_size=4))  # 16
         model.add(Conv1D(filters=64, kernel_size=5, padding='same',
                          activation='relu'))
         model.add(MaxPooling1D(pool_size=4))
 
         model.add(Flatten())
         model.add(Dense(1, activation='linear'))
-        ntwk=model
-        lenv=256
+        ntwk = model
+        lenv = 256
 
-    if typem==3:
+    if typem == 3:
         model = Sequential()
         # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
         model.add(Conv1D(filters=64, kernel_size=5, padding='same',
                          activation='relu', input_shape=(256, 1)))
-        model.add(MaxPooling1D(pool_size=4)) # 64
+        model.add(MaxPooling1D(pool_size=4))  # 64
         model.add(Conv1D(filters=64, kernel_size=5, padding='same',
                          activation='relu'))
-        model.add(MaxPooling1D(pool_size=4)) #16
+        model.add(MaxPooling1D(pool_size=4))  # 16
         model.add(Conv1D(filters=64, kernel_size=5, padding='same',
-                                 activation='relu'))
+                         activation='relu'))
 
         model.add(TimeDistributed(Dense(1, activation='sigmoid')))
 
         model.add(AveragePooling1D(pool_size=16))
         model.add(Flatten())
-        ntwk =model
-        lenv=256
+        ntwk = model
+        lenv = 256
 
-    if typem==4:
+    if typem == 4:
         model = Sequential()
         # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
         model.add(Conv1D(filters=64, kernel_size=5, padding='same',
                          activation='relu', input_shape=(256*2, 1)))
-        model.add(MaxPooling1D(pool_size=4)) # 64
+        model.add(MaxPooling1D(pool_size=4))  # 64
         model.add(Conv1D(filters=64, kernel_size=5, padding='same',
                          activation='relu'))
-        model.add(MaxPooling1D(pool_size=4)) #16
+        model.add(MaxPooling1D(pool_size=4))  # 16
         model.add(Conv1D(filters=64, kernel_size=5, padding='same',
-                                 activation='relu'))
+                         activation='relu'))
 
         model.add(LSTM(100))
         model.add(Dense(1, activation='linear'))
-        ntwk =model
-        lenv=256*2
+        ntwk = model
+        lenv = 256*2
     if typem == 5:
         model = Sequential()
         # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
@@ -104,10 +104,10 @@ def model(typem=1,window_length=None,base=False):
         model.add(TimeDistributed(Dense(1, activation='sigmoid')))
         model.add(AveragePooling1D(pool_size=25))
         model.add(Flatten())
-        ntwk =model
-        lenv=100
+        ntwk = model
+        lenv = 100
 
-    if typem==6:
+    if typem == 6:
         model = Sequential()
         # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
         model.add(Conv1D(filters=32, kernel_size=5, padding='same',
@@ -125,12 +125,12 @@ def model(typem=1,window_length=None,base=False):
         """
         model.add(MaxPooling1D(pool_size=4))
         model.add(Conv1D(filters=32, kernel_size=5, padding='same',
-                                 activation='relu'))
+                         activation='relu'))
         model.add(TimeDistributed(Dense(1, activation='sigmoid')))
         model.add(AveragePooling1D(pool_size=25))
         model.add(Flatten())
-        ntwk =model
-        lenv=100
+        ntwk = model
+        lenv = 100
     if typem == 7:
         model = Sequential()
         # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
@@ -149,15 +149,15 @@ def model(typem=1,window_length=None,base=False):
         """
         model.add(MaxPooling1D(pool_size=4))
         model.add(Conv1D(filters=32, kernel_size=5, padding='same',
-                                 activation='relu'))
+                         activation='relu'))
         model.add(MaxPooling1D(pool_size=4))
         model.add(Conv1D(filters=32, kernel_size=5, padding='same',
-                                 activation='relu'))
+                         activation='relu'))
         model.add(TimeDistributed(Dense(1, activation='sigmoid')))
         model.add(AveragePooling1D(pool_size=6))
         model.add(Flatten())
-        ntwk =model
-        lenv=96
+        ntwk = model
+        lenv = 96
     if typem == 8:
         model = Sequential()
         # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
@@ -176,63 +176,60 @@ def model(typem=1,window_length=None,base=False):
         """
         model.add(MaxPooling1D(pool_size=4))
         model.add(Conv1D(filters=64, kernel_size=5, padding='same',
-                                 activation='relu'))
+                         activation='relu'))
         model.add(MaxPooling1D(pool_size=4))
         model.add(Conv1D(filters=64, kernel_size=5, padding='same',
-                                 activation='relu'))
+                         activation='relu'))
         model.add(TimeDistributed(Dense(1, activation='sigmoid')))
         model.add(AveragePooling1D(pool_size=6))
         model.add(Flatten())
-        ntwk =model
-        lenv=96
+        ntwk = model
+        lenv = 96
     print(ntwk.summary())
-    return ntwk,lenv
+    return ntwk, lenv
 
-
-
-import argparse
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument('--extra', dest='extra', type=str,default="")
-parser.add_argument('--root', dest='root', type=str,default="/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/")
+parser.add_argument('--extra', dest='extra', type=str, default="")
+parser.add_argument('--root', dest='root', type=str,
+                    default="/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/")
 parser.add_argument('--weight-name', dest='weight_name', type=str)
-parser.add_argument('--typem', dest='typem', type=int,default=1)
-parser.add_argument('--maxf', dest='maxf', type=int,default=None)
-parser.add_argument('--window-length', dest='length_window', type=int,default=None)
-parser.add_argument('--overlap', dest='overlap', type=int,default=None)
+parser.add_argument('--typem', dest='typem', type=int, default=1)
+parser.add_argument('--maxf', dest='maxf', type=int, default=None)
+parser.add_argument('--window-length', dest='length_window', type=int, default=None)
+parser.add_argument('--overlap', dest='overlap', type=int, default=None)
 parser.add_argument('--delta', dest="delta", action="store_true")
 parser.add_argument('--rescale', dest="rescale", action="store_true")
 parser.add_argument('--raw', dest="raw", action="store_true")
 parser.add_argument('--base', dest="base", action="store_true")
 
 
-
 args = parser.parse_args()
 
-length_window=args.length_window
-maxf=args.maxf
-weight_name=args.weight_name
-typem=args.typem
-extra=args.extra
-root=args.root
+length_window = args.length_window
+maxf = args.maxf
+weight_name = args.weight_name
+typem = args.typem
+extra = args.extra
+root = args.root
 
-ntwk,lenv = model(typem=typem,window_length=length_window,base=args.base)
+ntwk, lenv = model(typem=typem, window_length=length_window, base=args.base)
 ntwk.load_weights(weight_name)
 
 if length_window is None:
     length_window = lenv
 
-train_test=['/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T-yeast.csv',
-            '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T-human.csv',
-            '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-human.csv',
-            '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-yeast.csv',
-            '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T1-yeast.csv',
-            '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-69-yeast.csv',
-            '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-9-yeast.csv',
-            '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-40-yeast.csv',
-            '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-27-human.csv',
-            '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B1-yeast.csv']
+train_test = ['/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T-yeast.csv',
+              '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T-human.csv',
+              '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-human.csv',
+              '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-yeast.csv',
+              '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T1-yeast.csv',
+              '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-69-yeast.csv',
+              '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-9-yeast.csv',
+              '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-40-yeast.csv',
+              '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-27-human.csv',
+              '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B1-yeast.csv']
 if args.base:
     root = '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name'
 data = {}
@@ -241,36 +238,41 @@ Tt = np.load("T-T1-corrected-transition_iter3.npy")
 
 for t in train_test:
     if args.base:
-        t = t.replace("raw","tomb/clean_name")
+        t = t.replace("raw", "tomb/clean_name")
     print(t)
-    ws=5
+    ws = 5
     if "T-yeast" in t:
-        #print("la")
-        ws=8
-    #print(ws)
-    X,y = load_data([t],root=root,values=["test_with_tombo_CNV_logcosh_3layers/weights.22-0.01","test_longueur_lstm_from_scratch_without_human_weights.25-0.02","init_B"])
+        # print("la")
+        ws = 8
+    # print(ws)
+    X, y = load_data([t], root=root, values=["test_with_tombo_CNV_logcosh_3layers/weights.22-0.01",
+                                             "test_longueur_lstm_from_scratch_without_human_weights.25-0.02", "init_B"])
     if not args.base:
-        Xrt,yrt,fnt = load_events(X,y,min_length=10*length_window,raw=args.raw,base=args.base,maxf=args.maxf)
+        Xrt, yrt, fnt = load_events(X, y, min_length=10*length_window,
+                                    raw=args.raw, base=args.base, maxf=args.maxf)
         extra_e = []
     else:
-        Xrt,yrt,fnt,extra_e = load_events(X,y,min_length=10*length_window,raw=args.raw,base=args.base,maxf=args.maxf,extra=True)
+        Xrt, yrt, fnt, extra_e = load_events(
+            X, y, min_length=10*length_window, raw=args.raw, base=args.base,
+            maxf=args.maxf, extra=True)
     if args.raw:
         max_len = 10000
     else:
         max_len = 2000
-    Xt,yt,_ =transform_reads(Xrt,np.array(yrt),lenv=length_window,max_len=2000,overlap=args.overlap,
-                           delta=args.delta,rescale=args.rescale,extra_e=extra_e,Tt=Tt)
-    #print(Xt)
-    data[t.split("/")[-1][:-4]]=[Xt,[yti[0][0] for yti in yt]]
-
-
+    Xt, yt, _ = transform_reads(Xrt, np.array(yrt), lenv=length_window,
+                                max_len=2000, overlap=args.overlap,
+                                delta=args.delta, rescale=args.rescale,
+                                extra_e=extra_e, Tt=Tt)
+    # print(Xt)
+    data[t.split("/")[-1][:-4]] = [Xt, [yti[0][0] for yti in yt]]
 
 
 Predicts = []
 
-closer = ["T-yeast","T1-yeast","T-human","B-9-yeast","B-27-human","B-40-yeast","B-69-yeast","B1-yeast","B-yeast","B-human"]
-Xr=[]
-yr=[]
+closer = ["T-yeast", "T1-yeast", "T-human", "B-9-yeast", "B-27-human",
+          "B-40-yeast", "B-69-yeast", "B1-yeast", "B-yeast", "B-human"]
+Xr = []
+yr = []
 for d in closer:
     print(d)
     yr.extend(data[d][1])
@@ -278,20 +280,20 @@ for d in closer:
         if args.overlap is None:
             Predicts.append(np.mean(ntwk.predict(xt)))
         else:
-            #print(xt)
-            xt=np.array(xt)
-            #print(xt.shape)
-            r = ntwk.predict(xt.reshape(-1,length_window,xt.shape[-1]))
-            #print(len(r))
-            r= r.reshape(args.overlap,-1,1)
-            #print(r.shape)
-            Predicts.append(np.mean(np.median(r,axis=0)))
+            # print(xt)
+            xt = np.array(xt)
+            # print(xt.shape)
+            r = ntwk.predict(xt.reshape(-1, length_window, xt.shape[-1]))
+            # print(len(r))
+            r = r.reshape(args.overlap, -1, 1)
+            # print(r.shape)
+            Predicts.append(np.mean(np.median(r, axis=0)))
 
 
 Predicts2 = []
-closer = ["B-9-yeast","B-yeast"]
-Xr=[]
-yr2=[]
+closer = ["B-9-yeast", "B-yeast"]
+Xr = []
+yr2 = []
 for d in closer:
     print(d)
     yr2.extend(data[d][1])
@@ -299,19 +301,21 @@ for d in closer:
         if args.overlap is None:
             Predicts2.append(np.mean(ntwk.predict(xt)))
         else:
-            #print(xt)
-            xt=np.array(xt)
-            r = ntwk.predict(xt.reshape(-1,length_window,xt.shape[-1])).reshape(args.overlap,-1,1)
-            Predicts2.append(np.mean(np.median(r,axis=0)))
+            # print(xt)
+            xt = np.array(xt)
+            r = ntwk.predict(xt.reshape(-1, length_window,
+                                        xt.shape[-1])).reshape(args.overlap, -1, 1)
+            Predicts2.append(np.mean(np.median(r, axis=0)))
 
 Predicts = np.array(Predicts)
 Predicts2 = np.array(Predicts2)
 
-pylab.title("Deviation %.2f, on test only (9 and B1) %.2f" % (np.std(Predicts-yr),np.std(Predicts2-yr2)))
+pylab.title("Deviation %.2f, on test only (9 and B1) %.2f" %
+            (np.std(Predicts-yr), np.std(Predicts2-yr2)))
 pylab.plot(Predicts)
-pylab.plot(yr,"o")
+pylab.plot(yr, "o")
 pylab.xlabel("Sample #")
 pylab.ylabel("Ratio_b")
-filen =weight_name[:-5]+"sample_values"+extra+".pdf"
-print("Writing on %s"% filen)
+filen = weight_name[:-5]+"sample_values"+extra+".pdf"
+print("Writing on %s" % filen)
 pylab.savefig(filen)
