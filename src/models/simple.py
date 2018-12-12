@@ -234,26 +234,26 @@ def create_model(params):
         model.compile(loss='logcosh', optimizer='adam')
     # model.load_weights("test_cnv2/weights.18-0.03.hdf5")
 
-        name = "".join(["%s_$s" % (p, str(value)) for p, value in params.items)])
-        checkpointer=ModelCheckpoint(
-            filepath = args.root+'/weights_%s.hdf5' % name,
-            verbose = 1, save_best_only = True)
-        es=EarlyStopping(patience = 10)
+        name = "".join(["%s_$s" % (p, str(value)) for p, value in params.items])
+        checkpointer = ModelCheckpoint(
+            filepath=args.root+'/weights_%s.hdf5' % name,
+            verbose=1, save_best_only=True)
+        es = EarlyStopping(patience=10)
 
-        model.fit(X_train, y_train[::, 0], epochs = 40,
-                  batch_size = params['batch_size'],
-                  sample_weight = y_train[::, 1],
-                  validation_split = 0.1, callbacks = [checkpointer, es])
+        model.fit(X_train, y_train[::, 0], epochs=40,
+                  batch_size=params['batch_size'],
+                  sample_weight=y_train[::, 1],
+                  validation_split=0.1, callbacks=[checkpointer, es])
         # Final evaluation of the model
 
-        scores=model.evaluate(X_val, y_val[::, 0], verbose = 0)
+        scores = model.evaluate(X_val, y_val[::, 0], verbose=0)
         print(scores)
         return {'loss': -scores, 'status': STATUS_OK}
 
 
 # indep_val = files
-train_test=files
-per_dataset=400
+train_test = files
+per_dataset = 400
 
 for val in indep_val:
     train_test.remove(val)
@@ -270,40 +270,40 @@ print(train_test)
 print(indep_val)
 
 if args.lstm:
-    lenv=200
-    lenv=160
+    lenv = 200
+    lenv = 160
 else:
-    lenv=256*2
-    lenv=100
-    lenv=96
+    lenv = 256*2
+    lenv = 100
+    lenv = 96
 
 if args.initw is not None:
     model.load_weights(args.initw)
 
-X_train, y_train=load_data_complete(train_test, root = root,
-                                      per_dataset = args.per_dataset,
-                                      lenv = lenv, pmix = args.pmix,
-                                      values = ["test_with_tombo_LSTM_alls_4000_noise_Tcorrected_iter3_filter//weights.17-0.01",
+X_train, y_train = load_data_complete(train_test, root=root,
+                                      per_dataset=args.per_dataset,
+                                      lenv=lenv, pmix=args.pmix,
+                                      values=["test_with_tombo_LSTM_alls_4000_noise_Tcorrected_iter3_filter//weights.17-0.01",
                                               "test_with_tombo_CNV_logcosh_3layers/weights.22-0.01",
                                               "test_with_tombo/weights.03-0.03", "test_longueur_lstm_from_scratch_without_human_weights.25-0.02"],
-                                      delta = args.delta, raw = args.raw,
-                                      rescale = args.rescale, base = args.base, noise = args.noise_norm)
+                                      delta=args.delta, raw=args.raw,
+                                      rescale=args.rescale, base=args.base, noise=args.noise_norm)
 if val != []:
-    X_val, y_val=load_data_complete(val, root = root, per_dataset = 50, lenv = lenv, pmix = args.pmix,
-                                      values = ["test_with_tombo/weights.03-0.03",
+    X_val, y_val = load_data_complete(val, root=root, per_dataset=50, lenv=lenv, pmix=args.pmix,
+                                      values=["test_with_tombo/weights.03-0.03",
                                               "test_longueur_lstm_from_scratch_without_human_weights.25-0.02"],
-                                      delta = args.delta, raw = args.raw, rescale = args.rescale, base = args.base, noise = args.noise_norm)
+                                      delta=args.delta, raw=args.raw, rescale=args.rescale, base=args.base, noise=args.noise_norm)
 
     # X_val = X_val[:64 * len(X_val) // 64]
     # y_val = y_val[:64 * len(y_val) // 64]
 
-    n90=int(len(X_train)*0.9)
-    X_val=np.concatenate((X_val, X_train[n90, :]), axis = 0)
-    y_val=np.concatenate((y_val, y_train[n90, :]), axis = 0)
+    n90 = int(len(X_train)*0.9)
+    X_val = np.concatenate((X_val, X_train[n90, :]), axis=0)
+    y_val = np.concatenate((y_val, y_train[n90, :]), axis=0)
 
 
-trials=Trials()
-best=fmin(create_model, space, algo = tpe.suggest, max_evals = 50, trials = trials)
+trials = Trials()
+best = fmin(create_model, space, algo=tpe.suggest, max_evals=50, trials=trials)
 print 'best: '
 print best
 with open("opti-lstm.pick", "w") as f:
