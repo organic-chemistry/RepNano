@@ -194,15 +194,15 @@ def create_model(params):
     typem = 1
     if typem == 1:
         model = Sequential()
-        model.add(Conv1D(filters=params['filters'],
-                         kernel_size=params['kernel_size'], padding='same',
+        model.add(Conv1D(filters=int(params['filters']),
+                         kernel_size=int(params['kernel_size']), padding='same',
                          activation='relu', input_shape=(160, init)))
         if params['pooling']:
             model.add(MaxPooling1D(pool_size=params["pool_size"]))
         if params['dropout'] != 0:
             model.add(Dropout(params['dropout']))
 
-        model.add(LSTM(params['neurones']))
+        model.add(LSTM(int(params['neurones'])))
         model.add(Dense(1, activation=params['activation']))
         model.compile(loss='logcosh', optimizer=params['optimizer'])  # , metrics=['accuracy'])
         # model.load_weights("test_longueur_lstm_from_scratch_without_human/weights.25-0.02.hdf5")
@@ -242,7 +242,7 @@ def create_model(params):
         es = EarlyStopping(patience=10)
 
         model.fit(X_train, y_train[::, 0], epochs=40,
-                  batch_size=params['batch_size'],
+                  batch_size=int(params['batch_size']),
                   sample_weight=y_train[::, 1],
                   validation_split=0.1, callbacks=[checkpointer, es])
         # Final evaluation of the model
