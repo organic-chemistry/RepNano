@@ -236,7 +236,7 @@ def create_model(params):
     # model.load_weights("test_cnv2/weights.18-0.03.hdf5")
 
     def fl(name):
-        if type(name) == {}:
+        if type(name) == dict:
             return "".join(["%s-%s" % (p, str(fl(value))) for p, value in name.items()])
         else:
             return name
