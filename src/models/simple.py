@@ -234,11 +234,12 @@ def create_model(params):
         model.compile(loss='logcosh', optimizer='adam')  # , metrics=['accuracy'])
     # model.load_weights("test_cnv2/weights.18-0.03.hdf5")
 
+        name = "".join(["%s_$s" % (p, str(value) for p, value in params.items)])
         checkpointer = ModelCheckpoint(
-            filepath=args.root+'/weights.{epoch:02d}-{val_loss:.2f}.hdf5', verbose=1, save_best_only=True)
+            filepath=args.root+'/weights_%s.hdf5' % name, verbose=1, save_best_only=True)
         es = EarlyStopping(patience=10)
 
-        model.fit(X_train, y_train[::, 0], epochs=100, batch_size=params['batch_size'],
+        model.fit(X_train, y_train[::, 0], epochs=40, batch_size=params['batch_size'],
                   sample_weight=y_train[::, 1], validation_split=0.1, callbacks=[checkpointer, es])
         # Final evaluation of the model
 
