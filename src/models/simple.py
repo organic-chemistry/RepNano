@@ -13,7 +13,7 @@ from keras.layers import LSTM
 from keras.layers.convolutional import Conv1D
 from keras.layers.convolutional import MaxPooling1D
 from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
-
+from hyperopt.mongoexp import MongoTrials
 import h5py
 import glob
 import pandas as pd
@@ -309,7 +309,8 @@ if val != []:
     y_val = np.concatenate((y_val, y_train[n90:]), axis=0)
 
 
-trials = Trials()
+trials = MongoTrials()
+trials = MongoTrials('mongo://localhost:1234/foo_db/jobs', exp_key='lstm')
 best = fmin(create_model, space, algo=tpe.suggest, max_evals=50, trials=trials)
 print('best: ')
 print(best)
