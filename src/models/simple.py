@@ -299,8 +299,8 @@ if val != []:
     # y_val = y_val[:64 * len(y_val) // 64]
 
     n90 = int(len(X_train)*0.9)
-    X_val = np.concatenate((X_val, X_train[n90, :]), axis=0)
-    y_val = np.concatenate((y_val, y_train[n90, :]), axis=0)
+    X_val = np.concatenate((X_val, X_train[n90:]), axis=0)
+    y_val = np.concatenate((y_val, y_train[n90:]), axis=0)
 
 
 trials = Trials()
