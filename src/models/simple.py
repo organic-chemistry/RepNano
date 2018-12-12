@@ -177,7 +177,7 @@ if args:
 space = {
     'filters': hp.quniform('filters', 16, 128, 1),
     'kernel_size': hp.quniform('kernel_size', 64, 1024, 1),
-    'choice_pooling': hp.choice('choice_pooling', [{"pooling": False},
+    'choice_pooling': hp.choice('choice_pooling', [{"pooling": False, },
                                                    {"pooling": True,
                                                     "pool_size": hp.choice("pool_size", [2, 4])}]),
     'dropout': hp.choice('dropout', [0, 0.25, 0.4]),
@@ -235,7 +235,8 @@ def create_model(params):
         model.compile(loss='logcosh', optimizer='adam')
     # model.load_weights("test_cnv2/weights.18-0.03.hdf5")
 
-    name = "".join(["%s_%s" % (p, str(value)) for p, value in params.items()])
+    name = "".join(["%s-%s" % (p, str(value)) for p, value in params.items()])
+    print(name)
     checkpointer = ModelCheckpoint(
         filepath=args.root+'/weights_%s.hdf5' % name,
         verbose=1, save_best_only=True)
