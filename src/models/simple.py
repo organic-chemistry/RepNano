@@ -197,8 +197,8 @@ def create_model(params):
         model.add(Conv1D(filters=int(params['filters']),
                          kernel_size=int(params['kernel_size']), padding='same',
                          activation='relu', input_shape=(160, init)))
-        if params['pooling']:
-            model.add(MaxPooling1D(pool_size=params["pool_size"]))
+        if params["choice_pooling"]['pooling']:
+            model.add(MaxPooling1D(pool_size=params["choice_pooling"]["pool_size"]))
         if params['dropout'] != 0:
             model.add(Dropout(params['dropout']))
 
