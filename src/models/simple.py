@@ -178,7 +178,7 @@ space = {
     'kernel_size': hp.uniform('kernel_size', 64, 1024),
     'choice_pooling': hp.choice('choice_pooling', [{"pooling": False},
                                                    {"pooling": True,
-                                                    "pool_size": hp.choice("pool_size": [2, 4])}]),
+                                                    "pool_size": hp.choice("pool_size", [2, 4])}]),
     'dropout': hp.choice('dropout', [0, 0.25, 0.4]),
     'neurones': hp.uniform('neurones', 20, 300),
     'batch_size': hp.uniform('batch_size', 28, 128),
