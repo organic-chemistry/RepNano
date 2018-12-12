@@ -235,7 +235,7 @@ def create_model(params):
         model.compile(loss='logcosh', optimizer='adam')
     # model.load_weights("test_cnv2/weights.18-0.03.hdf5")
 
-    name = "".join(["%s_$s" % (p, str(value)) for p, value in params.items])
+    name = "".join(["%s_$s" % (p, str(value)) for p, value in params.items()])
     checkpointer = ModelCheckpoint(
         filepath=args.root+'/weights_%s.hdf5' % name,
         verbose=1, save_best_only=True)
