@@ -18,7 +18,7 @@ import h5py
 import glob
 import pandas as pd
 import numpy as np
-
+from create_model import create_model
 
 from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 from .simple_utilities import load_data, load_events, transform_reads
@@ -188,76 +188,6 @@ space = {
 }
 
 
-def create_model(params):
-    # typem=1, kernel_size=3, filters=32, neurones=100,
-    #             activation="linear", pooling=True, mpool=2, dropout=0):
-    typem = 1
-    if typem == 1:
-        model = Sequential()
-        model.add(Conv1D(filters=int(params['filters']),
-                         kernel_size=int(params['kernel_size']), padding='same',
-                         activation='relu', input_shape=(160, init)))
-        if params["choice_pooling"]['pooling']:
-            model.add(MaxPooling1D(pool_size=params["choice_pooling"]["pool_size"]))
-        if params['dropout'] != 0:
-            model.add(Dropout(params['dropout']))
-
-        model.add(LSTM(int(params['neurones'])))
-        model.add(Dense(1, activation=params['activation']))
-        model.compile(loss='logcosh', optimizer=params['optimizer'])  # , metrics=['accuracy'])
-        # model.load_weights("test_longueur_lstm_from_scratch_without_human/weights.25-0.02.hdf5")
-        # model.load_weights("test_longueur/weights.05-0.02.hdf5")
-    else:
-        model = Sequential()
-        # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
-        model.add(Conv1D(filters=32, kernel_size=5, padding='same',
-                         activation='relu', input_shape=(160, init)))
-        """
-        model.add(MaxPooling1D(pool_size=4)) # 16
-        model.add(Conv1D(filters=64, kernel_size=5, padding='same',
-                         activation='relu'))
-        model.add(MaxPooling1D(pool_size=4)) #4
-        model.add(Conv1D(filters=64, kernel_size=5, padding='same',
-                                 activation='relu'))
-
-        # model.add(LSTM(100))
-        # model.add(Dense(1, activation='linear'))
-        """
-        model.add(MaxPooling1D(pool_size=4))
-        model.add(Conv1D(filters=32, kernel_size=5, padding='same',
-                         activation='relu'))
-        model.add(MaxPooling1D(pool_size=4))
-        model.add(Conv1D(filters=32, kernel_size=5, padding='same',
-                         activation='relu'))
-        model.add(TimeDistributed(Dense(1, activation='sigmoid')))
-        model.add(AveragePooling1D(pool_size=10))
-        model.add(Flatten())
-        model.compile(loss='logcosh', optimizer='adam')
-    # model.load_weights("test_cnv2/weights.18-0.03.hdf5")
-
-    def fl(name):
-        if type(name) == dict:
-            return "".join(["%s-%s" % (p, str(fl(value))) for p, value in name.items()])
-        else:
-            return name
-    name = fl(params)
-    print(name)
-    checkpointer = ModelCheckpoint(
-        filepath=args.root+'/weights_%s.hdf5' % name,
-        verbose=1, save_best_only=True)
-    es = EarlyStopping(patience=10)
-
-    model.fit(X_train, y_train[::, 0], epochs=40,
-              batch_size=int(params['batch_size']),
-              sample_weight=y_train[::, 1],
-              validation_split=0.1, callbacks=[checkpointer, es])
-    # Final evaluation of the model
-
-    scores = model.evaluate(X_val, y_val[::, 0], verbose=0)
-    print(scores)
-    return {'loss': -scores, 'status': STATUS_OK}
-
-
 # indep_val = files
 train_test = files
 per_dataset = 400
@@ -308,7 +238,14 @@ if val != []:
     X_val = np.concatenate((X_val, X_train[n90:]), axis=0)
     y_val = np.concatenate((y_val, y_train[n90:]), axis=0)
 
+    X_train = X_train[:n90]
+    y_train = y_train[:n90]
 
+rootw = "/data/bioinfo@borvo/users/jarbona/mongo_net/first/"
+with open(rootw+"train.pick") as f:
+    cPickle.dump([X_train, y_train], f)
+with open(rootw + "val.pick") as f:
+    cPickle.dump([X_val, y_val], f)
 trials = MongoTrials('mongo://localhost:1234/foo_db/jobs', exp_key='lstm')
 best = fmin(create_model, space, algo=tpe.suggest, max_evals=50, trials=trials)
 print('best: ')
