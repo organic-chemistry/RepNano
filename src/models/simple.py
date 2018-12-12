@@ -235,21 +235,21 @@ def create_model(params):
         model.compile(loss='logcosh', optimizer='adam')
     # model.load_weights("test_cnv2/weights.18-0.03.hdf5")
 
-        name = "".join(["%s_$s" % (p, str(value)) for p, value in params.items])
-        checkpointer = ModelCheckpoint(
-            filepath=args.root+'/weights_%s.hdf5' % name,
-            verbose=1, save_best_only=True)
-        es = EarlyStopping(patience=10)
+    name = "".join(["%s_$s" % (p, str(value)) for p, value in params.items])
+    checkpointer = ModelCheckpoint(
+        filepath=args.root+'/weights_%s.hdf5' % name,
+        verbose=1, save_best_only=True)
+    es = EarlyStopping(patience=10)
 
-        model.fit(X_train, y_train[::, 0], epochs=40,
-                  batch_size=int(params['batch_size']),
-                  sample_weight=y_train[::, 1],
-                  validation_split=0.1, callbacks=[checkpointer, es])
-        # Final evaluation of the model
+    model.fit(X_train, y_train[::, 0], epochs=40,
+              batch_size=int(params['batch_size']),
+              sample_weight=y_train[::, 1],
+              validation_split=0.1, callbacks=[checkpointer, es])
+    # Final evaluation of the model
 
-        scores = model.evaluate(X_val, y_val[::, 0], verbose=0)
-        print(scores)
-        return {'loss': -scores, 'status': STATUS_OK}
+    scores = model.evaluate(X_val, y_val[::, 0], verbose=0)
+    print(scores)
+    return {'loss': -scores, 'status': STATUS_OK}
 
 
 # indep_val = files
