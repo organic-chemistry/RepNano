@@ -175,14 +175,14 @@ if args:
 
 
 space = {
-    'filters': hp.uniform('filters', 16, 128),
-    'kernel_size': hp.uniform('kernel_size', 64, 1024),
+    'filters': hp.quniform('filters', 16, 128, 1),
+    'kernel_size': hp.quniform('kernel_size', 64, 1024, 1),
     'choice_pooling': hp.choice('choice_pooling', [{"pooling": False},
                                                    {"pooling": True,
                                                     "pool_size": hp.choice("pool_size", [2, 4])}]),
     'dropout': hp.choice('dropout', [0, 0.25, 0.4]),
-    'neurones': hp.uniform('neurones', 20, 300),
-    'batch_size': hp.uniform('batch_size', 28, 128),
+    'neurones': hp.quniform('neurones', 20, 300, 1),
+    'batch_size': hp.quniform('batch_size', 28, 128, 1),
     'optimizer': hp.choice('optimizer', ['adadelta', 'adam', 'rmsprop']),
     'activation': hp.choice('activation', ["linear", "sigmoid"])
 }
