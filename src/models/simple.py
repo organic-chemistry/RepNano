@@ -18,7 +18,7 @@ import h5py
 import glob
 import pandas as pd
 import numpy as np
-from create_model import create_model
+from create_model.simple import create_model
 
 from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 from .simple_utilities import load_data, load_events, transform_reads
