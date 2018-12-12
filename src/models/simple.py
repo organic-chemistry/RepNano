@@ -250,7 +250,7 @@ trials = MongoTrials('mongo://localhost:1234/foo_db/jobs', exp_key='lstm')
 best = fmin(create_model, space, algo=tpe.suggest, max_evals=50, trials=trials)
 print('best: ')
 print(best)
-with open("opti-lstm.pick", "w") as f:
+with open("opti-lstm.pick", "wb") as f:
     cPickle.dump(best, f)
 
 """
