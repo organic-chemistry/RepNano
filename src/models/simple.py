@@ -1,4 +1,5 @@
 # LSTM and CNN for sequence classification in the IMDB dataset
+import _pickle as cPickle
 import time
 import tensorflow as tf
 from git import Repo
@@ -304,8 +305,8 @@ if val != []:
 
 trials = Trials()
 best = fmin(create_model, space, algo=tpe.suggest, max_evals=50, trials=trials)
-print 'best: '
-print best
+print('best: ')
+print(best)
 with open("opti-lstm.pick", "w") as f:
     cPickle.dump(best, f)
 
