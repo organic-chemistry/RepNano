@@ -7,10 +7,11 @@ import os
 import argparse
 import numpy
 from keras.models import Sequential
-from keras.layers import Dense, Flatten, AveragePooling1D, TimeDistributed
+from keras.layers import Dense, Flatten, AveragePooling1D, TimeDistributed, Dropout
 from keras.layers import LSTM
 from keras.layers.convolutional import Conv1D
 from keras.layers.convolutional import MaxPooling1D
+from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 
 import h5py
 import glob
@@ -98,7 +99,7 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200,
 
 # fix random seed for reproducibility
 # load the dataset but only keep the top n words, zero the rest
-#(X_train, y_train), (X_test, y_test) = imdb.load_data(num_words=top_words)
+# (X_train, y_train), (X_test, y_test) = imdb.load_data(num_words=top_words)
 
 
 parser = argparse.ArgumentParser()
@@ -151,14 +152,15 @@ else:
              '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/B-yeast.csv',
              '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/T1-yeast.csv',
              '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/B-69-yeast.csv',
-             '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/B-9-yeast.csv',
              '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/B1-yeast.csv']
     #         '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-27-human.csv']
 
     indep_val = []  # [ '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/B-40-yeast.csv',
     #    "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/B-yeast.csv"]
 
-#indep_val = ["/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-yeast.csv"]
+    val = ['/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/B-9-yeast.csv']
+
+# indep_val = ["/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-yeast.csv"]
 argparse_dict["traning"] = files
 argparse_dict["indep_val"] = indep_val
 
@@ -169,61 +171,83 @@ with open(args.root + '/params.json', 'w') as fp:
 init = 1
 if args:
     init = 5
-if args.lstm:
-    model = Sequential()
-    # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
-    model.add(Conv1D(filters=32, kernel_size=3, padding='same',
-                     activation='relu', input_shape=(200, init)))
-    model.add(MaxPooling1D(pool_size=2))
-    # model.add(Conv1D(filters=32, kernel_size=5, padding='same',
-    #                 activation='relu'))
-    # model.add(MaxPooling1D(pool_size=2))
-    # model.add(Conv1D(filters=64, kernel_size=5, padding='same',
-    #                 activation='relu'))
-    # model.add(MaxPooling1D(pool_size=2))
-    model.add(LSTM(100))
-    model.add(Dense(1, activation='linear'))
-    model.compile(loss='mse', optimizer='adam')  # , metrics=['accuracy'])
-    # model.load_weights("test_longueur_lstm_from_scratch_without_human/weights.25-0.02.hdf5")
-    # model.load_weights("test_longueur/weights.05-0.02.hdf5")
-else:
-    model = Sequential()
-    # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
-    model.add(Conv1D(filters=32, kernel_size=5, padding='same',
-                     activation='relu', input_shape=(96, init)))
-    """
-    model.add(MaxPooling1D(pool_size=4)) # 16
-    model.add(Conv1D(filters=64, kernel_size=5, padding='same',
-                     activation='relu'))
-    model.add(MaxPooling1D(pool_size=4)) #4
-    model.add(Conv1D(filters=64, kernel_size=5, padding='same',
-                             activation='relu'))
 
-    #model.add(LSTM(100))
-    #model.add(Dense(1, activation='linear'))
-    """
-    model.add(MaxPooling1D(pool_size=4))
-    model.add(Conv1D(filters=32, kernel_size=5, padding='same',
-                     activation='relu'))
-    model.add(MaxPooling1D(pool_size=4))
-    model.add(Conv1D(filters=32, kernel_size=5, padding='same',
-                     activation='relu'))
-    model.add(TimeDistributed(Dense(1, activation='sigmoid')))
-    model.add(AveragePooling1D(pool_size=6))
 
-    model.add(Flatten())
-    model.compile(loss='logcosh', optimizer='adam')  # , metrics=['accuracy'])
+space = {
+    'filters': hp.uniform('filters', 16, 128),
+    'kernel_size': hp.uniform('kernel_size', 64, 1024),
+    'choice_pooling': hp.choice('choice_pooling', [{"pooling": False},
+                                                   {"pooling": True,
+                                                    "pool_size": hp.choice("pool_size": [2, 4])}]),
+    'dropout': hp.choice('dropout', [0, 0.25, 0.4]),
+    'neurones': hp.uniform('neurones', 20, 300),
+    'batch_size': hp.uniform('batch_size', 28, 128),
+    'optimizer': hp.choice('optimizer', ['adadelta', 'adam', 'rmsprop']),
+    'activation': hp.choice('activation', ["linear", "sigmoid"])
+}
+
+
+def create_model(params):
+    # typem=1, kernel_size=3, filters=32, neurones=100,
+    #             activation="linear", pooling=True, mpool=2, dropout=0):
+    typem = 1
+    if typem == 1:
+        model = Sequential()
+        model.add(Conv1D(filters=params['filters'],
+                         kernel_size=params['kernel_size'], padding='same',
+                         activation='relu', input_shape=(160, init)))
+        if params['pooling']:
+            model.add(MaxPooling1D(pool_size=params["pool_size"]))
+        if params['dropout'] != 0:
+            model.add(Dropout(params['dropout']))
+
+        model.add(LSTM(params['neurones']))
+        model.add(Dense(1, activation=params['activation']))
+        model.compile(loss='logcosh', optimizer=params['optimizer'])  # , metrics=['accuracy'])
+        # model.load_weights("test_longueur_lstm_from_scratch_without_human/weights.25-0.02.hdf5")
+        # model.load_weights("test_longueur/weights.05-0.02.hdf5")
+    else:
+        model = Sequential()
+        # model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
+        model.add(Conv1D(filters=32, kernel_size=5, padding='same',
+                         activation='relu', input_shape=(160, init)))
+        """
+        model.add(MaxPooling1D(pool_size=4)) # 16
+        model.add(Conv1D(filters=64, kernel_size=5, padding='same',
+                         activation='relu'))
+        model.add(MaxPooling1D(pool_size=4)) #4
+        model.add(Conv1D(filters=64, kernel_size=5, padding='same',
+                                 activation='relu'))
+
+        # model.add(LSTM(100))
+        # model.add(Dense(1, activation='linear'))
+        """
+        model.add(MaxPooling1D(pool_size=4))
+        model.add(Conv1D(filters=32, kernel_size=5, padding='same',
+                         activation='relu'))
+        model.add(MaxPooling1D(pool_size=4))
+        model.add(Conv1D(filters=32, kernel_size=5, padding='same',
+                         activation='relu'))
+        model.add(TimeDistributed(Dense(1, activation='sigmoid')))
+        model.add(AveragePooling1D(pool_size=10))
+        model.add(Flatten())
+        model.compile(loss='logcosh', optimizer='adam')  # , metrics=['accuracy'])
     # model.load_weights("test_cnv2/weights.18-0.03.hdf5")
 
-checkpointer = ModelCheckpoint(
-    filepath=args.root+'/weights.{epoch:02d}-{val_loss:.2f}.hdf5', verbose=1, save_best_only=True)
-es = EarlyStopping(patience=10)
-reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,
-                              patience=5, min_lr=0.0001)
-print(model.summary())
+        checkpointer = ModelCheckpoint(
+            filepath=args.root+'/weights.{epoch:02d}-{val_loss:.2f}.hdf5', verbose=1, save_best_only=True)
+        es = EarlyStopping(patience=10)
+
+        model.fit(X_train, y_train[::, 0], epochs=100, batch_size=params['batch_size'],
+                  sample_weight=y_train[::, 1], validation_split=0.1, callbacks=[checkpointer, es])
+        # Final evaluation of the model
+
+        scores = model.evaluate(X_val, y_val[::, 0], verbose=0)
+        print(scores)
+        return {'loss': -scores, 'status': STATUS_OK}
 
 
-#indep_val = files
+# indep_val = files
 train_test = files
 per_dataset = 400
 
@@ -243,6 +267,7 @@ print(indep_val)
 
 if args.lstm:
     lenv = 200
+    lenv = 160
 else:
     lenv = 256*2
     lenv = 100
@@ -259,16 +284,28 @@ X_train, y_train = load_data_complete(train_test, root=root,
                                               "test_with_tombo/weights.03-0.03", "test_longueur_lstm_from_scratch_without_human_weights.25-0.02"],
                                       delta=args.delta, raw=args.raw,
                                       rescale=args.rescale, base=args.base, noise=args.noise_norm)
-if indep_val != []:
-    X_val, y_val = load_data_complete(indep_val, root=root, per_dataset=50, lenv=lenv, pmix=args.pmix,
+if val != []:
+    X_val, y_val = load_data_complete(val, root=root, per_dataset=50, lenv=lenv, pmix=args.pmix,
                                       values=["test_with_tombo/weights.03-0.03",
                                               "test_longueur_lstm_from_scratch_without_human_weights.25-0.02"],
                                       delta=args.delta, raw=args.raw, rescale=args.rescale, base=args.base, noise=args.noise_norm)
 
-    X_val = X_val[:64 * len(X_val) // 64]
-    y_val = y_val[:64 * len(y_val) // 64]
+    #X_val = X_val[:64 * len(X_val) // 64]
+    #y_val = y_val[:64 * len(y_val) // 64]
+
+    n90 = int(len(X_train)*0.9)
+    X_val = np.concatenate((X_val, X_train[n90, :]), axis=0)
+    y_val = np.concatenate((y_val, y_train[n90, :]), axis=0)
 
 
+trials = Trials()
+best = fmin(create_model, space, algo=tpe.suggest, max_evals=50, trials=trials)
+print 'best: '
+print best
+with open("opti-lstm.pick", "w") as f:
+    cPickle.dump(best, f)
+
+"""
 print(X_train.shape, y_train.shape)
 print(y_train[::40], np.mean(y_train, axis=0))
 print(X_train.dtype, y_train.dtype)
@@ -280,8 +317,6 @@ if args.incweightT is not None:
     y_train[y_train[::, 0] == 0, 1] *= args.incweightT
     print(np.mean(y_train, axis=0))
 
-model.fit(X_train, y_train[::, 0], epochs=100, batch_size=64,
-          sample_weight=y_train[::, 1], validation_split=0.1, callbacks=[checkpointer, es, reduce_lr])
-# Final evaluation of the model
-scores = model.evaluate(X_val, y_val[::, 0], verbose=0)
+
 print("Accuracy: %.2f%%" % (scores))
+"""
