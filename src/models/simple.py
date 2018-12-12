@@ -240,7 +240,7 @@ def create_model(params):
             return "".join(["%s-%s" % (p, str(fl(value))) for p, value in name.items()])
         else:
             return name
-    name = fl(name)
+    name = fl(params)
     print(name)
     checkpointer = ModelCheckpoint(
         filepath=args.root+'/weights_%s.hdf5' % name,
