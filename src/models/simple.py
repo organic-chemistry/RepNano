@@ -113,6 +113,7 @@ parser.add_argument('--delta', dest="delta", action="store_true")
 parser.add_argument('--raw', dest="raw", action="store_true")
 parser.add_argument('--rescale', dest="rescale", action="store_true")
 parser.add_argument('--base', dest="base", action="store_true")
+parser.add_argument('--train-val', dest="train_val", action="store_true")
 parser.add_argument('--noise-norm', dest="noise_norm", action="store_true")
 parser.add_argument('--initw', type=str, default=None)
 
@@ -176,7 +177,7 @@ if args:
 
 space = {
     'filters': hp.quniform('filters', 16, 128, 1),
-    'kernel_size': hp.quniform('kernel_size', 64, 1024, 1),
+    'kernel_size': hp.quniform('kernel_size', 64, 124, 1),
     'choice_pooling': hp.choice('choice_pooling', [{"pooling": False, },
                                                    {"pooling": True,
                                                     "pool_size": hp.choice("pool_size", [2, 4])}]),
@@ -217,36 +218,39 @@ else:
 if args.initw is not None:
     model.load_weights(args.initw)
 
-X_train, y_train = load_data_complete(train_test, root=root,
-                                      per_dataset=args.per_dataset,
-                                      lenv=lenv, pmix=args.pmix,
-                                      values=["test_with_tombo_LSTM_alls_4000_noise_Tcorrected_iter3_filter//weights.17-0.01",
-                                              "test_with_tombo_CNV_logcosh_3layers/weights.22-0.01",
-                                              "test_with_tombo/weights.03-0.03", "test_longueur_lstm_from_scratch_without_human_weights.25-0.02"],
-                                      delta=args.delta, raw=args.raw,
-                                      rescale=args.rescale, base=args.base, noise=args.noise_norm)
-if val != []:
-    X_val, y_val = load_data_complete(val, root=root, per_dataset=50, lenv=lenv, pmix=args.pmix,
-                                      values=["test_with_tombo/weights.03-0.03",
-                                              "test_longueur_lstm_from_scratch_without_human_weights.25-0.02"],
-                                      delta=args.delta, raw=args.raw, rescale=args.rescale, base=args.base, noise=args.noise_norm)
 
-    # X_val = X_val[:64 * len(X_val) // 64]
-    # y_val = y_val[:64 * len(y_val) // 64]
+if args.train_val:
 
-    n90 = int(len(X_train)*0.9)
-    X_val = np.concatenate((X_val, X_train[n90:]), axis=0)
-    y_val = np.concatenate((y_val, y_train[n90:]), axis=0)
+    X_train, y_train = load_data_complete(train_test, root=root,
+                                          per_dataset=args.per_dataset,
+                                          lenv=lenv, pmix=args.pmix,
+                                          values=["test_with_tombo_LSTM_alls_4000_noise_Tcorrected_iter3_filter//weights.17-0.01",
+                                                  "test_with_tombo_CNV_logcosh_3layers/weights.22-0.01",
+                                                  "test_with_tombo/weights.03-0.03", "test_longueur_lstm_from_scratch_without_human_weights.25-0.02"],
+                                          delta=args.delta, raw=args.raw,
+                                          rescale=args.rescale, base=args.base, noise=args.noise_norm)
+    if val != []:
+        X_val, y_val = load_data_complete(val, root=root, per_dataset=50, lenv=lenv, pmix=args.pmix,
+                                          values=["test_with_tombo/weights.03-0.03",
+                                                  "test_longueur_lstm_from_scratch_without_human_weights.25-0.02"],
+                                          delta=args.delta, raw=args.raw, rescale=args.rescale, base=args.base, noise=args.noise_norm)
 
-    X_train = X_train[:n90]
-    y_train = y_train[:n90]
+        # X_val = X_val[:64 * len(X_val) // 64]
+        # y_val = y_val[:64 * len(y_val) // 64]
 
-rootw = "/data/bioinfo@borvo/users/jarbona/mongo_net/first/"
+        n90 = int(len(X_train)*0.9)
+        X_val = np.concatenate((X_val, X_train[n90:]), axis=0)
+        y_val = np.concatenate((y_val, y_train[n90:]), axis=0)
 
-np.save(rootw+"X_train.npy", X_train)
-np.save(rootw+"y_train.npy", y_train)
-np.save(rootw+"X_val.npy", X_val)
-np.save(rootw+"y_val.npy", y_val)
+        X_train = X_train[:n90]
+        y_train = y_train[:n90]
+
+    rootw = "/data/bioinfo@borvo/users/jarbona/mongo_net/first/"
+
+    np.save(rootw+"X_train.npy", X_train)
+    np.save(rootw+"y_train.npy", y_train)
+    np.save(rootw+"X_val.npy", X_val)
+    np.save(rootw+"y_val.npy", y_val)
 #with open(rootw+"train.pick", "wb") as f:#
 #    cPickle.dump([X_train, y_train], f)
 # with open(rootw + "val.pick", "wb") as f:
