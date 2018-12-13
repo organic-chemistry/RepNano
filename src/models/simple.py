@@ -242,10 +242,15 @@ if val != []:
     y_train = y_train[:n90]
 
 rootw = "/data/bioinfo@borvo/users/jarbona/mongo_net/first/"
-with open(rootw+"train.pick", "wb") as f:
-    cPickle.dump([X_train, y_train], f)
-with open(rootw + "val.pick", "wb") as f:
-    cPickle.dump([X_val, y_val], f)
+
+np.save(rootw+"X_train.npy", X_train)
+np.save(rootw+"y_train.npy", y_train)
+np.save(rootw+"X_val.npy", X_val)
+np.save(rootw+"y_val.npy", y_val)
+#with open(rootw+"train.pick", "wb") as f:#
+#    cPickle.dump([X_train, y_train], f)
+# with open(rootw + "val.pick", "wb") as f:
+#    cPickle.dump([X_val, y_val], f)
 trials = MongoTrials('mongo://localhost:1234/foo_db/jobs', exp_key='lstm')
 best = fmin(create_model, space, algo=tpe.suggest, max_evals=50, trials=trials)
 print('best: ')
