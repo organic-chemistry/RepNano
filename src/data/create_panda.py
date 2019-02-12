@@ -25,7 +25,7 @@ if os.path.exists(args.filename) and not args.replace:
 """
 path, name = os.path.split(args.filename)
 ls = glob.glob(path + "/" + args.root_directory + "/*")
-print("found %i files"%len(ls))
+print("found %i files" % len(ls))
 if len(ls) == 0:
     print("Warning, root directory is relative to filename")
 if os.path.exists(args.filename):
