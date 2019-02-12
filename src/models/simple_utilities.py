@@ -170,9 +170,10 @@ def load_data(lfiles, values=[["saved_weights_ratio.05-0.03", 0],
         # print("Weight", np.mean(yw),len(yw))
         y1 = []
         for iy1, iyw in zip(y1, yw):
-            iy1.append([0, 0]*nc)
+            y1.append([0, 0]*nc)
             y1[-1][2*cat] = iy1
             y1[-1][2*cat + 1] = iyw
+            print(y1)
         # y1 = [[iy1, iyw] for iy1, iyw in zip(y1, yw)]
         # print(len(y1))
         if per_dataset is None:
