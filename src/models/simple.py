@@ -44,7 +44,7 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200,
 
         t0 = time.time()
         X, y = load_data([data], root=root, per_dataset=per_dataset,
-                         values=values+["init_B"], nc=nc)  # X filename,y B amount
+                         values=values+[["init_B", 0]], nc=nc)  # X filename,y B amount
 
         t1 = time.time()
         print(t1-t0, "load csv")
