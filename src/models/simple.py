@@ -272,7 +272,7 @@ else:
         params = {"filters": 32, "kernel_size": 3,
                   "choice_pooling": {"pooling": True, "pool_size": 2},
                   "neurones": 100, "batch_size": 50, "optimizer": "adam",
-                  "activation": "sigmoid", "nc": args.nc, "dropout": 0}
+                  "activation": "linear", "nc": args.nc, "dropout": 0}
         create_model(params)
 
     """

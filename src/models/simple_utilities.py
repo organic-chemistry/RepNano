@@ -173,7 +173,7 @@ def load_data(lfiles, values=[["saved_weights_ratio.05-0.03", 0],
             yt.append([0, 0]*nc)
             yt[-1][2*cat] = iy1
             yt[-1][2*cat + 1] = iyw
-            print(yt[-1])
+            # print(yt[-1])
         y1 = yt
         # y1 = [[iy1, iyw] for iy1, iyw in zip(y1, yw)]
         # print(len(y1))
