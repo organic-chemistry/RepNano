@@ -268,23 +268,11 @@ else:
         with open("opti-lstm.pick", "wb") as f:
             cPickle.dump(best, f)
     else:
-        space = {
-            'filters': hp.quniform('filters', 16, 128, 1),
-            'kernel_size': hp.quniform('kernel_size', 64, 124, 1),
-            'choice_pooling': hp.choice('choice_pooling', [{"pooling": False, },
-                                                           {"pooling": True,
-                                                            "pool_size": hp.choice("pool_size", [2, 4])}]),
-            'dropout': hp.choice('dropout', [0, 0.25, 0.4]),
-            'neurones': hp.quniform('neurones', 20, 300, 1),
-            'batch_size': hp.quniform('batch_size', 28, 128, 1),
-            'optimizer': hp.choice('optimizer', ['adadelta', 'adam', 'rmsprop']),
-            'activation': hp.choice('activation', ["linear", "sigmoid"])
-        }
 
         params = {"filters": 32, "kernel_size": 3,
                   "choice_pooling": {"pooling": True, "pool_size": 2},
                   "neurones": 100, "batch_size": 50, "optimizer": "adam",
-                  "activation": "sigmoid", "nc": args.nc}
+                  "activation": "sigmoid", "nc": args.nc, "dropout": 0}
         create_model(params)
 
     """
