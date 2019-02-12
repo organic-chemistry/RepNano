@@ -50,7 +50,7 @@ def get_T_ou_B_delta_ind(x, TransitionT, TransitionB, filtered=False, rs={}):
 
     seq = x["bases"][2:-3].copy()
     seq[(~significatif) & Tm] = "X"
-    #print(np.sum((~significatif) & Tm))
+    # print(np.sum((~significatif) & Tm))
     which = np.argmin(np.concatenate(
         (deltasT[::, np.newaxis], deltasB[::, np.newaxis]), axis=1), axis=1)
     # print(significatif)
@@ -133,7 +133,7 @@ def rescale_deltas(real, th, Tm):
 
     def f(x):
         delta = ((real[~Tm]-x[0])/x[1] - th[~Tm])**2
-        #delta = ((real-x[0])/x[1] - th)**2
+        # delta = ((real-x[0])/x[1] - th)**2
 
         delta[delta > np.percentile(delta, 80)] = 0
         return np.sum(delta)
@@ -144,15 +144,17 @@ def deltas(which, th, Tm):
     return np.mean((which-th)**2), np.mean((which[~Tm]-th[~Tm])**2), np.mean((which[Tm]-th[Tm])**2)
 
 
-def load_data(lfiles, values=["saved_weights_ratio.05-0.03", "init_B"], root=".", per_dataset=None):
+def load_data(lfiles, values=[["saved_weights_ratio.05-0.03", 0],
+                              ["init_B", 0],
+                              ["init_E", 1]], root=".", per_dataset=None, nc=1):
     X = []
     y = []
     for file in lfiles:
         d = pd.read_csv(file)
-        #print(file, d)
+        # print(file, d)
         X1 = [os.path.join(root, f) for f in d["filename"]]
         found = False
-        for value in values:
+        for value, cat in values:
             if value in d.columns:
 
                 y1 = d[value]
@@ -163,17 +165,22 @@ def load_data(lfiles, values=["saved_weights_ratio.05-0.03", "init_B"], root="."
             print("Values not found", values)
             print("Available", d.columns)
             raise
-        #print(np.mean(y1), np.std(y1),len(y1),len(X1))
+        # print(np.mean(y1), np.std(y1),len(y1),len(X1))
         yw = d["init_w"]
-        #print("Weight", np.mean(yw),len(yw))
-        y1 = [[iy1, iyw] for iy1, iyw in zip(y1, yw)]
+        # print("Weight", np.mean(yw),len(yw))
+        y1 = []
+        for iy1, iyw in zip(y1, yw):
+            iy1.append([0, 0]*nc)
+            y1[-1][2*cat] = iy1
+            y1[-1][2*cat + 1] = iyw
+        # y1 = [[iy1, iyw] for iy1, iyw in zip(y1, yw)]
         # print(len(y1))
         if per_dataset is None:
             X.extend(X1)
             y.extend(y1)
         else:
-            X.extend(X1[:per_dataset])
-            y.extend(y1[:per_dataset])
+            X.extend(X1[: per_dataset])
+            y.extend(y1[: per_dataset])
     assert (len(X) == len(y))
     # print(y)
     return X, y
@@ -205,7 +212,7 @@ def load_events(X, y, min_length=1000, ws=5, raw=False, base=False, maxf=None, e
             # print(len(rawV))
             events = {"mean": rawV}
 
-        #events = events[1:-1]
+        # events = events[1:-1]
 
         if min_length is not None and len(events["mean"]) < min_length:
             continue
@@ -243,7 +250,7 @@ def scale(x, rescale=False):
     else:
         scale = 20
     # print(scale,np.percentile(x, 75) , np.percentile(x, 25))
-    #x /= scale
+    # x /= scale
     x /= scale
     if np.sum(x > 10) > len(x) * 0.05:
         print("Warning lotl of rare events")
@@ -256,8 +263,8 @@ def scale(x, rescale=False):
 
 def scale_one_read(events, rescale=False):
     mean = events["mean"]
-    #std = events["stdv"]
-    #length = events["length"]
+    # std = events["stdv"]
+    # length = events["length"]
 
     mean = scale(mean.copy(), rescale=rescale)
     """
@@ -265,9 +272,9 @@ def scale_one_read(events, rescale=False):
     delta = mean[1:] - mean[:-1]
     rmuninf = (delta > -15) & (delta < 15)
     mean = delta[~rmuninf]"""
-    #std = scale(std.copy())
+    # std = scale(std.copy())
     # print("stl")
-    #length = scale(length.copy())
+    # length = scale(length.copy())
     # print("el")
     V = np.array([mean]).T
     return V

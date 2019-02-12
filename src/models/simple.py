@@ -32,7 +32,7 @@ def unison_shuffled_copies(a, b):
 
 def load_data_complete(dataset, root, per_dataset=None, lenv=200,
                        shuffle=True, pmix=None, values=[], delta=False,
-                       raw=False, rescale=False, base=False, noise=False):
+                       raw=False, rescale=False, base=False, noise=False, nc=1):
 
     Tt = np.load("T-T1-corrected-transition_iter3.npy")
     X_t, y_t = [], []
@@ -44,7 +44,7 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200,
 
         t0 = time.time()
         X, y = load_data([data], root=root, per_dataset=per_dataset,
-                         values=values+["init_B"])  # X filename,y B amount
+                         values=values+["init_B"], nc=nc)  # X filename,y B amount
 
         t1 = time.time()
         print(t1-t0, "load csv")
@@ -116,6 +116,7 @@ parser.add_argument('--base', dest="base", action="store_true")
 parser.add_argument('--train-val', dest="train_val", action="store_true")
 parser.add_argument('--noise-norm', dest="noise_norm", action="store_true")
 parser.add_argument('--initw', type=str, default=None)
+parser.add_argument('--nc', type=int, default=1)
 
 
 args = parser.parse_args()
@@ -224,16 +225,17 @@ if args.train_val:
     X_train, y_train = load_data_complete(train_test, root=root,
                                           per_dataset=args.per_dataset,
                                           lenv=lenv, pmix=args.pmix,
-                                          values=["test_with_tombo_LSTM_alls_4000_noise_Tcorrected_iter3_filter//weights.17-0.01",
-                                                  "test_with_tombo_CNV_logcosh_3layers/weights.22-0.01",
-                                                  "test_with_tombo/weights.03-0.03", "test_longueur_lstm_from_scratch_without_human_weights.25-0.02"],
+                                          values=[
+                                              ["test_with_tombo_LSTM_alls_4000_noise_Tcorrected_iter3_filter//weights.17-0.01", 0]],
                                           delta=args.delta, raw=args.raw,
-                                          rescale=args.rescale, base=args.base, noise=args.noise_norm)
+                                          rescale=args.rescale, base=args.base,
+                                          noise=args.noise_norm, nc=args.nc)
     if val != []:
         X_val, y_val = load_data_complete(val, root=root, per_dataset=50, lenv=lenv, pmix=args.pmix,
-                                          values=["test_with_tombo/weights.03-0.03",
-                                                  "test_longueur_lstm_from_scratch_without_human_weights.25-0.02"],
-                                          delta=args.delta, raw=args.raw, rescale=args.rescale, base=args.base, noise=args.noise_norm)
+                                          values=[
+                                              ["test_with_tombo_LSTM_alls_4000_noise_Tcorrected_iter3_filter//weights.17-0.01", 0]],
+                                          delta=args.delta, raw=args.raw, rescale=args.rescale,
+                                          base=args.base, noise=args.noise_norm, nc=args.nc)
 
         # X_val = X_val[:64 * len(X_val) // 64]
         # y_val = y_val[:64 * len(y_val) // 64]
@@ -251,29 +253,51 @@ if args.train_val:
     np.save(rootw+"y_train.npy", y_train)
     np.save(rootw+"X_val.npy", X_val)
     np.save(rootw+"y_val.npy", y_val)
-#with open(rootw+"train.pick", "wb") as f:#
-#    cPickle.dump([X_train, y_train], f)
-# with open(rootw + "val.pick", "wb") as f:
-#    cPickle.dump([X_val, y_val], f)
-trials = MongoTrials('mongo://localhost:1234/foo_db/jobs', exp_key='lstm')
-best = fmin(create_model, space, algo=tpe.suggest, max_evals=50, trials=trials)
-print('best: ')
-print(best)
-with open("opti-lstm.pick", "wb") as f:
-    cPickle.dump(best, f)
+else:
+    #with open(rootw+"train.pick", "wb") as f:#
+    #    cPickle.dump([X_train, y_train], f)
+    # with open(rootw + "val.pick", "wb") as f:
+    #    cPickle.dump([X_val, y_val], f)
+    opti = False
+    if opti:
+        trials = MongoTrials('mongo://localhost:1234/foo_db/jobs', exp_key='lstm')
+        best = fmin(create_model, space, algo=tpe.suggest, max_evals=50, trials=trials)
+        print('best: ')
+        print(best)
+        with open("opti-lstm.pick", "wb") as f:
+            cPickle.dump(best, f)
+    else:
+        space = {
+            'filters': hp.quniform('filters', 16, 128, 1),
+            'kernel_size': hp.quniform('kernel_size', 64, 124, 1),
+            'choice_pooling': hp.choice('choice_pooling', [{"pooling": False, },
+                                                           {"pooling": True,
+                                                            "pool_size": hp.choice("pool_size", [2, 4])}]),
+            'dropout': hp.choice('dropout', [0, 0.25, 0.4]),
+            'neurones': hp.quniform('neurones', 20, 300, 1),
+            'batch_size': hp.quniform('batch_size', 28, 128, 1),
+            'optimizer': hp.choice('optimizer', ['adadelta', 'adam', 'rmsprop']),
+            'activation': hp.choice('activation', ["linear", "sigmoid"])
+        }
 
-"""
-print(X_train.shape, y_train.shape)
-print(y_train[::40], np.mean(y_train, axis=0))
-print(X_train.dtype, y_train.dtype)
-# for yi in y_train:
-#    print(yi)
-# , validation_data=(X_val, y_val[::, 0], y_val[::, 1])
-if args.incweightT is not None:
-    print(np.mean(y_train, axis=0))
-    y_train[y_train[::, 0] == 0, 1] *= args.incweightT
-    print(np.mean(y_train, axis=0))
+        params = {"filters": 32, "kernel_size": 3,
+                  "choice_pooling": {"pooling": True, "pool_size": 2},
+                  "neurones": 100, "batch_size": 50, "optimizer": "adam",
+                  "activation": "sigmoid", "nc": args.nc}
+        create_model(params)
+
+    """
+    print(X_train.shape, y_train.shape)
+    print(y_train[::40], np.mean(y_train, axis=0))
+    print(X_train.dtype, y_train.dtype)
+    # for yi in y_train:
+    #    print(yi)
+    # , validation_data=(X_val, y_val[::, 0], y_val[::, 1])
+    if args.incweightT is not None:
+        print(np.mean(y_train, axis=0))
+        y_train[y_train[::, 0] == 0, 1] *= args.incweightT
+        print(np.mean(y_train, axis=0))
 
 
-print("Accuracy: %.2f%%" % (scores))
+    print("Accuracy: %.2f%%" % (scores))
 """
