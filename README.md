@@ -41,8 +41,9 @@ refers to.
 
 The script will generate one file per read that will be used as input by the network
 
-
-
+To predict with the model
+==============================
+python  src/repnano/models/predict_simple.py --weight=data/training/B-I-filter-delta-rescale-sigmoid_weights_filters-32kernel_size-3choice_pooling-pooling-Truepool_size-2neurones-100batch_size-50optimizer-adamactivation-sigmoidnc-2dropout-0bi-False.hdf5 --directory ./test_B1/ --output ./test.fa --maxf 1  --typem 1 --IdU  --delta --overlap 10
 
 ==============================
 

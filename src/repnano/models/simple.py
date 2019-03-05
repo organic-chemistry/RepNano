@@ -18,10 +18,10 @@ import h5py
 import glob
 import pandas as pd
 import numpy as np
-from create_model.simple import create_model
+from repnano.models.create_model import create_model
 
 from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
-from .simple_utilities import load_data, load_events, transform_reads
+from repnano.models.simple_utilities import load_data, load_events, transform_reads
 
 
 def unison_shuffled_copies(a, b):
@@ -34,7 +34,7 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200,
                        shuffle=True, pmix=None, values=[], delta=False,
                        raw=False, rescale=False, base=False, noise=False, nc=1):
 
-    Tt = np.load("T-T1-corrected-transition_iter3.npy")
+    Tt = np.load("data/training/T-T1-corrected-transition_iter3.npy")
     X_t, y_t = [], []
     for data in dataset:
         print("Loading", data)
@@ -44,7 +44,7 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200,
 
         t0 = time.time()
         X, y = load_data([data], root=root, per_dataset=per_dataset,
-                         values=values+[["init_B", 0], ["init_E", 1]], nc=nc)  # X filename,y B amount
+                         values=values+[["init_B", 0], ["init_I", 1]], nc=nc)  # X filename,y B amount
 
         t1 = time.time()
         print(t1-t0, "load csv")
@@ -105,6 +105,7 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200,
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--root', type=str, default="data/training/")
+parser.add_argument('--eroot', type=str, default="./")
 parser.add_argument('--cnv', dest="lstm", action="store_false")
 parser.add_argument('--per-dataset', dest="per_dataset", type=int, default="400")
 parser.add_argument('--pmix', dest="pmix", type=float, default=None)
@@ -113,9 +114,10 @@ parser.add_argument('--delta', dest="delta", action="store_true")
 parser.add_argument('--raw', dest="raw", action="store_true")
 parser.add_argument('--rescale', dest="rescale", action="store_true")
 parser.add_argument('--base', dest="base", action="store_true")
+parser.add_argument('--bi', dest="bi", action="store_true")
 parser.add_argument('--train-val', dest="train_val", action="store_true")
 parser.add_argument('--noise-norm', dest="noise_norm", action="store_true")
-parser.add_argument('--initw', type=str, default=None)
+parser.add_argument('--initw', type=str, default="")
 parser.add_argument('--nc', type=int, default=1)
 
 
@@ -150,13 +152,18 @@ if not args.base:
 else:
       # '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/T-human.csv',
         #     '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/B-27-human.csv',
+    files = ['/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/T-human.csv',
+             '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/B-27-human.csv']
     files = ['/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/B-40-yeast.csv',
              '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/T-yeast.csv',
              '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/B-yeast.csv',
              '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/T1-yeast.csv',
              '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/B-69-yeast.csv',
-             '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/B1-yeast.csv']
-    # '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/E-yeast.csv']
+             '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/B1-yeast.csv',
+             '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/B-9-yeast.csv']
+    if args.nc == 2:
+        files += ['/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/I-yeast.csv']
+    #
     #         '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-27-human.csv']
 
     indep_val = []  # [ '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/B-40-yeast.csv',
@@ -216,9 +223,13 @@ else:
     lenv = 256*2
     lenv = 100
     lenv = 96
-
+"""
 if args.initw is not None:
     model.load_weights(args.initw)
+
+"""
+rootw = os.path.join("/data/bioinfo@borvo/users/jarbona/mongo_net/first/", args.eroot)
+os.makedirs(rootw, exist_ok=True)
 
 
 if args.train_val:
@@ -227,7 +238,8 @@ if args.train_val:
                                           per_dataset=args.per_dataset,
                                           lenv=lenv, pmix=args.pmix,
                                           values=[
-                                              ["test_with_tombo_LSTM_alls_4000_noise_Tcorrected_iter3_filter//weights.17-0.01", 0]],
+                                              ["test_with_tombo_LSTM_alls_4000_noise_Tcorrected_iter3_filter//weights.17-0.01", 0],
+                                              ["../mongo_net/first/B-Iweights_filters-32kernel_size-3choice_pooling-pooling-Truepool_size-2neurones-100batch_size-50optimizer-adamactivation-linearnc-2dropout-0", 1]],
                                           delta=args.delta, raw=args.raw,
                                           rescale=args.rescale, base=args.base,
                                           noise=args.noise_norm, nc=args.nc)
@@ -248,12 +260,10 @@ if args.train_val:
         X_train = X_train[:n90]
         y_train = y_train[:n90]
 
-    rootw = "/data/bioinfo@borvo/users/jarbona/mongo_net/first/"
-
-    np.save(rootw+"X_train.npy", X_train)
-    np.save(rootw+"y_train.npy", y_train)
-    np.save(rootw+"X_val.npy", X_val)
-    np.save(rootw+"y_val.npy", y_val)
+    np.save(os.path.join(rootw, "X_train.npy"), X_train)
+    np.save(os.path.join(rootw, "y_train.npy"), y_train)
+    np.save(os.path.join(rootw, "X_val.npy"), X_val)
+    np.save(os.path.join(rootw, "y_val.npy"), y_val)
 else:
     #with open(rootw+"train.pick", "wb") as f:#
     #    cPickle.dump([X_train, y_train], f)
@@ -272,8 +282,8 @@ else:
         params = {"filters": 32, "kernel_size": 3,
                   "choice_pooling": {"pooling": True, "pool_size": 2},
                   "neurones": 100, "batch_size": 50, "optimizer": "adam",
-                  "activation": "linear", "nc": args.nc, "dropout": 0}
-        create_model(params)
+                  "activation": "sigmoid", "nc": args.nc, "dropout": 0, "bi": args.bi}
+        create_model(params, rootw=rootw, wn=args.initw)
 
     """
     print(X_train.shape, y_train.shape)

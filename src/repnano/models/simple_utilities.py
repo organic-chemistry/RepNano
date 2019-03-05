@@ -1,3 +1,4 @@
+import sys
 from scipy import optimize
 import pandas as pd
 from ..features.extract_events import extract_events, get_events
@@ -146,7 +147,7 @@ def deltas(which, th, Tm):
 
 def load_data(lfiles, values=[["saved_weights_ratio.05-0.03", 0],
                               ["init_B", 0],
-                              ["init_E", 1]], root=".", per_dataset=None, nc=1):
+                              ["init_I", 1]], root=".", per_dataset=None, nc=1):
     X = []
     y = []
     for file in lfiles:
@@ -170,7 +171,7 @@ def load_data(lfiles, values=[["saved_weights_ratio.05-0.03", 0],
         # print("Weight", np.mean(yw),len(yw))
         yt = []
         for iy1, iyw in zip(y1, yw):
-            yt.append([0, 0]*nc)
+            yt.append([0, 1]*nc)
             yt[-1][2*cat] = iy1
             yt[-1][2*cat + 1] = iyw
             # print(yt[-1])
@@ -282,7 +283,10 @@ def scale_one_read(events, rescale=False):
     return V
 
 
-def transform_reads(X, y, lenv=200, max_len=None, overlap=None, delta=False, rescale=False, noise=False, extra_e=[], Tt=[]):
+def transform_reads(X, y, lenv=200, max_len=None, overlap=None, delta=False,
+                    rescale=False, noise=False, extra_e=[], Tt=[], typem=None):
+    # print(lenv, max_len, overlap, delta,
+    #          rescale, noise)
     Xt = []
     yt = []
     # print(y.shape)
@@ -293,26 +297,53 @@ def transform_reads(X, y, lenv=200, max_len=None, overlap=None, delta=False, res
         r = [0, 0, 0, 0]
         r[s.index(B)] = 1
         return r
+
+    Value = {"A": 0, "T": 1, "C": 2, "G": 3, "B": 4, "I": 5}
+
+    def embed(lv, size=6, plus_T=0):
+        def se(l):
+            # print(l)
+            r = np.zeros(size)
+            if l != "T":
+                r[Value[l]] = 1
+            else:
+                r[Value[l]+plus_T] = 1
+            return r
+
+        # return "".join(lv)
+        return np.array([se(letter) for letter in lv])
+
     which_keep = []
     for ip, (events, yi) in enumerate(zip(X, y)):
-        if type(events) == dict and "bases" in events.keys():
-            V = np.array([[m] + mapb(b) for m, b in zip(events["mean"], events["bases"])])
-            if rescale and extra_e != [] and len(V) != 0:
+        if typem != 3:
+            if type(events) == dict and "bases" in events.keys():
+                V = np.array([[m] + mapb(b) for m, b in zip(events["mean"], events["bases"])])
+                if rescale and extra_e != [] and len(V) != 0:
 
-                # print("Resacl")
-                new, Tm, th, rs = get_rescaled_deltas(events, Tt, filtered=True, rs={})
+                    # print("Resacl")
+                    new, Tm, th, rs = get_rescaled_deltas(events, Tt, filtered=True, rs={})
 
-                if new != []:
-                    V = V[2:2+len(new)]
-                    V[::, 0] = new
-                else:
-                    which_keep.append(False)
-                    continue
+                    if new != []:
+                        V = V[2:2+len(new)]
+                        V[::, 0] = new
 
-        else:
-            V = scale_one_read(events, rescale=rescale)
+                    else:
+                        which_keep.append(False)
+                        continue
+
+            else:
+                V = scale_one_read(events, rescale=rescale)
+        if typem == 3:
+            # print("la,type3")
+            sc = events["bases"].copy()
+            sc[sc == "B"] = "T"
+            sc[sc == "I"] = "T"
+            mean = events["mean"][::, np.newaxis].copy()
+            mean /= 3
+            V = np.concatenate((mean, embed(sc, size=4)), axis=-1)
 
         if delta:
+
             V = V[1:]-V[:-1]
 
         if max_len is not None:
