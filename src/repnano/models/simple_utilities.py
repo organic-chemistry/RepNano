@@ -189,6 +189,15 @@ def load_data(lfiles, values=[["saved_weights_ratio.05-0.03", 0],
     return X, y
 
 
+def load_events_bigf(X, y, min_length=1000, ws=5, raw=False, base=False,
+                     maxf=None, extra=False, verbose=True):
+    assert(len(X) == 1)
+    h5 = h5py.File(X[0], "r")
+    for v in h5.values():
+        yield load_events([v], y, min_length=min_length, ws=ws, raw=raw,
+                          base=base, maxf=maxf, extra=extra, verbose=verbose)
+
+
 def load_events(X, y, min_length=1000, ws=5, raw=False, base=False, maxf=None, extra=False, verbose=True):
     Xt = []
     indexes = []
@@ -198,15 +207,19 @@ def load_events(X, y, min_length=1000, ws=5, raw=False, base=False, maxf=None, e
     extra_e = []
     for ifi, filename in enumerate(X):
         # print(filename)
-
-        h5 = h5py.File(filename, "r")
+        if type(filename) == str:
+            h5 = h5py.File(filename, "r")
+            bigf = False
+        else:
+            h5 = filename
+            bigf = True
         tomb = False
         if base:
             tomb = True
         events, rawV, sl = get_events(h5, already_detected=False,
                                       chemistry="rf", window_size=np.random.randint(ws, ws+3),
                                       old=False, verbose=False,
-                                      about_max_len=None, extra=True, tomb=tomb)
+                                      about_max_len=None, extra=True, tomb=tomb, bigf=bigf)
 
         if events is None:
             empty += 1
@@ -227,8 +240,8 @@ def load_events(X, y, min_length=1000, ws=5, raw=False, base=False, maxf=None, e
             Xt.append({"mean": events["mean"], "bases": events["bases"]})
         else:
             Xt.append({"mean": events["mean"]})
-
-        h5.close()
+        if not bigf:
+            h5.close()
 
         yt.append(y[ifi])
         indexes.append(ifi)

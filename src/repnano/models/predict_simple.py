@@ -1,4 +1,4 @@
-from repnano.models.simple_utilities import load_events, transform_reads, get_T_ou_B_delta_ind
+from repnano.models.simple_utilities import load_events, transform_reads, get_T_ou_B_delta_ind, load_events_bigf
 from repnano.models.create_model import create_model
 from keras.models import Sequential
 from keras.layers import Dense, Flatten, TimeDistributed, AveragePooling1D
@@ -81,6 +81,7 @@ parser.add_argument('--overlap', dest='overlap', type=int, default=None)
 parser.add_argument('--IdU', dest='idu', action="store_true")
 
 parser.add_argument('--delta', dest="delta", action="store_true")
+parser.add_argument('--bigf', dest="bigf", action="store_true")
 parser.add_argument('--norescale', dest="rescale", action="store_false")
 parser.add_argument('--raw', dest="raw", action="store_true")
 parser.add_argument('--nobase', dest="base", action="store_false")
@@ -148,97 +149,113 @@ if len(directory):
 
 if Nmax is not None:
     files = files[-Nmax:]
+if args.bigf:
+    print("Found %i files" % len(files))
+else:
+    print("Found %i reads" % len(files))
 
-print("Found %i reads" % len(files))
 Nempty_short = 0
+ntreated = 0
 for i, read in enumerate(files):
     if args.verbose:
         print(read)
     X = [read]
     y = [[0, 0]]
-    if not args.base:
-        Xrt, yrt, fnt = load_events(X, y, min_length=2*length_window,
-                                    raw=args.raw, base=args.base,
-                                    maxf=args.maxf, verbose=False)
-        extra_e = []
+
+    if args.bigf:
+        fun = load_events_bigf
     else:
-        Xrt, yrt, fnt, extra_e = load_events(
-            X, y, min_length=2*length_window, raw=args.raw,
-            base=args.base, maxf=args.maxf, extra=True, verbose=False)
-
-    if len(Xrt) == 0:
-        Nempty_short += 1
-        if args.verbose:
-            print("No event or too short")
-        continue
-    seq2, TouB3, Success = get_T_ou_B_delta_ind(Xrt[0], Tt, Tb, True)
-    if not Success:
-        continue
-    Xt, yt, _ = transform_reads(Xrt, np.array(yrt), lenv=length_window,
-                                max_len=None, overlap=args.overlap,
-                                delta=args.delta, rescale=args.rescale,
-                                extra_e=extra_e, Tt=Tt, typem=args.typem)
-    # print(Xt[0])
-    if len(Xt) == 0:
-        continue
-
-    def atomise(r):
-        Proba = {}
-        res = []
-        L = int(length_window // args.overlap)
-        for i in range(0, len(seq2)):
-            Proba[i] = []
-        for k in range(0, args.overlap):
-            for l in range(0, (len(seq2) // length_window)-1):
-                mini = k*L + l*length_window
-                maxi = mini + length_window
-                for i in range(mini, maxi):
-                    Proba[i].append(r[k, l][0])
-        for i in Proba:
-            res.append(np.median(np.array(Proba[i])))
-        return res
-
-    if args.overlap is None:
-        res = ntwk.predict(Xt[0])
-        if not args.idu:
-            res0 = np.ones((res.shape[0], length_window, 1)) * res[::, np.newaxis, ::]
-            res0 = res0.flatten()
-            Brdu = res0
-
+        def fun(*args, **kwargs):
+            return [load_events(*args, **kwargs)]
+    for val in fun(X, y, min_length=2*length_window,
+                   raw=args.raw, base=args.base,
+                   maxf=args.maxf, verbose=False, extra=args.base):
+        ntreated += 1
+        #print(val, args.base)
+        if not args.base:
+            Xrt, yrt, fnt = val
+            extra_e = []
         else:
-            res0 = np.ones((res[0].shape[0], length_window, 1)) * res[0][::, np.newaxis, ::]
-            res0 = res0.flatten()
-            Brdu = res0
-            res1 = np.ones((res[1].shape[0], length_window, 1)) * res[1][::, np.newaxis, ::]
-            res1 = res1.flatten()
-            Idu = res1
-    else:
-        xt = np.array(Xt[0])
-        # print(xt.shape)
-        r = ntwk.predict(xt.reshape(-1, length_window, xt.shape[-1]))
-        # print(r)
-        if not args.idu:
-            # print(len(r))
-            Brdu = r.reshape(args.overlap, -1, 1)
-            Brdu = atomise(Brdu)
+            Xrt, yrt, fnt, extra_e = val
 
+        if len(Xrt) == 0:
+            Nempty_short += 1
+            if args.verbose:
+                print("No event or too short")
+            continue
+        seq2, TouB3, Success = get_T_ou_B_delta_ind(Xrt[0], Tt, Tb, True)
+        if not Success:
+            continue
+        Xt, yt, _ = transform_reads(Xrt, np.array(yrt), lenv=length_window,
+                                    max_len=None, overlap=args.overlap,
+                                    delta=args.delta, rescale=args.rescale,
+                                    extra_e=extra_e, Tt=Tt, typem=args.typem)
+        # print(Xt[0])
+        if len(Xt) == 0:
+            continue
+
+        def atomise(r):
+            Proba = {}
+            res = []
+            L = int(length_window // args.overlap)
+            for i in range(0, len(seq2)):
+                Proba[i] = []
+            for k in range(0, args.overlap):
+                for l in range(0, (len(seq2) // length_window)-1):
+                    mini = k*L + l*length_window
+                    maxi = mini + length_window
+                    for i in range(mini, maxi):
+                        Proba[i].append(r[k, l][0])
+            for i in Proba:
+                res.append(np.median(np.array(Proba[i])))
+            return res
+
+        if args.overlap is None:
+            res = ntwk.predict(Xt[0])
+            if not args.idu:
+                res0 = np.ones((res.shape[0], length_window, 1)) * res[::, np.newaxis, ::]
+                res0 = res0.flatten()
+                Brdu = res0
+
+            else:
+                res0 = np.ones((res[0].shape[0], length_window, 1)) * res[0][::, np.newaxis, ::]
+                res0 = res0.flatten()
+                Brdu = res0
+                res1 = np.ones((res[1].shape[0], length_window, 1)) * res[1][::, np.newaxis, ::]
+                res1 = res1.flatten()
+                Idu = res1
         else:
-            Brdu = r[0]
-            Brdu = Brdu.reshape(args.overlap, -1, 1)
-            Brdu = atomise(Brdu)
+            xt = np.array(Xt[0])
+            # print(xt.shape)
+            r = ntwk.predict(xt.reshape(-1, length_window, xt.shape[-1]))
+            # print(r)
+            if not args.idu:
+                # print(len(r))
+                Brdu = r.reshape(args.overlap, -1, 1)
+                Brdu = atomise(Brdu)
 
-            Idu = r[1]
-            Idu = Idu.reshape(args.overlap, -1, 1)
-            Idu = atomise(Idu)
+            else:
+                Brdu = r[0]
+                Brdu = Brdu.reshape(args.overlap, -1, 1)
+                Brdu = atomise(Brdu)
 
-    fo.writelines(">%s_template_deepnano %s \n" % (read, str(extra_e[0][1])))
-    fo.writelines("".join(seq2) + "\n")
+                Idu = r[1]
+                Idu = Idu.reshape(args.overlap, -1, 1)
+                Idu = atomise(Idu)
 
-    fo1.writelines(">%s_template_deepnano\n" % read)
-    fo1.writelines(" ".join(["%.2f" % ires2 for ires2 in Brdu])+"\n")
-    if args.idu:
-        fo2.writelines(">%s_template_deepnano\n" % read)
-        fo2.writelines(" ".join(["%.2f" % ires2 for ires2 in Idu])+"\n")
+        fo.writelines(">%s_template_deepnano %s \n" % (read, str(extra_e[0][1])))
+        fo.writelines("".join(seq2) + "\n")
+
+        fo1.writelines(">%s_template_deepnano\n" % read)
+        fo1.writelines(" ".join(["%.2f" % ires2 for ires2 in Brdu])+"\n")
+        if args.idu:
+            fo2.writelines(">%s_template_deepnano\n" % read)
+            fo2.writelines(" ".join(["%.2f" % ires2 for ires2 in Idu])+"\n")
+
+        if Nmax is not None and ntreated >= Nmax:
+            break
+    if Nmax is not None and ntreated >= Nmax:
+        break
 
 fo.close()
 fo1.close()

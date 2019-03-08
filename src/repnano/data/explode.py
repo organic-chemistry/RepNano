@@ -42,6 +42,12 @@ def explode_fast5(name, tmpdir, n=None):
     h5.close()
 
 
+if __name__ == "__main__":
+    import sys
+    print(sys.argv)
+    explode_fast5(sys.argv[1], tmpdir=sys.argv[2])
+
+
 """
 root = "../../../deepnano5bases/data/tomb/"
 fich = "env/ig/atelier/nanopore/cns/MN19358/RG_IN_PROCESS/190205_MN19358_FAK41381_A/fast5_file_management/workdir/barcode01/"

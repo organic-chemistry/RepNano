@@ -38,28 +38,51 @@ defs = {
 
 }
 
-def smooth(ser,sc):
-    return np.array(pd.Series(ser).rolling(sc,min_periods=1,center=True).mean())
-def find_raw(raw,maxi=1000,safe=10):
+
+def smooth(ser, sc):
+    return np.array(pd.Series(ser).rolling(sc, min_periods=1, center=True).mean())
+
+
+def find_raw(raw, maxi=1000, safe=10):
     m = raw
-    d2 = smooth(np.sqrt((m[1:]-m[:-1])**2),1000)
+    d2 = smooth(np.sqrt((m[1:]-m[:-1])**2), 1000)
 
-    return min(np.argmax(d2[safe:]>3)+safe,len(m)-1),min(len(d2)-np.argmax(d2[::-1]>3)+safe,len(m)-1)
+    return min(np.argmax(d2[safe:] > 3)+safe, len(m)-1), min(len(d2)-np.argmax(d2[::-1] > 3)+safe, len(m)-1)
+
+
 def get_events(h5, already_detected=True, chemistry="r9.5", window_size=None,
-               old=True,verbose=True,about_max_len=None,extra=False,tomb=False):
+               old=True, verbose=True, about_max_len=None, extra=False, tomb=False, bigf=False):
     if tomb:
-        try:
-            #print(h5.filename)
-            e = h5["Analyses/RawGenomeCorrected_000/BaseCalled_template/Events"].value
-            #print(e)
-        except:
-            #print("failed")
-            return None,None,None
-        #e = list(e)
-        return {"mean":e["norm_mean"],"bases":np.array(e["base"],dtype=str)},\
-                dict(h5["Analyses/RawGenomeCorrected_000/BaseCalled_template/"].attrs),\
-                dict(h5["Analyses/RawGenomeCorrected_000/BaseCalled_template/Alignment"].attrs)
+        if bigf:
+            racine = "BaseCalled_template/"
+        else:
+            racine = "Analyses/RawGenomeCorrected_000/BaseCalled_template/"
 
+        try:
+            # print(h5.filename)
+            # print()
+            if bigf:
+                e = h5[racine+"Event"].value
+            else:
+                e = h5[racine+"Events"].value
+        # print(e)
+        except:
+            """
+            def printname(name, two=""):
+                print(name, two)
+                try:
+                    print(name, name.value)
+                except:
+                    pass
+            print("failed")
+            print(h5[racine])
+            h5[racine].visit(printname)
+            """
+            return None, None, None
+        #e = list(e)
+        return {"mean": e["norm_mean"], "bases": np.array(e["base"], dtype=str)},\
+            dict(h5[racine].attrs),\
+            dict(h5[racine+"/Alignment"].attrs)
 
     if already_detected:
         try:
@@ -78,18 +101,20 @@ def get_events(h5, already_detected=True, chemistry="r9.5", window_size=None,
                 return h5["Segmentation_Rep/events"]
             else:
                 raw, sl = get_raw(h5)
-                s,e = find_raw(raw)
-                return h5["Segmentation_Rep/events"],raw[s:e],sl
+                s, e = find_raw(raw)
+                return h5["Segmentation_Rep/events"], raw[s:e], sl
         except:
-            #print("la")
+            # print("la")
             return extract_events(h5, chemistry, window_size,
-                                  old=old,verbose=verbose,about_max_len=about_max_len)
+                                  old=old, verbose=verbose, about_max_len=about_max_len)
 
-def find2(event,maxi=1000,safe=10):
+
+def find2(event, maxi=1000, safe=10):
     m = event["mean"]
     d2 = np.sqrt((m[1:]-m[:-1])**2)
 
-    return min(np.argmax(d2[safe:]>30)+safe,len(m)-1),min(len(d2)-np.argmax(d2[::-1]>30)+safe,len(m)-1)
+    return min(np.argmax(d2[safe:] > 30)+safe, len(m)-1), min(len(d2)-np.argmax(d2[::-1] > 30)+safe, len(m)-1)
+
 
 def scale_ratio(x):
     x -= np.percentile(x, 25)
@@ -104,6 +129,7 @@ def scale_ratio(x):
     x[x < -5] = 0
 
     return x
+
 
 def get_raw(h5):
     # print(h5["Raw/Reads"].keys())
@@ -197,7 +223,7 @@ def get_tstat(s, s2, wl):
     return np.concatenate([np.zeros(wl), np.abs(delta / np.sqrt(deltav)), np.zeros(wl - 1)])
 
 
-def extract_events(h5, chem, window_size=None, old=True, verbose=True, about_max_len=None,extra=False):
+def extract_events(h5, chem, window_size=None, old=True, verbose=True, about_max_len=None, extra=False):
     # print("ed")
     raw, sl = get_raw(h5)
 
@@ -215,19 +241,19 @@ def extract_events(h5, chem, window_size=None, old=True, verbose=True, about_max
     max_thresh = med + 1.48 * 2 + mad
 
     #first_event = find_stall(events, max_thresh)
-    #first_event, last_event = find_stall(
+    # first_event, last_event = find_stall(
     #    events, threshold=0.05, raw=raw, sampling_rate=sl, max_under_threshold=100)
     """
     first_event, last_event = find_stall(
             events, start_threshold=8.5, end_threshold=4, raw=raw, sampling_rate=sl, max_under_threshold=750)
     """
     v = find2(events)
-    first_event,last_event = v
+    first_event, last_event = v
 
-    #print(len(events),first_event,last_event)
+    # print(len(events),first_event,last_event)
     #last_event = None
     #first_event,last_event = 0,None
-    #print(first_event)
+    # print(first_event)
     #events = events[first_event:last_event]
 
     if verbose:
@@ -237,8 +263,8 @@ def extract_events(h5, chem, window_size=None, old=True, verbose=True, about_max
     else:
         #startraw = int(np.sum(events[:first_event]["length"])*sl)
         #endraw = int(np.sum(events[last_event:]["length"])*sl)
-        #print(startraw,endraw,len(raw))
-        return events[first_event:last_event],raw[startraw:-endraw],sl
+        # print(startraw,endraw,len(raw))
+        return events[first_event:last_event], raw[startraw:-endraw], sl
 
 
 @jit
