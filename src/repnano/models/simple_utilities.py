@@ -220,6 +220,11 @@ def load_events(X, y, min_length=1000, ws=5, raw=False, base=False, maxf=None, e
                                       chemistry="rf", window_size=np.random.randint(ws, ws+3),
                                       old=False, verbose=False,
                                       about_max_len=None, extra=True, tomb=tomb, bigf=bigf)
+        if type(filename) != str:
+            try:
+                filename = filename.name
+            except:
+                pass
 
         if events is None:
             empty += 1

@@ -183,6 +183,9 @@ for i, read in enumerate(files):
             if args.verbose:
                 print("No event or too short")
             continue
+        else:
+            if fnt != []:
+                read = fnt[0]
         seq2, TouB3, Success = get_T_ou_B_delta_ind(Xrt[0], Tt, Tb, True)
         if not Success:
             continue
@@ -243,10 +246,10 @@ for i, read in enumerate(files):
                 Idu = Idu.reshape(args.overlap, -1, 1)
                 Idu = atomise(Idu)
 
-        fo.writelines(">%s_template_deepnano %s \n" % (read, str(extra_e[0][1])))
+        fo.writelines(">%s %s \n" % (read, str(extra_e[0][1])))
         fo.writelines("".join(seq2) + "\n")
 
-        fo1.writelines(">%s_template_deepnano\n" % read)
+        fo1.writelines(">%s\n" % read)
         fo1.writelines(" ".join(["%.2f" % ires2 for ires2 in Brdu])+"\n")
         if args.idu:
             fo2.writelines(">%s_template_deepnano\n" % read)
