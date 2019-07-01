@@ -38,7 +38,7 @@ def model(typem=1, base=False, nc=1, window_length=None):
         params = {"filters": 32, "kernel_size": 3,
                   "choice_pooling": {"pooling": True, "pool_size": 2},
                   "neurones": 100, "batch_size": 50, "optimizer": "adam",
-                  "activation": "linear", "nc": nc, "dropout": 0}
+                  "activation": "sigmoid", "nc": nc, "dropout": 0,"bi":False}
         ntwk = create_model(params, create_only=True)
     if typem == 7:
         model = Sequential()
@@ -82,6 +82,7 @@ parser.add_argument('--typem', dest='typem', type=int, default=1)
 parser.add_argument('--nc', dest='nc', type=int, default=1)
 parser.add_argument('--target', dest='target', type=int, default=1)
 parser.add_argument('--thres', dest='thres', type=float, default=0.3)
+parser.add_argument('--assign-value', dest='assign', type=float, default=1)
 parser.add_argument('--maxf', dest='maxf', type=int, default=None)
 parser.add_argument('--window-length', dest='length_window', type=int, default=200)
 parser.add_argument('--compute-only', dest="compute_only", action="store_true")
@@ -119,7 +120,7 @@ else:
 assert(len(fn) == len(Xr))
 print("Nfiles", len(Xr))
 yr = np.array(yr)
-Xt, yt, which_keep = transform_reads(
+Xt, yt, which_keep,NotT = transform_reads(
     Xr, yr, lenv=length_window, Tt=Tt, rescale=args.rescale, extra_e=extra_e)
 
 fn = [ifn for ifn, w in zip(fn, which_keep) if w]
@@ -136,12 +137,15 @@ fname = os.path.split(filename)[-1][:-4]
 Predicts = np.array(Predicts)
 pylab.hist(Predicts, bins=40)
 fnf = weight_name[:-5]+"histo_B_T_%s" % (fname)+extra+".pdf"
-print("Percent of reads < %.1f" % args.thres, np.sum(Predicts < args.thres)/len(Predicts))
+under = np.sum(Predicts < args.thres)/len(Predicts)
+print("Percent of reads < %.1f" % args.thres,under)
+val = min(args.assign / (1-under),1)
+
 pylab.savefig(fnf)
 print("Writing", weight_name[:-5]+"histo_B_T_%s" % (fname)+extra+".pdf")
 csvf = pd.read_csv(filename)
 wn = weight_name[:-5]
-csvf[wn] = [1 for _ in range(len(csvf))]
+csvf[wn] = [val for _ in range(len(csvf))]
 found = 0
 assert len(Predicts) == len(fn)
 for f, r in zip(fn, Predicts):
@@ -149,7 +153,7 @@ for f, r in zip(fn, Predicts):
         b = r
     else:
         if r > args.thres:
-            b = 1
+            b = val
         else:
             b = 0
     fnshort = f.replace(root, "")

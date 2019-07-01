@@ -9,6 +9,7 @@ import numpy as np
 import pylab
 import pandas as pd
 from repnano.models.create_model import create_model
+import glob
 
 
 def model(typem=1, window_length=None, base=False, nc=1):
@@ -212,6 +213,9 @@ parser.add_argument('--delta', dest="delta", action="store_true")
 parser.add_argument('--rescale', dest="rescale", action="store_true")
 parser.add_argument('--raw', dest="raw", action="store_true")
 parser.add_argument('--base', dest="base", action="store_true")
+parser.add_argument('--on-percent', dest="on_percent", action="store_true")
+parser.add_argument('--min-length', dest='mlength', type=int, default=1)
+
 
 
 args = parser.parse_args()
@@ -241,6 +245,11 @@ train_test = ['/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/T-yeast
               '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-40-yeast.csv',
               '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-27-human.csv',
               '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B1-yeast.csv']
+if args.on_percent:
+    root = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name"
+    train_test = glob.glob("/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/percent*.csv")
+    train_test.sort()
+
 if args.nc != 1:
     train_test.append('/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/I-yeast.csv')
 
@@ -276,14 +285,15 @@ for t in train_test:
         max_len = 10000
     else:
         max_len = 2000
-    Xt, yt, _ = transform_reads(Xrt, np.array(yrt), lenv=length_window,
-                                max_len=2000, overlap=args.overlap,
+    Xt, yt, Keep, NotT = transform_reads(Xrt, np.array(yrt), lenv=length_window,
+                                overlap=args.overlap,
                                 delta=args.delta, rescale=args.rescale,
                                 extra_e=extra_e, Tt=Tt, typem=args.typem)
     # print(Xt)
     # print(Xt[0])
+    #print(NotT)
     if args.nc == 1:
-        data[t.split("/")[-1][:-4]] = [Xt, [yti[0][0] for yti in yt]]
+        data[t.split("/")[-1][:-4]] = [Xt, [yti[0][0] for yti in yt], NotT, Keep]
     else:
         data[t.split("/")[-1][:-4]] = [Xt, [[yti[0][2*j] for j in range(args.nc)] for yti in yt]]
 
@@ -293,15 +303,23 @@ closer = ["T-yeast", "T1-yeast", "T-human", "B-9-yeast", "B-27-human",
 if args.nc != 1:
     closer.append("I-yeast")
 
+if args.on_percent:
+    closer = data.keys()
+
 
 def predict(closer, nc=1):
     Xr = []
     yr = []
+    nott = []
     Predicts = []
     for d in closer:
-        print(d)
+        #print(d)
         yr.extend(data[d][1])
-        for xt in data[d][0]:
+        #print(data[d][2],data[d][3])
+
+
+        #print(nott[-1])
+        for idd,xt in enumerate(data[d][0]):
             if args.overlap is None:
                 if nc == 1:
                     Predicts.append(np.mean(ntwk.predict(xt)))
@@ -318,18 +336,23 @@ def predict(closer, nc=1):
                 # print(r.shape)
                 Predicts.append(np.mean(np.median(r, axis=0)))
 
-    return Xr, np.array(yr), np.array(Predicts)
+            if args.rescale:
+                nott.append(data[d][2][data[d][3]][idd])
+
+    return Xr, np.array(yr), np.array(Predicts),np.array(nott)
 
 
-if args.nc == 1:
-    Xr, yr, Predicts = predict(closer, nc=args.nc)
+if args.on_percent:
+    Xr, yr, Predicts, nott = predict(closer, nc=args.nc)
 
-    closer = ["B-9-yeast", "B-yeast"]
-    Xr, yr2, Predicts2 = predict(closer, nc=args.nc)
-
-    pylab.title("Deviation %.2f, on test only (9 and B1) %.2f" %
-                (np.std(Predicts-yr), np.std(Predicts2-yr2)))
-    pylab.plot(Predicts)
+    pylab.title("Deviation %.2f" %
+                (np.std(Predicts-yr)))
+    if not args.rescale:
+        pylab.plot(Predicts)
+    else:
+        x = list(range(len(Predicts)))
+        print(len(x),len(Predicts),len(nott))
+        pylab.errorbar(x, Predicts, yerr=nott,ecolor='g')
     pylab.plot(yr, "o")
     pylab.xlabel("Sample #")
     pylab.ylabel("Ratio_b")
@@ -337,23 +360,41 @@ if args.nc == 1:
     print("Writing on %s" % filen)
     pylab.savefig(filen)
 else:
-    Xr, yr, Predicts = predict(closer, nc=args.nc)
 
-    # print(Predicts)
-    closer = ["B-9-yeast", "B-yeast"]
-    Xr, yr2, Predicts2 = predict(closer, nc=args.nc)
 
-    f = pylab.figure()
-    nc = args.nc
-    for i in range(args.nc):
-        f.add_subplot(1, 2, i+1)
-        # , np.std(Predicts2-yr2)))
-        pylab.title("Deviation %.2f" % (np.std(Predicts[::, i]-yr[::, i])))
+    if args.nc == 1:
+        Xr, yr, Predicts,nott = predict(closer, nc=args.nc)
 
-        pylab.plot(Predicts[::, i])
-        pylab.plot(yr[::, i], "o")
+        closer = ["B-9-yeast", "B-yeast"]
+        Xr, yr2, Predicts2,nott = predict(closer, nc=args.nc)
+
+        pylab.title("Deviation %.2f, on test only (9 and B1) %.2f" %
+                    (np.std(Predicts-yr), np.std(Predicts2-yr2)))
+        pylab.plot(Predicts)
+        pylab.plot(yr, "o")
         pylab.xlabel("Sample #")
         pylab.ylabel("Ratio_b")
         filen = weight_name[:-5]+"sample_values"+extra+".pdf"
-    print("Writing on %s" % filen)
-    pylab.savefig(filen)
+        print("Writing on %s" % filen)
+        pylab.savefig(filen)
+    else:
+        Xr, yr, Predicts,nott = predict(closer, nc=args.nc)
+
+        # print(Predicts)
+        closer = ["B-9-yeast", "B-yeast"]
+        Xr, yr2, Predicts2 = predict(closer, nc=args.nc)
+
+        f = pylab.figure()
+        nc = args.nc
+        for i in range(args.nc):
+            f.add_subplot(1, 2, i+1)
+            # , np.std(Predicts2-yr2)))
+            pylab.title("Deviation %.2f" % (np.std(Predicts[::, i]-yr[::, i])))
+
+            pylab.plot(Predicts[::, i])
+            pylab.plot(yr[::, i], "o")
+            pylab.xlabel("Sample #")
+            pylab.ylabel("Ratio_b")
+            filen = weight_name[:-5]+"sample_values"+extra+".pdf"
+        print("Writing on %s" % filen)
+        pylab.savefig(filen)

@@ -9,8 +9,7 @@ import numpy as np
 import argparse
 import os
 
-
-def model(typem=1, window_length=None, base=False, idu=False):
+def model(typem=1, window_length=None, base=False, idu=False,activation="linear"):
     init = 1
     if base:
         init = 5
@@ -26,7 +25,7 @@ def model(typem=1, window_length=None, base=False, idu=False):
                          activation='relu', input_shape=(lenv, init)))
         model.add(MaxPooling1D(pool_size=2))
         model.add(LSTM(100))
-        model.add(Dense(1, activation='linear'))
+        model.add(Dense(1, activation=activation))
         model.compile(loss='mse', optimizer='adam')  # , metrics=['accuracy'])
         ntwk = model
 
@@ -79,6 +78,7 @@ parser.add_argument('--window-length', dest='length_window', type=int,
                     default=96)
 parser.add_argument('--overlap', dest='overlap', type=int, default=None)
 parser.add_argument('--IdU', dest='idu', action="store_true")
+parser.add_argument('--activation', dest='activation', default="linear")
 
 parser.add_argument('--delta', dest="delta", action="store_true")
 parser.add_argument('--bigf', dest="bigf", action="store_true")
@@ -107,7 +107,7 @@ Nmax = maxf
 print(args.base, args.delta, args.rescale)
 
 ntwk, lenv = model(typem=typem, window_length=length_window, base=args.base,
-                   idu=args.idu)
+                   idu=args.idu,activation=args.activation)
 ntwk.load_weights(weight_name)
 
 if length_window is None:
@@ -189,7 +189,7 @@ for i, read in enumerate(files):
         seq2, TouB3, Success = get_T_ou_B_delta_ind(Xrt[0], Tt, Tb, True)
         if not Success:
             continue
-        Xt, yt, _ = transform_reads(Xrt, np.array(yrt), lenv=length_window,
+        Xt, yt, _,NotT = transform_reads(Xrt, np.array(yrt), lenv=length_window,
                                     max_len=None, overlap=args.overlap,
                                     delta=args.delta, rescale=args.rescale,
                                     extra_e=extra_e, Tt=Tt, typem=args.typem)

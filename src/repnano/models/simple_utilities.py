@@ -27,15 +27,15 @@ def get_rescaled_deltas(x, TransitionM, filtered=False, rs={}):
     new = real.copy()
     new = (new-rs["x"][0])/rs["x"][1]
     # print(rs["x"])
+    whole, NotT, T = deltas(new, th, Tm)
     if filtered:
-        whole, NotT, T = deltas(new, th, Tm)
         if NotT > 0.25:
-            return [], [], [], []
-    return new, Tm, th, rs
+            return [], [], [], [],NotT
+    return new, Tm, th, rs,NotT
 
 
 def get_T_ou_B_delta_ind(x, TransitionT, TransitionB, filtered=False, rs={}):
-    new, Tm, th, rs = get_rescaled_deltas(x, TransitionT, filtered=filtered, rs=rs)
+    new, Tm, th, rs,NotT = get_rescaled_deltas(x, TransitionT, filtered=filtered, rs=rs)
     if filtered and len(new) == 0:
         return [], [], False
 
@@ -307,9 +307,10 @@ def transform_reads(X, y, lenv=200, max_len=None, overlap=None, delta=False,
     #          rescale, noise)
     Xt = []
     yt = []
+    NotTVal = []
     # print(y.shape)
     # print(y)
-
+    #print("Tr",typem)
     def mapb(B):
         s = "ATCG"
         r = [0, 0, 0, 0]
@@ -333,14 +334,16 @@ def transform_reads(X, y, lenv=200, max_len=None, overlap=None, delta=False,
 
     which_keep = []
     for ip, (events, yi) in enumerate(zip(X, y)):
+        #print(events)
         if typem != 3:
             if type(events) == dict and "bases" in events.keys():
                 V = np.array([[m] + mapb(b) for m, b in zip(events["mean"], events["bases"])])
                 if rescale and extra_e != [] and len(V) != 0:
 
                     # print("Resacl")
-                    new, Tm, th, rs = get_rescaled_deltas(events, Tt, filtered=True, rs={})
-
+                    new, Tm, th, rs,NotT = get_rescaled_deltas(events, Tt, filtered=True, rs={})
+                    #print(NotT)
+                    NotTVal.append(NotT)
                     if new != []:
                         V = V[2:2+len(new)]
                         V[::, 0] = new
@@ -350,6 +353,7 @@ def transform_reads(X, y, lenv=200, max_len=None, overlap=None, delta=False,
                         continue
 
             else:
+                #print("La?")
                 V = scale_one_read(events, rescale=rescale)
         if typem == 3:
             # print("la,type3")
@@ -413,4 +417,4 @@ def transform_reads(X, y, lenv=200, max_len=None, overlap=None, delta=False,
     which_keep = np.array(which_keep)
     assert np.sum(which_keep) == len(Xt)
     assert len(which_keep) == len(X)
-    return Xt, np.array(yt), np.array(which_keep)
+    return Xt, np.array(yt), np.array(which_keep) , np.array(NotTVal)

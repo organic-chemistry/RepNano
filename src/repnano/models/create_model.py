@@ -6,6 +6,7 @@ from keras.layers import LSTM
 from keras.layers.convolutional import Conv1D
 from keras.layers.convolutional import MaxPooling1D
 from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
+from keras import backend as K
 import _pickle as cPickle
 import numpy as np
 import os
@@ -35,7 +36,19 @@ def create_model(params,
 
         if params["nc"] == 1:
             model.add(Dense(1, activation=params['activation']))
-            model.compile(loss='logcosh', optimizer=params['optimizer'])
+            if params.get("cost","logcosh") == "custom":
+                print("Custom loss")
+                def normal(x,p,sigma):
+                    return 1/(2*sigma)**0.5*K.exp(-(x-p)**2/(2*sigma)**2)
+                def loss(y_true,y_pred):
+                    sigma=0.2
+                    return K.mean(1/(2*sigma)**0.5 - normal(y_true,0,sigma) - normal(y_true,y_pred,sigma))
+
+                model.compile(loss=loss, optimizer=params['optimizer'])
+            else:
+
+
+                model.compile(loss=params.get("cost","logcosh"), optimizer=params['optimizer'])
         else:
             input = Input(shape=(160, init))
             LSTMo = model(input)

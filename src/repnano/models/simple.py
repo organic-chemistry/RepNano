@@ -64,7 +64,7 @@ def load_data_complete(dataset, root, per_dataset=None, lenv=200,
         print("Total cumulated read length", np.sum([len(xi["mean"]) for xi in Xp]))
         assert(len(Xp) == len(yp))
 
-        Xpp, ypp, _ = transform_reads(Xp, np.array(yp), lenv=lenv, delta=delta,
+        Xpp, ypp, _ ,_= transform_reads(Xp, np.array(yp), lenv=lenv, delta=delta,
                                       rescale=rescale, noise=noise, extra_e=extra_e, Tt=Tt)
         t1 = time.time()
         print(t1-t0, "transform")
@@ -119,6 +119,11 @@ parser.add_argument('--train-val', dest="train_val", action="store_true")
 parser.add_argument('--noise-norm', dest="noise_norm", action="store_true")
 parser.add_argument('--initw', type=str, default="")
 parser.add_argument('--nc', type=int, default=1)
+parser.add_argument('--on-percent', dest="on_percent", action="store_true")
+parser.add_argument("--take-val-from",dest="take",default=None)
+parser.add_argument('--cost', type=str, default="logcosh")
+parser.add_argument('--typem', type=int, default=1)
+
 
 
 args = parser.parse_args()
@@ -149,6 +154,7 @@ if not args.base:
 
     indep_val = ["/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-9-yeast.csv",
                  "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-yeast.csv"]
+
 else:
       # '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/T-human.csv',
         #     '/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/B-27-human.csv',
@@ -171,6 +177,13 @@ else:
 
     val = ['/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/B-9-yeast.csv']
 
+if args.on_percent:
+    root = "/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name"
+    files = glob.glob("/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/percent*.csv")
+    val = ['/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/B-9-yeast.csv']
+
+    indep_val = []
+    #val = []
 # indep_val = ["/data/bioinfo@borvo/users/jarbona/deepnano5bases/data/raw/B-yeast.csv"]
 argparse_dict["traning"] = files
 argparse_dict["indep_val"] = indep_val
@@ -233,13 +246,16 @@ os.makedirs(rootw, exist_ok=True)
 
 
 if args.train_val:
+    values=[["test_with_tombo_LSTM_alls_4000_noise_Tcorrected_iter3_filter//weights.17-0.01", 0],
+        ["../mongo_net/first/B-Iweights_filters-32kernel_size-3choice_pooling-pooling-Truepool_size-2neurones-100batch_size-50optimizer-adamactivation-linearnc-2dropout-0", 1]]
+
+    if args.take is not None:
+        values.append([args.take,0])
 
     X_train, y_train = load_data_complete(train_test, root=root,
                                           per_dataset=args.per_dataset,
                                           lenv=lenv, pmix=args.pmix,
-                                          values=[
-                                              ["test_with_tombo_LSTM_alls_4000_noise_Tcorrected_iter3_filter//weights.17-0.01", 0],
-                                              ["../mongo_net/first/B-Iweights_filters-32kernel_size-3choice_pooling-pooling-Truepool_size-2neurones-100batch_size-50optimizer-adamactivation-linearnc-2dropout-0", 1]],
+                                          values=values,
                                           delta=args.delta, raw=args.raw,
                                           rescale=args.rescale, base=args.base,
                                           noise=args.noise_norm, nc=args.nc)
@@ -282,8 +298,8 @@ else:
         params = {"filters": 32, "kernel_size": 3,
                   "choice_pooling": {"pooling": True, "pool_size": 2},
                   "neurones": 100, "batch_size": 50, "optimizer": "adam",
-                  "activation": "sigmoid", "nc": args.nc, "dropout": 0, "bi": args.bi}
-        create_model(params, rootw=rootw, wn=args.initw)
+                  "activation": "sigmoid", "nc": args.nc, "dropout": 0, "bi": args.bi,"cost":args.cost}
+        create_model(params, rootw=rootw, wn=args.initw,typem=args.typem)
 
     """
     print(X_train.shape, y_train.shape)
