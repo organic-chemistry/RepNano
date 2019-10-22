@@ -1,45 +1,36 @@
-DeepNano5Bases
+Repnano
 ==============================
+Typical pipeline :
 
-Extension of deepnano to work with 5 bases
+#First explode the files if they are stored by 400
+python src/repnano/data/explode.py
 
-To Evaluate the performances
-==============================
+ tombo preprocess annotate_raw_with_fastqs --fast5-basedir BN/ --fastq-filenames ./fastq/BTF_BN_ONT_1_FAK06596_A.fastq --overwrite --processes 4
+ tombo resquiggle BN/ S288C_reference_sequence_R64-2-1_20150113.fa --processes 4 --num-most-common-errors 5
+ predict_simple.py  test_with_tombo_CNV_logcosh_3layers_alls_4000_noise_Tcorrected_iter3_filter_weights.68-0.01.hdf5 --directory=20180223-run9/RawData/BC/unsorted/ --output=/20180223-run9/BC-MyOv/BC_CNV_tombo-MyOv.fa --overlap 10
 
-To evaluate the model :
+T-T1-corrected-transition_iter3.npy
 
-python -m src.models.predict_model --weights=data/training/my_model_weights-3390-removed-bad-B.h5 --directory=data/raw/control/ --Nbases=5 --output=data/processed/result.fasta
-
-New model with extract_event:
-python -m src.models.predict_model --weights=data/training/my_model_weights-9300.h5 --directory=data/raw/control/ --Nbases=5 --output=data/processed/result.fasta --detect
-
-The directory must contain fasta sequences
-
-to evaluate the model and get some info on T/B and alignement:
-But the code must be modified
-
-python -m src.test.evaluate
-
-python -m src.models.train_model --Nbases 8 --pre-trained-weight=data/training/v9p5-delta10-ref-from-file-bis-max-files//my_model_weights-9300.h5 --from-pre-trained --pre-trained-dir-list=test-ref-all.txt --root data/training/v9p5-delta10-ref-from-net-bis-max-files-8b-max200 --deltaseq=50 --forcelength=0.1  --max-file=200
+B-corrected-transition_iter1.npy
 
 
 To train the model
 ==============================
- -  first generate the files needed by the network with the script src.data.build_all:
- python -m src.data.build_all --split --root data/raw/ --processed data/processed --file sub_template.InDeepNano  --from-folder substituted --type-read temp
+# Prepare data for training:
+first preprocess data and resquigle
+Then use src/repnano/data/create_panda.py  to create a csv file that contain list of file and their percent of B
 
-if split is specified it will create two folders in data/processed:
-  substituted_temp_train and substituted_temp_test
-  if comp is specified:
-  substituted_comp_train and substituted_comp_test
+As loading all data each time take quite some time first read all data and create a pick file ( by adding --train-val)
+python src/repnano/models/simple.py --eroot percent-clean2/  --per-dataset 1000 --on-percent --base --take-val-from /data/bioinfo@borvo/users/jarbona/mongo_net/first/percent-clean1/w
+eights_filters-32kernel_size-3choice_pooling-pooling-Truepool_size-2neurones-100batch_size-50optimizer-adamactivation-sigmoidnc-1dropout-0bi-False --train-val
 
-  where the read about the chromosome 11 are stored in test
+Then rerun without train val
+python src/repnano/models/simple.py --eroot percent-clean2/  --per-dataset 1000 --on-percent --base --take-val-from /data/bioinfo@borvo/users/jarbona/mongo_net/first/percent-clean1/w
+eights_filters-32kernel_size-3choice_pooling-pooling-Truepool_size-2neurones-100batch_size-50optimizer-adamactivation-sigmoidnc-1dropout-0bi-False
 
-the file sub_template.InDeepNano must be in the root directory data/raw
-and the folder data/raw/substituted must contain the read to wich sub_template.InDeepNano
-refers to.
 
-The script will generate one file per read that will be used as input by the network
+
+
 
 To predict with the model
 ==============================
@@ -103,8 +94,3 @@ Project Organization
     │       └── visualize.py
     │
     └── tox.ini            <- tox file with settings for running tox; see tox.testrun.org
-
-
---------
-
-<p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
