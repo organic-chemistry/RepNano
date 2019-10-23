@@ -1,7 +1,46 @@
 Repnano
 =============================
 
-Typical pipeline :
+Wellcome to repnano the implementation of the software from ref.
+Repnano allow to extract BrdU content from oxford nanopore experiment.
+
+The software output two files:
+on fasta file with the sequence where T have been replaced by T X or B according
+to our transition matrix approach and a file fa_ratio_B with the corresponding
+ratio for each base of the sequence as computed by the neural network
+
+Install
+==============================
+
+### First install tombo :
+conda create --name tomboenv python=3.6 keras pandas numba
+conda activate tomboenv
+conda install -c bioconda ont-tombo
+
+then modify _preprocess.py installed in tombo
+to find the _preprocess file run :
+conda config  --show envs_dirs
+s
+
+it should output the directory where is installed the python library: for example
+miniconda3/envs/
+then preprocess should be in
+miniconda3/envs/tomboenv/lib/python3.6/site-packages/tombo/
+
+(typically in directory similar to miniconda3new/envs/keras3/lib/python3.6/site-packages/tombo/)
+by the version in modif_tombo/_preprocess.py
+
+### Then install repnano:
+git clone https://github.com/organic-chemistry/RepNano.git
+cd RepNano
+python setup.py develop
+
+Usage
+=============================
+The typical pipeline consist in the allignement of oxford nanopore reads and then
+in the prediction of brdu content by the neural network
+
+
 The typical output of nanopore is composed of 2 files:
 one fastq file and one fast5 file.
 If the fast5 file is compress the first step is to unzip it:
@@ -26,49 +65,12 @@ Then we use tombo resquiggle command by alligning on the reference genome (here 
 
  tombo resquiggle temporary_directory_to_store_the_400_files/ S288C_reference_sequence_R64-2-1_20150113.fa --processes 4 --num-most-common-errors 5 --dna
 
- predict_simple.py  test_with_tombo_CNV_logcosh_3layers_alls_4000_noise_Tcorrected_iter3_filter_weights.68-0.01.hdf5 --directory=20180223-run9/RawData/BC/unsorted/ --output=/20180223-run9/BC-MyOv/BC_CNV_tombo-MyOv.fa --overlap 10
+
+python src/repnano/models/predict_simple.py  --weight=weight/test_with_tombo_CNV_logcosh_3layers_alls_4000_noise_Tcorrected_iter3_filter_weights.68-0.01.hdf5 --directory=temporary_directory_to_store_the_400_files/ --output=output_files.fa --overlap 10
 
 T-T1-corrected-transition_iter3.npy
 
 B-corrected-transition_iter1.npy
-
-
-To train the model
-==============================
-# Prepare data for training:
-first preprocess data and resquigle
-Then use src/repnano/data/create_panda.py  to create a csv file that contain list of file and their percent of B
-
-As loading all data each time take quite some time first read all data and create a pick file ( by adding --train-val)
-python src/repnano/models/simple.py --eroot percent-clean2/  --per-dataset 1000 --on-percent --base --take-val-from /data/bioinfo@borvo/users/jarbona/mongo_net/first/percent-clean1/w
-eights_filters-32kernel_size-3choice_pooling-pooling-Truepool_size-2neurones-100batch_size-50optimizer-adamactivation-sigmoidnc-1dropout-0bi-False --train-val
-
-Then rerun without train val
-python src/repnano/models/simple.py --eroot percent-clean2/  --per-dataset 1000 --on-percent --base --take-val-from /data/bioinfo@borvo/users/jarbona/mongo_net/first/percent-clean1/w
-eights_filters-32kernel_size-3choice_pooling-pooling-Truepool_size-2neurones-100batch_size-50optimizer-adamactivation-sigmoidnc-1dropout-0bi-False
-
-
-
-Install
-==============================
-# git clone repnano
-python setup.py develop
-
-# then install tombo :
-conda create --name tomboenv python=3.6
-conda activate tomboenv
-conda install -c bioconda ont-tombo
-# then modify _preprocess.py installed in tombo
-to find the _preprocess file run :
-conda config  --show envs_dirs
-
-it should output the directory where is installed the python library: for example
-miniconda3/envs/
-then preprocess should be in
-miniconda3/envs/tomboenv/lib/python3.6/site-packages/tombo/
-
-(typically in directory similar to miniconda3new/envs/keras3/lib/python3.6/site-packages/tombo/)
-by the version in modif_tombo/_preprocess.py
 
 
 
@@ -132,3 +134,4 @@ Project Organization
     │       └── visualize.py
     │
     └── tox.ini            <- tox file with settings for running tox; see tox.testrun.org
+
