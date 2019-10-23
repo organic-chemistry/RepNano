@@ -9,7 +9,8 @@ import numpy as np
 import argparse
 import os
 
-def model(typem=1, window_length=None, base=False, idu=False,activation="linear"):
+
+def model(typem=1, window_length=None, base=False, idu=False, activation="linear"):
     init = 1
     if base:
         init = 5
@@ -107,7 +108,7 @@ Nmax = maxf
 print(args.base, args.delta, args.rescale)
 
 ntwk, lenv = model(typem=typem, window_length=length_window, base=args.base,
-                   idu=args.idu,activation=args.activation)
+                   idu=args.idu, activation=args.activation)
 ntwk.load_weights(weight_name)
 
 if length_window is None:
@@ -115,8 +116,8 @@ if length_window is None:
 if length_window != lenv:
     length_window = lenv
 
-Tt = np.load("data/training/T-T1-corrected-transition_iter3.npy")
-Tb = np.load("data/training/B-corrected-transition_iter1.npy")
+Tt = np.load("transitionM/T-T1-corrected-transition_iter3.npy")
+Tb = np.load("transitionM/B-corrected-transition_iter1.npy")
 
 
 if len(reads) == 0 and len(directory) == 0:
@@ -189,10 +190,10 @@ for i, read in enumerate(files):
         seq2, TouB3, Success = get_T_ou_B_delta_ind(Xrt[0], Tt, Tb, True)
         if not Success:
             continue
-        Xt, yt, _,NotT = transform_reads(Xrt, np.array(yrt), lenv=length_window,
-                                    max_len=None, overlap=args.overlap,
-                                    delta=args.delta, rescale=args.rescale,
-                                    extra_e=extra_e, Tt=Tt, typem=args.typem)
+        Xt, yt, _, NotT = transform_reads(Xrt, np.array(yrt), lenv=length_window,
+                                          max_len=None, overlap=args.overlap,
+                                          delta=args.delta, rescale=args.rescale,
+                                          extra_e=extra_e, Tt=Tt, typem=args.typem)
         # print(Xt[0])
         if len(Xt) == 0:
             continue
