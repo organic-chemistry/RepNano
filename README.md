@@ -63,14 +63,12 @@ If no file is process:
 
 Then we use tombo resquiggle command by alligning on the reference genome (here yeast: S288C_reference_sequence_R64-2-1_20150113.fa  )
 
- tombo resquiggle temporary_directory_to_store_the_400_files/ S288C_reference_sequence_R64-2-1_20150113.fa --processes 4 --num-most-common-errors 5 --dna
+tombo resquiggle temporary_directory_to_store_the_400_files/ S288C_reference_sequence_R64-2-1_20150113.fa --processes 4 --num-most-common-errors 5 --dna
 
 
-python src/repnano/models/predict_simple.py  --weight=weight/test_with_tombo_CNV_logcosh_3layers_alls_4000_noise_Tcorrected_iter3_filter_weights.68-0.01.hdf5 --directory=temporary_directory_to_store_the_400_files/ --output=output_files.fa --overlap 10
+python src/repnano/models/predict_simple.py   --directory=temporary_directory_to_store_the_400_files/ --output=results/output_files.fa --overlap 10
 
-T-T1-corrected-transition_iter3.npy
 
-B-corrected-transition_iter1.npy
 
 
 
