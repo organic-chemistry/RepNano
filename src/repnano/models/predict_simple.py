@@ -72,7 +72,7 @@ def model(typem=1, window_length=None, base=False, idu=False, activation="linear
 parser = argparse.ArgumentParser()
 
 
-parser.add_argument('--weight', dest='weight_name', type=str)
+parser.add_argument('--weight', dest='weight_name', type=str,default="weight/test_with_tombo_CNV_logcosh_3layers_alls_4000_noise_Tcorrected_iter3_filter_weights.68-0.01.hdf5")
 parser.add_argument('--typem', dest='typem', type=int, default=7)
 parser.add_argument('--maxf', dest='maxf', type=int, default=None)
 parser.add_argument('--window-length', dest='length_window', type=int,
