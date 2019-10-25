@@ -5,6 +5,7 @@ from keras.layers import Dense, Flatten, TimeDistributed, AveragePooling1D
 from keras.layers import LSTM
 from keras.layers.convolutional import Conv1D
 from keras.layers.convolutional import MaxPooling1D
+from tqdm import tqdm
 import numpy as np
 import argparse
 import os
@@ -165,6 +166,8 @@ for i, read in enumerate(files):
 
     if args.bigf:
         fun = load_events_bigf
+        def fun(*args, **kwargs):
+            return tqdm(load_events_bigf(*args, **kwargs))
     else:
         def fun(*args, **kwargs):
             return [load_events(*args, **kwargs)]

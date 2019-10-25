@@ -14,7 +14,7 @@ Install
 
 ### First install tombo :
 ```
-conda create --name tomboenv python=3.6 keras pandas numba
+conda create --name tomboenv python=3.6 keras pandas numba tqdm
 conda activate tomboenv
 conda install -c bioconda ont-tombo
 ```
