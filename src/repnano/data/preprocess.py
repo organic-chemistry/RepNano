@@ -5,7 +5,7 @@ import mappy
 import h5py
 import io
 from joblib import Parallel, delayed
-
+import copy
 
 
 def get_name(h5p):
@@ -39,6 +39,26 @@ def assign_fasta(h5p, fasta):
                         dtype=h5py.special_dtype(vlen=str))
 
 
+
+"""
+rsqgl_res = resquiggle_read(
+            map_res, std_ref, params, outlier_thresh,
+            const_scale=const_scale, skip_seq_scaling=skip_seq_scaling,
+            seq_samp_type=seq_samp_type)
+        n_iters = 1
+        #print("maxs,",max_scaling_iters)
+        while n_iters < max_scaling_iters and rsqgl_res.norm_params_changed:
+
+            rsqgl_res = resquiggle_read(
+                map_res._replace(scale_values=rsqgl_res.scale_values),
+                std_ref, params, outlier_thresh, all_raw_signal=all_raw_signal,
+                seq_samp_type=seq_samp_type)
+            n_iters += 1
+        return rsqgl_res
+
+"""
+
+
 def process_h5(fast5_data, aligner):
     seq_samp_type = tombo_helper.seqSampleType("DNA", False)  # Impose DNA  but what is rev_sig
     # prep aligner, signal model and parameters
@@ -56,9 +76,36 @@ def process_h5(fast5_data, aligner):
     map_results = map_results._replace(raw_signal=all_raw_signal)
 
     # run full re-squiggle
-    rsqgl_res = resquiggle.resquiggle_read(
-        map_results, std_ref, rsqgl_params, all_raw_signal=all_raw_signal,outlier_thresh=5)
 
+    #use_save_bandwidth = True
+    try:
+
+        rsqgl_res = resquiggle.resquiggle_read(
+            map_results, std_ref, rsqgl_params, all_raw_signal=all_raw_signal,outlier_thresh=5)
+
+    #cprs = copy.deepcopy(rsqgl_params)
+    #cprs.use_save_bandwidth = True
+    except:
+        cprs = tombo_stats.load_resquiggle_parameters(
+            seq_samp_type, use_save_bandwidth=True)
+        #print(cprs)
+        rsqgl_res = resquiggle.resquiggle_read(
+            map_results, std_ref, cprs, all_raw_signal=all_raw_signal, outlier_thresh=5)
+    #except:
+    #    pass
+    """
+       """
+
+    """
+    n_iters = 1
+    max_scaling_iters = 3
+    while n_iters < max_scaling_iters and rsqgl_res.norm_params_changed:
+        rsqgl_res = resquiggle.resquiggle_read(
+            map_results._replace(scale_values=rsqgl_res.scale_values),
+            std_ref, rsqgl_params, outlier_thresh=5, all_raw_signal=all_raw_signal,
+            seq_samp_type=seq_samp_type)
+        n_iters += 1
+    """
     norm_means = tombo_helper.c_new_means(rsqgl_res.raw_signal, rsqgl_res.segs)
     norm_stds = tombo_helper.repeat(np.NAN)
 
