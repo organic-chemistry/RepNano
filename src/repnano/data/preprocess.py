@@ -261,43 +261,60 @@ def process_one_big_hdf5(hdf5_name, fn_fastq, ref, output_name,njobs,maxlen=None
         return res
 
     # To do multiprocess first create virtuals then process
-    print("create virtuals")
     data = {}
-    virtuals = {}
+    data = {}
+
+    from itertools import zip_longest  # for Python 3.x
+    def grouper(n, iterable, padvalue=None):
+        "grouper(3, 'abcdefg', 'x') --> ('a','b','c'), ('d','e','f'), ('g','x','x')"
+        return list(zip_longest(*[iter(iterable)] * n, fillvalue=padvalue))
+
     with h5py.File(hdf5_name, "r+") as h5:
         keys = list(h5.keys())
 
-        for ik, k in enumerate(keys[:maxlen]):
-            # print(k)
-            h5p = h5[k]
-            # print(h5p)
-            name = get_name(h5p)
-            if name not in data_fastq:
-                error["seq_not_found"] += 1
-                continue
+        #Create virtual file by batch of 400
 
-            virtuals[k] = create_virtual(data_fastq[name], raw=h5[k]["Raw"])
+        for group_k in grouper(400,keys[:maxlen]):
+            print("create virtuals by batch of 400")
 
-    list_k = list(virtuals.keys())
+            list_k = []
+            virtuals = {}
 
-    if njobs == 1:
-        data = {k:virtual_h5_to_processing(virtuals[k], Al) for k in tqdm(list_k)}
-    else:
-        from itertools import zip_longest  # for Python 3.x
-        # from six.moves import zip_longest # for both (uses the six compat library)
+            for ik, k in enumerate(group_k):
+                # print(k)
 
-        def grouper(n, iterable, padvalue=None):
-            "grouper(3, 'abcdefg', 'x') --> ('a','b','c'), ('d','e','f'), ('g','x','x')"
-            return list(zip_longest(*[iter(iterable)] * n, fillvalue=padvalue))
-        print("Process by chunk  of 20")
-        #create chunk of about 20
-        #split = int(len(list_k) / (10))
-        list_virtual_lists = grouper(20,[[virtuals[k],k] for k in list_k],None)
-        #print(list_virtual_lists)
-        gdata = Parallel(n_jobs=njobs)(delayed(process_chunk)(virtuals_l,ref) for virtuals_l in tqdm(list_virtual_lists))
-        #print(gdata)
-        data = {k:item for sublist in gdata for k,item in sublist.items()}
-        del gdata
+                if k is None:
+                    continue
+
+                h5p = h5[k]
+                # print(h5p)
+                name = get_name(h5p)
+                if name not in data_fastq:
+                    error["seq_not_found"] += 1
+                    continue
+
+                virtuals[k] = create_virtual(data_fastq[name], raw=h5[k]["Raw"])
+                list_k.append(k)
+
+
+            if njobs == 1:
+                for k in tqdm(list_k):
+                    data[k] = virtual_h5_to_processing(virtuals[k], Al)
+            else:
+                # from six.moves import zip_longest # for both (uses the six compat library)
+
+
+                print("Process by chunk  of 20")
+                #create chunk of about 20
+                #split = int(len(list_k) / (10))
+                list_virtual_lists = grouper(20,[[virtuals[k],k] for k in list_k],None)
+                #print(list_virtual_lists)
+                gdata = Parallel(n_jobs=njobs)(delayed(process_chunk)(virtuals_l,ref) for virtuals_l in tqdm(list_virtual_lists))
+                #print(gdata)
+                for sublist in gdata :
+                    for k,item in sublist.items():
+                        data[k] = item
+                del gdata
 
         #print(data)
     #
