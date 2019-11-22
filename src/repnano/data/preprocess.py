@@ -171,7 +171,7 @@ def process_one_big_hdf5(hdf5_name, fn_fastq, ref, output_name,njobs,maxlen=None
     # First one run over the keys to get the name that we will need for the fastq:
     # We do this to decrease memory usage
     key_to_keep = []
-    with h5py.File(hdf5_name, "r+") as h5:
+    with h5py.File(hdf5_name, "r") as h5:
         keys = list(h5.keys())
 
         print("Total number of reads %i" % len(keys))
