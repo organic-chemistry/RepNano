@@ -59,7 +59,7 @@ to our transition matrix (TM) approach
 Usage (Older files : one fast5 file per read, before 2019)
 =============================
 
-This pipeline requires additionnal installing steps to be done only once:
+This pipeline requires additional installing steps to be done only once:
 
 Additional installing steps
 ====
@@ -112,7 +112,7 @@ Finally run RepNano to estimate BrdU content along mapped reads :
 python src/repnano/models/predict_simple.py   --directory=fast5_directory/ --output=results/output_files.fa --overlap 10
 ```
 
-Fork detection, initiation and terminaison
+Fork detection, initiation and termination
 ==============================
 
 The previous steps can be used to detect BrdU in any experimental context. In contrast, this last part is only to detect replication forks labelled in conditions resembling the ones used in Hennion *et al* (REF). 
@@ -122,15 +122,17 @@ Fork detection relies on the module [simplification](https://pypi.org/project/si
 pip install simplification
 ```
 
-To detect replication forks, as well as initiation and terminaison events, you have to run the following command, where the 'results' folder is the output of RepNano: 
+To detect replication forks, as well as initiation and termination events, you have to run the following command, where the 'results' folder is the output of RepNano, the 'DetectionFOLDER' is the location of the detection output files and 'prefix' is a prefix in the output files (it can be a sample ID for instance).
 
 ```sh
-python src/repnano/detection/ForkPrediction-CNN-TM.py results/ DetectionFOLDER
+python src/repnano/detection/ForkPrediction-CNN-TM.py results/ DetectionFOLDER prefix
 ```
+A number of parameters are set up at the beginning of ForkPrediction-CNN-TM.py and can be modified to make the detection more or less stringent.
 
-Additionnal scripts
+
+Additional scripts
 ==============================
 
-Finally the folder *R* contains the R script used to perform the downstream analysis and to generate most of the figures of the article. 
+Finally the folder *R* contains the R scripts used to perform the downstream analysis and to generate most of the figures of the article. 
 
 
