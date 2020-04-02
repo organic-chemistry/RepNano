@@ -9,17 +9,65 @@ A fasta file with the sequence where T have been replaced by T, X or B according
 to our transition matrix approach and a file .fa_ratio_B with the corresponding
 BrdU ratio for each base of the sequence as computed by the neural network. 
 
+
 Install
 ==============================
 
 ### First install Tombo :
 ```
-conda create --name tomboenv python=3.6 keras pandas numba
+conda create --name tomboenv python=3.6 keras pandas numba tqdm
 conda activate tomboenv
 conda install -c bioconda ont-tombo
 ```
 
-Then the _preprocess.py file installed in tombo has to be modified. To find the _preprocess.py file to replace, run :
+
+### Then install repnano:
+```
+git clone https://github.com/organic-chemistry/RepNano.git
+cd RepNano
+python setup.py develop
+```
+
+Usage (on fast5 file that contains 4000 reads)
+==============================
+The first step is to create a file: output.fast5 that will contain the aligned current on the reference genome by using
+tombo package:
+```
+python src/repnano/data/preprocess.py  --hdf5 fast5_file.fast5 --fastq fastq_file.fastq --ref reference_genome.fa  --output_name output.fast5 --njobs 6
+```
+Then to call repnano on this file:
+```
+python src/repnano/models/predict_simple.py output.fast5 --bigf   --output=results/output_file.fa --overlap 10
+```
+repnano generate two files:
+one fasta file (output_file.fa) with the sequence where T have been replaced by T X or B according
+to our transition matrix approach and a file (output_file.fa_ratio_B) with the corresponding
+ratio for each base of the sequence as computed by the neural network
+
+Usage (Old) on fast5 file that contain one read
+=============================
+
+The typical pipeline consists in Oxford Nanopore reads alignment on a reference genome followed by prediction of BrdU content 
+by the neural network and the transition matrix approaches. 
+
+
+This pipeline require additionnal installing steps to be done only once:
+
+Additional installing steps
+====
+
+the _preprocess.py file installed in tombo has to be modified. To find the _preprocess.py file to replace, run :
+```
+conda config  --show envs_dirs
+```
+
+It should output the directory where the python library is installed, for example miniconda3/envs/
+
+In this example, the _preprocess.py file to replace is in miniconda3/envs/tomboenv/lib/python3.6/site-packages/tombo/
+
+You should run:
+```
+cp modif_tombo/_preprocess.py miniconda3/envs/tomboenv/lib/python3.6/site-packages/tombo/Then the _preprocess.py file installed in tombo has to be modified. To find the _preprocess.py file to replace, run :
 ```
 conda config  --show envs_dirs
 ```
@@ -31,17 +79,10 @@ In this example, the _preprocess.py file to replace is in miniconda3/envs/tomboe
 You should run:
 ```
 cp modif_tombo/_preprocess.py miniconda3/envs/tomboenv/lib/python3.6/site-packages/tombo/
-```
-### Then install RepNano:
-```
-git clone https://github.com/organic-chemistry/RepNano.git
-cd RepNano
-python setup.py develop
-```
+
 
 Usage
-=============================
-The typical pipeline consists in Oxford Nanopore reads alignment on a reference genome followed by prediction of BrdU content by the neural network and the transition matrix approaches. 
+====
 
 Oxford Nanopore outputs 2 kind of files:
 A fastq file containing all the sequences obtained by the Guppy basecaller, and several fast5 files (raw currents) containing 4000 reads each.
@@ -61,6 +102,7 @@ python src/repnano/data/explode.py unziped_dir/data.fast5 temporary_directory_to
 The next step is to associate the sequence of each read from the fastq file to the corresponding fast5 file using Tombo (see Tombo documentation):
 ```
 tombo preprocess annotate_raw_with_fastqs --fast5-basedir temporary_directory_to_store_the_4000_files/ --fastq-filenames data.fastq --overwrite --processes 4
+
 ```
 
 If no file is processed:
@@ -72,6 +114,7 @@ If no file is processed:
 Then use Tombo resquiggle command to map the fastq sequence on the reference genome (here yeast: S288C_reference_sequence_R64-2-1_20150113.fa) and to realign the raw current on the reference sequence: 
 ```
 tombo resquiggle temporary_directory_to_store_the_4000_files/ S288C_reference_sequence_R64-2-1_20150113.fa --processes 4 --num-most-common-errors 5 --dna
+
 ```
 
 Finally run RepNano to estimate BrdU content along mapped reads : 

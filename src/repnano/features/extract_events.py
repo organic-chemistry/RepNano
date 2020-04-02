@@ -62,7 +62,10 @@ def get_events(h5, already_detected=True, chemistry="r9.5", window_size=None,
             # print(h5.filename)
             # print()
             if bigf:
-                e = h5[racine+"Event"].value
+                if "Event" in h5[racine].keys():
+                    e = h5[racine+"Event"].value
+                else:
+                    e = h5[racine + "Events"].value
             else:
                 e = h5[racine+"Events"].value
         # print(e)
