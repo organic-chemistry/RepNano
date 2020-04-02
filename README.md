@@ -33,7 +33,7 @@ Usage (on fast5 file that contains 4000 reads, 2019 and later)
 The typical pipeline consists in Oxford Nanopore reads alignment on a reference genome followed by prediction of BrdU content 
 by the neural network and the transition matrix approaches. 
 
-Oxford Nanopore outputs 2 kind of files:
+Oxford Nanopore outputs 2 kinds of files:
 - a fastq file containing all the sequences obtained by the Guppy basecaller,
 - several fast5 files (raw currents) containing 4000 reads each.
 If the fast5 folder is compressed, first run :
@@ -59,7 +59,7 @@ to our transition matrix (TM) approach
 Usage (Older files : one fast5 file per read, before 2019)
 =============================
 
-This pipeline require additionnal installing steps to be done only once:
+This pipeline requires additionnal installing steps to be done only once:
 
 Additional installing steps
 ====
