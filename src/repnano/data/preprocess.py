@@ -233,7 +233,7 @@ def process_one_big_hdf5(hdf5_name, fn_fastq, ref, output_name,njobs,maxlen=None
         error = {}
         event_data =[]
         resq_res = []
-        with h5py.File(virtual) as h5:
+        with h5py.File(virtual,"w") as h5:
 
             try:
                 event_data,resq_res = process_h5(h5, aligner=Al)

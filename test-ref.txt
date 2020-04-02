@@ -1,2 +1,0 @@
-data/raw/20170908-R9.5/AG-Thy/0/ T data/raw/20170908-R9.5/BTF_AG_ONT_1_FAH14273_A-select.sam
-data/raw/20170908-R9.5/AH-BrdU/0/ B data/raw/20170908-R9.5/BTF_AH_ONT_1_FAH14319_A-select.sam

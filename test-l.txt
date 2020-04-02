@@ -1,2 +1,0 @@
-data/raw/20170908-R9.5/AG-Thy/0/ 0
-data/raw/20170908-R9.5/AL-IdU/0/ 1
