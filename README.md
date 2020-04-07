@@ -49,7 +49,7 @@ python src/repnano/data/preprocess.py  --hdf5 fast5_file.fast5 --fastq fastq_fil
 ```
 RepNano is then called on this file:
 ```sh
-python src/repnano/models/predict_simple.py output.fast5 --bigf --output=results/output_file.fa --overlap 10
+python src/repnano/models/predict_simple.py output.fast5 --bigf --output=BrdU_calls/output_file.fa --overlap 10
 ```
 RepNano generates two files:
 - **output_file.fa** with the read sequences where T have been replaced by T, X or B according
@@ -109,7 +109,7 @@ tombo resquiggle fast5_directory/ S288C_reference_sequence_R64-2-1_20150113.fa -
 
 Finally run RepNano to estimate BrdU content along mapped reads : 
 ```
-python src/repnano/models/predict_simple.py   --directory=fast5_directory/ --output=results/output_files.fa --overlap 10
+python src/repnano/models/predict_simple.py   --directory=fast5_directory/ --output=BrdU_calls/output_files.fa --overlap 10
 ```
 
 Fork detection, initiation and termination
@@ -122,10 +122,10 @@ Fork detection relies on the module [simplification](https://pypi.org/project/si
 pip install simplification
 ```
 
-To detect replication forks, as well as initiation and termination events, you have to run the following command, where the 'results' folder is the output of RepNano, the 'DetectionFOLDER' is the location of the detection output files and 'prefix' is a prefix in the output files (it can be a sample ID for instance).
+To detect replication forks, as well as initiation and termination events, you have to run the following command, where the 'BrdU_calls' folder is the output of RepNano, the 'DetectionFOLDER' is the location of the detection output files and 'prefix' is a prefix in the output files (it can be a sample ID for instance).
 
 ```sh
-python src/repnano/detection/ForkPrediction-CNN-TM.py results/ DetectionFOLDER prefix
+python src/repnano/detection/ForkPrediction-CNN-TM.py BrdU_calls/ DetectionFOLDER prefix
 ```
 A number of parameters are set up at the beginning of ForkPrediction-CNN-TM.py and can be modified to make the detection more or less stringent.
 
