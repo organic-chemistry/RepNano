@@ -129,7 +129,7 @@ python src/repnano/detection/ForkPrediction-CNN-TM.py BrdU_calls/ DetectionFOLDE
 ```
 A number of parameters are set up at the beginning of ForkPrediction-CNN-TM.py and can be modified to make the detection more or less stringent.
 
-
+ 
 Additional scripts
 ==============================
 
