@@ -136,3 +136,9 @@ Additional scripts
 Finally the folder *R* contains the R scripts used to perform the downstream analysis and to generate most of the figures of the article. 
 
 
+License and acknowledgment
+==============================
+
+This software is licenced under the MIT license,
+During the course of development of this software, part of the software DeepNano
+have been used (Boža, Vladimír, Broňa Brejová, and Tomáš Vinař. "DeepNano: deep recurrent neural networks for base calling in MinION nanopore reads." PloS one 12.6 (2017).)
