@@ -163,7 +163,7 @@ def create_event(h5p, event_data,rsqgl_res):
 
 
 
-def process_one_big_hdf5(hdf5_name, fn_fastq, ref, output_name,njobs,maxlen=None):
+def process_one_big_hdf5(hdf5_name, fn_fastq, ref, output_name,njobs,maxlen=None,fastqs=None):
     error = {"seq_not_found": 0}
     if ref is not None:
         Al = mappy.Aligner(ref, preset="map-ont")
@@ -183,12 +183,16 @@ def process_one_big_hdf5(hdf5_name, fn_fastq, ref, output_name,njobs,maxlen=None
 
     # Get fasta seq
     data_fastq = {}
-    for name, seq, qual, comment in mappy.fastx_read(fn=fn_fastq,
-                                                     read_comment=True):
-        # print(name,seq,qual,comment)
-        name_fast = "_".join(name.split("_")[:2])
-        if name_fast in key_to_keep:
-            data_fastq[name_fast] = "\n".join([name, seq, "None", qual])  # WARRRRRRRRNNNINGGGGGGGGGG
+    if fastqs == None:
+        fastqs = [fn_fastq]
+    for fastq in fastqs:
+        print("Reading",fastq)
+        for name, seq, qual, comment in mappy.fastx_read(fn=fastq,
+                                                         read_comment=True):
+            # print(name,seq,qual,comment)
+            name_fast = "_".join(name.split("_")[:2])
+            if name_fast in key_to_keep:
+                data_fastq[name_fast] = "\n".join([name, seq, "None", qual])  # WARRRRRRRRNNNINGGGGGGGGGG
 
     n_processed = 0
 
@@ -348,6 +352,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--hdf5', type=str)
     parser.add_argument('--fastq', type=str)
+    parser.add_argument('--fastqs', type=str,nargs='+')
     parser.add_argument('--ref', type=str)
     parser.add_argument('--output_name', type=str)
     parser.add_argument('--njobs', type=int,default=1)
@@ -358,6 +363,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     process_one_big_hdf5(hdf5_name=args.hdf5,fn_fastq=args.fastq,
-                         ref=args.ref,output_name=args.output_name,njobs=args.njobs,maxlen=args.maxlen)
+                         ref=args.ref,output_name=args.output_name,njobs=args.njobs,maxlen=args.maxlen,fastqs=args.fastqs)
 
 #{'seq_not_found': 0, 'Read event to sequence alignment extends beyond bandwidth': 1003, 'Alignment not produced': 415}
