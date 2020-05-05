@@ -8,10 +8,12 @@ from joblib import Parallel, delayed
 import copy
 
 
-def get_name(h5p):
+def get_names(h5p):
     ch = int(str(h5p["channel_id"].attrs["channel_number"])[2:-1])
     readn = int(h5p["Raw"].attrs["read_number"])
-    return "ch%i_read%i" % (ch, readn)
+    #print(h5p["Raw"].attrs["read_id"])
+    #print()
+    return "ch%i_read%i" % (ch, readn) , h5p["Raw"].attrs["read_id"].decode("utf-8")
 
 
 def assign_fasta(h5p, fasta):
@@ -162,6 +164,42 @@ def create_event(h5p, event_data,rsqgl_res):
 
 
 
+def read_fastq(fastq,to_keep):
+    data_fastq = {}
+    with open(fastq,"r") as f:
+        data = []
+        keep = False
+        line  = f.readline()
+        while line:
+            #print(line)
+            if line.startswith("@"):
+                if len(data) == 4:
+                    name_fast = "_".join(data[0].split("_")[:2])
+                    data[0] =data[0]
+                    data[2]="None"
+                    #data[-1] = data[-1].replace("\\'","'")
+                    data_fastq[name_fast] = "\n".join(data)
+                    #print(data)
+                    #print(len(data[-1]),type(data[-1]))
+
+                line = line[1:]
+                name_fast = "_".join(line[:-1].split("_")[:2])
+                #print(line)
+                #print(name_fast,len(data))
+                if name_fast in to_keep:
+                    keep = True
+
+                else:
+                    keep = False
+                data = []
+            if keep:
+                data.append(u"""%s"""%line[:-1])
+
+            line = f.readline()
+    #print(to_keep)
+    #print("size",len(data_fastq))
+    return data_fastq
+
 
 def process_one_big_hdf5(hdf5_name, fn_fastq, ref, output_name,njobs,maxlen=None,fastqs=None):
     error = {"seq_not_found": 0}
@@ -170,7 +208,8 @@ def process_one_big_hdf5(hdf5_name, fn_fastq, ref, output_name,njobs,maxlen=None
 
     # First one run over the keys to get the name that we will need for the fastq:
     # We do this to decrease memory usage
-    key_to_keep = []
+    key_to_keep1 = []
+    key_to_keep2 = []
     with h5py.File(hdf5_name, "r") as h5:
         keys = list(h5.keys())
 
@@ -179,7 +218,12 @@ def process_one_big_hdf5(hdf5_name, fn_fastq, ref, output_name,njobs,maxlen=None
             # print(k)
             h5p = h5[k]
             # print(h5p)
-            key_to_keep.append(get_name(h5p))
+            id1,id2 = get_names(h5p) #depend of the formating
+            key_to_keep1.append(id1)
+            key_to_keep2.append(id2)
+
+            #print(id1,id2)
+
 
     # Get fasta seq
     data_fastq = {}
@@ -187,13 +231,28 @@ def process_one_big_hdf5(hdf5_name, fn_fastq, ref, output_name,njobs,maxlen=None
         fastqs = [fn_fastq]
     for fastq in fastqs:
         print("Reading",fastq)
+
         for name, seq, qual, comment in mappy.fastx_read(fn=fastq,
                                                          read_comment=True):
-            # print(name,seq,qual,comment)
+            #print(name,seq,qual,comment)
+            
             name_fast = "_".join(name.split("_")[:2])
-            if name_fast in key_to_keep:
-                data_fastq[name_fast] = "\n".join([name, seq, "None", qual])  # WARRRRRRRRNNNINGGGGGGGGGG
 
+
+            read_id = name.split()[0].split('_')[0]
+
+            #print(name_fast, read_id)
+
+            if name_fast in key_to_keep1 or read_id in key_to_keep2:
+                #print(name_fast,read_id)
+                if read_id in key_to_keep2:
+                    name_fast = read_id
+                #print(name,seq,qual)
+                data_fastq[name_fast] = "\n".join([name, seq, "None", qual])  # WARRRRRRRRNNNINGGGGGGGGGG
+                #print(len(qual), type(qual))
+
+        #data_fastq.update(read_fastq(fastq,key_to_keep))
+    print("si",len(data_fastq))
     n_processed = 0
 
     def copy_raw(raw_source, destination):
@@ -292,10 +351,15 @@ def process_one_big_hdf5(hdf5_name, fn_fastq, ref, output_name,njobs,maxlen=None
 
                 h5p = h5[k]
                 # print(h5p)
-                name = get_name(h5p)
-                if name not in data_fastq:
-                    error["seq_not_found"] += 1
-                    continue
+                name1,name2 = get_names(h5p)
+                name = name1
+                if name1 not in data_fastq:
+                    name = name2
+                    if name2 not in data_fastq:
+                        error["seq_not_found"] += 1
+                        continue
+
+                #print(name1,name2)
 
                 virtuals[k] = create_virtual(data_fastq[name], raw=h5[k]["Raw"])
                 list_k.append(k)
@@ -352,7 +416,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--hdf5', type=str)
     parser.add_argument('--fastq', type=str)
-    parser.add_argument('--fastqs', type=str,nargs='+')
+    parser.add_argument('--fastqs', type=str,nargs='+',default=None)
     parser.add_argument('--ref', type=str)
     parser.add_argument('--output_name', type=str)
     parser.add_argument('--njobs', type=int,default=1)

@@ -206,7 +206,7 @@ def load_events(X, y, min_length=1000, ws=5, raw=False, base=False, maxf=None, e
     empty = 0
     extra_e = []
     for ifi, filename in enumerate(X):
-        # print(filename)
+        #print(filename)
         if type(filename) == str:
             h5 = h5py.File(filename, "r")
             bigf = False
