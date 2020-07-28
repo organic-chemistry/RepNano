@@ -131,7 +131,7 @@ A number of parameters are set up at the beginning of ForkPrediction-CNN-TM.py a
 
 The detection results obtained in [Hennion *et al.*](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-020-02013-3) can be found in [Detected_events](Detected_events) folder (S288C yeast genome):
 - [forks](Detected_events/FORKseq_TM-CNN.forks)
-- [initation events](Detected_events/FORKseq_TM-CNN.inits)
+- [initiation events](Detected_events/FORKseq_TM-CNN.inits)
 - [termination events](Detected_events/FORKseq_TM-CNN.term)
 
 Additional scripts
