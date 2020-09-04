@@ -5,6 +5,8 @@ import mappy
 import h5py
 import io
 from joblib import Parallel, delayed
+import errno
+import os
 import copy
 
 
@@ -203,7 +205,12 @@ def read_fastq(fastq,to_keep):
 
 def process_one_big_hdf5(hdf5_name, fn_fastq, ref, output_name,njobs,maxlen=None,fastqs=None):
     error = {"seq_not_found": 0}
+
     if ref is not None:
+        if not os.path.exists(ref):
+            raise FileNotFoundError(
+                errno.ENOENT, os.strerror(errno.ENOENT), ref)
+
         Al = mappy.Aligner(ref, preset="map-ont")
 
     # First one run over the keys to get the name that we will need for the fastq:

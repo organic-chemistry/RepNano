@@ -23,6 +23,11 @@ from repnano.models.create_model import create_model
 from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 from repnano.models.simple_utilities import load_data, load_events, transform_reads
 
+from numpy.random import seed
+seed(1)
+from tensorflow import set_random_seed
+set_random_seed(2)
+
 
 def unison_shuffled_copies(a, b):
     assert len(a) == len(b)
