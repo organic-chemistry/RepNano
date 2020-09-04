@@ -1,13 +1,13 @@
 RepNano
 =============================
 
-Welcome to RepNano repository (implementation from Hennion *et al.* 2020 REF).
+Welcome to RepNano repository (implementation from [Hennion *et al.*, Genome Biol 21, 125. 2020](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-020-02013-3)).
 RepNano allows to estimate BrdU content from Oxford Nanopore raw sequencing reads.
 
 The software outputs two files:
-- a fasta file with the read sequences where T have been replaced by T, X or B according
+- a `.fa` fasta file with the read sequences where T have been replaced by T, X or B according
 to our transition matrix (TM) approach
-- a .fa_ratio_B file with the BrdU ratio for each base of the sequence as computed by the neural network (CNN). 
+- a `.fa_ratio_B` file with the BrdU ratio for each base of the sequence as computed by the neural network (CNN). 
 
 
 Installation
@@ -115,7 +115,7 @@ python src/repnano/models/predict_simple.py   --directory=fast5_directory/ --out
 Fork detection, initiation and termination
 ==============================
 
-The previous steps can be used to detect BrdU in any experimental context. In contrast, this last part is only to detect replication forks labelled in conditions resembling the ones used in Hennion *et al* (REF). 
+The previous steps can be used to detect BrdU in any experimental context. In contrast, this last part is only to detect replication forks labelled in conditions resembling the ones used in [Hennion *et al.*](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-020-02013-3). 
 
 Fork detection relies on the module [simplification](https://pypi.org/project/simplification/) that have to be installed first. 
 ```sh
@@ -129,7 +129,11 @@ python src/repnano/detection/ForkPrediction-CNN-TM.py BrdU_calls/ DetectionFOLDE
 ```
 A number of parameters are set up at the beginning of ForkPrediction-CNN-TM.py and can be modified to make the detection more or less stringent.
 
- 
+The detection results obtained in [Hennion *et al.*](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-020-02013-3) can be found in [Detected_events](Detected_events) folder (S288C yeast genome):
+- [forks](Detected_events/FORKseq_TM-CNN.forks)
+- [initiation events](Detected_events/FORKseq_TM-CNN.inits)
+- [termination events](Detected_events/FORKseq_TM-CNN.term)
+
 Additional scripts
 ==============================
 
