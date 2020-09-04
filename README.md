@@ -143,6 +143,10 @@ This software is licensed under the MIT license.
 During the course of development of this software, part of the software DeepNano
 have been used (Boža, Vladimír, Broňa Brejová, and Tomáš Vinař. "DeepNano: deep recurrent neural networks for base calling in MinION nanopore reads." PloS one 12.6 (2017).)
 
+TODO:
+R10 error
+dealing with N
+conda package
 
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3743241.svg)](https://doi.org/10.5281/zenodo.3743241)

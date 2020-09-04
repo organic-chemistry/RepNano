@@ -7,7 +7,8 @@ import os
 from multiprocessing import Pool
 import numpy as np
 
-# python src/repnano/data/create_panda.py --root-directory I-yeast --filename //data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/I-yeast.csv --add-keys init_I 1.0 init_w 0.8
+# python src/repnano/data/create_panda.py --root-directory I-yeast
+#  --filename //data/bioinfo@borvo/users/jarbona/deepnano5bases/data/tomb/clean_name/I-yeast.csv --add-keys init_I 1.0 init_w 0.8
 import glob
 
 parser = argparse.ArgumentParser()

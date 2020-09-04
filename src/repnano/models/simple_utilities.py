@@ -17,7 +17,7 @@ def give_ratio_index(seq):
     return index, val[~np.isnan(val)]
 
 
-def get_rescaled_deltas(x, TransitionM, filtered=False, rs={}):
+def get_rescaled_deltas(x, TransitionM, filtered=False, rs={},thresh=0.25):
     real, th = get_signal_expected_ind(x, TransitionM)
     Tm = get_tmiddle(x)
     if rs == {}:
@@ -28,18 +28,20 @@ def get_rescaled_deltas(x, TransitionM, filtered=False, rs={}):
     new = (new-rs["x"][0])/rs["x"][1]
     # print(rs["x"])
     whole, NotT, T = deltas(new, th, Tm)
+    #print(NotT)
     if filtered:
-        if NotT > 0.25:
+        if NotT > thresh:
             return [], [], [], [],NotT
     return new, Tm, th, rs,NotT
 
 
-def get_T_ou_B_delta_ind(x, TransitionT, TransitionB, filtered=False, rs={}):
-    new, Tm, th, rs,NotT = get_rescaled_deltas(x, TransitionT, filtered=filtered, rs=rs)
+def get_T_ou_B_delta_ind(x, TransitionT, TransitionB, filtered=False, rs={},thresh=0.25,both=False,signif=0.4,cl=None):
+    new, Tm, th, rs,NotT = get_rescaled_deltas(x, TransitionT, filtered=filtered, rs=rs,thresh=thresh)
     if filtered and len(new) == 0:
-        return [], [], False
+        return [], [], {"success":False}
 
     Tm = get_strict_T_middle(x)
+
     # print(len(new),len(x["bases"]))
     real, thT = get_signal_expected_ind(x, TransitionT)
     real, thB = get_signal_expected_ind(x, TransitionB)
@@ -47,18 +49,40 @@ def get_T_ou_B_delta_ind(x, TransitionT, TransitionB, filtered=False, rs={}):
     deltasT = np.abs(new-thT)
     deltasB = np.abs(new-thB)
 
-    significatif = (np.abs(thT-thB) > 0.4)  # & ((deltasT<0.4) | (deltasB<0.4))
-
+    significatif = (np.abs(thT-thB) > signif) # & ((deltasT<0.4) | (deltasB<0.4))
+    if cl is not None:
+        significatif = significatif & ((deltasT<cl) | (deltasB<cl))
     seq = x["bases"][2:-3].copy()
-    seq[(~significatif) & Tm] = "X"
-    # print(np.sum((~significatif) & Tm))
     which = np.argmin(np.concatenate(
         (deltasT[::, np.newaxis], deltasB[::, np.newaxis]), axis=1), axis=1)
+
+    if both:
+
+        #print("vanta",np.sum(significatif & Tm))
+        significatif[1:] = significatif[1:] | significatif[:-1]
+
+        which[~significatif] = 10
+
+        which[1:] = which[1:] + which[:-1]
+        #print("bf",np.sum(significatif & Tm))
+        significatif[1:][which[1:]==1]=False
+        which[which==1]=-1
+        which[which==2]=1
+        which[which==10] = 0
+        which[which==11] = 1
+
+        #print(np.sum(significatif & Tm))
+
+
+    #isT = x["bases"][2:-3] == "T"
+    seq[(~significatif) & Tm] = "X"
+    # print(np.sum((~significatif) & Tm))
+
     # print(significatif)
     # print(Tm)
     seq[significatif & (which == 1) & Tm] = "B"
     TouB = [{"T": 0, "B": 1}[b] for b in seq if b in ["T", "B"]]
-    return seq, TouB, True
+    return seq, TouB, {"success":True,"NotT":NotT}
 
 
 def list_transition(length=5):

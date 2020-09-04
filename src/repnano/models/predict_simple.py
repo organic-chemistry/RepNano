@@ -191,7 +191,7 @@ for i, read in enumerate(files):
             if fnt != []:
                 read = fnt[0]
         seq2, TouB3, Success = get_T_ou_B_delta_ind(Xrt[0], Tt, Tb, True)
-        if not Success:
+        if not Success["success"]:
             continue
         Xt, yt, _, NotT = transform_reads(Xrt, np.array(yrt), lenv=length_window,
                                           max_len=None, overlap=args.overlap,
