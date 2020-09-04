@@ -70,6 +70,18 @@ def model(typem=1, window_length=None, base=False, idu=False, activation="linear
     return ntwk, lenv
 
 
+def atomise(r, length_window, overlap, final_length):
+    # create shift all windows by increasing factor of L
+    # and do a median
+    Proba = {}
+    res = []
+    L = int(length_window // overlap)
+    rf = np.zeros((overlap, final_length)) * np.nan
+    for k in range(0, overlap):
+        rf[k, k * L:k * L + r.shape[1] * length_window] = np.repeat(r[k, :, 0], length_window)
+
+    return np.nanmedian(rf, axis=0)
+
 parser = argparse.ArgumentParser()
 
 
@@ -201,22 +213,6 @@ for i, read in enumerate(files):
         if len(Xt) == 0:
             continue
 
-        def atomise(r):
-            Proba = {}
-            res = []
-            L = int(length_window // args.overlap)
-            for i in range(0, len(seq2)):
-                Proba[i] = []
-            for k in range(0, args.overlap):
-                for l in range(0, (len(seq2) // length_window)-1):
-                    mini = k*L + l*length_window
-                    maxi = mini + length_window
-                    for i in range(mini, maxi):
-                        Proba[i].append(r[k, l][0])
-            for i in Proba:
-                res.append(np.median(np.array(Proba[i])))
-            return res
-
         if args.overlap is None:
             res = ntwk.predict(Xt[0])
             if not args.idu:
@@ -236,19 +232,20 @@ for i, read in enumerate(files):
             # print(xt.shape)
             r = ntwk.predict(xt.reshape(-1, length_window, xt.shape[-1]))
             # print(r)
+            overlap = args.overlap
             if not args.idu:
                 # print(len(r))
                 Brdu = r.reshape(args.overlap, -1, 1)
-                Brdu = atomise(Brdu)
+                Brdu = atomise(Brdu,length_window=length_window,overlap=overlap,final_length=len(seq2))
 
             else:
                 Brdu = r[0]
                 Brdu = Brdu.reshape(args.overlap, -1, 1)
-                Brdu = atomise(Brdu)
+                Brdu =  atomise(Brdu,length_window=length_window,overlap=overlap,final_length=len(seq2))
 
                 Idu = r[1]
                 Idu = Idu.reshape(args.overlap, -1, 1)
-                Idu = atomise(Idu)
+                Idu = atomise(Idu,length_window=length_window,overlap=overlap,final_length=len(seq2))
 
         fo.writelines(">%s %s \n" % (read, str(extra_e[0][1])))
         fo.writelines("".join(seq2) + "\n")
