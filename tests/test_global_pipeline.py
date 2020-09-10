@@ -27,6 +27,7 @@ def run_pipeline():
 
 
 
+
 def test_find_expected_files_preprocess(run_pipeline):
     root = "tests/current_output"
     list_files = ["output.fast5"]
@@ -60,7 +61,7 @@ def compute_differences(f1_n,f2_n,numerical=False):
                     else:
                         p1 = np.array(list(map(float,l1.strip().split())))
                         p2 = np.array(list(map(float,l2.strip().split())))
-                        print(f"percent b string1 {np.nanmean(p1):.2f} percent b string 2 {np.nanmean(p2):.2f}")
+                        print(f"percent b string1 {np.nanmean(p1):.2f} percent b string 2 {np.nanmean(p2):.2f} , size {len(p1)}")
                         val.append(np.abs(np.nanmean(p1)-np.nanmean(p2)))
 
 
@@ -92,9 +93,7 @@ def test_compare_file_calling(run_pipeline):
             assert(False)
 
 
-def test_global_pipeline(run_pipeline):
-    pass
-"""
+
 if __name__=="__main__":
     
     root = "tests/current_output"
@@ -102,4 +101,4 @@ if __name__=="__main__":
     file_n ="/output_file.fa_ratio_B"
     delta = compute_differences(root+file_n,ref+file_n,numerical=True)
     print(delta)
-    print(np.mean(delta["val"]))"""
+    print(np.mean(delta["val"]))
