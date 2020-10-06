@@ -74,6 +74,12 @@ def process_h5(fast5_data, aligner):
     map_results = resquiggle.map_read(fast5_data, aligner,
                                       std_ref)  # Should be modified at that point to insert sequence from fasta
     #print(map_results)
+    bases = set(map_results.genome_seq)
+    non_canonical = [b for b in bases if b not in ["a","t","c","g","A","T","C","G"]]
+    if len(non_canonical) != 0:
+        raise ValueError("Found non canonical bases (%s)"%str(non_canonical))
+
+    #print(map_results)
     all_raw_signal = tombo_helper.get_raw_read_slot(fast5_data)['Signal'][:]
     if seq_samp_type.rev_sig:
         all_raw_signal = all_raw_signal[::-1]
@@ -280,12 +286,12 @@ def process_one_big_hdf5(hdf5_name, fn_fastq, ref, output_name,njobs,maxlen=None
             read2.attrs[k] = raw_source.attrs[k]
         shape = raw_source["Signal"].shape
         # print(np.median(h5p["Raw/Signal"].value),len(h5p["Raw/Signal"].value))
-        read2.create_dataset("Signal", shape, dtype="<i2", data=raw_source["Signal"].value)
+        read2.create_dataset("Signal", shape, dtype="<i2", data=raw_source["Signal"])
 
     def create_virtual(fasta, raw):
         virtual = io.BytesIO()
         error = {}
-        with h5py.File(virtual) as h5:
+        with h5py.File(virtual,"w") as h5:
             assign_fasta(h5, fasta)
             copy_raw(raw_source=raw, destination=h5)
 
@@ -308,7 +314,7 @@ def process_one_big_hdf5(hdf5_name, fn_fastq, ref, output_name,njobs,maxlen=None
             try:
                 event_data,resq_res = process_h5(h5, aligner=Al)
 
-            except tombo_helper.TomboError as err:
+            except (tombo_helper.TomboError,ValueError) as err:
                 if len(err.args) > 0:
                     msg = err.args[0]
 
@@ -327,7 +333,18 @@ def process_one_big_hdf5(hdf5_name, fn_fastq, ref, output_name,njobs,maxlen=None
         res = {}
         for virtual,k in virtuals:
             if virtual is not None:
-                res[k] = virtual_h5_to_processing(virtual,Al)
+                try:
+                    res[k] = virtual_h5_to_processing(virtual,Al)
+                except IndexError as err:
+                    error = {}
+                    if len(err.args) > 0:
+                        msg = err.args[0]
+                        error[msg] = 1
+                    else:
+                        error["IndexError"] += 1
+                    res[k] =[ [] ,[] , error]
+
+
         return res
 
     # To do multiprocess first create virtuals then process
@@ -416,6 +433,13 @@ def process_one_big_hdf5(hdf5_name, fn_fastq, ref, output_name,njobs,maxlen=None
     print(error)
 
     print("\nSucefully processed", n_processed)
+
+    for k in error.keys():
+        if "Found non canonical bases" in k:
+
+            print("\n\nNon canonical bases error can be resolved by changing the non canonical bases by canonical bases in the reference genome")
+            print("For example sed 's/N/A/g' ref_with_N.txt > ref_corrected.txt")
+            print("To replace all N bases by A bases")
 
 if __name__ == "__main__":
     import argparse

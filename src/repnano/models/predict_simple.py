@@ -100,7 +100,7 @@ parser.add_argument('--norescale', dest="rescale", action="store_false")
 parser.add_argument('--raw', dest="raw", action="store_true")
 parser.add_argument('--nobase', dest="base", action="store_false")
 parser.add_argument('--verbose', dest="verbose", action="store_true")
-
+parser.add_argument('--percent', action="store_true")
 parser.add_argument('--output', type=str, default="output.fasta")
 parser.add_argument('--directory', type=str, default='',
                     help="Directory where read files are stored")
@@ -147,6 +147,8 @@ fo = open(output, "w")
 fo1 = open(output+"_ratio_B", "w")
 if args.idu:
     fo2 = open(output+"_ratio_I", "w")
+if args.percent:
+    prc = open(output+"_percentBrdu", "w")
 
 files = reads
 if reads == "":
@@ -255,6 +257,8 @@ for i, read in enumerate(files):
         if args.idu:
             fo2.writelines(">%s_template_deepnano\n" % read)
             fo2.writelines(" ".join(["%.2f" % ires2 for ires2 in Idu])+"\n")
+        if args.percent:
+            prc.writelines(f"{read} {np.nanmean(Brdu):.2f}\n")
 
         if Nmax is not None and ntreated >= Nmax:
             break
@@ -265,6 +269,8 @@ fo.close()
 fo1.close()
 if args.idu:
     fo2.close()
+if args.percent:
+    prc.close()
 
 
 print("Read empty or too short ", Nempty_short)

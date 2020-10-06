@@ -15,9 +15,8 @@ Installation
 
 ### First install Tombo :
 ```sh
-conda create --name tomboenv python=3.6 keras pandas numba tqdm joblib
+conda create --name tomboenv -c bioconda python=3.6 keras pandas numba tqdm joblib  ont-tombo matplotlib
 conda activate tomboenv
-conda install -c bioconda ont-tombo
 ```
 
 
@@ -152,9 +151,10 @@ TODO:
 
 show error message when analysing R10 samples
 
-dealing with N in reference genome
 
 create conda package / facilitate installation
+
+separer resquiggle from mapping
 
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3743241.svg)](https://doi.org/10.5281/zenodo.3743241)

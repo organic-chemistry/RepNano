@@ -63,11 +63,11 @@ def get_events(h5, already_detected=True, chemistry="r9.5", window_size=None,
             # print()
             if bigf:
                 if "Event" in h5[racine].keys():
-                    e = h5[racine+"Event"].value
+                    e = h5[racine+"Event"]
                 else:
-                    e = h5[racine + "Events"].value
+                    e = h5[racine + "Events"]
             else:
-                e = h5[racine+"Events"].value
+                e = h5[racine+"Events"]
         # print(e)
         except:
             """

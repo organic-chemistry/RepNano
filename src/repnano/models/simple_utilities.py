@@ -324,6 +324,44 @@ def scale_one_read(events, rescale=False):
     V = np.array([mean]).T
     return V
 
+def mapb(B):
+    s = "ATCG"
+    r = [0, 0, 0, 0]
+    r[s.index(B)] = 1
+    return r
+
+
+def create(X):
+    r = np.zeros((len(X["mean"]),5))
+    r[::,0]=X["mean"]
+    for l,val in zip(["A","T","C","G"],range(1,5)):
+        #print(l,val)
+        r[X["bases"]==l,val]=1
+    return r
+
+def window_stack(a, stepsize=1, width=3):
+    # print([[i,1+i-width or None,stepsize] for i in range(0,width)])
+    return np.hstack(a[i:1+i-width or None:stepsize] for i in range(0, width))
+
+def window_stack_numpy_v2(a,stepsize,width):
+    stride = a.strides[-1]
+    last_dim=a.shape[-1]
+    nline = int((len(a)-width)/(stepsize) + 1)
+
+    return np.lib.stride_tricks.as_strided(a, shape=(nline,width*last_dim), strides=(stepsize*last_dim*stride,stride))
+
+def transform_read(X,y,window_size,pad_size):
+
+
+    #V = np.array([[m] + mapb(b) for m, b in zip(X["mean"], X["bases"])])
+    V=create(X)
+    pad = np.zeros((pad_size,V.shape[1]))
+    V = np.concatenate([pad,V,pad],axis=0)
+    V = window_stack(V,stepsize=window_size-2*pad_size,width=window_size).reshape(-1, window_size,V.shape[-1])[::, ::, ::]
+    return V,np.zeros(V.shape[0])+y
+
+
+
 
 def transform_reads(X, y, lenv=200, max_len=None, overlap=None, delta=False,
                     rescale=False, noise=False, extra_e=[], Tt=[], typem=None):
@@ -335,11 +373,7 @@ def transform_reads(X, y, lenv=200, max_len=None, overlap=None, delta=False,
     # print(y.shape)
     # print(y)
     #print("Tr",typem)
-    def mapb(B):
-        s = "ATCG"
-        r = [0, 0, 0, 0]
-        r[s.index(B)] = 1
-        return r
+
 
     Value = {"A": 0, "T": 1, "C": 2, "G": 3, "B": 4, "I": 5}
 
@@ -361,7 +395,8 @@ def transform_reads(X, y, lenv=200, max_len=None, overlap=None, delta=False,
         #print(events)
         if typem != 3:
             if type(events) == dict and "bases" in events.keys():
-                V = np.array([[m] + mapb(b) for m, b in zip(events["mean"], events["bases"])])
+                #V = np.array([[m] + mapb(b) for m, b in zip(events["mean"], events["bases"])])
+                V = create(events)
                 if rescale and extra_e != [] and len(V) != 0:
 
                     # print("Resacl")
