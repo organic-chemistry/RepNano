@@ -10,6 +10,7 @@ import os
 import numpy as np
 import pylab
 import matplotlib as mpl
+from repnano.models.train_simple import iter_keys, get_type , standardize_name
 
 mpl.use("Agg")
 
@@ -53,11 +54,11 @@ if args.percent_file:
         p_high = n_high / len(target_percent_sub)
         target_percent_value = min(args.percent/p_high,100)
 
-        print(f"threshold {threshold:.2f}, p high {p_high:.2f} , target p high {target_percent_value:.2f}")
+        print(f"threshold {threshold:.2f}, p read high {p_high:.2f} , target value high {target_percent_value:.2f}")
 
 
         pylab.hist(np.array(target_percent.percent),range=[0,1],bins=nbin,
-                   label=f"threshold {threshold:.2f}, p high {p_high:.2f} , target p high {target_percent_value:.2f}")
+                   label=f"thres {threshold:.2f}, p read high {p_high:.2f} , target value high {target_percent_value:.2f}")
         pylab.plot([p/nbin/2,p/nbin/2],[0,m])
         pylab.legend()
         nf = args.output[:-4]+"_histo.png"
@@ -81,13 +82,14 @@ file_path = os.path.abspath(args.input)
 h5 = h5py.File(file_path, "r")
 #print(target_percent)
 skip=0
-if args.percent_file and not target_percent.readname[0].startswith("/"):
-    #print("Skip")
-    skip = 1
-for v in h5.values():
-    #print(v.name)
+typef = get_type(h5)
+target_percent.readname =[standardize_name(name) for name in target_percent.readname]
+#print(target_percent[:10])
+
+for read_name in iter_keys(h5,typef=typef):
+    #print(read_name)
     if target_percent_value != 0:
-        selec = target_percent[ target_percent.readname == v.name[skip:]]
+        selec = target_percent[ target_percent.readname == read_name]
         if len(selec) != 0:
             #print("Found")
             #print(selec)
@@ -104,7 +106,7 @@ for v in h5.values():
     else:
         percent_v=args.percent
         error=0
-
-    data.append({"file_name":file_path,"readname":v.name,"percent":percent_v,"type":args.type,"metadata":args.metadata,"error":error})
+    #break
+    data.append({"file_name":file_path,"readname":read_name,"percent":percent_v,"type":args.type,"metadata":args.metadata,"error":error})
 
 pd.DataFrame(data).to_csv(args.output,index=False)

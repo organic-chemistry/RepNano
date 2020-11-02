@@ -332,6 +332,7 @@ def mapb(B):
 
 
 def create(X):
+
     r = np.zeros((len(X["mean"]),5))
     r[::,0]=X["mean"]
     for l,val in zip(["A","T","C","G"],range(1,5)):
@@ -350,7 +351,7 @@ def window_stack_numpy_v2(a,stepsize,width):
 
     return np.lib.stride_tricks.as_strided(a, shape=(nline,width*last_dim), strides=(stepsize*last_dim*stride,stride))
 
-def transform_read(X,y,window_size,pad_size):
+def transform_read(X,y,window_size,pad_size,):
 
 
     #V = np.array([[m] + mapb(b) for m, b in zip(X["mean"], X["bases"])])

@@ -237,7 +237,6 @@ def process_one_big_hdf5(hdf5_name, fn_fastq, ref, output_name,njobs,maxlen=None
 
             #print(id1,id2)
 
-
     # Get fasta seq
     data_fastq = {}
     if fastqs == None:
@@ -331,6 +330,8 @@ def process_one_big_hdf5(hdf5_name, fn_fastq, ref, output_name,njobs,maxlen=None
             else:
                 Al = ref
         res = {}
+        if virtuals is None or len(virtuals) == 0:
+            return res
         for virtual,k in virtuals:
             if virtual is not None:
                 try:
@@ -451,13 +452,13 @@ if __name__ == "__main__":
     parser.add_argument('--ref', type=str)
     parser.add_argument('--output_name', type=str)
     parser.add_argument('--njobs', type=int,default=1)
-    parser.add_argument('--maxlen', type=int,default=None)
+    parser.add_argument('--max_len', type=int,default=None)
 
 
 
     args = parser.parse_args()
 
     process_one_big_hdf5(hdf5_name=args.hdf5,fn_fastq=args.fastq,
-                         ref=args.ref,output_name=args.output_name,njobs=args.njobs,maxlen=args.maxlen,fastqs=args.fastqs)
+                         ref=args.ref,output_name=args.output_name,njobs=args.njobs,maxlen=args.max_len,fastqs=args.fastqs)
 
 #{'seq_not_found': 0, 'Read event to sequence alignment extends beyond bandwidth': 1003, 'Alignment not produced': 415}
