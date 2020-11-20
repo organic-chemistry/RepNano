@@ -332,7 +332,11 @@ def process_one_big_hdf5(hdf5_name, fn_fastq, ref, output_name,njobs,maxlen=None
         res = {}
         if virtuals is None or len(virtuals) == 0:
             return res
-        for virtual,k in virtuals:
+        #print(virtuals)
+        for block in virtuals:
+            if block is None:
+                continue
+            virtual, k = block
             if virtual is not None:
                 try:
                     res[k] = virtual_h5_to_processing(virtual,Al)

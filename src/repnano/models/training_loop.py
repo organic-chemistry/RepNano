@@ -3,6 +3,8 @@ import subprocess
 import argparse
 import os
 import json
+import pandas as pd
+import ast
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', type=str)
@@ -19,6 +21,8 @@ with open(args.training_info,"r") as f:
 trainig_repertory = training["training_repertory"]
 os.makedirs(trainig_repertory,exist_ok=True)
 
+dataset = pd.read_csv(args.dataset,sep=";")
+
 for i in range(training["nloop"]):
     if i == 0:
         input_folder = training["initial_percent"]
@@ -29,16 +33,29 @@ for i in range(training["nloop"]):
     output_folder = f"{trainig_repertory}/training_from_initial_network_{i}/"
     add=""
     if i >= training["nloop"]-1:
-        add = " --smalllr "
+        add = " --smalllr --lstm"
 
     percent_training = " ".join(training["training_key"])
-    percent_validation= " ".join(training["validation_key"])
+    if type(training["validation_key"]) == float:
+        percent_val = True
+        percent_validation = training["validation_key"]
+    else:
+        percent_val = False
+        percent_validation= " ".join(training["validation_key"])
+    mods = ast.literal_eval(dataset["mods"][0])
+    mods = ' '.join(mods)
 
     if not os.path.exists(model_folder):
         if "max_len" in training:
             m = training["max_len"]
             add += f" --max_len {m} "
-        cmd = f"python src/repnano/models/train_simple.py --root_data  {input_folder} --root_save {model_folder} --percents_training {percent_training} --percents_validation {percent_validation} --error " + add
+        if i != 0:
+            add += " --error"
+        if not percent_val:
+            add += f" --percents_validation {percent_validation} "
+        else:
+            add += f" --validation {percent_validation} "
+        cmd = f"python src/repnano/models/train_simple.py --root_data  {input_folder} --root_save {model_folder} --percents_training {percent_training}  --mods {mods}" + add
         #cmd = f"python src/repnano/models/train_simple.py --root_data  {input_folder} --root_save {model_folder} --percents_training 0  --percents_validation 0 --error"
         print(cmd)
         if args.do:
@@ -55,7 +72,7 @@ for i in range(training["nloop"]):
         if "max_len" in training:
             m = training["max_len"]
             add += f" --max_len {m}"
-        cmd = f"python3 preprocess_dataset.py  --type dv --model {model_folder}/weights.hdf5 --out {output_folder} --dataset {args.dataset} " + add
+        cmd = f"python3 misc/preprocess_dataset.py  --type dv --model {model_folder}/weights.hdf5 --out {output_folder} --dataset {args.dataset} " + add
         print(cmd)
         if args.do:
             subprocess.run(cmd, shell=True, check=True)

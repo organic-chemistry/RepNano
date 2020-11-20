@@ -92,4 +92,4 @@ python src/repnano/models/training_loop.py  --dataset dataset_preprocessed.csv -
 
 Calling with gupy classic
 #################
- `bin/guppy_basecaller /scratch/jarbona/data_Repnano/grouped_list_small_val/ --save_path /scratch/jarbona/data_Repnano/grouped_list_small_val_bassecalled --config data/dna_r9.4.1_450bps_hac.cfg --device cuda:0`
+ `bin/guppy_basecaller -i /scratch/jarbona/data_Repnano/grouped_list_small_val/ --save_path /scratch/jarbona/data_Repnano/grouped_list_small_val_bassecalled --config data/dna_r9.4.1_450bps_hac.cfg --device cuda:0`

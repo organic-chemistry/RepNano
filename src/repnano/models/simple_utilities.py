@@ -359,7 +359,8 @@ def transform_read(X,y,window_size,pad_size,):
     pad = np.zeros((pad_size,V.shape[1]))
     V = np.concatenate([pad,V,pad],axis=0)
     V = window_stack(V,stepsize=window_size-2*pad_size,width=window_size).reshape(-1, window_size,V.shape[-1])[::, ::, ::]
-    return V,np.zeros(V.shape[0])+y
+    #print(y)
+    return V,np.zeros((V.shape[0],y.shape[0]))+y
 
 
 
