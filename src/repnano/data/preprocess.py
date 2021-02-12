@@ -437,7 +437,7 @@ def process_one_big_hdf5(hdf5_name, fn_fastq, ref, output_name,njobs,maxlen=None
     print("detail of errors:")
     print(error)
 
-    print("\nSucefully processed", n_processed)
+    print("\nSuccessfully processed", n_processed)
 
     for k in error.keys():
         if "Found non canonical bases" in k:
