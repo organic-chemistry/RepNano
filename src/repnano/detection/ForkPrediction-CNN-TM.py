@@ -52,6 +52,13 @@ outputCNN_I = open(output+'/'+sample+'_CNN.init','w')
 outputTM_T = open(output+'/'+sample+'_TM.term','w')
 outputCNN_T = open(output+'/'+sample+'_CNN.term','w')
 
+############## Headers #####################
+outputTM_FnoF.write( "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n"%("chrom","start","end", "direction", "FASTA", "read", "strand", "JumpScore", "AsymScore"))
+outputCNN_FnoF.write( "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n"%("chrom","start","end", "direction", "FASTA", "read", "strand", "JumpScore", "AsymScore"))
+outputTM_I.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % ("chrom", "middle", "end1", "start1", "start2", "end2", "FASTA", "read", "strand"))
+outputCNN_I.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % ("chrom", "middle", "end1", "start1", "start2", "end2", "FASTA", "read", "strand"))
+outputTM_T.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % ("chrom", "middle", "start1", "end1", "end2", "start2", "FASTA", "read", "strand"))
+outputCNN_T.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % ("chrom", "middle", "start1", "end1", "end2", "start2", "FASTA", "read", "strand"))
 
 ############## Detection #####################
 
