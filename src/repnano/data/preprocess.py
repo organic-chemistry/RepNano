@@ -437,7 +437,7 @@ def process_one_big_hdf5(hdf5_name, fn_fastq, ref, output_name,njobs,maxlen=None
     print("detail of errors:")
     print(error)
 
-    print("\nSucefully processed", n_processed)
+    print("\nSuccessfully processed", n_processed)
 
     for k in error.keys():
         if "Found non canonical bases" in k:
@@ -461,6 +461,9 @@ if __name__ == "__main__":
 
 
     args = parser.parse_args()
+    dire = os.path.split(args.output_name)[0]
+    if dire != "":
+        os.makedirs(dire, exist_ok=True)
 
     process_one_big_hdf5(hdf5_name=args.hdf5,fn_fastq=args.fastq,
                          ref=args.ref,output_name=args.output_name,njobs=args.njobs,maxlen=args.max_len,fastqs=args.fastqs)

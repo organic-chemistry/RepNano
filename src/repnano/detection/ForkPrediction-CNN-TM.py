@@ -33,16 +33,32 @@ MinDist = 1000 # minimum distance between diverging forks to call an initiation 
 score = 2 # minimum asymetry score to call termination and initiation events
 jumpscore = 1 # minimum jump score to call termination and initiation events
 
-############## Output files #####################
-outputTM_F = open(output+'/'+sample+'_S'+str(smoothing)+'SD'+str(Stdev_TM)+'Fit'+str(Sparam)+'MinJump'+str(MinJump_TM)+'MinAmpli'+str(MinAmplitude_TM)+'score'+str(score)+'JS'+str(jumpscore)+'_TM.forks5','w')
-outputTM_FnoF = open(output+'/'+sample+'_S'+str(smoothing)+'SD'+str(Stdev_TM)+'Fit'+str(Sparam)+'MinJump'+str(MinJump_TM)+'MinAmpli'+str(MinAmplitude_TM)+'_TM.forksNoF5','w')
-outputCNN_F = open(output+'/'+sample+'_S'+str(smoothingCNN)+'SD'+str(Stdev_CNN)+'Fit'+str(Sparam)+'MinJump'+str(MinJump_CNN)+'MinAmpli'+str(MinAmplitude_CNN)+'score'+str(score)+'JS'+str(jumpscore)+'_CNN.forks5','w')
-outputCNN_FnoF = open(output+'/'+sample+'_S'+str(smoothingCNN)+'SD'+str(Stdev_CNN)+'Fit'+str(Sparam)+'MinJump'+str(MinJump_CNN)+'MinAmpli'+str(MinAmplitude_CNN)+'_CNN.forksNoF5','w')
-outputTM_I = open(output+'/'+sample+'_S'+str(smoothing)+'SD'+str(Stdev_TM)+'Fit'+str(Sparam)+'MinJump'+str(MinJump_TM)+'LowPlateau'+str(LowPlateau_TM)+'MinAmpli'+str(MinAmplitude_TM)+'score'+str(score)+'JS'+str(jumpscore)+'_TM.inits5','w')
-outputCNN_I = open(output+'/'+sample+'_S'+str(smoothingCNN)+'SD'+str(Stdev_CNN)+'Fit'+str(Sparam)+'MinJump'+str(MinJump_CNN)+'LowPlateau'+str(LowPlateau_CNN)+'MinAmpli'+str(MinAmplitude_CNN)+'score'+str(score)+'JS'+str(jumpscore)+'_CNN.inits5','w')
-outputTM_T = open(output+'/'+sample+'_S'+str(smoothing)+'SD'+str(Stdev_TM)+'Fit'+str(Sparam)+'MinJump'+str(MinJump_TM)+'MinAmpli'+str(MinAmplitude_TM)+'score'+str(score)+'JS'+str(jumpscore)+'_TM.term5','w')
-outputCNN_T = open(output+'/'+sample+'_S'+str(smoothingCNN)+'SD'+str(Stdev_CNN)+'Fit'+str(Sparam)+'MinJump'+str(MinJump_CNN)+'MinAmpli'+str(MinAmplitude_CNN)+'score'+str(score)+'JS'+str(jumpscore)+'_CNN.term5','w')
+os.makedirs(output, exist_ok=True) 
+############## Output files dev #####################
+#outputTM_F = open(output+'/'+sample+'_S'+str(smoothing)+'SD'+str(Stdev_TM)+'Fit'+str(Sparam)+'MinJump'+str(MinJump_TM)+'MinAmpli'+str(MinAmplitude_TM)+'score'+str(score)+'JS'+str(jumpscore)+'_TM.forks5','w')
+#outputTM_FnoF = open(output+'/'+sample+'_S'+str(smoothing)+'SD'+str(Stdev_TM)+'Fit'+str(Sparam)+'MinJump'+str(MinJump_TM)+'MinAmpli'+str(MinAmplitude_TM)+'_TM.forksNoF5','w')
+#outputCNN_F = open(output+'/'+sample+'_S'+str(smoothingCNN)+'SD'+str(Stdev_CNN)+'Fit'+str(Sparam)+'MinJump'+str(MinJump_CNN)+'MinAmpli'+str(MinAmplitude_CNN)+'score'+str(score)+'JS'+str(jumpscore)+'_CNN.forks5','w')
+#outputCNN_FnoF = open(output+'/'+sample+'_S'+str(smoothingCNN)+'SD'+str(Stdev_CNN)+'Fit'+str(Sparam)+'MinJump'+str(MinJump_CNN)+'MinAmpli'+str(MinAmplitude_CNN)+'_CNN.forksNoF5','w')
+#outputTM_I = open(output+'/'+sample+'_S'+str(smoothing)+'SD'+str(Stdev_TM)+'Fit'+str(Sparam)+'MinJump'+str(MinJump_TM)+'LowPlateau'+str(LowPlateau_TM)+'MinAmpli'+str(MinAmplitude_TM)+'score'+str(score)+'JS'+str(jumpscore)+'_TM.inits5','w')
+#outputCNN_I = open(output+'/'+sample+'_S'+str(smoothingCNN)+'SD'+str(Stdev_CNN)+'Fit'+str(Sparam)+'MinJump'+str(MinJump_CNN)+'LowPlateau'+str(LowPlateau_CNN)+'MinAmpli'+str(MinAmplitude_CNN)+'score'+str(score)+'JS'+str(jumpscore)+'_CNN.inits5','w')
+#outputTM_T = open(output+'/'+sample+'_S'+str(smoothing)+'SD'+str(Stdev_TM)+'Fit'+str(Sparam)+'MinJump'+str(MinJump_TM)+'MinAmpli'+str(MinAmplitude_TM)+'score'+str(score)+'JS'+str(jumpscore)+'_TM.term5','w')
+#outputCNN_T = open(output+'/'+sample+'_S'+str(smoothingCNN)+'SD'+str(Stdev_CNN)+'Fit'+str(Sparam)+'MinJump'+str(MinJump_CNN)+'MinAmpli'+str(MinAmplitude_CNN)+'score'+str(score)+'JS'+str(jumpscore)+'_CNN.term5','w')
 
+############## Output files prod #####################
+outputTM_FnoF = open(output+'/'+sample+'_TM.forks','w')
+outputCNN_FnoF = open(output+'/'+sample+'_CNN.forks','w')
+outputTM_I = open(output+'/'+sample+'_TM.init','w')
+outputCNN_I = open(output+'/'+sample+'_CNN.init','w')
+outputTM_T = open(output+'/'+sample+'_TM.term','w')
+outputCNN_T = open(output+'/'+sample+'_CNN.term','w')
+
+############## Headers #####################
+outputTM_FnoF.write( "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n"%("chrom","start","end", "direction", "FASTA", "read", "strand", "JumpScore", "AsymScore"))
+outputCNN_FnoF.write( "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n"%("chrom","start","end", "direction", "FASTA", "read", "strand", "JumpScore", "AsymScore"))
+outputTM_I.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % ("chrom", "middle", "end1", "start1", "start2", "end2", "FASTA", "read", "strand"))
+outputCNN_I.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % ("chrom", "middle", "end1", "start1", "start2", "end2", "FASTA", "read", "strand"))
+outputTM_T.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % ("chrom", "middle", "start1", "end1", "end2", "start2", "FASTA", "read", "strand"))
+outputCNN_T.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % ("chrom", "middle", "start1", "end1", "end2", "start2", "FASTA", "read", "strand"))
 
 ############## Detection #####################
 
@@ -82,7 +98,7 @@ for Seqs in files :
                             TractNumberTM[len(TractsTM)] = 1
                         InitsTM, TractsTM = mu.DetectInits(TractsTM, Xs, X, Yr, LowPlateau_TM,MinDist,score,jumpscore)
                         mu.ExportBedForksNoFilter(TractsTM,outputTM_FnoF, chrom, Seqs, readname, strand)
-                        mu.ExportBedForks(TractsTM,outputTM_F, chrom, Seqs, readname, strand, jumpscore, score)
+                        #mu.ExportBedForks(TractsTM,outputTM_F, chrom, Seqs, readname, strand, jumpscore, score)
                         mu.ExportInits(InitsTM,outputTM_I,chrom, Seqs, readname, strand)
                         TermTM = mu.DetectTermsFilter3(TractsTM, Xs, X, Yr, LowPlateau_TM, jumpscore, score)
                         mu.ExportInits(TermTM, outputTM_T, chrom, Seqs, readname, strand)
@@ -114,7 +130,7 @@ for Seqs in files :
                         TractNumberCNN[len(TractsCNN)] = 1
                     InitsCNN,  TractsCNN= mu.DetectInits(TractsCNN, Xs_CNN, X_CNN, Yr_CNN, LowPlateau_CNN,MinDist,score, jumpscore) # include correction during initiation events detection 
                     mu.ExportBedForksNoFilter(TractsCNN,outputCNN_FnoF, chrom, Seqs, readname, strand)
-                    mu.ExportBedForks(TractsCNN,outputCNN_F, chrom, Seqs, readname, strand,jumpscore, score)
+                    #mu.ExportBedForks(TractsCNN,outputCNN_F, chrom, Seqs, readname, strand,jumpscore, score)
                     mu.ExportInits(InitsCNN,outputCNN_I,chrom, Seqs, readname, strand)
                     TermCNN = mu.DetectTermsFilter3(TractsCNN, Xs_CNN, X_CNN, Yr_CNN, LowPlateau_CNN, jumpscore, score)
                     mu.ExportInits(TermCNN, outputCNN_T, chrom, Seqs, readname, strand)
@@ -133,10 +149,10 @@ for Seqs in files :
 
 outputTM_FnoF.close()
 outputCNN_FnoF.close()
-outputTM_F.close()
+#outputTM_F.close()
 outputTM_I.close()
 outputTM_T.close()
-outputCNN_F.close()
+#outputCNN_F.close()
 outputCNN_I.close()
 outputCNN_T.close()
 
