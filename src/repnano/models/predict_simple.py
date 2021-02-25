@@ -85,7 +85,7 @@ def atomise(r, length_window, overlap, final_length):
 parser = argparse.ArgumentParser()
 
 
-parser.add_argument('--weight', dest='weight_name', type=str,default="weight/test_with_tombo_CNV_logcosh_3layers_alls_4000_noise_Tcorrected_iter3_filter_weights.68-0.01.hdf5")
+parser.add_argument('--weight', dest='weight_name', type=str,default=None)
 parser.add_argument('--typem', dest='typem', type=int, default=7)
 parser.add_argument('--maxf', dest='maxf', type=int, default=None)
 parser.add_argument('--window-length', dest='length_window', type=int,
@@ -107,11 +107,20 @@ parser.add_argument('--directory', type=str, default='',
 parser.add_argument('reads', type=str, nargs='*')
 
 
+
+
 args = parser.parse_args()
+
+abs_root = os.path.split(os.path.abspath(__file__))[0] + "/../../../"
+
+if args.weight_name == None:
+    weight_name = abs_root+"weight/test_with_tombo_CNV_logcosh_3layers_alls_4000_noise_Tcorrected_iter3_filter_weights.68-0.01.hdf5"
+else:
+    weight_name = args.weight_name
 
 length_window = args.length_window
 maxf = args.maxf
-weight_name = args.weight_name
+
 typem = args.typem
 reads = args.reads
 directory = args.directory
@@ -129,8 +138,8 @@ if length_window is None:
 if length_window != lenv:
     length_window = lenv
 
-Tt = np.load("transitionM/T-T1-corrected-transition_iter3.npy")
-Tb = np.load("transitionM/B-corrected-transition_iter1.npy")
+Tt = np.load(abs_root+"transitionM/T-T1-corrected-transition_iter3.npy")
+Tb = np.load(abs_root+"transitionM/B-corrected-transition_iter1.npy")
 
 
 if len(reads) == 0 and len(directory) == 0:
