@@ -15,7 +15,7 @@ Installation
 
 ### First install Tombo :
 ```sh
-conda create --name tomboenv -c bioconda python=3.6 keras pandas numba tqdm joblib  ont-tombo matplotlib
+conda create --name tomboenv --override-channels  -c defaults -c bioconda  python=3.6 keras pandas numba tqdm joblib  ont-tombo matplotlib
 conda activate tomboenv
 ```
 

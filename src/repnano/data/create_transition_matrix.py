@@ -231,6 +231,8 @@ if __name__ == "__main__":
                         help="Base to exclude from the normalisation procedure")
     parser.add_argument('--norm_method', dest='norm', default="median_unmodified",
                         choices=["median_unmodified","fit_unmodified"])
+    parser.add_argument('--show', action="store_true")
+
     args = parser.parse_args()
 
     data_0 = load_dataset([args.ref],args.max)
@@ -276,11 +278,11 @@ if __name__ == "__main__":
 
         TB, _,  TtdB = get_transition_matrix_ind(data_100,length=length,existing_transition=TT)
 
-
-    pylab.figure(figsize=(20, 15))
-    pylab.plot(TT[TT != 0].flatten())
-    pylab.plot(TB[TT != 0].flatten())
-    pylab.show()
+    if args.show:
+        pylab.figure(figsize=(20, 15))
+        pylab.plot(TT[TT != 0].flatten())
+        pylab.plot(TB[TT != 0].flatten())
+        pylab.show()
 
 
     all_t = sort_by_delta_mean(TT,TB,length)
