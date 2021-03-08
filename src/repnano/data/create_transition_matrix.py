@@ -6,6 +6,7 @@ from repnano.models.simple_utilities import load_events_bigf
 import pylab
 from scipy import stats
 import os
+import glob
 
 def list_transition(length=5):
     lt = [list(s) for s in itertools.product(["A","T","C","G"], repeat=length)]
@@ -235,15 +236,24 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    load_ref = args.ref
+
     load_compare = args.compare
 
 
     if os.path.isfile(args.ref):
         load_ref = [args.ref]
+    else:
+        print("Looking for fast5 extension files")
+        load_ref = glob.glob(args.ref+"*.fast5")
+        load_ref.sort()
 
     if os.path.isfile(args.compare):
         load_compare = [args.compare]
+    else:
+        print("Looking for fast5 extension files")
+        load_compare = glob.glob(args.compare + "*.fast5")
+        load_compare.sort()
+
 
 
     data_0 = load_dataset(load_ref,args.max)
