@@ -193,7 +193,7 @@ def load_dataset(files,maxf):
                 continue
             else:
                 reads.append(Xrt[0])
-        if len(reads)> maxf:
+        if maxf is not None and len(reads)> maxf:
             break
     return reads
 
