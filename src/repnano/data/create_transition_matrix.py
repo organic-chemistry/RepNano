@@ -5,7 +5,7 @@ from tqdm import tqdm
 from repnano.models.simple_utilities import load_events_bigf
 import pylab
 from scipy import stats
-
+import os
 
 def list_transition(length=5):
     lt = [list(s) for s in itertools.product(["A","T","C","G"], repeat=length)]
@@ -193,8 +193,8 @@ def load_dataset(files,maxf):
                 continue
             else:
                 reads.append(Xrt[0])
-            if len(reads)> maxf:
-                break
+        if len(reads)> maxf:
+            break
     return reads
 
 def sort_by_delta_mean(TT,TB,length):
@@ -235,8 +235,19 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    data_0 = load_dataset([args.ref],args.max)
-    data_100 = load_dataset([args.compare],args.max)
+    load_ref = args.ref
+    load_compare = args.compare
+
+
+    if os.path.isfile(args.ref):
+        load_ref = [args.ref]
+
+    if os.path.isfile(args.compare):
+        load_compare = [args.compare]
+
+
+    data_0 = load_dataset(load_ref,args.max)
+    data_100 = load_dataset(load_compare,args.max)
     length = args.length
     norm=args.norm
     root_name=args.prefix
