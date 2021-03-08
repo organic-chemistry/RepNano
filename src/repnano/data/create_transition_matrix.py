@@ -228,6 +228,27 @@ def test_transitions(d_trans):
         # print(d_trans[k],ind)
         assert (d_trans[k] == ind)
 
+def load_directory_or_file_or_transitions(path):
+    all_ready_computed = False
+    if path.endswith(".pick"):
+        with open(path,"rb") as f:
+            distribution = pickle.load(f)
+        mean = np.zeros(len(distribution))
+        for iv,v in enumerate(distribution):
+            mean[iv] = np.mean(v)
+        all_ready_computed = True
+        return [mean,distribution],all_ready_computed
+
+    if os.path.isfile(path):
+        load = [path]
+    else:
+        print("Looking for fast5 extension files")
+        load = glob.glob(path + "/*.fast5")
+        load.sort()
+        print("Found:")
+        print(load)
+    return load,all_ready_computed
+
 
 if __name__ == "__main__":
     import argparse
@@ -250,26 +271,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
 
-    def load_directory_or_file_or_transitions(path):
-        all_ready_computed = False
-        if path.endswith(".pick"):
-            with open(path,"rb") as f:
-                distribution = pickle.load(f)
-            mean = np.zeros(len(distribution))
-            for iv,v in enumerate(distribution):
-                mean[iv] = np.mean(v)
-            all_ready_computed = True
-            return [mean,distribution],all_ready_computed
 
-        if os.path.isfile(path):
-            load = [path]
-        else:
-            print("Looking for fast5 extension files")
-            load = glob.glob(path + "/*.fast5")
-            load.sort()
-            print("Found:")
-            print(load)
-        return load,all_ready_computed
 
 
 
