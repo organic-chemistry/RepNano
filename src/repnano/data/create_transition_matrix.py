@@ -7,6 +7,8 @@ import pylab
 from scipy import stats
 import os
 import glob
+import pickle
+
 
 def list_transition(length=5):
     lt = [list(s) for s in itertools.product(["A","T","C","G"], repeat=length)]
@@ -61,6 +63,9 @@ def get_transition_matrix_ind(list_reads, existing_transition=None, filtered=Fal
             Ttd[i1].append(signal)
 
     #print(len(Plat),len(Ttd))
+    for k,v in d_trans.items():
+        Ttd[v] = np.array(Ttd[v],dtype=np.float16)
+
     return Plat / Np, errors,Ttd
 
 def get_signal_expected(x, Tt,length=5):
@@ -211,9 +216,16 @@ def sort_by_signicatively_different(Ttd,TtdB,length):
     list_trans, d_trans = list_transition(length)
     for k1,v1 in d_trans.items():
         _,p = stats.mannwhitneyu(Ttd[v1],TtdB[v1])
-        trans.append([p,np.mean(Ttd[v1]-TB[v1]),k1])
+        trans.append([p,np.mean(Ttd[v1])-np.mean(TtdB[v1]),k1])
     trans.sort()
     return trans
+
+def test_transitions(d_trans):
+    x = {"bases": np.random.choice(["A", "T", "G", "C"], length * 4)}
+    for pos, ind in enumerate(get_indexes(x, length)):
+        k = "".join(x["bases"][pos:pos + length])  # ,d_trans[ind])
+        # print(d_trans[k],ind)
+        assert (d_trans[k] == ind)
 
 
 if __name__ == "__main__":
@@ -237,7 +249,17 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
 
-    def load_directory_or_file(path):
+    def load_directory_or_file_or_transitions(path):
+        all_ready_computed = False
+        if path.endswith(".pick"):
+            with open(path,"rb") as f:
+                distribution = pickle.load(f)
+            mean = np.zeros(len(distribution))
+            for iv,v in enumerate(distribution):
+                mean[iv] = np.mean(v)
+            all_ready_computed = True
+            return [mean,distribution],all_ready_computed
+
         if os.path.isfile(path):
             load = [path]
         else:
@@ -246,15 +268,23 @@ if __name__ == "__main__":
             load.sort()
             print("Found:")
             print(load)
-        return load
+        return load,all_ready_computed
 
 
-    load_ref = load_directory_or_file(args.ref)
-    load_compare = load_directory_or_file(args.compare)
 
 
-    data_0 = load_dataset(load_ref,args.max)
-    data_100 = load_dataset(load_compare,args.max)
+    load_ref,allready_computed_ref = load_directory_or_file_or_transitions(args.ref)
+    load_compare,allready_computed_compare = load_directory_or_file_or_transitions(args.compare)
+
+    if not allready_computed_ref:
+        data_0 = load_dataset(load_ref,args.max)
+    else:
+        ref_mean,ref_distribution  = load_ref
+    if not allready_computed_compare:
+        data_100 = load_dataset(load_compare,args.max)
+    else:
+        compare_mean,compare_distribution  = load_compare
+
     length = args.length
     norm=args.norm
     root_name=args.prefix
@@ -271,58 +301,63 @@ if __name__ == "__main__":
 
 
     list_trans, d_trans = list_transition(length)
+    test_transitions(d_trans)
 
-    #Small test
-    x = {"bases": np.random.choice(["A", "T", "G", "C"], length * 4)}
-    for pos, ind in enumerate(get_indexes(x, length)):
-        k = "".join(x["bases"][pos:pos + length])  # ,d_trans[ind])
-        # print(d_trans[k],ind)
-        assert (d_trans[k] == ind)
 
     if norm == "median_unmodified":
-        TT, _ , TtdT = get_transition_matrix_ind(data_0, length=length,norm="median_unmodified")
-        TB,  _, TtdB = get_transition_matrix_ind(data_100, length=length,norm="median_unmodified")
+        if not allready_computed_ref:
+            ref_mean, _ , ref_distribution = get_transition_matrix_ind(data_0, length=length,norm="median_unmodified")
+        if not allready_computed_compare:
+            compare_mean, _ , compare_distribution = get_transition_matrix_ind(data_100, length=length,norm="median_unmodified")
 
 
     if norm == "fit_unmodified":
-        TTp=None
 
-        for i in range(6):
-            TT,  _, TtdT = get_transition_matrix_ind(data_0,length=length,existing_transition=TTp)
-            if TTp is not None:
-                print(np.nanmean(TT[TT!=0]-TTp[TT!=0]),np.nanstd(TT[TT!=0]-TTp[TT!=0])/np.nanstd(TT[TT!=0]))
-                print(np.nanstd(TTp[TTp!=0]),np.nanstd(TT[TT!=0]))
-            TTp=TT
-
-        TB, _,  TtdB = get_transition_matrix_ind(data_100,length=length,existing_transition=TT)
+        if not allready_computed_ref:
+            TTp=None
+            for i in range(6):
+                TT,  _, TtdT = get_transition_matrix_ind(data_0,length=length,existing_transition=TTp)
+                if TTp is not None:
+                    print(np.nanmean(TT[TT!=0]-TTp[TT!=0]),np.nanstd(TT[TT!=0]-TTp[TT!=0])/np.nanstd(TT[TT!=0]))
+                    print(np.nanstd(TTp[TTp!=0]),np.nanstd(TT[TT!=0]))
+                TTp=TT
+            ref_mean = TT
+            ref_distribution = TtdT
+        if not allready_computed_compare:
+            compare_mean, _ , compare_distribution = get_transition_matrix_ind(data_100,
+                                                                           length=length,
+                                                                           existing_transition=ref_mean)
 
     if args.show:
         pylab.figure(figsize=(20, 15))
-        pylab.plot(TT[TT != 0].flatten())
-        pylab.plot(TB[TT != 0].flatten())
+        pylab.plot(ref_mean)
+        pylab.plot(ref_distribution)
         pylab.show()
 
 
-    all_t = sort_by_delta_mean(TT,TB,length)
-    print("TT1,TB")
+    all_t = sort_by_delta_mean(ref_mean,compare_mean,length)
+    print("Comparing",args.ref,args.compare)
     for transitions in all_t[:30]:
-        print(transitions[1:])
+        print("%.2f %s" % (transitions[1], transitions[2]))
 
-    significatively_different = sort_by_signicatively_different(TtdT,TtdB,length=length)
+    significatively_different = sort_by_signicatively_different(ref_distribution,
+                                                                compare_distribution,length=length)
 
-    print("TT1,TB")
+    print("Comparing",args.ref,args.compare)
     for transitions in significatively_different[:30]:
-        print(transitions[:])
+        print("%.2e %.2f %s"%(transitions[0],transitions[1],transitions[2]))
 
-    np.save(f"{root_name}TT_{norm}",TT)
-    np.save(f"{root_name}TB_{norm}",TB)
 
-    import pickle
-    with open(f"{root_name}Td_{norm}.pick","wb") as f:
-        pickle.dump(TtdT,f)
+    if not allready_computed_ref:
+        np.save(f"{root_name}ref_{norm}",ref_mean)
 
-    with open(f"{root_name}Bd_{norm}.pick","wb") as f:
-        pickle.dump(TtdB,f)
+        with open(f"{root_name}ref_distribution_{norm}.pick","wb") as f:
+            pickle.dump(ref_distribution,f)
+
+    if not allready_computed_compare:
+        np.save(f"{root_name}compare_{norm}", compare_mean)
+        with open(f"{root_name}compare_distribution_{norm}.pick","wb") as f:
+            pickle.dump(compare_distribution,f)
 
 
 
