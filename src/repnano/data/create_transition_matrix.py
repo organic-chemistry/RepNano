@@ -2,7 +2,6 @@ import itertools
 import numpy as np
 from scipy import optimize
 from tqdm import tqdm
-from repnano.models.simple_utilities import load_events_bigf
 import pylab
 from scipy import stats
 import os
@@ -174,6 +173,8 @@ def get_rescaled_signal(x, TransitionM, filtered=False, rs={}, thresh=0.25,lengt
     return new, Tm, th, rs, NotT
 
 def load_dataset(files,maxf):
+    from repnano.models.simple_utilities import load_events_bigf
+
     Nempty_short = 0
     reads = []
 
@@ -346,7 +347,6 @@ if __name__ == "__main__":
     print("Comparing",args.ref,args.compare)
     for transitions in significatively_different[:30]:
         print("%.2e %.2f %s"%(transitions[0],transitions[1],transitions[2]))
-
 
     if not allready_computed_ref:
         np.save(f"{root_name}ref_{norm}",ref_mean)
