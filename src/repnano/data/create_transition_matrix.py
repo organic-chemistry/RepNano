@@ -237,23 +237,20 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
 
-    load_compare = args.compare
+    def load_directory_or_file(path):
+        if os.path.isfile(path):
+            load = [path]
+        else:
+            print("Looking for fast5 extension files")
+            load = glob.glob(path + "/*.fast5")
+            load.sort()
+            print("Found:")
+            print(load)
+        return load
 
 
-    if os.path.isfile(args.ref):
-        load_ref = [args.ref]
-    else:
-        print("Looking for fast5 extension files")
-        load_ref = glob.glob(args.ref+"*.fast5")
-        load_ref.sort()
-
-    if os.path.isfile(args.compare):
-        load_compare = [args.compare]
-    else:
-        print("Looking for fast5 extension files")
-        load_compare = glob.glob(args.compare + "*.fast5")
-        load_compare.sort()
-
+    load_ref = load_directory_or_file(args.ref)
+    load_compare = load_directory_or_file(args.compare)
 
 
     data_0 = load_dataset(load_ref,args.max)
