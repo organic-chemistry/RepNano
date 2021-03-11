@@ -11,7 +11,7 @@ import pickle
 
 def list_transition(length=5):
     lt = [list(s) for s in itertools.product(["A","T","C","G"], repeat=length)]
-    return lt,{"".join(s):lt.index(s) for s in lt}
+    return lt,{"".join(s):ind for ind,s in enumerate(lt)}
 
 
 
@@ -32,7 +32,9 @@ def norm_median_unmodified(x,length):
     Tm = get_motif(x, length)
     deltas = (delta0 - np.median(delta0[~Tm])) / stats.median_absolute_deviation(delta0[~Tm])
     return deltas
-def get_transition_matrix_ind(list_reads, existing_transition=None, filtered=False, rescale=False,length=5,norm=True):
+def get_transition_matrix_ind(list_reads,
+                              existing_transition=None,
+                              filtered=False, rescale=False,length=5,norm=True):
 
     Ttd = [[] for _ in range(4 ** length)]
     Plat = np.zeros((4 ** length))
@@ -172,9 +174,9 @@ def get_rescaled_signal(x, TransitionM, filtered=False, rs={}, thresh=0.25,lengt
             return [], [], [], [], NotT
     return new, Tm, th, rs, NotT
 
-def load_dataset(files,maxf):
+def load_dataset(files,maxf,exclude=None):
     from repnano.models.simple_utilities import load_events_bigf
-
+    print("Trimming",exclude)
     Nempty_short = 0
     reads = []
 
@@ -199,8 +201,18 @@ def load_dataset(files,maxf):
 
                 continue
             else:
-                reads.append(Xrt[0])
-        if maxf is not None and len(reads)> maxf:
+                if exclude is None:
+                    reads.append(Xrt[0])
+                else:
+                    read = Xrt[0]
+                    read["mean"] = read["mean"][exclude:-exclude]
+                    read["bases"] = read["bases"][exclude:-exclude]
+                    reads.append(read)
+
+            if maxf is not None and len(reads)> maxf:
+                break
+        #And exit the main loop
+        if maxf is not None and len(reads) > maxf:
             break
     return reads
 
@@ -208,16 +220,24 @@ def sort_by_delta_mean(TT,TB,length):
     trans = []
     list_trans, d_trans = list_transition(length)
     for k1,v1 in d_trans.items():
+        if np.isnan(TT[v1]) or np.isnan(TB[v1]):
+            continue
         trans.append([np.abs(TT[v1]-TB[v1]),TT[v1]-TB[v1],k1])
     trans.sort()
     return trans[::-1]
 
-def sort_by_signicatively_different(Ttd,TtdB,length):
+def sort_by_signicatively_different(Ttd,TtdB,length,which="mann"):
     trans = []
     list_trans, d_trans = list_transition(length)
     for k1,v1 in d_trans.items():
-        _,p = stats.mannwhitneyu(Ttd[v1],TtdB[v1])
-        trans.append([p,np.mean(Ttd[v1])-np.mean(TtdB[v1]),k1])
+        if len(Ttd[v1]) == 0 or len(TtdB[v1]) == 0:
+            continue
+        if which == "mann":
+            _,p = stats.mannwhitneyu(Ttd[v1],TtdB[v1])
+        if which == "kolmogorov":
+            _,p = stats.ks_2samp(Ttd[v1],TtdB[v1])
+
+        trans.append([p,np.mean(Ttd[v1])-np.mean(TtdB[v1]),k1,len(Ttd[v1]),len(TtdB[v1])])
     trans.sort()
     return trans
 
@@ -229,6 +249,8 @@ def test_transitions(d_trans):
         assert (d_trans[k] == ind)
 
 def load_directory_or_file_or_transitions(path):
+    if path is None:
+        return [],False
     all_ready_computed = False
     if path.endswith(".pick"):
         with open(path,"rb") as f:
@@ -261,6 +283,13 @@ if __name__ == "__main__":
     parser.add_argument('--compare', dest='compare', type=str, default=None)
     parser.add_argument('--length-window', dest='length', type=int, default=None)
     parser.add_argument('--max-number-of-reads', dest='max', type=int, default=None)
+    parser.add_argument('--trim_border', dest='exclude', type=int, default=None,
+                        help="Remove begining and end of the sequence")
+
+    parser.add_argument('--create_only', dest='create',action="store_true",
+                        help="Only create a ref matrix")
+
+
 
     parser.add_argument('--exclude_base', dest='base', default=None,
                         help="Base to exclude from the normalisation procedure")
@@ -280,11 +309,18 @@ if __name__ == "__main__":
     load_compare,allready_computed_compare = load_directory_or_file_or_transitions(args.compare)
 
     if not allready_computed_ref:
-        data_0 = load_dataset(load_ref,args.max)
+        data_0 = load_dataset(load_ref,args.max,exclude=args.exclude)
     else:
         ref_mean,ref_distribution  = load_ref
     if not allready_computed_compare:
-        data_100 = load_dataset(load_compare,args.max)
+        if args.compare is None and not args.create_only:
+            #print("CHang")
+            indexes  = np.array(np.arange(len(data_0)),dtype=np.int)
+            np.random.shuffle(indexes)
+            data_100 = np.array(data_0)[indexes[len(data_0)//2:]]
+            data_0 = np.array(data_0)[indexes[:len(data_0)//2]]
+        else:
+            data_100 = load_dataset(load_compare,args.max,exclude=args.exclude)
     else:
         compare_mean,compare_distribution  = load_compare
 
@@ -310,7 +346,7 @@ if __name__ == "__main__":
     if norm == "median_unmodified":
         if not allready_computed_ref:
             ref_mean, _ , ref_distribution = get_transition_matrix_ind(data_0, length=length,norm="median_unmodified")
-        if not allready_computed_compare:
+        if not allready_computed_compare and not args.create_only:
             compare_mean, _ , compare_distribution = get_transition_matrix_ind(data_100, length=length,norm="median_unmodified")
 
 
@@ -326,7 +362,7 @@ if __name__ == "__main__":
                 TTp=TT
             ref_mean = TT
             ref_distribution = TtdT
-        if not allready_computed_compare:
+        if not allready_computed_compare and not args.create_only:
             compare_mean, _ , compare_distribution = get_transition_matrix_ind(data_100,
                                                                            length=length,
                                                                            existing_transition=ref_mean)
@@ -337,18 +373,18 @@ if __name__ == "__main__":
         pylab.plot(ref_distribution)
         pylab.show()
 
+    if not args.create_only:
+        all_t = sort_by_delta_mean(ref_mean,compare_mean,length)
+        print("Comparing",args.ref,args.compare)
+        for transitions in all_t[:30]:
+            print("%.2f %s" % (transitions[1], transitions[2]))
 
-    all_t = sort_by_delta_mean(ref_mean,compare_mean,length)
-    print("Comparing",args.ref,args.compare)
-    for transitions in all_t[:30]:
-        print("%.2f %s" % (transitions[1], transitions[2]))
+        significatively_different = sort_by_signicatively_different(ref_distribution,
+                                                                    compare_distribution,length=length)
 
-    significatively_different = sort_by_signicatively_different(ref_distribution,
-                                                                compare_distribution,length=length)
-
-    print("Comparing",args.ref,args.compare)
-    for transitions in significatively_different[:30]:
-        print("%.2e %.2f %s"%(transitions[0],transitions[1],transitions[2]))
+        print("Comparing",args.ref,args.compare)
+        for transitions in significatively_different[:30]:
+            print("%.2e %.2f %s"%(transitions[0],transitions[1],transitions[2]))
 
     if not allready_computed_ref:
         np.save(f"{root_name}ref_{norm}",ref_mean)
@@ -356,7 +392,7 @@ if __name__ == "__main__":
         with open(f"{root_name}ref_distribution_{norm}.pick","wb") as f:
             pickle.dump(ref_distribution,f)
 
-    if not allready_computed_compare:
+    if not allready_computed_compare and not args.create_only:
         np.save(f"{root_name}compare_{norm}", compare_mean)
         with open(f"{root_name}compare_distribution_{norm}.pick","wb") as f:
             pickle.dump(compare_distribution,f)
