@@ -286,7 +286,7 @@ if __name__ == "__main__":
     parser.add_argument('--trim_border', dest='exclude', type=int, default=None,
                         help="Remove begining and end of the sequence")
 
-    parser.add_argument('--create_only', dest='create',action="store_true",
+    parser.add_argument('--create_only', dest='create_only',action="store_true",
                         help="Only create a ref matrix")
 
 
