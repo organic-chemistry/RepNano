@@ -388,7 +388,7 @@ if __name__ == "__main__":
 
     if not allready_computed_ref:
         name = f"{root_name}ref_{norm}"
-        dir = os.path.split()[0]
+        dir = os.path.split(name)[0]
         if not os.path.exists(dir):
             os.makedirs(dir)
         np.save(name,ref_mean)
