@@ -387,7 +387,11 @@ if __name__ == "__main__":
             print("%.2e %.2f %s"%(transitions[0],transitions[1],transitions[2]))
 
     if not allready_computed_ref:
-        np.save(f"{root_name}ref_{norm}",ref_mean)
+        name = f"{root_name}ref_{norm}"
+        dir = os.path.split()[0]
+        if not os.path.exists(dir):
+            os.makedirs(dir)
+        np.save(name,ref_mean)
 
         with open(f"{root_name}ref_distribution_{norm}.pick","wb") as f:
             pickle.dump(ref_distribution,f)
