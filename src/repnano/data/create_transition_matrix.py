@@ -34,7 +34,8 @@ def norm_median_unmodified(x,length):
     return deltas
 def get_transition_matrix_ind(list_reads,
                               existing_transition=None,
-                              filtered=False, rescale=False,length=5,norm=True):
+                              filtered=False, rescale=False,length=5,
+                              norm=True,order=0):
 
     Ttd = [[] for _ in range(4 ** length)]
     Plat = np.zeros((4 ** length))
@@ -50,18 +51,23 @@ def get_transition_matrix_ind(list_reads,
             signal, Tm, th, res, error = get_rescaled_signal(x, TransitionM=existing_transition, filtered=filtered,length=length)
             errors.append(error)
         else:
-            signal,_ = get_signal_expected(x, Tt=None,length=length)
 
             if norm == "median_unmodified":
                 signal =  norm_median_unmodified(x,length)
+            else:
+                signal, _ = get_signal_expected(x, Tt=None, length=length)
 
         indexes = get_indexes(x,length=length)
 
-        for i1,signal in zip(indexes[:], signal):
+        for pos_seq,(i1,isignal) in enumerate(zip(indexes[:], signal)):
 
-            Plat[i1] += signal
+            Plat[i1] += isignal
             Np[i1] += 1
-            Ttd[i1].append(signal)
+            if order == 0:
+                Ttd[i1].append(isignal)
+            if order == 1:
+                if pos_seq >=1 and pos_seq < len(signal)-2:
+                    Ttd[i1].append([signal[pos_seq-1:pos_seq+2]])
 
     #print(len(Plat),len(Ttd))
     for k,v in d_trans.items():
@@ -267,6 +273,10 @@ def load_directory_or_file_or_transitions(path):
         print("Looking for fast5 extension files")
         load = glob.glob(path + "/*.fast5")
         load.sort()
+        if len(load) == 0:
+            print("Looking for h5 extension files")
+            load = glob.glob(path + "/*.h5")
+            load.sort()
         print("Found:")
         print(load)
     return load,all_ready_computed
@@ -283,6 +293,8 @@ if __name__ == "__main__":
     parser.add_argument('--compare', dest='compare', type=str, default=None)
     parser.add_argument('--length-window', dest='length', type=int, default=None)
     parser.add_argument('--max-number-of-reads', dest='max', type=int, default=None)
+    parser.add_argument('--order', dest='order', type=int, default=0)
+
     parser.add_argument('--trim_border', dest='exclude', type=int, default=None,
                         help="Remove begining and end of the sequence")
 
@@ -298,11 +310,6 @@ if __name__ == "__main__":
     parser.add_argument('--show', action="store_true")
 
     args = parser.parse_args()
-
-
-
-
-
 
 
     load_ref,allready_computed_ref = load_directory_or_file_or_transitions(args.ref)
@@ -345,9 +352,15 @@ if __name__ == "__main__":
 
     if norm == "median_unmodified":
         if not allready_computed_ref:
-            ref_mean, _ , ref_distribution = get_transition_matrix_ind(data_0, length=length,norm="median_unmodified")
+            ref_mean, _ , ref_distribution = get_transition_matrix_ind(data_0,
+                                                                       length=length,
+                                                                       norm="median_unmodified",
+                                                                       order=args.order)
         if not allready_computed_compare and not args.create_only:
-            compare_mean, _ , compare_distribution = get_transition_matrix_ind(data_100, length=length,norm="median_unmodified")
+            compare_mean, _ , compare_distribution = get_transition_matrix_ind(data_100,
+                                                                               length=length,
+                                                                               norm="median_unmodified",
+                                                                                order=args.order)
 
 
     if norm == "fit_unmodified":
@@ -355,7 +368,8 @@ if __name__ == "__main__":
         if not allready_computed_ref:
             TTp=None
             for i in range(6):
-                TT,  _, TtdT = get_transition_matrix_ind(data_0,length=length,existing_transition=TTp)
+                TT,  _, TtdT = get_transition_matrix_ind(data_0,length=length,existing_transition=TTp,
+                                                                       order=args.order)
                 if TTp is not None:
                     print(np.nanmean(TT[TT!=0]-TTp[TT!=0]),np.nanstd(TT[TT!=0]-TTp[TT!=0])/np.nanstd(TT[TT!=0]))
                     print(np.nanstd(TTp[TTp!=0]),np.nanstd(TT[TT!=0]))
@@ -365,7 +379,8 @@ if __name__ == "__main__":
         if not allready_computed_compare and not args.create_only:
             compare_mean, _ , compare_distribution = get_transition_matrix_ind(data_100,
                                                                            length=length,
-                                                                           existing_transition=ref_mean)
+                                                                           existing_transition=ref_mean,
+                                                                       order=args.order)
 
     if args.show:
         pylab.figure(figsize=(20, 15))
@@ -387,18 +402,22 @@ if __name__ == "__main__":
             print("%.2e %.2f %s"%(transitions[0],transitions[1],transitions[2]))
 
     if not allready_computed_ref:
-        name = f"{root_name}ref_{norm}"
+        name = f"{root_name}ref"
         dir = os.path.split(name)[0]
         if not os.path.exists(dir):
             os.makedirs(dir)
         np.save(name,ref_mean)
 
-        with open(f"{root_name}ref_distribution_{norm}.pick","wb") as f:
+        with open(f"{root_name}ref_distribution.pick","wb") as f:
             pickle.dump(ref_distribution,f)
 
     if not allready_computed_compare and not args.create_only:
-        np.save(f"{root_name}compare_{norm}", compare_mean)
-        with open(f"{root_name}compare_distribution_{norm}.pick","wb") as f:
+        name = f"{root_name}compare"
+        dir = os.path.split(name)[0]
+        if not os.path.exists(dir):
+            os.makedirs(dir)
+        np.save(name, compare_mean)
+        with open(f"{root_name}compare_distribution.pick","wb") as f:
             pickle.dump(compare_distribution,f)
 
 

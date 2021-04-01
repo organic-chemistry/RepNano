@@ -7,6 +7,7 @@ import io
 from joblib import Parallel, delayed
 import errno
 import os
+import glob
 import copy
 
 
@@ -457,6 +458,7 @@ if __name__ == "__main__":
     parser.add_argument('--output_name', type=str)
     parser.add_argument('--njobs', type=int,default=1)
     parser.add_argument('--max_len', type=int,default=None)
+    parser.add_argument('--Nfile', type=int,default=1)
 
 
 
@@ -464,8 +466,20 @@ if __name__ == "__main__":
     dire = os.path.split(args.output_name)[0]
     if dire != "":
         os.makedirs(dire, exist_ok=True)
+    if args.Nfile == 1:
+        process_one_big_hdf5(hdf5_name=args.hdf5,fn_fastq=args.fastq,
+                         ref=args.ref,output_name=args.output_name,njobs=args.njobs,
+                             maxlen=args.max_len,fastqs=args.fastqs)
 
-    process_one_big_hdf5(hdf5_name=args.hdf5,fn_fastq=args.fastq,
-                         ref=args.ref,output_name=args.output_name,njobs=args.njobs,maxlen=args.max_len,fastqs=args.fastqs)
+    else:
+        ls = glob.glob(args.hdf5+"/*.fast5")
+        ls.sort()
+        if args.Nfile != 0:
+            ls = ls[:args.Nfile]
+        for i,fast5 in enumerate(ls):
+            print("Processing",fast5)
+            process_one_big_hdf5(hdf5_name=fast5, fn_fastq=args.fastq,
+                                 ref=args.ref, output_name=args.output_name +f"/output_{i}.h5", njobs=args.njobs,
+                                 maxlen=args.max_len, fastqs=args.fastqs)
 
 #{'seq_not_found': 0, 'Read event to sequence alignment extends beyond bandwidth': 1003, 'Alignment not produced': 415}
