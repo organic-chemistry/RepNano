@@ -180,7 +180,7 @@ def get_rescaled_signal(x, TransitionM, filtered=False, rs={}, thresh=0.25,lengt
             return [], [], [], [], NotT
     return new, Tm, th, rs, NotT
 
-def load_dataset(files,maxf,exclude=None):
+def load_dataset(files,maxf,exclude=None,min=200):
     from repnano.models.simple_utilities import load_events_bigf
     print("Trimming",exclude)
     Nempty_short = 0
@@ -194,7 +194,7 @@ def load_dataset(files,maxf,exclude=None):
 
         def fun(*args, **kwargs):
             return tqdm(load_events_bigf(*args, **kwargs))
-        for val in fun(X, y, min_length=200,
+        for val in fun(X, y, min_length=min,
                        raw=False, base=True,
                        maxf=maxf, verbose=False, extra=True):
 
@@ -294,6 +294,7 @@ if __name__ == "__main__":
     parser.add_argument('--length-window', dest='length', type=int, default=None)
     parser.add_argument('--max-number-of-reads', dest='max', type=int, default=None)
     parser.add_argument('--order', dest='order', type=int, default=0)
+    parser.add_argument('--min-length', dest='min', type=int, default=200)
 
     parser.add_argument('--trim_border', dest='exclude', type=int, default=None,
                         help="Remove begining and end of the sequence")
@@ -316,7 +317,7 @@ if __name__ == "__main__":
     load_compare,allready_computed_compare = load_directory_or_file_or_transitions(args.compare)
 
     if not allready_computed_ref:
-        data_0 = load_dataset(load_ref,args.max,exclude=args.exclude)
+        data_0 = load_dataset(load_ref,args.max,exclude=args.exclude,min=args.min)
     else:
         ref_mean,ref_distribution  = load_ref
     if not allready_computed_compare:
@@ -327,7 +328,7 @@ if __name__ == "__main__":
             data_100 = np.array(data_0)[indexes[len(data_0)//2:]]
             data_0 = np.array(data_0)[indexes[:len(data_0)//2]]
         else:
-            data_100 = load_dataset(load_compare,args.max,exclude=args.exclude)
+            data_100 = load_dataset(load_compare,args.max,exclude=args.exclude,min=args.min)
     else:
         compare_mean,compare_distribution  = load_compare
 
