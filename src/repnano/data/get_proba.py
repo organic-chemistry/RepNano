@@ -188,7 +188,8 @@ if __name__ == "__main__":
     else:
         all_to_process = [[f1] for f1 in tmp_list]
 
-    for i, filel in all_to_process:
+    for i, filel in enumerate(all_to_process):
+        print("Processing",filel)
         data_0 = load_dataset(filel,args.max, exclude=args.exclude)
 
         probas = evaluate_dataset(data_0,ref=histo_ref,
