@@ -24,4 +24,4 @@ then install the corresponding version of pyguppy:
 and create a symbolic link to ont-guppy in the repertory of execution
 
 
-`megalodon in_path --outputs mod_mappings mod_basecall --reference S288C_reference_sequence_R64-2-1_20150113.fa  --processes 40    --overwrite --device cuda:0 --output-dir out_path  --guppy-config modif_from_dna_r9.4.1_450bps_modbases_dam-dcm-cpg_hac.cfg  --disable-mod-calibration`
+`megalodon in_path --outputs mod_mappings mod_basecall --reference S288C_reference_sequence_R64-2-1_20150113.fa  --processes 40    --overwrite --device cuda:0 --output-dir out_path  --guppy-config modif_from_dna_r9.4.1_450bps_modbases_dam-dcm-cpg_hac.cfg  --disable-mod-calibration --mod-min-prob 0`

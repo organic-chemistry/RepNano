@@ -1,4 +1,5 @@
 import numpy as np
+import os, pickle
 def nan_polate(A):
     ok = ~np.isnan(A)
     xp = ok.ravel().nonzero()[0]
@@ -26,7 +27,7 @@ def interpolate_for_dynamic_range_and_norm(histo,limit=1e-7):
     histo[histo<limit]=limit
     return histo/np.sum(histo)
 
-def predict_proba(v,ran,normed_histo,limit=1e-7):
+def predict_log_proba(v,ran,normed_histo,limit=1e-7):
     outsider=False
     #print(v,ran[0],ran[-1],int((v-ran[0])/(ran[1]-ran[0])),ran[1]-ran[0])
     bins = (ran[1]-ran[0])#/len(ran)
@@ -82,9 +83,9 @@ def evaluate_dataset(list_reads,ranges,ref,compare=None,
 
         for pos_seq,(i1,isignal) in enumerate(zip(indexes[:], signal)):
 
-            p1,out1 = predict_proba(isignal, ranges[i1], ref[i1], limit=1e-7)
+            p1,out1 = predict_log_proba(isignal, ranges[i1], ref[i1], limit=1e-7)
             if compare is not None:
-                p2,out2 = predict_proba(isignal, ranges[i1], compare[i1], limit=1e-7)
+                p2,out2 = predict_log_proba(isignal, ranges[i1], compare[i1], limit=1e-7)
                 proba.append([p1,out1,p2,out2,i1])
             else:
                 proba.append([p1, out1,i1])
@@ -143,13 +144,15 @@ if __name__ == "__main__":
                         choices=["median_unmodified","fit_unmodified"])
     parser.add_argument('--show', action="store_true")
     parser.add_argument('--refine', action="store_true")
+    parser.add_argument('--all-in-one',dest="all_in_one", action="store_true")
 
 
     args = parser.parse_args()
 
+    if args.refine and not args.all_in_one:
+        print("#########################")
+        print("Warning ,refinement will be done using only the last file!!")
 
-    data_0 = load_dataset(load_directory_or_file_or_transitions(args.dataset)[0],
-                          args.max, exclude=args.exclude)
 
     load_ref, allready_computed_ref = load_directory_or_file_or_transitions(args.ref)
     load_compare, allready_computed_compare = load_directory_or_file_or_transitions(args.compare)
@@ -169,12 +172,9 @@ if __name__ == "__main__":
         def get_motif(x, length):
             return np.zeros(len(x["mean"][:-length + 1]), dtype=bool)
     create_transition_matrix.get_motif = get_motif
-    probas = evaluate_dataset(data_0,ref=histo_ref,
-                                        ranges=ranges,
-                                        compare=histo_compare,
-                                          length=args.length,
-                                          norm=args.norm)
-    import os, pickle
+
+
+    # Create directory to write probas:
     root_name = args.prefix
     name = f"{root_name}"
     dir = os.path.split(name)[0]
@@ -182,8 +182,25 @@ if __name__ == "__main__":
     if not os.path.exists(dir):
         os.makedirs(dir)
 
-    with open(f"{root_name}probas.pick", "wb") as f:
-        pickle.dump(probas, f)
+    tmp_list = load_directory_or_file_or_transitions(args.dataset)[0]
+    if args.all_in_one:
+        all_to_process = [tmp_list]
+    else:
+        all_to_process = [[f1] for f1 in tmp_list]
+
+    for i, filel in all_to_process:
+        data_0 = load_dataset(filel,args.max, exclude=args.exclude)
+
+        probas = evaluate_dataset(data_0,ref=histo_ref,
+                                            ranges=ranges,
+                                            compare=histo_compare,
+                                              length=args.length,
+                                              norm=args.norm)
+
+
+
+        with open(f"{root_name}probas_{i}.pick", "wb") as f:
+            pickle.dump(probas, f)
 
 
     if args.show:
@@ -212,6 +229,7 @@ if __name__ == "__main__":
             pylab.show()
 
     if load_compare is not None and args.refine:
+
         #refv = [np.mean(np.log(p[::,0])) for p in probas]
         #compv = [np.mean(np.log(p[::, 2])) for p in probas]
         #refvscomp = np.array(refv) > np.array(compv)

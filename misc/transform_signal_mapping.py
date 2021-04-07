@@ -108,6 +108,7 @@ def update_h5(file_n, bam_info, list_reads=[], maxi=2,
         Exp = {}
         ik = 0
         p=[]
+        error = 0
         for k in f.get_read_ids():
             if filter_section:
                 if k in bam_info.keys() and bam_info[k][2][0] is None:
@@ -143,8 +144,10 @@ def update_h5(file_n, bam_info, list_reads=[], maxi=2,
 
                 else:
                     continue
-
-            hout.write_read(read.get_read_dictionary())
+            try:
+                hout.write_read(read.get_read_dictionary())
+            except ValueError:
+                error += 1
             list_seq=read.Reference
             i_val = global_alphabet.alphabet.index(val_new)
             cano_val = global_alphabet.alphabet.index(cano)
@@ -154,6 +157,7 @@ def update_h5(file_n, bam_info, list_reads=[], maxi=2,
             if maxi is not None and ik > maxi:
                 break
             ik += 1
+    print("N redundant",error)
     return p
 
 if __name__ == "__main__":
