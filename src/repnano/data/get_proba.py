@@ -38,7 +38,7 @@ def predict_log_proba(v,ran,normed_histo,limit=1e-7):
     else:
         return np.log(normed_histo[binp]),outsider
 
-def compute_histo(ref,compare=None,binh=50):
+def compute_histo(ref,compare=None,binh=50,selected_transitions=[]):
     ranges = []
     histo_ref=[]
     histo_compare = []
@@ -52,15 +52,20 @@ def compute_histo(ref,compare=None,binh=50):
         histo,ran = np.histogram(ref[i],bins=binh,
                        range=xr,density=True);
         histo_ref.append(interpolate_for_dynamic_range_and_norm(histo))
+        if (selected_transitions != []) and (i not in selected_transitions):
+            histo_ref[-1]=np.ones_like(histo_ref[-1]*1e-7)
         ranges.append(ran)
         if compare is not None:
             hc,_ = np.histogram(compare[i], bins=binh,
                          range=xr, density=True);
             histo_compare.append(interpolate_for_dynamic_range_and_norm(hc))
+            if (selected_transitions != []) and (i not in selected_transitions):
+                histo_compare[-1] = np.ones_like(histo_compare[-1] * 1e-7)
+
     return ranges,histo_ref,histo_compare
 
 from repnano.data.create_transition_matrix import get_signal_expected,\
-    norm_median_unmodified,norm_median_unmodified,get_indexes
+    norm_median_unmodified,norm_median_unmodified,get_indexes, norm_mean_unmodified
 def evaluate_dataset(list_reads,ranges,ref,compare=None,
                               existing_transition=None,
                               filtered=False, rescale=False,length=5,
@@ -73,7 +78,9 @@ def evaluate_dataset(list_reads,ranges,ref,compare=None,
     for x in list_reads:
 
         if norm == "median_unmodified":
-            signal =  norm_median_unmodified(x,length)
+            signal = norm_median_unmodified(x, length)
+        elif norm == "mean_unmodified":
+            signal = norm_mean_unmodified(x, length)
         else:
             signal, _ = get_signal_expected(x, Tt=None, length=length)
 
@@ -114,7 +121,7 @@ def evaluate_dataset(list_reads,ranges,ref,compare=None,
 if __name__ == "__main__":
 
     from repnano.data.create_transition_matrix import load_directory_or_file_or_transitions,\
-        list_transition,load_dataset, get_base_middle, get_transition_matrix_ind
+        list_transition,load_dataset, get_base_middle, get_transition_matrix_ind, sort_by_delta_mean
     from repnano.data import create_transition_matrix
     import argparse
     parser = argparse.ArgumentParser()
@@ -141,13 +148,16 @@ if __name__ == "__main__":
     parser.add_argument('--exclude_base', dest='base', default=None,
                         help="Base to exclude from the normalisation procedure")
     parser.add_argument('--norm_method', dest='norm', default="median_unmodified",
-                        choices=["median_unmodified","fit_unmodified"])
+                        choices=["mean_unmodified","median_unmodified","fit_unmodified","nothing"])
     parser.add_argument('--show', action="store_true")
     parser.add_argument('--refine', action="store_true")
     parser.add_argument('--all-in-one',dest="all_in_one", action="store_true")
 
 
     args = parser.parse_args()
+
+    if args.norm == "fit_unmodified":
+        raise f"norm {args.norm} not implemented (must pass ref mat)"
 
     if args.refine and not args.all_in_one:
         print("#########################")
@@ -160,8 +170,11 @@ if __name__ == "__main__":
 
     if allready_computed_compare is False:
         load_compare = [None,None]
-    ranges,histo_ref,histo_compare = compute_histo(load_ref[1],load_compare[1])
 
+    all_t = sort_by_delta_mean(load_ref[0],load_compare[0], args.length)
+
+    ranges,histo_ref,histo_compare = compute_histo(load_ref[1],load_compare[1])
+                                       #            selected_transitions = [d_trans[t[2]] for t in all_t[:50]])
 
 
     if args.base != None:

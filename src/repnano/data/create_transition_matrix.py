@@ -32,6 +32,12 @@ def norm_median_unmodified(x,length):
     Tm = get_motif(x, length)
     deltas = (delta0 - np.median(delta0[~Tm])) / stats.median_absolute_deviation(delta0[~Tm])
     return deltas
+
+def norm_mean_unmodified(x,length):
+    delta0, _ = get_signal_expected(x, Tt=None, length=length)
+    Tm = get_motif(x, length)
+    deltas = (delta0 - np.mean(delta0[~Tm])) / np.mean(delta0[~Tm]**2)
+    return deltas
 def get_transition_matrix_ind(list_reads,
                               existing_transition=None,
                               filtered=False, rescale=False,length=5,
@@ -54,6 +60,8 @@ def get_transition_matrix_ind(list_reads,
 
             if norm == "median_unmodified":
                 signal =  norm_median_unmodified(x,length)
+            elif norm == "mean_unmodified":
+                signal =  norm_mean_unmodified(x,length)
             else:
                 signal, _ = get_signal_expected(x, Tt=None, length=length)
 
@@ -107,7 +115,7 @@ def get_base_middle(x, length,base="T"):
 def rescale_deltas(real, th, Tm):
 
     abs = np.abs(real-th)
-    thres = np.percentile(abs, 50)
+    thres = np.percentile(abs, 25)
     skip = Tm | (abs > thres)
     def f(x):
         #delta = (real[skip]  / x[1]  + x[0]- th[skip]) ** 2
@@ -307,7 +315,7 @@ if __name__ == "__main__":
     parser.add_argument('--exclude_base', dest='base', default=None,
                         help="Base to exclude from the normalisation procedure")
     parser.add_argument('--norm_method', dest='norm', default="median_unmodified",
-                        choices=["median_unmodified","fit_unmodified"])
+                        choices=["mean_unmodified","median_unmodified","fit_unmodified","nothing"])
     parser.add_argument('--show', action="store_true")
 
     args = parser.parse_args()
@@ -351,21 +359,22 @@ if __name__ == "__main__":
     test_transitions(d_trans)
 
 
-    if norm == "median_unmodified":
+    if norm in ["median_unmodified","nothing","mean_unmodified"]:
+        print(norm)
+
         if not allready_computed_ref:
             ref_mean, _ , ref_distribution = get_transition_matrix_ind(data_0,
                                                                        length=length,
-                                                                       norm="median_unmodified",
+                                                                       norm=norm,
                                                                        order=args.order)
         if not allready_computed_compare and not args.create_only:
             compare_mean, _ , compare_distribution = get_transition_matrix_ind(data_100,
                                                                                length=length,
-                                                                               norm="median_unmodified",
+                                                                               norm=norm,
                                                                                 order=args.order)
 
 
     if norm == "fit_unmodified":
-
         if not allready_computed_ref:
             TTp=None
             for i in range(6):

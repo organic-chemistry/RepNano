@@ -11,9 +11,16 @@ def get_h5_p(file_n, maxi=None,cano="T",mods=["B","I"]):
         print("After",dict(f.attrs.items()))
 
         new_alphabet = f.attrs["alphabet"]
+        to_pop = []
+        for m in mods:
+            if m not in new_alphabet:
+                print(f"Warning {m} not in alphabet")
+                print(f"Plot for {m} will not be produceds")
+                to_pop.append(m)
+        mods.remove(m)
         Exp = {}
         ik = 0
-        p={"B":[],"I":[]}
+        p={m:[] for m in mods}
         for k in f["Reads"]:
             read = f["Reads"][k]
 
@@ -39,7 +46,7 @@ def get_h5_p(file_n, maxi=None,cano="T",mods=["B","I"]):
             if maxi is not None and ik > maxi:
                 break
             ik += 1
-    return p
+    return p,mods
 
 if __name__ =="__main__":
     import pylab
@@ -52,9 +59,9 @@ if __name__ =="__main__":
 
     args = parser.parse_args()
 
-    p = get_h5_p(args.h5,mods=args.mods)
+    p,mods = get_h5_p(args.h5,mods=args.mods)
     #print(p)
-    for mod in args.mods:
+    for mod in mods:
         pylab.clf()
         pylab.hist(p[mod], bins=100,label=f"Total reads {len(p[mod])}")
         pylab.legend()
