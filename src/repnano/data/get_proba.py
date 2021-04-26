@@ -120,15 +120,23 @@ import pandas as pd
 def smooth(ser, sc):
     return np.array(pd.Series(ser).rolling(sc, min_periods=1, center=True).mean())
 
-def write(list_reads,probas,global_th,enrichment_th,length,bed_f):
+def write(list_reads,probas,global_th,enrichment_th,length,bed_f,motif):
 
     list_trans, d_trans = list_transition(length)
 
     selected = []
+    delta_shift = length//2
     for seq, v in d_trans.items():
-        if "T" in seq[2:3]:
+        if motif is None:
             selected.append(v)
-
+        else:
+            if len(motif) == 1:
+                if motif in seq[delta_shift:delta_shift+1]:
+                    selected.append(v)
+            else:
+                if motif in seq:
+                    selected.append(v)
+    print(selected)
     def motif_in(proba, selected):
         inside = np.zeros_like(proba[::, 4].copy(), dtype=bool)
         for t in selected:
@@ -142,12 +150,15 @@ def write(list_reads,probas,global_th,enrichment_th,length,bed_f):
         mean_ref = np.mean((proba[::, 0] * (~motif_seq)))
         #print(mean_ref)
         #Remove read whose outside motif transitions are too far from the reference
-        if mean_ref< global_th:
+        if (global_th is not None) and (mean_ref< global_th):
             continue
         #Smooth in order to take into account information from multiple transition
         delta=smooth(proba[::,2]-proba[::,0],4)
 
-        relevant = (delta * motif_seq) > enrichment_th
+        if enrichment_th is None:
+            relevant = motif_seq
+        else:
+            relevant = (delta * motif_seq) > enrichment_th
         meta = read["meta"]
         #print(meta)
         if meta["mapped_strand"] == "-":
@@ -155,7 +166,7 @@ def write(list_reads,probas,global_th,enrichment_th,length,bed_f):
             delta = delta[::-1]
 
         for transition in np.where(relevant)[0]:
-            pos = meta["mapped_start"]+transition
+            pos = meta["mapped_start"]+transition + delta_shift
             valid_transition.append([meta["id"],meta["mapped_chrom"],meta["mapped_strand"],
                                      pos,float(f"{delta[transition]:.2f}")])
     print(f"Writing to {bed_f}")
@@ -200,6 +211,7 @@ if __name__ == "__main__":
     parser.add_argument('--global_th', type=float, default=None)
     parser.add_argument('--enrichment_th', type=float, default=None)
     parser.add_argument('--output_bed', action="store_true")
+    parser.add_argument('--motif', type=str,default=None)
 
     args = parser.parse_args()
 
@@ -264,8 +276,9 @@ if __name__ == "__main__":
             pickle.dump(probas, f)
 
         if args.output_bed:
-            write(data_0, probas, args.global_th, args.enrichment_th, args.length,
-                  bed_f=f"{root_name}probas_{i}.bed")
+            write(data_0, probas, global_th=args.global_th,enrichment_th=args.enrichment_th,
+                  length=args.length,
+                  bed_f=f"{root_name}probas_{i}.bed",motif=args.motif)
 
     if args.show:
         import pylab
