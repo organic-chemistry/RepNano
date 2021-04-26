@@ -114,9 +114,54 @@ def evaluate_dataset(list_reads,ranges,ref,compare=None,
             for i in range((length-1)//2):
                 proba.insert(0,temp)
                 proba.append(temp)
-
         probas.append(np.array(proba,dtype=np.float16))
     return probas
+import pandas as pd
+def smooth(ser, sc):
+    return np.array(pd.Series(ser).rolling(sc, min_periods=1, center=True).mean())
+
+def write(list_reads,probas,global_th,enrichment_th,length,bed_f):
+
+    list_trans, d_trans = list_transition(length)
+
+    selected = []
+    for seq, v in d_trans.items():
+        if "T" in seq[2:3]:
+            selected.append(v)
+
+    def motif_in(proba, selected):
+        inside = np.zeros_like(proba[::, 4].copy(), dtype=bool)
+        for t in selected:
+            inside[proba[::, 4] == t] = 1
+        return inside
+
+    valid_transition = []
+    for read,proba in zip(list_reads,probas):
+
+        motif_seq = motif_in(proba, selected=selected)
+        mean_ref = np.mean((proba[::, 0] * (~motif_seq)))
+        #print(mean_ref)
+        #Remove read whose outside motif transitions are too far from the reference
+        if mean_ref< global_th:
+            continue
+        #Smooth in order to take into account information from multiple transition
+        delta=smooth(proba[::,2]-proba[::,0],4)
+
+        relevant = (delta * motif_seq) > enrichment_th
+        meta = read["meta"]
+        #print(meta)
+        if meta["mapped_strand"] == "-":
+            relevant = relevant[::-1]
+            delta = delta[::-1]
+
+        for transition in np.where(relevant)[0]:
+            pos = meta["mapped_start"]+transition
+            valid_transition.append([meta["id"],meta["mapped_chrom"],meta["mapped_strand"],
+                                     pos,float(f"{delta[transition]:.2f}")])
+    print(f"Writing to {bed_f}")
+    pd.DataFrame(valid_transition,columns=["id","mapped_chrom","mapped_strand","pos","log"]).to_csv(bed_f,index=False)
+
+
 
 if __name__ == "__main__":
 
@@ -144,7 +189,6 @@ if __name__ == "__main__":
                         help="Only create a ref matrix")
 
 
-
     parser.add_argument('--exclude_base', dest='base', default=None,
                         help="Base to exclude from the normalisation procedure")
     parser.add_argument('--norm_method', dest='norm', default="median_unmodified",
@@ -153,6 +197,9 @@ if __name__ == "__main__":
     parser.add_argument('--refine', action="store_true")
     parser.add_argument('--all-in-one',dest="all_in_one", action="store_true")
 
+    parser.add_argument('--global_th', type=float, default=None)
+    parser.add_argument('--enrichment_th', type=float, default=None)
+    parser.add_argument('--output_bed', action="store_true")
 
     args = parser.parse_args()
 
@@ -216,6 +263,9 @@ if __name__ == "__main__":
         with open(f"{root_name}probas_{i}.pick", "wb") as f:
             pickle.dump(probas, f)
 
+        if args.output_bed:
+            write(data_0, probas, args.global_th, args.enrichment_th, args.length,
+                  bed_f=f"{root_name}probas_{i}.bed")
 
     if args.show:
         import pylab

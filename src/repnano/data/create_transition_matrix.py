@@ -215,13 +215,15 @@ def load_dataset(files,maxf,exclude=None,min=200):
 
                 continue
             else:
-                if exclude is None:
-                    reads.append(Xrt[0])
-                else:
-                    read = Xrt[0]
+                read = Xrt[0]
+                if exclude is not None:
                     read["mean"] = read["mean"][exclude:-exclude]
                     read["bases"] = read["bases"][exclude:-exclude]
-                    reads.append(read)
+                read["meta"] = extra_e[0][1]
+                #print(fnt)
+                #print(read["meta"])
+                read["meta"]["id"] = fnt[0]
+                reads.append(read)
 
             if maxf is not None and len(reads)> maxf:
                 break
