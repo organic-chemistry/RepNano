@@ -77,6 +77,7 @@ def evaluate_dataset(list_reads,ranges,ref,compare=None,
     probas = []
     for x in list_reads:
 
+
         if norm == "median_unmodified":
             signal = norm_median_unmodified(x, length)
         elif norm == "mean_unmodified":
@@ -120,7 +121,7 @@ import pandas as pd
 def smooth(ser, sc):
     return np.array(pd.Series(ser).rolling(sc, min_periods=1, center=True).mean())
 
-def write(list_reads,probas,global_th,enrichment_th,length,bed_f,motif):
+def write(list_reads,probas,global_th,enrichment_th,length,bed_f,motif,min_length=None):
 
     list_trans, d_trans = list_transition(length)
 
@@ -136,7 +137,7 @@ def write(list_reads,probas,global_th,enrichment_th,length,bed_f,motif):
             else:
                 if motif in seq:
                     selected.append(v)
-    print(selected)
+    #print(selected)
     def motif_in(proba, selected):
         inside = np.zeros_like(proba[::, 4].copy(), dtype=bool)
         for t in selected:
@@ -146,6 +147,8 @@ def write(list_reads,probas,global_th,enrichment_th,length,bed_f,motif):
     valid_transition = []
     for read,proba in zip(list_reads,probas):
 
+        if min is not None and len(proba) < min_length:
+            continue
         motif_seq = motif_in(proba, selected=selected)
         mean_ref = np.mean((proba[::, 0] * (~motif_seq)))
         #print(mean_ref)
@@ -212,6 +215,8 @@ if __name__ == "__main__":
     parser.add_argument('--enrichment_th', type=float, default=None)
     parser.add_argument('--output_bed', action="store_true")
     parser.add_argument('--motif', type=str,default=None)
+    parser.add_argument('--min-length', dest='min', type=int, default=200)
+
 
     args = parser.parse_args()
 
@@ -278,7 +283,8 @@ if __name__ == "__main__":
         if args.output_bed:
             write(data_0, probas, global_th=args.global_th,enrichment_th=args.enrichment_th,
                   length=args.length,
-                  bed_f=f"{root_name}probas_{i}.bed",motif=args.motif)
+                  bed_f=f"{root_name}probas_{i}.bed",motif=args.motif,
+                  min_length=args.min)
 
     if args.show:
         import pylab
