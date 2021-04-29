@@ -188,7 +188,7 @@ def get_rescaled_signal(x, TransitionM, filtered=False, rs={}, thresh=0.25,lengt
             return [], [], [], [], NotT
     return new, Tm, th, rs, NotT
 
-def load_dataset(files,maxf,exclude=None,min=200):
+def load_dataset(files,maxf,exclude=None,min=200,chunk=None):
     from repnano.models.simple_utilities import load_events_bigf
     print("Trimming",exclude)
     Nempty_short = 0
@@ -220,10 +220,25 @@ def load_dataset(files,maxf,exclude=None,min=200):
                     read["mean"] = read["mean"][exclude:-exclude]
                     read["bases"] = read["bases"][exclude:-exclude]
                 read["meta"] = extra_e[0][1]
-                #print(fnt)
-                #print(read["meta"])
                 read["meta"]["id"] = fnt[0]
-                reads.append(read)
+                if chunk is None:
+                    reads.append(read)
+                else:
+                    for split in range(len(read["mean"])//chunk + 1):
+                        nread = {}
+                        nread["mean"] = read["mean"][split*chunk:(split+1)*chunk]
+                        nread["bases"] = read["bases"][split*chunk:(split+1)*chunk]
+                        if len(nread["mean"])< min:
+                            continue
+                        nread["meta"] = extra_e[0][1]
+                        #Only start is needed for positionning
+                        if nread["meta"]["mapped_strand"] == "+":
+                            nread["meta"]["mapped_start"] = read["meta"]["mapped_start"] + split * chunk
+                        else:
+                            nread["meta"]["mapped_start"] = max(nread["meta"]["mapped_start"],
+                                                                nread["meta"]["mapped_end"]-(split+1)*chunk)
+                        nread["meta"]["id"] = fnt[0]
+                        reads.append(nread)
 
             if maxf is not None and len(reads)> maxf:
                 break
@@ -309,6 +324,9 @@ if __name__ == "__main__":
     parser.add_argument('--trim_border', dest='exclude', type=int, default=None,
                         help="Remove begining and end of the sequence")
 
+    parser.add_argument('--chunk', dest='chunk', type=int, default=None,
+                        help="Chunk sequence to obtain 'limilar sequence lengths'")
+
     parser.add_argument('--create_only', dest='create_only',action="store_true",
                         help="Only create a ref matrix")
 
@@ -327,7 +345,7 @@ if __name__ == "__main__":
     load_compare,allready_computed_compare = load_directory_or_file_or_transitions(args.compare)
 
     if not allready_computed_ref:
-        data_0 = load_dataset(load_ref,args.max,exclude=args.exclude,min=args.min)
+        data_0 = load_dataset(load_ref,args.max,exclude=args.exclude,min=args.min,chunk=args.chunk)
     else:
         ref_mean,ref_distribution  = load_ref
     if not allready_computed_compare:
@@ -338,7 +356,7 @@ if __name__ == "__main__":
             data_100 = np.array(data_0)[indexes[len(data_0)//2:]]
             data_0 = np.array(data_0)[indexes[:len(data_0)//2]]
         else:
-            data_100 = load_dataset(load_compare,args.max,exclude=args.exclude,min=args.min)
+            data_100 = load_dataset(load_compare,args.max,exclude=args.exclude,min=args.min,chunk=args.chunk)
     else:
         compare_mean,compare_distribution  = load_compare
 

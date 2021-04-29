@@ -1,0 +1,3 @@
+ - Preprocess files
+ - generate transition matrix
+ - generate proba (selection of thresholds ? (depend on percent of modification))
