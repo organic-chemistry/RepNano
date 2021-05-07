@@ -71,12 +71,6 @@ def process_h5(fast5_data, aligner):
     std_ref = tombo_stats.TomboModel(seq_samp_type=seq_samp_type)
     rsqgl_params = tombo_stats.load_resquiggle_parameters(seq_samp_type)
 
-    #print(rsqgl_params)
-    #for k in std_ref.sds.keys():
-    #    if k[2:3] == "T" or k[3:4] == "T":
-    #        #pass
-    #        std_ref.sds[k] = 1.
-    #print(std_ref.sds)
     # extract data from FAST5
     map_results = resquiggle.map_read(fast5_data, aligner,
                                       std_ref)  # Should be modified at that point to insert sequence from fasta
@@ -484,6 +478,9 @@ if __name__ == "__main__":
             ls = ls[:args.Nfile]
         for i,fast5 in enumerate(ls):
             print("Processing",fast5)
+            if os.path.exists(args.output_name +f"/output_{i}.h5"):
+                print("ALready process",args.output_name +f"/output_{i}.h5")
+                continue
             process_one_big_hdf5(hdf5_name=fast5, fn_fastq=args.fastq,
                                  ref=args.ref, output_name=args.output_name +f"/output_{i}.h5", njobs=args.njobs,
                                  maxlen=args.max_len, fastqs=args.fastqs)

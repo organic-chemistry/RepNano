@@ -41,17 +41,21 @@ def norm_mean_unmodified(x,length):
 def get_transition_matrix_ind(list_reads,
                               existing_transition=None,
                               filtered=False, rescale=False,length=5,
-                              norm=True,order=0):
+                              norm=True,order=0,maxi=None):
 
-    Ttd = [[] for _ in range(4 ** length)]
+    if maxi == None:
+        average = np.sum([len(x["mean"]) for x in list_reads]) / 4 ** length
+        maxi = int(15*average)
+        print(f"Average number of point by monomer {average:.2}, setting maxi to: {maxi}")
+    Ttd = [np.zeros(maxi,dtype=np.float16) for _ in range(4 ** length)]
     Plat = np.zeros((4 ** length))
-    Np = np.zeros((4 ** length))
+    Np = np.zeros((4 ** length),dtype=np.int)
 
     list_trans, d_trans = list_transition(length)
 
     errors = []
-    for x in list_reads:
-
+    for x in tqdm(list_reads):
+        error = False
         if existing_transition is not None:
 
             signal, Tm, th, res, error = get_rescaled_signal(x, TransitionM=existing_transition, filtered=filtered,length=length)
@@ -64,24 +68,36 @@ def get_transition_matrix_ind(list_reads,
                 signal =  norm_mean_unmodified(x,length)
             else:
                 signal, _ = get_signal_expected(x, Tt=None, length=length)
-
+        if error:
+            continue
         indexes = get_indexes(x,length=length)
-
+        #print(signal.dtype)
         for pos_seq,(i1,isignal) in enumerate(zip(indexes[:], signal)):
 
             Plat[i1] += isignal
-            Np[i1] += 1
+
             if order == 0:
-                Ttd[i1].append(isignal)
+                if Np[i1]<maxi:
+                    Ttd[i1][Np[i1]] = isignal
+
             if order == 1:
                 if pos_seq >=1 and pos_seq < len(signal)-2:
                     Ttd[i1].append([signal[pos_seq-1:pos_seq+2]])
+            Np[i1] += 1
 
     #print(len(Plat),len(Ttd))
+    Plat = Plat / Np
+    Saturated = 0
     for k,v in d_trans.items():
-        Ttd[v] = np.array(Ttd[v],dtype=np.float16)
-
-    return Plat / Np, errors,Ttd
+        Ttd[v] = Ttd[v][:min(Np[v],maxi-1)]
+        if Np[v]> maxi-1:
+            Saturated += 1
+    print(f"Number of {length}-mer with more than {maxi} points: {Saturated}")
+        #Plat[v] = np.median(Ttd[v])
+    #Checking for nan or inf:
+    if np.any(np.isinf(Plat)) or np.any(np.isnan(Plat)):
+        raise "Probable saturation"
+    return Plat, errors,Ttd
 
 def get_signal_expected(x, Tt,length=5):
 
@@ -110,6 +126,14 @@ def get_base_middle(x, length,base="T"):
         is_T = is_T[1:] | is_T[:-1]
     return is_T
 
+def get_base_in(x, length,base="T"):
+    is_T = np.zeros(len(x["bases"])-length+1,dtype=np.bool)
+    for i in range(length):
+        end = -length+1+i
+        if end == 0:
+            end = None
+        is_T = is_T | (x["bases"][i:end] == base)
+    return is_T
 
 
 def rescale_deltas(real, th, Tm):
@@ -140,12 +164,41 @@ def get_rescaled_signal(x, TransitionM, filtered=False, rs={}, thresh=0.25,lengt
     Tm = get_motif(x,length)
     #print(len(real),len(th),len(Tm),len(x["mean"]),len(get_indexes(x,length)))
 
+
     if rs == {}:
         # print("Comp")
-        rs = rescale_deltas(real, th, Tm)
+        #rs = rescale_deltas(real, th, Tm)
+        pass
+
+    #new = real.copy()
+    #new = (new ) / rs["x"][1] + rs["x"][0]
 
     new = real.copy()
-    new = (new ) / rs["x"][1] + rs["x"][0]
+    new -= np.mean(new[~Tm])
+    newstd = np.std(new[~Tm])
+
+
+    if np.isnan(newstd) or np.isinf(newstd):
+        newstd = np.std(new[~Tm][:10000])
+        #print(np.any(np.isnan(real)),np.any(np.isnan(new)),len(new))
+    oldstd = np.std(th[~Tm])
+    if np.isnan(oldstd) or np.isinf(oldstd):
+        print("STd infinite skipping",np.mean(~Tm),len(Tm))
+        oldstd = np.std(th[~Tm][:10000])
+        if np.isnan(oldstd) or np.isinf(oldstd):
+            error = True
+            return [], [], [], [], error
+        #print("WTF")
+
+    #new = new* stats.median_absolute_deviation(th[~Tm]) / stats.median_absolute_deviation(new[~Tm]) + np.mean(th[~Tm])
+    new = new * (oldstd/2+newstd/2) / newstd + np.mean(th[~Tm])
+    if np.any(np.isnan(new)):
+        print(oldstd,newstd,np.mean(th[~Tm]),np.mean(~Tm),len(Tm),np.mean(real) )
+        print(x["bases"][:100])
+        error = True
+        return [], [], [], [], error
+
+    #print(np.mean(new[~Tm]),np.mean(th[[~Tm]]),np.std(new[~Tm]),np.std(th[~Tm]))
     #print(rs["x"])
     """
 
@@ -156,37 +209,38 @@ def get_rescaled_signal(x, TransitionM, filtered=False, rs={}, thresh=0.25,lengt
 
     # print(rs["x"])
     """
+
+    #pylab.figure()
+    #pylab.hist(real[:200], "-o", label="old")
+    #pylab.plot(th[:200], "-o", label="th")
+    #pylab.plot(Tm[:200], "-o")
+    #pylab.legend()
+    #pylab.show()
     """
     pylab.figure()
-    pylab.plot(real[:200], "-o", label="old")
-    pylab.plot(th[:200], "-o", label="th")
-    pylab.plot(Tm[:200], "-o")
+    rg=[-4,4]
+    bins=100
+    pylab.hist(real[:],label="Before norm",range=rg,bins=bins)
+    pylab.hist(new[:],label="After norm",range=rg,bins=bins)
     pylab.legend()
     pylab.show()
 
     pylab.figure()
-    pylab.plot(real[:200],"-o",label="Before norm")
-    pylab.plot(new[:200],"-o",label="After norm")
-    pylab.plot(Tm[:200],"-o")
+    pylab.hist(new[:],label="New",range=rg,bins=bins)
+    pylab.hist(th[:],label="th",range=rg,bins=bins)
     pylab.legend()
     pylab.show()
+    exit()
 
-    pylab.figure()
-    pylab.plot(new[:200],"-o",label="New")
-    pylab.plot(th[:200],"-o",label="th")
-    pylab.plot(Tm[:200],"-o")
-    pylab.legend()
-    pylab.show()
     """
 
-
-    whole, NotT, T = deltas(new, th, Tm)
+    #whole, NotT, T = deltas(new, th, Tm)
     #print(np.mean((real-th)**2),whole, NotT, T)
     # print(NotT)
-    if filtered:
-        if NotT > thresh:
-            return [], [], [], [], NotT
-    return new, Tm, th, rs, NotT
+    #if filtered:
+    #    if NotT > thresh:
+    #        return [], [], [], [], NotT
+    return new, Tm, th, rs, False#NotT
 
 def load_dataset(files,maxf,exclude=None,min=200,chunk=None):
     from repnano.models.simple_utilities import load_events_bigf
@@ -219,6 +273,8 @@ def load_dataset(files,maxf,exclude=None,min=200,chunk=None):
                 if exclude is not None:
                     read["mean"] = read["mean"][exclude:-exclude]
                     read["bases"] = read["bases"][exclude:-exclude]
+
+                read["mean"] = np.array(read["mean"],dtype=np.float16)
                 read["meta"] = extra_e[0][1]
                 read["meta"]["id"] = fnt[0]
                 if chunk is None:
@@ -245,6 +301,7 @@ def load_dataset(files,maxf,exclude=None,min=200,chunk=None):
         #And exit the main loop
         if maxf is not None and len(reads) > maxf:
             break
+    print("Nsequences",len(reads))
     return reads
 
 def sort_by_delta_mean(TT,TB,length):
@@ -368,7 +425,7 @@ if __name__ == "__main__":
     # if noting to exclude must return false of length signal - length petamer + 1
     if args.base != None:
         def get_motif(x, length):
-            return get_base_middle(x, length,base=args.base)
+            return get_base_in(x, length,base=args.base)
     else:
         def get_motif(x, length):
             return np.zeros(len(x["mean"][:-length+1]),dtype=bool)
@@ -397,10 +454,17 @@ if __name__ == "__main__":
     if norm == "fit_unmodified":
         if not allready_computed_ref:
             TTp=None
+            niter = 6
+            TtdT = None
             for i in range(6):
+                print(f"Iteration {i} over {niter}")
+                if TtdT != None:
+                    del TtdT
+                    TtdT = None # In order to avoid to store it twice in memory
                 TT,  _, TtdT = get_transition_matrix_ind(data_0,length=length,existing_transition=TTp,
                                                                        order=args.order)
                 if TTp is not None:
+                    #TT = TTp/2+TT/2
                     print(np.nanmean(TT[TT!=0]-TTp[TT!=0]),np.nanstd(TT[TT!=0]-TTp[TT!=0])/np.nanstd(TT[TT!=0]))
                     print(np.nanstd(TTp[TTp!=0]),np.nanstd(TT[TT!=0]))
                 TTp=TT
