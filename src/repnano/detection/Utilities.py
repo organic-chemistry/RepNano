@@ -1,5 +1,6 @@
 import numpy as np
 from simplification.cutil import simplify_coords
+import matplotlib.pyplot as plt
 
 def give_ratio_index2(seq):
     val = np.zeros(len(seq))*np.nan
@@ -278,4 +279,31 @@ def Attributes(l):
     chrom = Attri['mapped_chrom'].split('\'')[1]
     return start, end, strand, chrom
 
+def PlotTracts(Tracts, color1,color2,color3,y, head=500):
+    if Tracts !={} :  
+        for ID in Tracts  : 
+            if abs(Tracts[ID]['score']) >= 2 :
+                if Tracts[ID]['dir'] =='R' :
+                    plt.arrow(Tracts[ID]['start'],y, Tracts[ID]['end']-Tracts[ID]['start']-head, 0, fc=color1, ec=color1,head_width=0.1, head_length=head, lw=1.5)
+                if  Tracts[ID]['dir'] =='L' :
+                    #print('LL1', Tracts[ID]['start'],Tracts[ID]['end'])
+                    plt.arrow(Tracts[ID]['end'],y, -Tracts[ID]['end']+Tracts[ID]['start']+head, 0, fc=color1, ec=color1,head_width=0.1, head_length=head, lw=1.5)
+            else :
+                #print 'score', Tracts[ID]['score']
+                if Tracts[ID]['dir'] =='R' :
+                    plt.arrow(Tracts[ID]['start'],y, Tracts[ID]['end']-Tracts[ID]['start']-head, 0, fc=color2, ec=color2,head_width=0.1, head_length=head, lw=1.5) #, linestyle = 'dashed')
+                    #print('RR', Tracts[ID]['start'],Tracts[ID]['end'])
+                if  Tracts[ID]['dir'] =='L' :
+                    plt.arrow(Tracts[ID]['end'],y, -Tracts[ID]['end']+Tracts[ID]['start']+head, 0, fc=color2, ec=color2,head_width=0.1, head_length=head, lw=1.5) #, linestyle = 'dashed')
+                if Tracts[ID]['dir'] =='?' :
+                    plt.arrow(Tracts[ID]['end'],y, -Tracts[ID]['end']+Tracts[ID]['start'], 0, fc=color2, ec=color2,head_width=0.0, head_length=0, lw=1.5) #, linestyle = 'dashed')
 
+def PlotInits(Inits, color,y):
+    if Inits!= None:
+        for i in Inits:
+            plt.plot(i[0], y, color,marker = '^', markersize=8, alpha = 1)
+            
+def PlotTerms(Inits, color,y):
+    if Inits!= None:
+        for i in Inits:
+            plt.plot(i[0], y, color,marker = 'v', markersize=8, alpha = 1)
