@@ -14,24 +14,41 @@ from taiyaki import alphabet, mapped_signal_files
 MAPPED_SIGNAL_WRITER = mapped_signal_files.HDF5Writer
 MAPPED_SIGNAL_READER = mapped_signal_files.HDF5Reader
 
-def clean_reads(reads, th=0.6, val="I",cano="T"):
+def clean_reads(reads, th=0.6, val="I",cano="T",lower_threshold=False,higher_threshold=False):
     print("Threshold",th)
+    print("Loweth",lower_threshold)
+    print("Higherth",higher_threshold)
+
     p = []
+    get_rid_of_read = []
     for k in reads.keys():
+        seq=None
         # print(reads[k][1])
         percent = reads[k][1]
-        add = (np.array(list(reads[k][0]["seq"])) == cano) & np.isnan(percent)
+        #add = (np.array(list(reads[k][0]["seq"])) == cano) & np.isnan(percent)
         # print(np.sum(add),np.isnan(percent)[:10],(np.array(list(reads[k][0]["seq"]))=="T")[:10])
-        percent[add] = 0
+        #percent[add] = 0
         # print(reads[k][0]["seq"]=="T")
-        p.append(np.nanmean(percent))
+        if reads[k][0]["mapped_strand"] == "-":
+            percent = percent[::-1]
+
+
         reads[k][0]["original_seq"] = ""+reads[k][0]["seq"]
+        if (lower_threshold is not False) and (np.nanmean(percent)< lower_threshold):
+            #Keep T only
+            p.append(0)
+            continue
+        if (higher_threshold is not False) and (np.nanmean(percent)> higher_threshold):
+            get_rid_of_read.append(k)
+            continue
+
+
 
         #Assign with thereshold
         if type(th) is float:
             #print(np.nanmean(p[-1]))
             #print(reads[k][0]["seq"])
-            if np.nanmean(p[-1]) > th:
+            if np.nanmean(np.nanmean(percent)) > th:
                 #print("Modified")
                 seq = np.array(list(reads[k][0]["seq"]))
                 seq[seq == cano] = val
@@ -45,7 +62,17 @@ def clean_reads(reads, th=0.6, val="I",cano="T"):
             seq = np.array(list(reads[k][0]["seq"]))
             seq[(seq == cano) & (percent>0.5) ] = val
             reads[k][0]["seq"] = "".join(list(seq))
+        if seq is None:
+            p.append(np.nanmean(percent))
+        else:
+            ncano = np.sum(list(seq) == cano)
+            nval =  np.sum(list(seq) == val)
+            p.append(nval/(nval+ncano+1e-7))
+
+
     #exit()
+    for k in get_rid_of_read:
+        reads.pop(k)
     return reads, p
 
 
@@ -55,7 +82,10 @@ def get_type(h5):
     return "rep"
 
 def update_h5(file_n, bam_info, list_reads=[], maxi=2,
-              new_alphabet=None, mod_long_names=None,val_new="B",cano="T",hout=None,global_alphabet=None,filter_section=False):
+              new_alphabet=None, mod_long_names=None,
+              val_new="B",cano="T",
+              hout=None,global_alphabet=None,
+              filter_section=False,subsample=[[0,0.1],[1,0.25]]):
     with MAPPED_SIGNAL_READER(file_n) as f:
 
         # print(f.attrs["collapse_alphabet"])
@@ -81,8 +111,13 @@ def update_h5(file_n, bam_info, list_reads=[], maxi=2,
         Exp = {}
         ik = 0
         p=[]
+        error = 0
         for k in f.get_read_ids():
+            if filter_section:
+                if k in bam_info.keys() and bam_info[k][2][0] is None:
+                    continue
             read = f.get_read(k)
+
 
             if k in bam_info.keys():
                 seq = np.array(list(bam_info[k][0]["seq"]))
@@ -100,7 +135,7 @@ def update_h5(file_n, bam_info, list_reads=[], maxi=2,
                 print(min(exp["Ref_to_signal"]))
             """
             if filter_section:
-                if bam_info[k][2][0] is not None:
+                if  k in bam_info.keys() and bam_info[k][2][0] is not None:
                     start,end = bam_info[k][2]
                     #print(read.Reference)
                     read.Reference = read.Reference[start:end]
@@ -113,16 +148,30 @@ def update_h5(file_n, bam_info, list_reads=[], maxi=2,
                 else:
                     continue
 
-            hout.write_read(read.get_read_dictionary())
-            list_seq=read.Reference
+            list_seq = read.Reference
             i_val = global_alphabet.alphabet.index(val_new)
             cano_val = global_alphabet.alphabet.index(cano)
-            p.append(np.sum(list_seq==i_val)/(np.sum(list_seq==i_val)+np.sum(list_seq==cano_val)))
+            percent_actual_value = np.sum(list_seq==i_val)/(np.sum(list_seq==i_val)+np.sum(list_seq==cano_val))
+            skip=False
+            if subsample != []:
+                for subv in subsample:
+                    if subv[0] == percent_actual_value:
+                        if np.random.rand()>subv[1]:
+                            skip = True
+            if skip:
+                continue
+            try:
+                hout.write_read(read.get_read_dictionary())
+            except ValueError:
+                error += 1
+
+            p.append(percent_actual_value)
 
             # b = exp["Dacs"][exp["Ref_to_signal"]-1]
             if maxi is not None and ik > maxi:
                 break
             ik += 1
+    print("N redundant",error)
     return p
 
 if __name__ == "__main__":
@@ -161,6 +210,11 @@ if __name__ == "__main__":
             mod_long_names = row["mod_long_names"]
             threshold = row["threshold"]
             filter_section = row["filter_section"]
+            lower_threshold = row["lower_threshold"]
+            higher_threshold = row["higher_threshold"]
+            subsample = row.get("subsample","[]")
+            subsample = ast.literal_eval(subsample)
+
             if type(filter_section) == str:
                 if filter_section == "False":
                     filter_section = False
@@ -178,6 +232,24 @@ if __name__ == "__main__":
                     except:
                         threshold = bool(threshold)
 
+            if type(lower_threshold) == str:
+                if lower_threshold == "False":
+                    lower_threshold = False
+                else:
+                    try:
+                        lower_threshold = float(lower_threshold)
+                    except:
+                        lower_threshold = bool(lower_threshold)
+
+            if type(higher_threshold) == str:
+                if higher_threshold == "False":
+                    higher_threshold = False
+                else:
+                    try:
+                        higher_threshold = float(higher_threshold)
+                    except:
+                        higher_threshold = bool(higher_threshold)
+
             modified_base = row["modified_base"]
             key = row["key"]
 
@@ -190,6 +262,7 @@ if __name__ == "__main__":
 
             print("threshold",threshold)
             print("filter_section",filter_section)
+            print("subsample",subsample)
             print(new_alphabet,mod_long_names)
 
 
@@ -198,13 +271,20 @@ if __name__ == "__main__":
                 root_bam = args.root_h5 + f"/{key}/mod_mappings.bam"
 
                 reads = load_read_bam(root_bam,
-                                      filter_b=0, n_b=1)
+                                      filter_b=0, n_b=1,fill_nan=True)
 
-                new_reads, p = clean_reads(reads, th=threshold, val=modified_base,cano="T")
+                pylab.clf()
+                pylab.hist([np.nanmean(pi[1]) for pi in reads.values() ],bins=100,range=[0,1])
+                pylab.savefig(args.root_h5+f"/{key}/original_histo_{modified_base}.png")
+
+                new_reads, p = clean_reads(reads, th=threshold, val=modified_base,cano="T",
+                                           lower_threshold=lower_threshold,
+                                           higher_threshold=higher_threshold)
                 root_map = args.root_h5 + f"/{key}/signal_mappings.hdf5"
                 p = update_h5(file_n=root_map,
                                 bam_info=new_reads, maxi=None, new_alphabet=new_alphabet, mod_long_names=mod_long_names,
-                                val_new=modified_base,cano="T",hout=hout,global_alphabet=alpha,filter_section=filter_section)
+                                val_new=modified_base,cano="T",hout=hout,global_alphabet=alpha,
+                              filter_section=filter_section,subsample=subsample)
 
 
 
@@ -213,7 +293,7 @@ if __name__ == "__main__":
                 #        with MAPPED_SIGNAL_READER(infile) as hin:
 
                 pylab.clf()
-                pylab.hist(p,bins=100)
+                pylab.hist(p,bins=100,range=[0,1])
                 pylab.savefig(args.root_h5+f"/{key}/histo_{modified_base}.png")
 
 
