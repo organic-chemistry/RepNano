@@ -66,34 +66,31 @@ for Seqs in files :
                 start, end, strand,chrom = mu.Attributes(s)
                 x,y = mu.give_ratio_index2(list(seq))
                 Y = mu.runningMean(y,smoothing_TM)
-                allTsites = mu.Tsites(list(seq))
                 if strand == '-' :   
                     X = end - np.array(x)
-                    allTsites = end - np.array(allTsites)
                 else : 
                     X = start+np.array(x)   
-                    allTsites = start+np.array(allTsites)
 
                     
                     ######## TM #########"
                     
-                    Xs,Ys,Yr = mu.Simplify(X,y, Stdev_TM,smoothing_TM, MinAmplitude_TM,Sparam)   
-                    if Xs != []:
+                Xs,Ys,Yr = mu.Simplify(X,y, Stdev_TM,smoothing_TM, MinAmplitude_TM,Sparam)   
+                if Xs != []:
                                             
-                        TractsTM = mu.Detection(Xs,Ys,MinJump_TM)
-                        try : 
-                            TractNumberTM[len(TractsTM)]+=1
-                        except : 
-                            TractNumberTM[len(TractsTM)] = 1
-                        InitsTM, TractsTM = mu.DetectInits(TractsTM, Xs, X, Yr, LowPlateau_TM,MinDist,score,jumpscore)
-                        #mu.ExportBedForksNoFilter(TractsTM,outputTM_FnoF, chrom, Seqs, readname, strand)
-                        #mu.ExportBedForks(TractsTM,outputTM_F, chrom, Seqs, readname, strand, jumpscore, score)
-                        #mu.ExportInits(InitsTM,outputTM_I,chrom, Seqs, readname, strand)
-                        TermTM = mu.DetectTermsFilter3(TractsTM, Xs, X, Yr, LowPlateau_TM, jumpscore, score)
-                        #mu.ExportInits(TermTM, outputTM_T, chrom, Seqs, readname, strand)
-                            
-                    else : 
-                        TractNumberTM[0]+=1
+                    TractsTM = mu.Detection(Xs,Ys,MinJump_TM)
+                    try : 
+                        TractNumberTM[len(TractsTM)]+=1
+                    except : 
+                        TractNumberTM[len(TractsTM)] = 1
+                    InitsTM, TractsTM = mu.DetectInits(TractsTM, Xs, X, Yr, LowPlateau_TM,MinDist,score,jumpscore)
+                    #mu.ExportBedForksNoFilter(TractsTM,outputTM_FnoF, chrom, Seqs, readname, strand)
+                    #mu.ExportBedForks(TractsTM,outputTM_F, chrom, Seqs, readname, strand, jumpscore, score)
+                    #mu.ExportInits(InitsTM,outputTM_I,chrom, Seqs, readname, strand)
+                    TermTM = mu.DetectTermsFilter3(TractsTM, Xs, X, Yr, LowPlateau_TM, jumpscore, score)
+                    #mu.ExportInits(TermTM, outputTM_T, chrom, Seqs, readname, strand)
+                        
+                else : 
+                    TractNumberTM[0]+=1
 
                         ######## Ratio CNN #######
                 read = l.split('/')[-1].split(' ')[0].split('\n')[0]
@@ -127,31 +124,36 @@ for Seqs in files :
                     TermCNN = mu.DetectTermsFilter3(TractsCNN, Xs_CNN, X_CNN, Yr_CNN, LowPlateau_CNN, jumpscore, score)
                     #mu.ExportInits(TermCNN, outputCNN_T, chrom, Seqs, readname, strand)
                     
+                else : 
+                        TractNumberCNN[0]+=1
 
            ########### make the figure  ###########
            
-                ax = fig.add_axes([0.05, .99-(w+0.003)*j, .85, w], xticks=[], yticks=[])
-                    #fig.text(0.8, 1.0-(w+0.002)*(j), ID)
-                j+=1
-                plt.ylim(0,1)
-                plt.xlim(start-5000, start+75000)
+                #### plot only the reads with tracks
                 
-                plt.plot(X_CNN,y_CNN, color='m', label='CNN', lw = 1)
-                if Xs_CNN!=[]:
-                    mu.PlotTracts(TractsCNN, 'm','k','k',0.8)
-                    mu.PlotInits(InitsCNN, 'm',0.8)
-                    mu.PlotTerms(TermCNN, 'm',0.8)
+                if (Xs_CNN!=[] and TractsCNN != {}) or (Xs != [] and TractsTM != {}): 
+           
+                    ax = fig.add_axes([0.05, .99-(w+0.003)*j, .85, w], xticks=[], yticks=[])
+                        #fig.text(0.8, 1.0-(w+0.002)*(j), ID)
+                    j+=1
+                    plt.ylim(0,1)
+                    plt.xlim(start-5000, start+75000)
                     
-                plt.plot(X,Y, color='g', label='TM', lw = 1)
-                if Xs != []:
-                    mu.PlotTracts(TractsTM,'g','k','k',0.9)
-                    mu.PlotInits(InitsTM, 'g',0.9)
-                    mu.PlotTerms(TermTM, 'g',0.9)
-                if j == 2 : plt.legend()
+                    plt.plot(X_CNN,y_CNN, color='m', label='CNN', lw = 1)
+                    if Xs_CNN!=[]:
+                        mu.PlotTracts(TractsCNN, 'm','k','k',0.8)
+                        mu.PlotInits(InitsCNN, 'm',0.8)
+                        mu.PlotTerms(TermCNN, 'm',0.8)
+                        
+                    plt.plot(X,Y, color='g', label='TM', lw = 1)
+                    if Xs != []:
+                        mu.PlotTracts(TractsTM,'g','k','k',0.9)
+                        mu.PlotInits(InitsTM, 'g',0.9)
+                        mu.PlotTerms(TermTM, 'g',0.9)
+                    if j == 2 : plt.legend()
 
                     
-                else : 
-                        TractNumberCNN[0]+=1
+                
                                                     
             else: 
                 l = h.readline()
