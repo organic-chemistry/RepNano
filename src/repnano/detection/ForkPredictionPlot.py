@@ -130,22 +130,24 @@ for Seqs in files :
 
            ########### make the figure  ###########
            
-                    ax = fig.add_axes([0.05, .99-(w+0.003)*j, .85, w], xticks=[], yticks=[])
+                ax = fig.add_axes([0.05, .99-(w+0.003)*j, .85, w], xticks=[], yticks=[])
                     #fig.text(0.8, 1.0-(w+0.002)*(j), ID)
-                    j+=1
-                    plt.ylim(0,1)
-                    plt.xlim(start-5000, start+75000)
-                    plt.plot(X_CNN,y_CNN, color='m', label='CNN', lw = 1)
-                    
+                j+=1
+                plt.ylim(0,1)
+                plt.xlim(start-5000, start+75000)
+                
+                plt.plot(X_CNN,y_CNN, color='m', label='CNN', lw = 1)
+                if Xs_CNN!=[]:
                     mu.PlotTracts(TractsCNN, 'm','k','k',0.8)
                     mu.PlotInits(InitsCNN, 'm',0.8)
                     mu.PlotTerms(TermCNN, 'm',0.8)
                     
-                    plt.plot(X,Y, color='g', label='TM', lw = 1)
+                plt.plot(X,Y, color='g', label='TM', lw = 1)
+                if Xs != []:
                     mu.PlotTracts(TractsTM,'g','k','k',0.9)
                     mu.PlotInits(InitsTM, 'g',0.9)
                     mu.PlotTerms(TermTM, 'g',0.9)
-                    if j == 2 : plt.legend()
+                if j == 2 : plt.legend()
 
                     
                 else : 
