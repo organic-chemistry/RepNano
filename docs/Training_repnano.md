@@ -18,7 +18,8 @@ The csv file to create the dataset must follow the structure here:
 
 
 **key** must be a unique value tha will be used to reference a given sample during the training part
-**f5** and **fq** must contain the absolute path to fast5 and fastq file. **ref** must contain the absolute path to the reference sequence.
+**f5** and **fq** must contain the absolute path to fast5 and fastq file. if a h5 file is given it is assumed it is an already preprocessed file. 
+If a repertory is given it is assumed it contain a fast5 file **ref** must contain the absolute path to the reference sequence.
 percent is an array with the percent of modification of the sample. **mods** is the name of the base that will be used instead of the canonical base.
 **mix** must specify is the training data is a mixture of 0 percent incorportation and a given percent so that the total percent of the sample
 correspond to the value in the array percents. 
@@ -34,7 +35,8 @@ Then you must execute the following code :
 
 `python misc/preprocess_dataset.py --dataset dataset.csv --out out_folder --from_scratch --repnano_preprocess`
 
-it will create two directories in the output folder:  initial_percent  preprocess and a csv file dataset_preprocessed.csv
+it will create two directories in the output folder:  initial_percent  preprocess and a csv file dataset_preprocessed.csv 
+(also in the output folder)
 This file is the copy of the previous file and also has a new column called **preprocessed** with the absolute path
 to the h5 file which contains the alligned current base sequence.
 The folder **preprocess** contains the preprocessed h5 files and **initial_percent** percents file that store the read file and the 
@@ -43,13 +45,9 @@ will change with the training cycle.
 
 `python src/repnano/models/training_loop.py  --dataset dataset_preprocessed.csv --training_info training.json`
 
-
-
-
 Examples
 `python misc/preprocess_dataset.py --dataset small_dataset_two.csv --out /scratch/jarbona/test_training_two/ --from_scratch --repnano_preprocess --max_len 100 --njobs 4`
 `python src/repnano/models/training_loop.py  --dataset /scratch/jarbona/test_training_two/dataset_preprocessed.csv --training_info training_two_test.json`
-
 
 # Trouble shoutting :
 ### Single to multi
