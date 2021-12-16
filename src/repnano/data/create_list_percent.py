@@ -6,14 +6,18 @@ name of the biffile, read name and percent value, and a possible metadata
 from scipy.optimize import curve_fit
 
 
-def get_target_percent(percent_file, g_percent_value,nbin=101):
+def get_target_percent(percent_file, g_percent_value,nbin=101,mixture=True,minimum_percent_highsample=0.5):
     #print(percent_file)
     target_percent = pd.read_csv(percent_file, sep=" ", names=["readname", "percent", "error", "mod"])
     target_percent.readname = [standardize_name(name) for name in target_percent.readname]
     target_percent.percent /= 100
 
+    if not mixture:
+        return target_percent,None,None,base
+
     target_percent_sub = target_percent[target_percent.error < args.threshold]
     print("Nselected",len(target_percent_sub))
+    print(f"Actual percent {np.nanmean(target_percent.percent)}, ground truth {g_percent_value}")
     #print(target_percent_sub)
     h, e = np.histogram(target_percent_sub.percent, bins=nbin, range=[0, 1],density=True)
     base = target_percent["mod"][0]
@@ -55,7 +59,7 @@ def get_target_percent(percent_file, g_percent_value,nbin=101):
 
         p = 100*popt[-2]
 
-        if error < 0.40 and popt[-2] - popt[1] > 0.1:   # to account for the fact that histo is not normalised
+        if error < 0.40 and (popt[-2] - popt[1] > 0.05):   # to account for the fact that histo is not normalised
             separable = True
 
         if error < 100:
@@ -68,7 +72,9 @@ def get_target_percent(percent_file, g_percent_value,nbin=101):
         separable=True
 
     threshold = p / nbin / 2
-    if np.mean(target_percent_sub.percent > threshold) < 0.5:
+    if np.mean(target_percent_sub.percent > threshold) < minimum_percent_highsample:
+        print("Not separable because higher sample proportion is too low (minimum percent high sample %f)"%minimum_percent_highsample)
+        print("Actual percent %.2f"%np.mean(target_percent_sub.percent > threshold))
         separable = False
 
     if separable:
@@ -119,11 +125,16 @@ if __name__ == "__main__":
     parser.add_argument('--percent', nargs="+",type=float)
     parser.add_argument('--type', type=str,help="Raw or Events",default="Events")
     parser.add_argument('--metadata', type=str,default="")
+    parser.add_argument('--exclude', type=str,default="")
+
     parser.add_argument('--percent_file', nargs='+',type=str ,default=[""])
     parser.add_argument('--mods', nargs='+',type=str ,default=[""])
 
     parser.add_argument('--plot', action="store_true")
-    parser.add_argument('--threshold', type=float,default=0.04)
+    parser.add_argument('--mixture', action="store_true")
+
+    parser.add_argument('--threshold', type=float,default=0.17)
+    parser.add_argument('--minimum_percent_highsample', type=float,default=0.5)
 
 
 
@@ -135,10 +146,9 @@ if __name__ == "__main__":
     os.makedirs(p,exist_ok=True)
 
     pf={}
-    if args.percent_file != [""]:
-        pf = {}
+    if args.percent_file != [""] and args.mixture:
         for pfile,g_target,mod in zip(args.percent_file,args.percent,args.mods):
-            pf[mod] = get_target_percent(pfile,g_target)
+            pf[mod] = get_target_percent(pfile,g_target,mixture=args.mixture,minimum_percent_highsample=args.minimum_percent_highsample)
             #print(pf[mod][0])
             assert(mod==pf[mod][-1])
 
@@ -155,31 +165,35 @@ if __name__ == "__main__":
 
     for read_name in iter_keys(h5,typef=typef):
         #print(read_name)
-        if pf != {}:
-            percent = []
-            error = []
-            for mod in args.mods:
+
+        percent = []
+        error = []
+
+        for mod,initial_value in zip(args.mods,args.percent):
+
+            if mod in pf.keys():
                 target_percent, target_percent_value, threshold,mod = pf[mod]
-                selec = target_percent[ target_percent.readname == standardize_name(read_name)]
-                if len(selec) != 0:
-                    #print("Found",target_percent_value,threshold,np.array(selec.percent)[0])
-                    #print(selec)
-                    if np.array(selec.percent)[0] > threshold:
+                selec = target_percent[target_percent.readname == standardize_name(read_name)]
+                #print("Found",target_percent_value,threshold,np.array(selec.percent)[0])
+                #print(selec)
+                if args.mixture:
+                    if len(selec) != 0 and (np.array(selec.percent)[0] > threshold):
                         percent.append(target_percent_value)
-                        error.append(np.array(selec.error)[0])
                     else:
-
                         percent.append(0)
-                        error.append(np.array(selec.error)[0])
                 else:
-                    percent_v = target_percent_value
-                    error.append(0)
-        else:
-            percent=args.percent
-            error=[0] * len(percent)
-        #print(percent)
+                    percent.append(initial_value)
 
-        info = {"file_name":file_path,"readname":standardize_name(read_name),"type":args.type,"metadata":args.metadata}
+                if len(selec) != 0:
+                    error.append(np.array(selec.error)[0])
+                else:
+                    error.append(0)
+            else:
+                percent.append(initial_value)
+                error.append(0)
+
+        info = {"file_name":file_path,"readname":standardize_name(read_name),
+                "type":args.type,"metadata":args.metadata,"exclude":args.exclude}
         for mod,p,e in zip(args.mods,percent,error):
             info[f"percent_{mod}"] = p
             info[f"error_{mod}"] = e

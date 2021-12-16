@@ -101,7 +101,8 @@ def get_longest_low(v_mono):
     else:
         return None, None
 
-def load_read_bam(bam,filter_b=0.5,n_b=5000,verbose=False,fill_nan=False,res=1,maxi=None,chs=None,tqdm_do=False):
+def load_read_bam(bam,filter_b=0.5,n_b=5000,verbose=False,fill_nan=False,res=1,
+    maxi=None,chs=None,tqdm_do=False,calibration=False):
     """
     filter_b and n_b are here to select signal with Brdu
     it select the signal if n_b points are higher that filter_b
@@ -175,6 +176,10 @@ def load_read_bam(bam,filter_b=0.5,n_b=5000,verbose=False,fill_nan=False,res=1,m
         else:
             Nn = val
 
+        if calibration:
+            lg = lambda x: 1/(1+np.exp(-(x-0.16)*30))
+            Nn = lg(Nn)
+
         if np.sum(np.array(Nn)>filter_b) >= n_b:
             Read[read.query_name] = [attr,Nn] #,get_longest_low(Nn)]
 
@@ -182,5 +187,124 @@ def load_read_bam(bam,filter_b=0.5,n_b=5000,verbose=False,fill_nan=False,res=1,m
             break
         #break
     return Read
+
+
+def load_read_bam_multi(bam,filter_b=0.5,n_b=5000,verbose=False,
+                        fill_nan=False,res=1,maxi=None,chs=None,
+                        tqdm_do=False,allready_mod=False):
+    """
+    filter_b and n_b are here to select signal with Brdu
+    it select the signal if n_b points are higher that filter_b
+    If you want to keep everything you can set n_b to 0
+    res is the resolution of the final signal
+    for example at 100, it does a smoothing average over 100 points and then select one point every 100 points
+
+    chs can be a list of chromosome that you want to keep
+    for example ["chr1","chr2"]
+    the nomenclature has to be the same as the one of your reference file
+
+    maxi is the maximum number of read that you want to process
+
+    it returns an array for each read with [attr,b_val]
+    The x coordinate is computed as x = np.arange(len(b_val)) * res + attr["mapped_start"]
+    If the strand mapped to is "-" I already flipped the signal.
+    (it means that the x coordinate are always increasing)
+    """
+    #print(bam)
+    if fill_nan:
+        print("Non implemented")
+    samfile = pysam.AlignmentFile(bam, "r")#,check_sq=False)
+
+    Read ={}
+
+    monitor = lambda x : x
+    if tqdm_do:
+        monitor = lambda x: tqdm.tqdm(x)
+
+    for ir,read in monitor(enumerate(samfile)):
+        if verbose:
+            print(ir,read)
+        #seq,Ml,Mm = read.get_forward_sequence(),read.get_tag("Ml"),[int(v) for v in read.get_tag("Mm")[:-1].split(",")[1:]]
+        seq = read.get_forward_sequence()
+
+        #print(Mm2)
+        #print(len(Mm),len(Mm2))
+        attr={}
+        if read.is_reverse:
+            attr["mapped_strand"] = "-"
+        else:
+            attr["mapped_strand"] = "+"
+
+
+        attr["mapped_chrom"] = read.reference_name
+
+
+        pos = read.get_reference_positions()
+        attr["mapped_start"] = pos[0]
+        attr["mapped_end"] = pos[-1]
+        attr["seq"]=seq
+        #print(read.reference_name, read.reference_id)
+        #print(read.header)
+        #for attrn in dir(read):
+    #        print(attrn,getattr(read,attrn))
+
+
+        if chs is not None and attr["mapped_chrom"] not in chs:
+            continue
+
+        try:
+            Ml = read.get_tag("Ml")
+        except:
+            Ml = np.array([])
+
+
+        Mmt = read.get_tag("Mm").split(";")[:-1]
+        #print(Mmt)
+        Mm = {}
+        base_ref={}
+        for Smm in Mmt:
+            base = Smm[2:3]
+            #shift = [int(v) for v in Smm.split(",")[1:]]
+            shift= np.fromstring(Smm[4:], dtype=np.int, sep=',')
+            #print(Smm[:3])
+            #Mm = np.fromstring(read.get_tag("Mm")[4:-1], dtype=np.int, sep=',')
+            Mm[base]=shift
+            base_ref[base]=Smm[:1]
+        #print(Mm)
+        if Mm != {}:
+            pass
+            # print(read.get_tag("Mm"))
+            # Mm = [int(v) for v in read.get_tag("Mm")[:-1].split(",")[1:]]
+            # print(Mm)
+        #print(Mm)
+        Nn ={}
+        start = 0
+        for mod in Mm.keys():
+
+            val = convert_to_coordinate(seq,Ml[start:start+len(Mm[mod])],Mm[mod],which=base_ref[mod])
+            #val[np.isnan(val) & (np.array(list(seq))=="T")]=0
+            start += len(Mm[mod])
+
+            if res != 1:
+                val = smooth(val,res)
+                val = np.array(val[::res],dtype=np.float16)
+
+            if attr["mapped_strand"] == "-":
+                val = val[::-1]
+
+
+            if not allready_mod:
+                val[np.isnan(val) & (np.array(list(seq)) == base_ref[mod])] = 0
+            Nn[mod]=val
+
+
+        #if np.sum(np.array(Nn[mod])>filter_b) >= n_b:
+        Read[read.query_name] = [attr,Nn] #,get_longest_low(Nn)]
+
+        if maxi is not None and ir >= maxi-1:
+            break
+        #break
+    return Read
+
 
 #load_read_bam("../../../debug/debug_GPU_ref/bam_runid_1ca9cbe0f2c9d4798f7e3ebf9c2ac6c7c775f0b4_0_0.bam",filter_b=0)

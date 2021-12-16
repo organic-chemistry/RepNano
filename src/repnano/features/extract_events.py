@@ -1,6 +1,6 @@
 import numpy as np
 from .helpers import scale, scale_clean
-from numba import jit
+#from numba import jit
 import pandas as pd
 
 
@@ -270,20 +270,20 @@ def extract_events(h5, chem, window_size=None, old=True, verbose=True, about_max
         return events[first_event:last_event], raw[startraw:-endraw], sl
 
 
-@jit
+#@jit
 def med_mad(data):
     dmed = np.median(data)
     dmad = np.median(abs(data - dmed))
     return dmed, dmad
 
 
-@jit
+#@jit
 def compute_prefix_sums(data):
     data_sq = data * data
     return np.cumsum(data), np.cumsum(data_sq)
 
 
-@jit
+#@jit
 def peak_detect(short_data, long_data, short_window, long_window, short_threshold, long_threshold,
                 peak_height):
     long_mask = 0
@@ -376,7 +376,7 @@ def generate_events_old(ss1, ss2, peaks, sample_rate):
 # The argument types will be inferred by Numba when function is called.
 
 
-@jit
+#@jit
 def find_best_partition(signal, gamma=0.1, maxlen=10, minlen=1):
     maxlen -= 1
     signal = np.array(signal)
@@ -401,7 +401,7 @@ def find_best_partition(signal, gamma=0.1, maxlen=10, minlen=1):
     return p
 
 
-@jit
+#@jit
 def return_start_length_mean_std(partition, signal, allinfos=False):
     start = []
     length = []

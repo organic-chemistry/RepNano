@@ -14,6 +14,7 @@ if __name__ == "__main__":
     from tensorflow.keras.models import load_model
     import tqdm
     from tensorflow.keras.utils import get_custom_objects
+    from repnano.data.create_transition_matrix import load_directory_or_file_or_transitions
 
     logs = tf.keras.losses.LogCosh()
 
@@ -44,6 +45,8 @@ if __name__ == "__main__":
     parser.add_argument('--final_size',type=int,default=100)
     parser.add_argument('--mods', nargs='+',type=str ,default=[""])
     parser.add_argument('--canonical', nargs='+',type=str ,default=[""])
+    parser.add_argument('--transition_matrix', type=str, default=None)
+    parser.add_argument('--exclude', type=str, default='')
 
 
     args = parser.parse_args()
@@ -58,17 +61,30 @@ if __name__ == "__main__":
 
     except ValueError:
         try:
-            model = tf.keras.Model(inputs=base_model.input, outputs=[base_model.get_layer('percent').output,
+            #print("input",base_model.input)
+            model = tf.keras.Model(inputs=base_model.input[0], outputs=[base_model.get_layer('percent').output,
                                                                      base_model.get_layer('std_percent').output])
             get_error = True
         except:
-            model = tf.keras.Model(inputs=base_model.input, outputs=base_model.get_layer('percent').output)
-            get_error = False
+            try:
+                model = tf.keras.Model(inputs=base_model.input, outputs=base_model.get_layer('percent').output)
+                get_error = False
+            except:
+                model = base_model
+                get_error = False
 
     model.summary()
     pad_size = (model.input[0].shape[-2] - args.final_size)//2
 
-    data = load(args.file,per_read=True,pad_size=pad_size,final_size=args.final_size,max_read=args.max_len)
+    if args.transition_matrix != None:
+        transition_matrix,_ = load_directory_or_file_or_transitions(args.transition_matrix)[0]
+    else:
+        transition_matrix = None
+
+    data = load(args.file,per_read=True,pad_size=pad_size,
+                final_size=args.final_size,max_read=args.max_len,
+                existing_transition=transition_matrix,
+                exclude=args.exclude)
     h =[]
     std = []
     fasta = args.output
@@ -171,7 +187,3 @@ if __name__ == "__main__":
 
             pylab.hist(np.array(h[::,i])[np.array(std[::,i])<0.045], range=[0, 1], bins=nbin)
             pylab.savefig(args.output[:-3] + f"distribution_filtered_{base}.png")
-
-
-
-

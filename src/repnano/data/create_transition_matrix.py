@@ -99,14 +99,19 @@ def get_transition_matrix_ind(list_reads,
         raise "Probable saturation"
     return Plat, errors,Ttd
 
-def get_signal_expected(x, Tt,length=5):
+def get_signal_expected(x, Tt,length=5,extended=False):
 
-    if (length % 2) == 0:
-        signal = x["mean"][(length-1) // 2:-((length-1) // 2)]
-        signal = signal[1:]-signal[:-1]
+    if not extended:
+        if (length % 2) == 0:
+            signal = x["mean"][(length-1) // 2:-((length-1) // 2)]
+            signal = signal[1:]-signal[:-1]
 
+        else:
+            signal = x["mean"][(length//2):-(length//2)]
     else:
-        signal = x["mean"][(length//2):-(length//2)]
+        if (length % 2) == 0:
+            raise "not implemented"
+        signal = x["mean"]
 
     if Tt is not None:
         indexes = get_indexes(x,length)
@@ -124,17 +129,18 @@ def get_base_middle(x, length,base="T"):
     elif (length %2) ==0:
         is_T = x["bases"][(length-1)//2:-((length-1)//2)] == base
         is_T = is_T[1:] | is_T[:-1]
+    #print(base)
+    #print(is_T)
     return is_T
 
 def get_base_in(x, length,base="T"):
     is_T = np.zeros(len(x["bases"])-length+1,dtype=np.bool)
-    for i in range(length):
+    for i in range(1,length-1):
         end = -length+1+i
         if end == 0:
             end = None
         is_T = is_T | (x["bases"][i:end] == base)
     return is_T
-
 
 def rescale_deltas(real, th, Tm):
 
@@ -159,9 +165,15 @@ def deltas(which, th, Tm):
     return np.mean((which - th) ** 2), np.mean((which[~Tm] - th[~Tm]) ** 2), np.mean((which[Tm] - th[Tm]) ** 2)
 
 
-def get_rescaled_signal(x, TransitionM, filtered=False, rs={}, thresh=0.25,length=5):
-    real, th = get_signal_expected(x, TransitionM,length=length)
-    Tm = get_motif(x,length)
+def get_rescaled_signal(x, TransitionM,
+                        filtered=False, rs={},
+                        thresh=0.25,length=5,Tm=None,extended=False):
+
+    real, th = get_signal_expected(x, TransitionM,length=length,
+                                   extended=extended)
+
+    if Tm is None:
+        Tm = get_motif(x,length)
     #print(len(real),len(th),len(Tm),len(x["mean"]),len(get_indexes(x,length)))
 
 
@@ -173,13 +185,19 @@ def get_rescaled_signal(x, TransitionM, filtered=False, rs={}, thresh=0.25,lengt
     #new = real.copy()
     #new = (new ) / rs["x"][1] + rs["x"][0]
 
+    if extended:
+        Tmp = np.concatenate([np.array([True]*(length//2)),
+                              Tm,
+                              np.array([True] *( length // 2))])
+    else:
+        Tmp = Tm
     new = real.copy()
-    new -= np.mean(new[~Tm])
-    newstd = np.std(new[~Tm])
+    new -= np.mean(new[~Tmp])
+    newstd = np.std(new[~Tmp])
 
 
     if np.isnan(newstd) or np.isinf(newstd):
-        newstd = np.std(new[~Tm][:10000])
+        newstd = np.std(new[~Tmp][:10000])
         #print(np.any(np.isnan(real)),np.any(np.isnan(new)),len(new))
     oldstd = np.std(th[~Tm])
     if np.isnan(oldstd) or np.isinf(oldstd):
@@ -425,7 +443,7 @@ if __name__ == "__main__":
     # if noting to exclude must return false of length signal - length petamer + 1
     if args.base != None:
         def get_motif(x, length):
-            return get_base_in(x, length,base=args.base)
+            return get_base_middle(x, length,base=args.base)
     else:
         def get_motif(x, length):
             return np.zeros(len(x["mean"][:-length+1]),dtype=bool)

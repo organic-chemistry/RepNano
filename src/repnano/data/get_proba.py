@@ -69,7 +69,7 @@ from repnano.data.create_transition_matrix import get_signal_expected,\
 def evaluate_dataset(list_reads,ranges,ref,compare=None,
                               existing_transition=None,
                               filtered=False, rescale=False,length=5,
-                              norm=True,order=0):
+                              norm=True,order=0,norm_mat=None):
 
     list_trans, d_trans = list_transition(length)
 
@@ -82,6 +82,9 @@ def evaluate_dataset(list_reads,ranges,ref,compare=None,
             signal = norm_median_unmodified(x, length)
         elif norm == "mean_unmodified":
             signal = norm_mean_unmodified(x, length)
+        elif existing_transition is not None:
+            signal, Tm, th, res, error = get_rescaled_signal(x, TransitionM=existing_transition, filtered=filtered,
+                                                                 length=length)
         else:
             signal, _ = get_signal_expected(x, Tt=None, length=length)
 

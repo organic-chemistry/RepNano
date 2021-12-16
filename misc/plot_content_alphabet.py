@@ -5,19 +5,25 @@ import argparse
 
 import numpy as np
 import h5py
-def get_h5_p(file_n, maxi=None,cano="T",mods=["B","I"]):
+def get_h5_p(file_n, maxi=None,mods=["B","I"]):
     with h5py.File(file_n, "r") as f:
 
         print("After",dict(f.attrs.items()))
 
         new_alphabet = f.attrs["alphabet"]
         to_pop = []
+        canos = []
         for m in mods:
             if m not in new_alphabet:
                 print(f"Warning {m} not in alphabet")
                 print(f"Plot for {m} will not be produceds")
                 to_pop.append(m)
-        mods.remove(m)
+            else:
+                i = new_alphabet.index(m)
+                canos.append(f.attrs["collapse_alphabet"][i:i+1])
+        print(canos)
+        for m in to_pop:
+            mods.remove(m)
         Exp = {}
         ik = 0
         p={m:[] for m in mods}
@@ -35,9 +41,9 @@ def get_h5_p(file_n, maxi=None,cano="T",mods=["B","I"]):
             Exp[exp["read_id"]] = exp
             # print(exp["read_id"])
 
-            list_seq=exp["Reference"]
+            list_seq=np.array(exp["Reference"])
             #print(list_seq)
-            for mod in mods:
+            for mod,cano in zip(mods,canos):
                 i_val = new_alphabet.index(mod)
                 cano_val = new_alphabet.index(cano)
                 p[mod].append(np.sum(list_seq==i_val)/(np.sum(list_seq==i_val)+np.sum(list_seq==cano_val)+1))

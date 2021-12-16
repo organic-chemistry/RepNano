@@ -1,0 +1,13 @@
+Metadata-Version: 2.1
+Name: repnano
+Version: 1.0.post0.dev53+gdbeee05.dirty
+Summary: Add a short description here!
+Home-page: https://pyscaffold.org/
+Author: jarbona
+Author-email: jeanmichel.arbona@ens-lyon.fr
+License: mit
+Description: UNKNOWN
+Platform: any
+Classifier: Development Status :: 4 - Beta
+Classifier: Programming Language :: Python
+Provides-Extra: testing

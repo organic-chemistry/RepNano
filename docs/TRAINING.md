@@ -18,10 +18,6 @@ and create a list of repertory files that contain direction to preprocess read a
 Then the calling can be made with the previous best model.
 
 
-
-
-
-
 	% B 	% masse spec
 BO 	0 	0
 BP 	10 	9,4
@@ -57,8 +53,7 @@ to get read of /read
 to prepare reads for training (taiyaki):
 `bin/prepare_mapped_reads.py /scratch/jarbona/data_Repnano/grouped_list/  /scratch/jarbona/data_Repnano/scaling/scale.tsv /scratch/jarbona/data_Repnano/mapped_signal_file.hdf5  models/mGru_flipflop_remapping_model_r9_DNA.checkpoint /home/jarbona/RepNano/data/preprocessed/test_with_error_corrected_17_test_lstm/merged_trimmed.fa --mod B T Brdu --job 6`
 
-It can also be done on megalodon part
-
+It can also be done on megalodon part (But how?)
 
 to train
 

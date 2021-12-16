@@ -123,7 +123,12 @@ def create_model(error=True,lstm=False,final_size=100,informative=False,nmod=1,m
     if informative:
         input_info = tf.keras.Input(shape=(final_size,n_channel))
 
-    output_mod = tf.keras.layers.TimeDistributed(tf.keras.layers.Dense(nmod,activation="sigmoid"),name="percent")(tmp)
+    #output_mod = tf.keras.layers.TimeDistributed(tf.keras.layers.Dense(nmod,activation="sigmoid"),name="percent")(tmp)
+
+    output_mod = tf.keras.layers.Conv1D(filters=nmod,
+                           kernel_size=1, padding='valid',
+                           activation='sigmoid',name="percent")(tmp)
+
 
     if informative:
         output_mod *= input_info
@@ -146,11 +151,13 @@ def create_model(error=True,lstm=False,final_size=100,informative=False,nmod=1,m
             model.compile(optimizer="Adam", loss="LogCosh")
 
     else:
-        input_mod_pred = tf.keras.Input(shape=(nmod))
+        input_mod_pred = tf.keras.Input(shape=(1,nmod))
 
-        output_delta_mod = tf.keras.layers.TimeDistributed(tf.keras.layers.Dense(nmod,activation="sigmoid"),name="std_percent")(tmp)
+        output_delta_mod = tf.keras.layers.Conv1D(filters=nmod,
+                               kernel_size=1, padding='valid',
+                               activation='sigmoid',name="std_percent")(tmp)
         fit_output_delta_mod = tf.keras.layers.AveragePooling1D(pool_size=final_size)(output_delta_mod)
-        fit_output_delta_mod = (fit_output_mod-input_mod_pred)**2 - fit_output_delta_mod
+        fit_output_delta_mod = ((fit_output_mod-input_mod_pred)**2 - fit_output_delta_mod**2) #*input_mod_pred*(1-input_mod_pred))
         if informative:
             fit_output_delta_mod *= input_info
 
@@ -168,7 +175,7 @@ def create_model(error=True,lstm=False,final_size=100,informative=False,nmod=1,m
             inputs += [input_info]
 
         model = tf.keras.Model(inputs=inputs,outputs=[fit_output_mod,fit_output_delta_mod])
-        model.compile(optimizer="Adam", loss=[logs,loss1])
+        model.compile(optimizer="Adam", loss=["LogCosh","LogCosh"])
 
     model.summary()
     return model
@@ -283,10 +290,6 @@ def iterate_over_h5(h5,typef,stride=5):
 
 
 
-
-
-
-
 def iter_keys(h5,typef):
     if typef=="rep":
         return h5.keys()
@@ -302,7 +305,7 @@ def load_bigf_with_percents(data_frame,name_bigf,max_read=None,mods=[]):
     typef=get_type(h5)
     #print(name_bigf)
     #for read_name,percent in zip(data_frame.readname,data_frame.percent):
-
+    exclude_nan = 0
     for read_name, events, rawV, sl in iterate_over_h5(h5, typef=typef):
         #print(read_name)
         found = data_frame["readname"] == read_name
@@ -313,17 +316,31 @@ def load_bigf_with_percents(data_frame,name_bigf,max_read=None,mods=[]):
                 break
         read_name = row["readname"]
         percent = np.array([row[f"percent_{m}"] for m in mods])
-        #print(row)
+
+        if np.any(np.isnan(percent)):
+            exclude_nan += 1
+            continue
         try:
             error =np.array([row[f"error{m}"] for m in mods])
         except:
             error=np.array([0]*len(mods))
+        try:
+            exclude = row["exclude"]
+            if type(exclude) != str and np.isnan(exclude):
+                exclude = ""
+        except:
+            exclude = ""
         #print(events,read_name)
-        X.append({"mean":events["mean"], "bases": events["bases"],"readname":read_name,"filename":name_bigf,"extra":sl,"error":error})
+        X.append({"mean":events["mean"],
+                  "bases": events["bases"],
+                  "readname":read_name,
+                  "filename":name_bigf,"extra":sl,
+                  "error":error,"exclude":exclude})
         y.append(percent)
         if max_read is not None and len(y) == max_read:
             break
-
+    print("Excluded because no info",exclude_nan)
+    print("Size of training set",len(X))
     return X,y
 def load_bigf(name_bigf,max_read=None):
     X = []
@@ -335,16 +352,30 @@ def load_bigf(name_bigf,max_read=None):
 
     for read_name , events, rawV, sl in iterate_over_h5(h5,typef=typef):
 
-        X.append({"mean":events["mean"], "bases": events["bases"],"readname":read_name,"filename":name_bigf,"extra":sl})
+        X.append({"mean":events["mean"], "bases": events["bases"],
+                  "readname":read_name,"filename":name_bigf,"extra":sl})
         y.append(np.array([np.nan]))
         if max_read is not None and len(y) == max_read:
             break
 
     return X,y
 
-def load(file,per_read=False,pad_size=12,max_read=None,final_size=100,mixture=False,mods=[]):
-    window_size=final_size + 2 * pad_size
+from repnano.data.create_transition_matrix import get_rescaled_signal,get_base_middle
 
+
+def get_base_in(x, length, base="T"):
+    is_T = np.zeros(len(x["bases"]) - length + 1, dtype=np.bool)
+    for i in range(1, length - 1):
+        end = -length + 1 + i
+        if end == 0:
+            end = None
+        is_T = is_T | (x["bases"][i:end] == base)
+    return is_T
+
+def load(file,per_read=False,pad_size=12,max_read=None,
+         final_size=100,mixture=False,mods=[],
+         existing_transition=None,exclude=''):
+    window_size=final_size + 2 * pad_size
     DataX = []
     Datay = []
     Readname = []
@@ -362,16 +393,45 @@ def load(file,per_read=False,pad_size=12,max_read=None,final_size=100,mixture=Fa
     for name_bigf in nf:
         if p is not None:
             X,y = load_bigf_with_percents(data_frame=p[p.file_name==name_bigf],
-                            name_bigf=name_bigf,max_read=max_read,mods=mods)
+                            name_bigf=name_bigf,max_read=max_read,
+                                          mods=mods)
         else:
             X,y = load_bigf(name_bigf=name_bigf,max_read=max_read)
         #print(len(X),len(y))
         for ir,(xv,yv) in enumerate(zip(X,y)):
+            #Here normalise the mean
+
             if len(xv["mean"])< window_size:
                 continue
             if max_read is not None and ir > max_read:
                 print("Reach limit",max_read)
                 break
+            if existing_transition is not None:
+                length=5
+                #print("exc",xv["exclude"])
+                if len(xv.get("exclude","")) != 0 or exclude != '':
+                    if len(xv.get("exclude","")) != 0 and exclude != '':
+                        assert xv.get("exclude","") == exclude
+                    elif len(xv.get("exclude","")) != 0:
+                        exclude = xv.get("exclude","")
+                    def get_motif(x, length):
+                        return get_base_middle(x, length, base=exclude)
+                else:
+                    def get_motif(x, length):
+                        return np.zeros(len(x["mean"][:-length + 1]), dtype=bool)
+
+                motif_to_exclude = get_motif(xv,length)
+                #print(len(motif_to_exclude),len(xv["mean"]))
+                signal, Tm, th, res, error = get_rescaled_signal(xv,
+                                                                 TransitionM=existing_transition,
+                                                                 filtered=False,
+                                                                  length=5,
+                                                                 Tm=motif_to_exclude,
+                                                                 extended=True)
+                if error:
+                    continue
+                xv["mean"] = signal
+
             x_t,y_t = transform_read(xv,yv,window_size=window_size,pad_size=pad_size)
             y_t /= 100
             DataX.append(x_t)
@@ -406,16 +466,26 @@ def load(file,per_read=False,pad_size=12,max_read=None,final_size=100,mixture=Fa
         return {"X": np.concatenate(DataX, axis=0), "y": np.concatenate(Datay, axis=0),"error":np.concatenate(Error,axis=0),"extra":Extra}
 
 
-def load_data(list_files,pad_size,max_read=None,final_size=100,mixture=False,mods=[]):
+def load_data(list_files,pad_size,max_read=None,final_size=100,mixture=False,
+              mods=[],existing_transition=None,exclude=''):
     X = []
     y = []
     error = []
     extra = []
     for file in list_files:
         print("Loading",file)
-        intermediary = load(file,pad_size=pad_size,max_read=max_read,final_size=final_size,mixture=mixture,mods=mods)
+        intermediary = load(file,pad_size=pad_size,
+                            max_read=max_read,final_size=final_size,
+                            mixture=mixture,mods=mods,
+                            existing_transition=existing_transition,
+                            exclude=exclude)
         X.append(intermediary["X"])
         y.append(intermediary["y"])
+        print("Mean y",np.mean(intermediary["y"],axis=0))
+        if np.any(np.isnan(intermediary["y"])):
+            print(np.sum(np.isnan(intermediary["y"])))
+            raise
+
         error.append(intermediary["error"])
         extra.append(intermediary["extra"])
 
@@ -431,9 +501,14 @@ def unison_shuffled_copies(a, b,error=None):
     else:
         return a[p], b[p],error[p]
 
-def load_percent(list_percent,pad_size=12,thres_error=0.045,max_read=None,final_size=100,mixture=False,mods=[]):
+def load_percent(list_percent,pad_size=12,thres_error=0.045,
+                 max_read=None,final_size=100,mixture=False,mods=[],
+                 existing_transition=None,exclude=''):
 
-    data  = load_data(list_percent,pad_size=pad_size,max_read=max_read,final_size=final_size,mixture=mixture,mods=mods)
+    data  = load_data(list_percent,pad_size=pad_size,max_read=max_read,
+                      final_size=final_size,mixture=mixture,mods=mods,
+                      existing_transition=existing_transition,
+                      exclude=exclude)
     X=data["X"]
     y=data["y"]
     error = data["error"]
@@ -460,6 +535,7 @@ if __name__ == "__main__":
     import argparse
     from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau, CSVLogger
     import os
+    from repnano.data.create_transition_matrix import load_directory_or_file_or_transitions
     np.random.seed(0)
 
     parser = argparse.ArgumentParser()
@@ -486,7 +562,7 @@ if __name__ == "__main__":
     parser.add_argument('--weigths',type=str)
     parser.add_argument('--mods', nargs='+',type=str ,default=[""])
     parser.add_argument('--epochs', type=int,default=100)
-
+    parser.add_argument('--transition_matrix', type=str,default=None)
 
 
 
@@ -504,6 +580,7 @@ if __name__ == "__main__":
                              batch_size=args.batch_size,nmod=len(args.mods))
 
     if args.weights:
+        """
         def loss_mixture_b(y_true,y_pred):
             return y_pred
 
@@ -511,11 +588,11 @@ if __name__ == "__main__":
         from tensorflow.keras.utils import get_custom_objects
 
         get_custom_objects().update({'loss_mixture_b': loss_mixture_b})
-
-        model_load = tf.keras.models.load_model(args.weights)
+        """
+        model = tf.keras.models.load_model(args.weights)
         #weights = model_load.get_weights()
-        model_load.save_weights("/tmp/weights.h5")
-        model.load_weights("/tmp/weights.h5",skip_mismatch=True,by_name=True)
+        #model_load.save_weights("/tmp/weights.h5")
+        #model.load_weights("/tmp/weights.h5",skip_mismatch=True,by_name=True)
 
 
 
@@ -523,9 +600,17 @@ if __name__ == "__main__":
     root_save = args.root_save +"/"
     pad_size = (model.input[0].shape[-2] - args.final_size)//2
     print(pad_size)
+    transition_matrix=None
+    if args.transition_matrix != None:
+        transition_matrix,_ = load_directory_or_file_or_transitions(args.transition_matrix)[0]
 
     X,y,sw,extra= load_percent(list_percent=[root_data+f"/{p}/percent.csv" for p in args.percents_training],
-                          pad_size=pad_size,max_read=args.max_len,final_size=args.final_size,mixture=args.mixture,mods=args.mods)
+                               pad_size=pad_size,
+                               max_read=args.max_len,
+                               final_size=args.final_size,
+                               mixture=args.mixture,
+                               mods=args.mods,
+                               existing_transition=transition_matrix)
     print("Mean not excluded",np.mean(sw))
     #exit()
 
@@ -555,6 +640,18 @@ if __name__ == "__main__":
 
     p,n = os.path.split(args.root_save)
     os.makedirs(p,exist_ok=True)
+    import tensorflow.keras.backend as K
+    from tensorflow.keras import callbacks as cb
+
+    class CleanCallback(cb.Callback):
+        def __init__(self):
+            pass
+        def on_epoch_end(self, epoch: int, logs=None):
+            # Analyze every 'n' epochs
+
+            # Housekeeping
+            gc.collect()
+            K.clear_session()
 
     checkpointer = ModelCheckpoint(
         filepath=root_save + 'weights.hdf5' ,
@@ -576,11 +673,12 @@ if __name__ == "__main__":
         callbacks = [checkpointer,
                      EarlyStopping(patience=10),
                      CSVLogger(root_save + 'log.csv'),
-                     ReduceLROnPlateau(patience=5)]
+                     ReduceLROnPlateau(patience=5) #,CleanCallback()
+                     ]
     else:
         callbacks = [checkpointer,
                      EarlyStopping(patience=3),
-                     CSVLogger(root_save + 'log.csv')]
+                     CSVLogger(root_save + 'log.csv') ]#,CleanCallback()]
 
     def truncv(v):
         return v
@@ -601,7 +699,7 @@ if __name__ == "__main__":
             raise "Nan in X"
 
 
-
+    """
     if args.weight:
         model.fit(X,target,
                   validation_data = (Xv,target_val,swv),
@@ -609,21 +707,28 @@ if __name__ == "__main__":
                   epochs=100,
                   callbacks=callbacks)
     else:
-        if args.mixture:
-            print(target[:100,3])
-            print(model.predict(X[:args.batch_size]))
-            loss_mixture(np.array(target[:args.batch_size],dtype=np.float32), model.predict(X[:args.batch_size]),
-                         batch_size=args.batch_size,mixture=define_mixture(50),plot="start.png")
+    """
+    if args.mixture:
+        print(target[:100,3])
+        print(model.predict(X[:args.batch_size]))
+        loss_mixture(np.array(target[:args.batch_size],dtype=np.float32), model.predict(X[:args.batch_size]),
+                     batch_size=args.batch_size,mixture=define_mixture(50),plot="start.png")
 
-        else:
-            pass
-            #print(len(target),target[:10],target.shape)
-
-        model.fit(truncv(X),truncv(target),
-                  validation_data = (truncv(Xv),truncv(target_val)),
-                  epochs=args.epochs,
-                  batch_size=args.batch_size,
-                  callbacks=callbacks)
+    else:
+        pass
+        #print(len(target),target[:10],target.shape)
+    """
+    for i in range(10):
+        if len(X) == 2:
+            print("x0",X[0][i][:3])
+            print("x1",X[1][i])
+            print("y",y[i])
+    """
+    model.fit(X,target,
+              validation_data = (truncv(Xv),truncv(target_val)),
+              epochs=args.epochs,
+              batch_size=args.batch_size,
+              callbacks=callbacks)
     if args.mixture:
         p = model.predict(X[:args.batch_size])
         for pred,ptrue in zip(p,target):
@@ -633,5 +738,3 @@ if __name__ == "__main__":
                              batch_size=args.batch_size,mixture=define_mixture(50),plot="end.png")
 
     #model.save("first_model")
-
-
