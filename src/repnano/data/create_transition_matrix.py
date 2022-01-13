@@ -43,9 +43,13 @@ def get_transition_matrix_ind(list_reads,
                               filtered=False, rescale=False,length=5,
                               norm=True,order=0,maxi=None):
 
+
     if maxi == None:
         average = np.sum([len(x["mean"]) for x in list_reads]) / 4 ** length
         maxi = int(15*average)
+        if maxi == 0:
+            #Probably a small sequence
+            maxi = 10*len(list_reads)
         print(f"Average number of point by monomer {average:.2}, setting maxi to: {maxi}")
     Ttd = [np.zeros(maxi,dtype=np.float16) for _ in range(4 ** length)]
     Plat = np.zeros((4 ** length))
@@ -77,7 +81,12 @@ def get_transition_matrix_ind(list_reads,
             Plat[i1] += isignal
 
             if order == 0:
-                if Np[i1]<maxi:
+                current_length=len(Ttd[i1])
+                if Np[i1]>=current_length:
+                    new = np.zeros(current_length*10,dtype=np.float16)
+                    new[:current_length]=Ttd[i1]
+                    Ttd[i1] = new
+                if Np[i1]<len(Ttd[i1]):
                     Ttd[i1][Np[i1]] = isignal
 
             if order == 1:
@@ -86,16 +95,17 @@ def get_transition_matrix_ind(list_reads,
             Np[i1] += 1
 
     #print(len(Plat),len(Ttd))
+
     Plat = Plat / Np
     Saturated = 0
     for k,v in d_trans.items():
-        Ttd[v] = Ttd[v][:min(Np[v],maxi-1)]
-        if Np[v]> maxi-1:
-            Saturated += 1
+        Ttd[v] = Ttd[v][:Np[v]]
+        #if Np[v]> maxi-1:
+        #    Saturated += 1
     print(f"Number of {length}-mer with more than {maxi} points: {Saturated}")
         #Plat[v] = np.median(Ttd[v])
     #Checking for nan or inf:
-    if np.any(np.isinf(Plat)) or np.any(np.isnan(Plat)):
+    if np.any(np.isinf(Plat[Np!=0])) or np.any(np.isnan(Plat[Np!=0])):
         raise "Probable saturation"
     return Plat, errors,Ttd
 
@@ -281,6 +291,7 @@ def load_dataset(files,maxf,exclude=None,min=200,chunk=None):
 
             Xrt, yrt, fnt, extra_e = val
 
+            #print(len(Xrt[0]))
 
             if len(Xrt) == 0:
                 Nempty_short += 1
@@ -288,7 +299,8 @@ def load_dataset(files,maxf,exclude=None,min=200,chunk=None):
                 continue
             else:
                 read = Xrt[0]
-                if exclude is not None:
+                #print(read)
+                if exclude not in [0,None]:
                     read["mean"] = read["mean"][exclude:-exclude]
                     read["bases"] = read["bases"][exclude:-exclude]
 
@@ -296,7 +308,9 @@ def load_dataset(files,maxf,exclude=None,min=200,chunk=None):
                 read["meta"] = extra_e[0][1]
                 read["meta"]["id"] = fnt[0]
                 if chunk is None:
+                    #print("La")
                     reads.append(read)
+                    #print(len(read["mean"]))
                 else:
                     for split in range(len(read["mean"])//chunk + 1):
                         nread = {}
@@ -320,6 +334,8 @@ def load_dataset(files,maxf,exclude=None,min=200,chunk=None):
         if maxf is not None and len(reads) > maxf:
             break
     print("Nsequences",len(reads))
+    print("Empty or too short",Nempty_short)
+    print("Average length",np.mean([len(x["mean"]) for x in reads]))
     return reads
 
 def sort_by_delta_mean(TT,TB,length):
@@ -415,8 +431,9 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-
+    #print("Ref dataset")
     load_ref,allready_computed_ref = load_directory_or_file_or_transitions(args.ref)
+    #print("Compare dataset")
     load_compare,allready_computed_compare = load_directory_or_file_or_transitions(args.compare)
 
     if not allready_computed_ref:
@@ -424,7 +441,7 @@ if __name__ == "__main__":
     else:
         ref_mean,ref_distribution  = load_ref
     if not allready_computed_compare:
-        if args.compare is None and not args.create_only:
+        if args.compare is None and args.create_only:
             #print("CHang")
             indexes  = np.array(np.arange(len(data_0)),dtype=np.int)
             np.random.shuffle(indexes)
@@ -531,12 +548,3 @@ if __name__ == "__main__":
         np.save(name, compare_mean)
         with open(f"{root_name}compare_distribution.pick","wb") as f:
             pickle.dump(compare_distribution,f)
-
-
-
-
-
-
-
-
-
