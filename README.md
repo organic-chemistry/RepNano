@@ -32,8 +32,8 @@ For compressed fast5 it is now necessary to install vbz from here:
 https://github.com/nanoporetech/vbz_compression/releases
 once extracted, create the repertory and move the plugin there:
 ```sh
-mkdir -p place_where_conda_is_located/.conda/envs/tomboenv38/lib/hdf5/plugin/
-cp ont-vbz-hdf-plugin-1.0.1-Linux/usr/local/hdf5/lib/plugin/libvbz_hdf_plugin.so lace_where_conda_is_located/.conda/envs/tomboenv38/lib/hdf5/plugin/
+mkdir -p place_where_conda_is_located/.conda/envs/tomboenv/lib/hdf5/plugin/
+cp ont-vbz-hdf-plugin-1.0.1-Linux/usr/local/hdf5/lib/plugin/libvbz_hdf_plugin.so place_where_conda_is_located/.conda/envs/tomboenv/lib/hdf5/plugin/
 ```
 
 Usage (on fast5 file that contains 4000 reads, 2019 and later)
